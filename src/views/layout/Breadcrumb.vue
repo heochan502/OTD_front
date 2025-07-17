@@ -1,3 +1,4 @@
+
 <template>
   <!-- 상단바 컴포넌트 -->
   <header class="breadcrumb">
@@ -12,22 +13,22 @@
       </div>
 
       <!-- 가운데 메뉴 -->
-      <nav class="nav">
-        <a href="#">홈</a>
-        <a href="#">리마인더</a>
-        <a href="#">루틴</a>
-        <a href="#">식단</a>
-        <a href="#">건강</a>
-        <a href="#">일기</a>
-        <a href="#">위치</a>
-        <a href="#">커뮤니티</a>
-      </nav>
+  <nav class="nav">
+    <router-link to="/">홈</router-link>
+    <router-link to="/reminder">리마인더</router-link>
+    <router-link to="/routine">루틴</router-link>
+    <router-link to="/diet">식단</router-link>
+    <router-link to="/health">건강</router-link>
+    <router-link to="/memo">일기</router-link>
+    <router-link to="/location">위치</router-link>
+    <router-link to="/community">커뮤니티</router-link>
+  </nav>
 
       <!-- 오른쪽 로그인 -->
-      <div class="auth">
-        <a href="#">로그인</a>
-        <a href="#">회원가입</a>
-      </div>
+  <div class="auth">
+    <router-link to="/login">로그인</router-link>
+    <router-link to="/signup">회원가입</router-link>
+  </div>
     </div>
   </header>
 </template>

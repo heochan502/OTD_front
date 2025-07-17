@@ -71,7 +71,7 @@ const handleImageChange = async (e) => {
     const file = files[i];
     const maxSizeInBytes = 5 * 2048 * 2048; // 5MB
     if (file && file.size > maxSizeInBytes) {
-      alert(`파일 "${file.name}"의 크기(${formatBytes(file.size)})가 5MB를 초과하여 업로드할 수 없습니다.)`);
+      alert(`파일 "${file.name}"의 크기(${formatBytes(file.size)})가 5MB를 초과하여 업로드할 수 없습니다.`);
       continue;
     }
     validFiles.push(file);
@@ -110,9 +110,9 @@ const handleImageChange = async (e) => {
 
 const removeImage = (index) => {
   showImages.value.splice(index, 1);
-  if(state.memo.image === showImages.value[index]) {
-     state.mamo.image = '';
-  }
+if (state.memo.image === showImages.value[index]) {
+  state.memo.image = '';
+}
 };
 
 const formatBytes = (bytes, decimals = 2) => {
@@ -126,6 +126,18 @@ const formatBytes = (bytes, decimals = 2) => {
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+const fileTypeCheck = (obj) => {
+  const fileName = obj.value;
+  const fileExtension = fileName.substring(fineName.lastIndexOf('.') + 1).toLowerCase();
+  const allowed = ['jpg', 'jpeg', 'png', 'gif'];
+  if(!allowed.includes(fileExtension)) {
+    allowed('jpg, jpeg, png, gif 형식의 파일만 등록 가능합니다.');
+    obj.value = '';
+    return false;
+  }
+  return true;
+};
 
 </script>
 
@@ -141,7 +153,9 @@ const formatBytes = (bytes, decimals = 2) => {
       </div>
       <div class="mb-3">
         <label>이미지 업로드 (최대 5장)</label>
-        <input type="file" multiple class="form-control" @change="handleImageChange" />
+        <input type="file" name="imageUpload"
+               accept=".jpg, .png, .jpeg, .gif"
+               class="form-control" @change="handleImageChange" />
         <div class="preview-list">
       <div v-for="(img, index) in showImages" :key="index" class="preview">
         <img :src="img" />
@@ -150,10 +164,10 @@ const formatBytes = (bytes, decimals = 2) => {
     </div>
       <div class="mb-3" v-if="state.memo.createdAt">
         <strong>등록일시:</strong> {{ state.memo.createdAt }}</div>
-      <button class="btn btn-primary w-100 py-3 mt-4" style="border: none;" @click="save">
+      <button class="btn btn-primary w-10 py-3 mt-4" style="border: none;" @click="save">
         {{ isUpdateMode ? "수정 완료" : "등록" }}</button>
   
-      <button v-if="isUpdateMode" class="btn btn-danger w-100 py-3 mt-3"
+      <button v-if="isUpdateMode" class="btn btn-danger w-10 py-3 mt-3"
         @click="remove">삭제</button>
     </div>
   </template>

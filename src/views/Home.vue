@@ -37,9 +37,9 @@ const remove = async id => {
 
 <template>
   <div class="memo-list">
-  <router-link to="/otd/memo/add" class="add btn btn-primary pb-3 mb-3 w-100">
+  <router-link to="/otd/memo/add" class="add btn btn-primary pb-3 mb-3 w-10">
   + 메모 추가 </router-link>
-  <router-link to="/otd/diary/add" class="add btn btn-primary pb-3 mb-3 w-100">
+  <router-link to="/otd/diary/add" class="add btn btn-primary pb-3 mb-3 w-10">
   + 다이어리 쓰기 </router-link>
     <div class="mb-3 mt-3 d-flex">
         <input type="text" id="title" class="form-control p-3 me-3"
@@ -50,7 +50,7 @@ const remove = async id => {
     <router-link v-for="m in state.otd" :to="`/otd/${m.id}`"
                  class="item" :key="m.id">
       <div class="d-flex pt-3">
-        <div class="pb-3 mb-0 w-100">
+        <div class="pb-3 mb-0 w-10">
           <div class="d-flex justify-content-between">
             <b>{{ m.title }}</b>
             <div>
@@ -70,8 +70,8 @@ const remove = async id => {
 }
   ::v-deep(.item) {
     background-color: #f8f9fa;
-    border: 1px solid #eee;
-    display: block;
+    border: 5px solid #eee;
+    display: flex;
     color: #000;
     text-decoration: none;
     padding: 20px 30px;
@@ -85,12 +85,22 @@ const remove = async id => {
   }
 
 .add {
-  background-color: skyblue;
+  background-color: #4fc3f7;
   color: #313131;
   font-weight: 700;
-  display: block;
+  display: inline-block;
+  width: 180px;
+  height: 60px;
   padding: 25px;
-  border: 1px solid #eee;
+  margin-top: 1rem;
   margin-bottom: 1rem;
+  margin-right: 20px;
+  margin-left: 10px;
+  line-height: 10px;
+
+  &:hover {
+  background-color: #29b6f6;
+  cursor: pointer;
+  }
 }
 </style>

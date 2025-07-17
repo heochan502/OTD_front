@@ -3,7 +3,7 @@
   <div class="layout">
     <Breadcrumb />
     <Content />
-  </div>
+</div>
 </template>
 
 <script setup>
