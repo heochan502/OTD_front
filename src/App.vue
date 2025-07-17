@@ -1,11 +1,16 @@
-<script setup>
-</script>
-
 <template>
- 
-<h1>project OTD 시작이다 !!</h1>
-
+  <div class="layout">
+    <Layout />
+  </div>
 </template>
 
-<script>
+<script setup>
+import Layout from './views/layout/Layout.vue';
 </script>
+
+<style scoped>
+.layout {
+  width: 100%;
+  min-height: 100vh;
+}
+</style>
