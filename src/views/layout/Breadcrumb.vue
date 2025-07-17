@@ -16,8 +16,8 @@
       <!-- 가운데 메뉴 -->
       <nav class="nav">
         <a href="#">홈</a>
-        <a href="#">리마인더</a>
-        <a href="#">루틴</a>
+        <router-link to="/reminder" href="#">리마인더</router-link>
+        <router-link to="/routine" href="#">루틴</router-link>
         <a href="#">식단</a>
         <a href="#">건강</a>
         <a href="#">일기</a>
