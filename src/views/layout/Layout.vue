@@ -1,3 +1,8 @@
+<script setup>
+import Breadcrumb from './Breadcrumb.vue';
+import Content from './Content.vue';
+</script>
+
 <template>
   <!-- 레이아웃을 통일해서 재사용할 컴포넌트 -->
   <div class="layout">
@@ -5,11 +10,6 @@
     <Content />
   </div>
 </template>
-
-<script setup>
-import Breadcrumb from './Breadcrumb.vue';
-import Content from './Content.vue';
-</script>
 
 <style scoped>
 .layout {

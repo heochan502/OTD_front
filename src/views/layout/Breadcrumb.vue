@@ -1,3 +1,5 @@
+<script setup></script>
+
 <template>
   <!-- 상단바 컴포넌트 -->
   <header class="breadcrumb">
@@ -20,7 +22,7 @@
         <a href="#">건강</a>
         <a href="#">일기</a>
         <a href="#">위치</a>
-        <a href="#">커뮤니티</a>
+        <router-link to="/community" href="#">커뮤니티</router-link>
       </nav>
 
       <!-- 오른쪽 로그인 -->
@@ -31,8 +33,6 @@
     </div>
   </header>
 </template>
-
-<script setup></script>
 
 <style scoped>
 .breadcrumb {
