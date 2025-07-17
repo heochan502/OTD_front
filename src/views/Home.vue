@@ -41,12 +41,6 @@ const remove = async id => {
   + 메모 추가 </router-link>
   <router-link to="/otd/diary/add" class="add btn btn-primary pb-3 mb-3 w-10">
   + 다이어리 쓰기 </router-link>
-    <div class="mb-3 mt-3 d-flex">
-        <input type="text" id="title" class="form-control p-3 me-3"
-               placeholder = "검색 키워드" v-model="model.searchText"
-               @keyup.enter="search" />
-        <button class="btn bg-black btn-primary" style="border: none;" @click="search">검색</button>
-    </div>
     <router-link v-for="m in state.otd" :to="`/otd/${m.id}`"
                  class="item" :key="m.id">
       <div class="d-flex pt-3">
