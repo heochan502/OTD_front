@@ -1,13 +1,13 @@
-<script setup>
-
-</script>
+<script setup></script>
 
 <template>
   <div>
-    <div class="calendar"></div>
+    <div>
+      <v-calendar> </v-calendar>
+    </div>
     <div class="reminder">
       <div class="btn">
-        <router-link to="/add">일정 추가하기</router-link>
+        <router-link to="/reminderadd">일정 추가하기</router-link>
       </div>
       <div class="list">
         <div>
@@ -15,7 +15,7 @@
             <b>오늘의 일정</b>
           </div>
           <div class="date">
-            <span>{{  }}년 {{  }}월 {{  }}일</span>
+            <span>{{}}년 {{}}월 {{}}일</span>
           </div>
         </div>
       </div>
@@ -23,6 +23,4 @@
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
