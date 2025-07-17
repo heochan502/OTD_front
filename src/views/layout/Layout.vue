@@ -4,16 +4,27 @@ import Content from './Content.vue';
 </script>
 
 <template>
-  <!-- 레이아웃을 통일해서 재사용할 컴포넌트 -->
+  <!-- 레이아웃을 통일해서 재사용할 컴포넌트를 보여줌 -->
   <div class="layout">
-    <Breadcrumb />
-    <Content />
+    <!-- 스크롤시 상단바가 화면에 딸려 내려오는 기능 구현할 예정 -->
+    <header class="headerlayout">
+      <Breadcrumb />
+    </header>
+    <main class="contentlayout">
+      <Content />
+    </main>
   </div>
 </template>
 
 <style scoped>
-.layout {
-  min-width: 100vh;
+.headerlayout {
+  min-width: 100vw;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+.contentlayout {
+  min-width: 100vw;
   min-height: 100vh;
   background-color: white;
   display: flex;

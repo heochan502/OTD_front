@@ -1,11 +1,19 @@
-<script setup></script>
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+function goHome() {
+  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
+}
+</script>
 
 <template>
   <!-- 상단바 컴포넌트 -->
   <header class="breadcrumb">
     <div class="inner">
       <!-- 왼쪽 로고 -->
-      <div class="logo">
+      <div class="logo" @click="goHome" style="cursor: pointer">
         <div>
           <span class="logo-one">One</span>
           <span class="logo-today">ToDay</span>
