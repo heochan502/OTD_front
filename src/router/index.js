@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import Community from '@/views/community/Communityview.vue';
+import CommunityList from '@/components/community/CommunityList.vue';
+import ReminderHome from '@/components/reminder/ReminderHome.vue';
+import RoutineHome from '@/components/routine/RoutineHome.vue';
+import ReminderForm from '@/components/reminder/ReminderForm.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,7 +16,22 @@ const router = createRouter({
     {
       path: '/community',
       name: 'community',
-      component: Community,
+      component: CommunityList,
+    },
+    {
+      path: '/reminder',
+      name: 'reminder',
+      component: ReminderHome,
+    },
+    {
+      path: '/routine',
+      name: 'routine',
+      component: RoutineHome,
+    },
+    {
+      path: '/reminderadd',
+      name: 'reminderadd',
+      component: ReminderForm,
     },
   ],
 });
