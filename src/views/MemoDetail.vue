@@ -142,42 +142,61 @@ const fileTypeCheck = (obj) => {
 </script>
 
 <template>
-    <div class="memo-detail mb-3">
-      <div class="mb-3"> <label>제목</label>
-        <input type="text" class="form-control" v-model="state.memo.title" />
+    <div class="memo-detail-container">
+      <h2 class="page-title">{{ isUpdateMode ? "메모 수정" : "새 메모 작성" }}</h2>
+
+      <div class="input-section">
+      <label for="memoTitle">제목</label>
+        <input type="text" id="memoTitle" class="form-control" v-model="state.memo.title" />
       </div>
-      <div class="mb-3">
-      <label>내용</label>
-      <textarea class="form-control" rows="5" v-model="state.memo.content"></textarea>
+
+      <div class="input-section">
+      <label for="memoContent">내용</label>
+      <textarea id="memoContent" class="form-control" rows="8" v-model="state.memo.content"></textarea>
       </div>
-      </div>
-      <div class="mb-3">
-        <label>이미지 업로드 (최대 5장)</label>
-        <input type="file" name="imageUpload"
+
+      <div class="input-section">
+        <label for ="memoImageUpload">이미지 업로드 (최대 5장)</label>
+        <input type="file" id="memoImageUpload" name="imageUpload"
                accept=".jpg, .png, .jpeg, .gif"
-               class="form-control" @change="handleImageChange" />
+               class="form-control" @change="handleImageChange" multiple />
         <div class="preview-list">
-      <div v-for="(img, index) in showImages" :key="index" class="preview">
-        <img :src="img" />
+      <div v-for="(img, index) in showImages" :key="index" class="preview-item">
+        <img :src="img" alt="미리보기 이미지" />
         <button class="remove-btn" @click="removeImage(index)">X</button>
       </div>
     </div>
-      <div class="mb-3" v-if="state.memo.createdAt">
+  </div>
+
+      <div class="info-section" v-if="state.memo.createdAt">
         <strong>등록일시:</strong> {{ state.memo.createdAt }}</div>
-      <button class="btn btn-primary w-10 py-3 mt-4" style="border: none;" @click="save">
+      <button class="btn btn-primary" @click="save">
         {{ isUpdateMode ? "수정 완료" : "등록" }}</button>
   
-      <button v-if="isUpdateMode" class="btn btn-danger w-10 py-3 mt-3"
+      <button v-if="isUpdateMode" class="btn btn-danger"
         @click="remove">삭제</button>
     </div>
   </template>
   
   <style scoped>
   
-  .mb-3 {
-    margin-bottom: 1rem;
-    font-weight: 400;
+  .memo-detail-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
+
+  .page-title {
+    font-size: 2.2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    text-wrap: 700;
+}
+
   .btn {
     background-color: skyblue;
     color: black;

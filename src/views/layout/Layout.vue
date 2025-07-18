@@ -12,8 +12,17 @@ import Content from './Content.vue';
 </script>
 
 <style scoped>
-.layout {
-  min-width: 100vh;
+.headerlayout {
+  min-width: 90vw;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.contentlayout {
+  min-width: 100vw;
   min-height: 100vh;
   background-color: white;
   display: flex;

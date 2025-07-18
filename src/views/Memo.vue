@@ -66,11 +66,17 @@ const procSubmit = async () => {
       <textarea id="image" class="form-control p-3"
              v-model="state.memo.image"></textarea>
     </div>
-    <button type="submit" class="btn bg-black btn-primary w-100 py-3">
+    <button type="submit" class="btn bg-black btn-primary w-20 py-3" style="border: none;">
       {{ state.memo.id > 0 ? "수정" : "저장" }}
     </button>
   </form>
 </template>
 
 <style scoped>
+.mb-3 {
+color: black;
+font-weight: bold;
+margin-left: 10px;
+margin-right: 10px;
+}
 </style>

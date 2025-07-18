@@ -4,7 +4,7 @@
   <header class="breadcrumb">
     <div class="inner">
       <!-- 왼쪽 로고 -->
-      <div class="logo">
+      <div class="logo" @click="goHome" style="cursor: pointer">
         <div>
           <span class="logo-one">One</span>
           <span class="logo-today">ToDay</span>
@@ -14,7 +14,7 @@
 
       <!-- 가운데 메뉴 -->
   <nav class="nav">
-    <router-link to="/home">홈</router-link>
+    <router-link to="/">홈</router-link>
     <a href="#">리마인더</a>
     <a href="#">루틴</a>
     <a href="#">식단</a>
@@ -38,6 +38,7 @@
 <style scoped>
 .breadcrumb {
   width: 100%;
+  margin: 0;
   border-bottom: 1px solid #ddd;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -60,20 +61,20 @@
 }
 
 .logo-one {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   color: #555;
 }
 
 .logo-today {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 10px;
+  font-size: 15px;
   color: #999;
   margin-top: -2px;
 }
@@ -82,7 +83,7 @@
   padding: 0 60px 0 120px;
   display: flex;
   gap: 20px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #222;
 }
@@ -94,7 +95,7 @@
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14px;
   color: #444;
 }
 </style>
