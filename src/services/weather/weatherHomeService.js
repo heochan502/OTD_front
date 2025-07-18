@@ -1,9 +1,5 @@
-import axios from '@/services/httpRequester';
+import axios from '@/services/weather/weatherRequester';
 
-export const getUltraSrtFcst = (baseDate, baseTime, nx, ny) => {
-  return axios
-    .get('/weather/ultra_srt_fcst', {
-      params: { baseDate, baseTime, nx, ny },
-    })
-    .catch((e) => e.response);
+export const getLocalName = () => {
+  return axios.get('/weather').catch((e) => e.response);
 };

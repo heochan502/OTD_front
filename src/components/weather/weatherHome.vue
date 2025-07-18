@@ -1,58 +1,57 @@
 <script setup>
-import { reactive, onMounted } from 'vue';
-import { getUltraSrtFcst } from '@/services/weather/weatherHomeService';
+import { ref, onMounted, reactive, computed } from 'vue';
+import { getLocalName } from '@/services/weather/weatherHomeService';
 
 const state = reactive({
   items: [],
 });
 
-onMounted(async () => {
-  try {
-    const baseDate = '20250717';
-    const baseTime = '1400';
-    const nx = 60;
-    const ny = 127;
-
-    const response = await getUltraSrtFcst(baseDate, baseTime, nx, ny);
-
-    // 응답 성공 시
-    weatherData.value = response.data;
-  } catch (e) {
-    error.value = e;
-    console.error('API 호출 실패:', e);
+const searchText = ref('');
+const showList = ref(false);
+// 검색어에 맞는 항목만 필터링
+const filterItems = computed(() => {
+  if (!searchText.value) {
+    return alert('지역명을 입력하세요');
   }
+  return state.items.filter((item) =>
+    (item.city + item.county + item.town).includes(searchText.value)
+  );
 });
 
-// onMounted(async () => {
-//   const res = await getUltraSrtFcst();
-//   state.items = res.data;
-//   console.log('state.items : ', state.items);
-// });
+onMounted(async () => {
+  const res = await getLocalName();
+  console.log(res.data);
+  state.items = res.data;
+});
 </script>
 
 <template>
-  <div class="summary">
-    <span>날씨 자세히 보기</span>
-    <p>날씨 한줄 요약</p>
+  <div class="container">
+    <div class="mb-3 mt-3 d-flex">
+      <input
+        v-model="searchText"
+        type="text"
+        placeholder="시 / 구 / 동을 입력하세요"
+        class="form-control mb-3"
+        keyup.enter="showList"
+      />
+      <button @click="showList = true" class="btn btn-primary mb-3">
+        검색
+      </button>
+    </div>
   </div>
-  <div class="weather">
-    <li v-for="(item, i) in items" :key="i">
-      {{ item.category }} ({{ categoryMap[item.category] }}):
-      {{ item.obsrValue }}
-    </li>
-    날씨 화면
+  <div class="row d-flex" v-if="showList">
+    <button class="col" v-for="item in filterItems" :key="item.id">
+      {{ item.city }} {{ item.county }} {{ item.town }}
+    </button>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.summary {
-  font-size: 30px;
-  justify-content: space-around;
-  display: flex;
-  color: black;
-}
-.weather {
-  color: black;
-  border: 1px solid black;
+.row {
+  flex-direction: column;
+  button {
+    color: black;
+  }
 }
 </style>
