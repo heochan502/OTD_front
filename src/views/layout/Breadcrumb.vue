@@ -1,11 +1,19 @@
 <script setup>
 import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/stores/counter';
 
 const router = useRouter();
+const counter = useAccountStore();
+
 
 function goHome() {
   router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
 }
+
+const logoutAccount = async () => {
+  alert('준비중!');
+}
+
 </script>
 
 <template>
@@ -35,8 +43,14 @@ function goHome() {
 
       <!-- 오른쪽 로그인 -->
       <div class="auth">
-        <a href="/login">로그인</a>
-        <a href="/signup">회원가입</a>
+        <template v-if="false">
+          <a href="/login">로그인</a>
+          <a href="/signup">회원가입</a>
+        </template>
+        <template v-else>
+          <a @click="logoutAccount">로그아웃</a>
+          <router-link to="/profile">회원정보</router-link>
+        </template>
       </div>
     </div>
   </header>
