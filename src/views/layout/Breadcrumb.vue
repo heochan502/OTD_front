@@ -10,7 +10,7 @@ function goHome() {
 
 <template>
   <!-- 상단바 컴포넌트 -->
-  <header class="breadcrumb">
+  <div class="breadcrumb">
     <div class="inner">
       <!-- 왼쪽 로고 -->
       <div class="logo" @click="goHome" style="cursor: pointer">
@@ -26,7 +26,7 @@ function goHome() {
         <a href="#">홈</a>
         <router-link to="/reminder" href="#">리마인더</router-link>
         <router-link to="/routine" href="#">루틴</router-link>
-        <a href="#">식단</a>
+        <router-link to="/meal" href="#">식단</router-link>
         <a href="#">건강</a>
         <a href="#">일기</a>
         <a href="#">위치</a>
@@ -39,12 +39,13 @@ function goHome() {
         <a href="#">회원가입</a>
       </div>
     </div>
-  </header>
+  </div>
 </template>
 
 <style scoped>
 .breadcrumb {
   width: 100%;
+  margin: 0;
   border-bottom: 1px solid #ddd;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -67,20 +68,20 @@ function goHome() {
 }
 
 .logo-one {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   color: #555;
 }
 
 .logo-today {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 10px;
+  font-size: 15px;
   color: #999;
   margin-top: -2px;
 }
@@ -89,7 +90,7 @@ function goHome() {
   padding: 0 60px 0 120px;
   display: flex;
   gap: 20px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #222;
 }
@@ -101,7 +102,7 @@ function goHome() {
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14px;
   color: #444;
 }
 </style>

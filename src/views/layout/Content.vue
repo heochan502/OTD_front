@@ -16,7 +16,7 @@
   min-width: 100vh;
   min-height: 100vh;
   flex: 1;
-  padding: 40px 32px;
+  padding: 30px 32px;
   background-color: #f5f5f5;
   display: flex;
   justify-content: center;
