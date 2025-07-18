@@ -35,8 +35,8 @@ function goHome() {
 
       <!-- 오른쪽 로그인 -->
       <div class="auth">
-        <a href="#">로그인</a>
-        <a href="#">회원가입</a>
+        <a href="/login">로그인</a>
+        <a href="/signup">회원가입</a>
       </div>
     </div>
   </header>
