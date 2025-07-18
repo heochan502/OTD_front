@@ -1,10 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 function goHome() {
-  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
+  router.push({ name: "home" }); // 라우트에 name 설정이 되어 있어야 함
 }
 </script>
 
@@ -27,7 +27,7 @@ function goHome() {
         <router-link to="/reminder" href="#">리마인더</router-link>
         <router-link to="/routine" href="#">루틴</router-link>
         <router-link to="/meal" href="#">식단</router-link>
-        <a href="#">건강</a>
+        <router-link to="/health" href="#">건강</router-link>
         <a href="#">일기</a>
         <a href="#">위치</a>
         <router-link to="/community" href="#">커뮤니티</router-link>
