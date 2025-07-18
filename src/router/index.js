@@ -6,6 +6,8 @@ import RoutineHome from "@/components/routine/RoutineHome.vue";
 import ReminderForm from "@/components/reminder/ReminderForm.vue";
 import MealForm from "@/components/meal/MealForm.vue";
 import HealthMain from "@/components/health/HealthMain.vue";
+import ElogDetail from "@/components/health/ElogDetail.vue";
+import ElogForm from "@/components/health/ElogForm.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +46,16 @@ const router = createRouter({
       path: "/health",
       name: "healthMain",
       component: HealthMain,
+    },
+    {
+      path: "/elog/:exerciselog_id",
+      name: "ElogDetail",
+      component: ElogDetail,
+    },
+    {
+      path: "/elog/add",
+      name: "ElogForm",
+      component: ElogForm,
     },
   ],
 });

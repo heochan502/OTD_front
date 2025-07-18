@@ -1,4 +1,7 @@
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+const tab = ref("null");
+</script>
 
 <template>
   <!-- 레이아웃 -->
@@ -7,9 +10,28 @@
       <!-- 상단 -->
       <div class="main_top">
         <!-- 리포트영역 -->
-        <div class="report">
-          <div>운동리포트</div>
-          <div>건강리포트</div>
+        <div class="report justify-center">
+          <v-card class="card">
+            <v-tabs
+              v-model="tab"
+              bg-color="#3BBEFF"
+              color="#fff"
+              class="justify-center"
+            >
+              <v-tab value="one">운동 리포트</v-tab>
+              <v-tab value="two">건강 리포트</v-tab>
+            </v-tabs>
+            <v-card-text>
+              <v-tabs-window v-model="tab">
+                <v-tabs-window-item value="one">
+                  운동리포트 내용
+                </v-tabs-window-item>
+                <v-tabs-window-item value="two">
+                  건강리포트 내용
+                </v-tabs-window-item>
+              </v-tabs-window>
+            </v-card-text>
+          </v-card>
         </div>
         <!-- 달력영역 -->
         <div>달력</div>
@@ -25,6 +47,7 @@
             ></router-link>
           </div>
           <div class="health_list_log">운동기록 리스트</div>
+          <router-link to="/elog/1">운동기록상세보기 임시</router-link>
         </div>
         <!-- 건강기록목록 -->
         <div class="log_list">
@@ -42,12 +65,16 @@
 </template>
 
 <style lang="scss" scoped>
+.container {
+  padding: 50px 50px 30px;
+}
 .main_top {
   display: flex;
   justify-content: space-between;
 
-  .report {
-    display: flex;
+  .card {
+    justify-content: center;
+    width: 380px;
   }
 }
 .main_bottom {
