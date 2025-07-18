@@ -18,7 +18,7 @@ import Content from './Content.vue';
 
 <style scoped>
 .headerlayout {
-  min-width: 100vw;
+  min-width: 90vw;
   background-color: white;
   display: flex;
   flex-direction: column;
