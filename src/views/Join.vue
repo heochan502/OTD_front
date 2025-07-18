@@ -16,12 +16,14 @@ const state = reactive({
     }
 });
 const submit = async () => {
-  const res = await join(state.form);
-  console.log('res:', res);
-  if (res.status === 200) {
-    alert('회원가입을 축하합니다.');
-    await router.push('/');
-  }
+    const res = await join(state.form);
+    if (res.status === 200) {
+      alert('회원가입을 축하합니다.');
+      await router.push('/');
+    } else {
+      alert(`회원가입 실패: ${res.data?.message || '서버 오류'}`);
+    }
+  
 };
 </script>
 
@@ -34,8 +36,8 @@ const submit = async () => {
           <input
             type="text"
             class="form-control"
-            id="name"
-            placeholder="이름을 입력해 주세요"
+            id="memberId"
+            placeholder="아이디를 입력해 주세요"
             v-model="state.form.memberId" />
           <label for="memberId">아이디</label>
         </div>
@@ -48,16 +50,6 @@ const submit = async () => {
             v-model="state.form.memberPw"
             autocomplete="off" />
           <label for="loginPw">비밀번호</label>
-        </div>
-        <div class="form-floating">
-          <input
-            type="password"
-            class="form-control"
-            id="memberPwCheck"
-            placeholder="비밀번호를 한번더 확인해주세요"
-            v-model="state.form.memberPw"
-            autocomplete="off" />
-          <label for="memberPwCheck">비밀번호 확인</label>
         </div>
         <div class="form-floating">
           <input
@@ -95,8 +87,6 @@ const submit = async () => {
             v-model="state.form.memberNick" />
           <label for="memberNick">닉네임</label>
         </div>
-
-   
         <button class="w-100 h6 btn py-3 btn-primary">회원가입</button>
       </form>
     </div>

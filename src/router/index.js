@@ -5,7 +5,7 @@ import ReminderHome from '@/components/reminder/ReminderHome.vue';
 import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/components/reminder/ReminderForm.vue';
 import Join from '@/views/Join.vue';
-
+import Login from '@/views/login.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -38,6 +38,11 @@ const router = createRouter({
       path: '/signup',
       name: 'join',
       component: Join,
+    }, 
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
     },
   ],
 });
