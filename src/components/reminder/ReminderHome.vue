@@ -107,59 +107,77 @@ const todayColor = (dayOfMonth) => {
 </script>
 
 <template>
-  <div class="calendar">
-    <h2 class="year_month">
-      <a href="#" @click.prevent="prevMonth"
-        ><img src="/src/image/button.png" alt="이전 달 보기"
-      /></a>
-      {{ currentYear }}년 {{ currentMonth }}월
-      <a href="#" @click.prevent="nextMonth"
-        ><img src="/src/image/button.png" alt="다음 달 보기"
-      /></a>
-    </h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <td v-for="dayOfWeek in dayOfWeek">
-            {{ dayOfWeek }}
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="rowOfMonth in calendarMatrix">
-          <td
-            v-for="dayOfMonth in rowOfMonth"
-            :class="{ today_color: todayColor(dayOfMonth) }"
-          >
-            {{ dayOfMonth }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div>
-    <div><button>일정 추가하기</button></div>
-    <div>
-      <p>오늘의 일정</p>
-      <p>{{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</p>
+  <div class="reminder">
+    <div class="calendar">
+      <h2 class="calendar_title">
+        <a href="#" @click.prevent="prevMonth"
+          ><img src="/src/image/button.png" alt="이전 달 보기"
+        /></a>
+        {{ currentYear }}년 {{ currentMonth }}월
+        <a href="#" @click.prevent="nextMonth"
+          ><img src="/src/image/button.png" alt="다음 달 보기"
+        /></a>
+      </h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <td v-for="dayOfWeek in dayOfWeek">
+              {{ dayOfWeek }}
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="rowOfMonth in calendarMatrix">
+            <td
+              v-for="dayOfMonth in rowOfMonth"
+              :class="{ today_color: todayColor(dayOfMonth) }"
+              class="day"
+            >
+              {{ dayOfMonth }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div>
-      <!-- 일정리스트 -->
+    <div class="list">
+      <div><router-link to="/reminderadd">일정 추가하기</router-link></div>
+      <div>
+        <span class="list_title">오늘의 일정</span>
+        <br />
+        <span class="list_date"
+          >{{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+        >
+      </div>
+      <div>
+        <!-- 일정리스트 -->
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.calendar {
-  width: 500px;
-  .year_month {
-    a > img {
-      width: 25px;
+.reminder {
+  display: flex;
+  gap: 30px;
+  .calendar {
+    width: 500px;
+    .calendar_title {
+      a > img {
+        width: 25px;
+      }
     }
-  }
-  .table {
-    .today_color {
-      color: steelblue;
+    .table {
+      td {
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: none;
+      }
+      .today_color {
+        color: steelblue;
+      }
+      td {
+        height: 70px;
+      }
     }
   }
 }
