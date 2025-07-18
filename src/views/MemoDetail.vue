@@ -19,6 +19,30 @@ const state = reactive({
 const isUpdateMode = route.params.id !== undefined;
 const showImages = ref([]);
 
+const alertModal = reactive({
+  show: false,
+  message: ''
+});
+
+const confirmModal = reactive({
+  show: false,
+  message: '',
+  resolve: null
+});
+
+const showAlert = (message) => {
+  alertModal.message = message;
+  alertModal.show = true;
+};
+
+const showConfirm = (message) => {
+  confirmModal.message = message;
+  confirmModal.show = true;
+  return new Promise(resolve => {
+    confirmModal.resolve = resolve;
+  });
+};
+
 onMounted( async () => {
     if (isUpdateMode) {
     const id = route.params.id;
@@ -31,32 +55,47 @@ onMounted( async () => {
 });
 
 const save = async() => {
-    const savePayload = {
-        title: state.memo.title,
-        content: state.memo.content,
-        image: state.memo.image,
+  const formData = new FormData();
+  formData.append('req', new Blob([JSON.stringify({
+    title: state.memo.title,
+    content: state.memo.content,
+  })], { type: 'application/json' }), 'memoData.json');
+
+  const fileInput = document.querySelector('input[type="file"]');
+  if (fileInput && fileInput.files.length > 0) {
+    formData.append('memoImageFile', fileInput.files[0]);
+  }
+  const userId = 1;
+
+  let result;
+
+  if (isUpdateMode) {
+      const savePayload = {
+      id: state.memo.id,
+      title: state.memo.title,
+      content: state.memo.content,
     };
+    result = await MemoHttpService.modify(state.memo.id, savePayload);
+  } else {
+    result = await MemoHttpService.create(userId, formData);
+  }
 
-    let result;
-
-    if (isUpdateMode) {
-        result = await MemoHttpService.modify(state.memo.id, savePayload);
-    } else {
-        result = await MemoHttpService.create(savePayload);
-    }
-
-    if(result.resultData === 1) {
-        alert(isUpdateMode ? "메모가 수정되었습니다." : "메모가 등록되었습니다.");
-        router.push("/otd/memo");
-    }
+  if(result.resultData === 1) {
+    showAlert(isUpdateMode ? "메모가 수정되었습니다." : "메모가 등록되었습니다.");
+    router.push("/otd/memo");
+  } else {
+    showAlert("메모 등록 실패: " + (result.message || "알 수 없는 오류가 발생하였습니다."));
+  }
 };
 
 const remove = async () => {
-    if(!confirm("삭제하시겠습니까?")) return;
+    if(!await showConfirm("삭제하시겠습니까?")) return;
     const result = await MemoHttpService.deleteById(state.memo.id);
     if(result.resultData === 1) {
-        alert("삭제되었습니다.");
+        showAlert("삭제되었습니다.");
         router.push("/otd/memo");
+    } else {
+    showAlert("메모 삭제 실패: ", + (result.message || "알 수 없는 오류가 발생하였습니다."));
     }
 };
 
@@ -64,14 +103,12 @@ const handleImageChange = async (e) => {
   const files = e.target.files;
   if(!files || files.length === 0) return;
 
-  let maximageUrlLists = 5 * 2048 * 2048; // 5MB 제한
-
   const validFiles = [];
   for(let i=0; i<files.length; i++) {
     const file = files[i];
     const maxSizeInBytes = 5 * 2048 * 2048; // 5MB
     if (file && file.size > maxSizeInBytes) {
-      alert(`파일 "${file.name}"의 크기(${formatBytes(file.size)})가 5MB를 초과하여 업로드할 수 없습니다.`);
+      showAlert(`파일 "${file.name}"의 크기(${formatBytes(file.size)})가 5MB를 초과하여 업로드할 수 없습니다.`);
       continue;
     }
     validFiles.push(file);
@@ -83,36 +120,18 @@ const handleImageChange = async (e) => {
     const file = validFiles[i];
     const currentImageUrl = URL.createObjectURL(file);
     newImageUrlLists.push(currentImageUrl);
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-    const response = await fetch('/upload', {
-      method: 'POST',
-      body: formData
-    });
-    const data = await response.json();
-    if(i === 0 && data.imageUrl) {
-      state.memo.image = data.imageUrl;
-    }
-    console.log("이미지 데이터 성공", data.imageUrl);
-  } catch (error) {
-    console.log("이미지 업로드 실패", error);
   }
-}
-  if (newImageUrlLists.length > 5) {
-  newImageUrlLists = newImageUrlLists.slice(0, 5);
+  if(newImageUrlLists.length > 5) {
+    newImageUrlLists = newImageUrlLists.slice(0, 5);
+    showAlert("최대 5장의 이미지만 업로드할 수 있습니다.");
   }
   showImages.value = newImageUrlLists;
   e.target.value = '';
 };
 
 const removeImage = (index) => {
+  URL.revokeObjectURL(showImages.value[index]);
   showImages.value.splice(index, 1);
-if (state.memo.image === showImages.value[index]) {
-  state.memo.image = '';
-}
 };
 
 const formatBytes = (bytes, decimals = 2) => {
@@ -129,10 +148,10 @@ const formatBytes = (bytes, decimals = 2) => {
 
 const fileTypeCheck = (obj) => {
   const fileName = obj.value;
-  const fileExtension = fileName.substring(fineName.lastIndexOf('.') + 1).toLowerCase();
+  const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
   const allowed = ['jpg', 'jpeg', 'png', 'gif'];
   if(!allowed.includes(fileExtension)) {
-    allowed('jpg, jpeg, png, gif 형식의 파일만 등록 가능합니다.');
+    showAlert('jpg, jpeg, png, gif 형식의 파일만 등록 가능합니다.');
     obj.value = '';
     return false;
   }
@@ -168,14 +187,37 @@ const fileTypeCheck = (obj) => {
     </div>
   </div>
 
-      <div class="info-section" v-if="state.memo.createdAt">
-        <strong>등록일시:</strong> {{ state.memo.createdAt }}</div>
-      <button class="btn btn-primary" @click="save">
-        {{ isUpdateMode ? "수정 완료" : "등록" }}</button>
-  
-      <button v-if="isUpdateMode" class="btn btn-danger"
-        @click="remove">삭제</button>
+    <div class="info-section" v-if="state.memo.createdAt">
+      <strong>등록일시:</strong> {{ state.memo.createdAt }}
     </div>
+
+    <div class="button-group">
+      <button class="btn btn-primary" @click="save">
+        {{ isUpdateMode ? "수정 완료" : "등록" }}
+      </button>
+
+      <button v-if="isUpdateMode" class="btn btn-danger" @click="remove">
+        삭제
+      </button>
+    </div>
+  </div>
+
+    <div v-if="alertModal.show" class="modal-overlay">
+      <div class="modal-content">
+        <p>{{ alertModal.message }}</p>
+        <button @click="alertModal.show = false" class="modal-btn">확인</button>
+      </div>
+    </div>
+
+  <div v-if="confirmModal && confirmModal.show" class="modal-overlay">
+    <div class="modal-content">
+      <p>{{ confirmModal.message }}</p>
+      <div class="modal-actions">
+        <button @click="confirmModal.resolve(true); confirmModal.show = false;" class="modal-btn confirm-yes">예</button>
+        <button @click="confirmModal.resolve(false); confirmModal.show = false;" class="modal-btn confirm-no">아니오</button>
+      </div>
+    </div>
+  </div>
   </template>
   
   <style scoped>
@@ -194,51 +236,190 @@ const fileTypeCheck = (obj) => {
     color: #333;
     text-align: center;
     margin-bottom: 30px;
-    text-wrap: 700;
+    font-weight: 700;
+}
+  .input-section {
+  margin-bottom: 25px;
+}
+  .input-section label {
+  display: block;
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+  .form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+  .form-control:focus {
+  border-color: skyblue;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.3);
+}
+
+  textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+  .preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+  .preview-item {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9e9e9;
+}
+
+  .preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+  .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-weight: bold;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+  .remove-btn:hover {
+    background: red;
+}
+
+  .info-section {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+  .button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: center;
 }
 
   .btn {
+    padding: 12px 25px;  
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+  .btn-primary {
     background-color: skyblue;
     color: black;
-    text-align: center;
-    font-weight: 600;
-  }
-  .btn:hover {
-    background-color: #a3cfd4;
-    color: black;
-  }
-  .upload-box {
-  margin: 20px 0;
+    border: none;
 }
-.preview-list {
+
+  .btn-primary:hover {
+    background-color: #87ceeb;
+    transform: translateY(-2px);
+}
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+  .btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-.preview {
-  position: relative;
-}
-.preview img {
-  width: 100px;
-  height: auto;
-  border-radius: 4px;
-  display: block;
-}
-.remove-btn {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-weight: bold;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
-  </style>
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  min-width: 300px;
+  max-width: 90%;
+}
+
+.modal-content p {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.modal-btn:hover {
+  opacity: 0.9;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-btn.confirm-yes {
+  background-color: skyblue;
+  color: black;
+}
+
+.modal-btn.confirm-no {
+  background-color: #ccc;
+  color: #333;
+}
+</style>

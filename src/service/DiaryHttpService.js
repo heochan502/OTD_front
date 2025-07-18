@@ -1,5 +1,5 @@
 import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:8080/otd';
+axios.defaults.baseURL = 'api/otd/memo';
 
 class DiaryHttpService {
     async create(jsonBody) {

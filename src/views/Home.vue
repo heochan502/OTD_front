@@ -17,9 +17,10 @@ const findAll = async (params) => {
     state.otd = data.resultData;
 }
 
-const model = {
+const model = reactive ({
     searchText: "",
-};
+});
+
 const search = () => {
     const params = { search_text: model.searchText};
     findAll(params);
