@@ -1,16 +1,31 @@
 <script setup>
 import { ref } from 'vue';
 const value = ref(60);
-
-const  valueDeterminate =20;
+const moreMeal = ref(500);
+const totalKcal = ref(2000);
+const maxKcal = ref(2500);
 </script>
 
 <template>
 
-
-
-
-
+<div class=" progress-container">
+    <div class="progress-wrapper">
+        <div class="d-flex justify-content-between">
+            <h4 class="totalkcal"> {{totalKcal}}/{{maxKcal}}kcal</h4>
+            <h4 class="moreeat">{{moreMeal}}kcal 더 먹을 수 있어요!</h4>
+        </div>
+    <div>
+        <progress
+            class="progress"
+            id="progress"
+            :value="value"
+            min="0"
+            max="100">
+        </progress>
+        </div>
+    </div>
+</div>
+<!-- 
 <div class="progress bigpro progress-container"
     role="progressbar"
     aria-label="Animated striped example">
@@ -66,11 +81,54 @@ const  valueDeterminate =20;
         :style="{ width: value + '%' }"
       ></div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style scoped>
 .progress-container {
+    max-width: 1024px;
+    margin: 30px 30px 10px 30px;   
+}
+.progress-wrapper {
+    width: 50%;
+    margin: 5px;
+    padding: 10px;
+}
+
+.totalkcal {
+    font-size: 25px;
+    color: #000000;
+    text-align: left;
+    position: relative;
+    top: 5px;
+}
+
+.moreeat {
+    padding-bottom: 0px;
+    font-size: 18px;
+    color: #ffffff;
+    position: relative;
+    top: 12px;
+    text-align: right;
+    font-weight: 400;
+}
+#progress {
+    appearance: none;
+    width: 100%;
+}
+#progress::-webkit-progress-bar {
+    background:#cbe7f1;
+    border-radius:15px;
+    box-shadow: inset 3px 3px 10px #cbe7f1;
+}
+#progress::-webkit-progress-value {
+    border-radius:10px;
+    background: #c1e5f3;
+    background: -webkit-linear-gradient(to right, #88a0ec, #305ff8);
+    background: linear-gradient(to right, #88a0ec, #305ff8);
+
+}
+/* .progress-container {
   margin: 30px;
   width: 50%;
   height: 20px;
@@ -127,6 +185,30 @@ const  valueDeterminate =20;
   grid-gap: 10px;
   
   
-}
+} */
+/* 
+
+  #progress {
+        position: absolute;
+        margin-bottom: 17px;
+        appearance: none;
+      }
+      
+      #progress::-webkit-progress-bar {
+        background: #e5eaec;
+        border-radius: 12px;
+        border: 1px solid #eeeeee;
+        height: 28px;
+        width: 200px;
+        overflow: hidden;
+      }
+
+      #progress::-webkit-progress-value {
+        background: #c2dbe2;
+        border-radius: 0px;
+        height: 28px;
+        width: 48px;
+      } */
+
 
 </style>
