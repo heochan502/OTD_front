@@ -1,13 +1,53 @@
 <script setup>
+import ProgressBar from './ProgressBar.vue';
 import { ref } from 'vue';
 const value = ref(60);
 const moreMeal = ref(500);
 const totalKcal = ref(2000);
 const maxKcal = ref(2500);
+const tansu = ref(30); // 탄수화물 비율
+const protein = ref(40); // 단백질 비율
+const jibang = ref(20); // 지방 비율
 </script>
 
 <template>
 
+
+
+<div class="progress-container">
+  <ProgressBar
+  class="totalcal"
+    :value="value"
+    :leftString=" `${totalKcal}/${maxKcal}kcal` "
+    :rightString=" `${moreMeal}kcal 더 먹을 수 있어요!` "
+    customsize="totalcal"
+  />
+ 
+</div >
+ <div class="inprogressbar d-flex justify-content-between"> 
+      <ProgressBar
+      class="tansu"
+      :value="tansu"
+      :leftString="`탄수화물`"
+      :rightString=" `${tansu}%` "
+      customsize="tansu"
+      />
+       <ProgressBar
+      class="protein"
+      :value="protein"
+      :leftString="`단백질`"
+      :rightString=" `${protein}%` "
+      customsize="protein"
+      />
+       <ProgressBar
+      class="jibang"
+      :value="jibang"
+      :leftString="`지방`"
+      :rightString=" `${jibang}%` "
+      customsize="jibang"
+      />
+  </div>
+<!-- 
 <div class=" progress-container">
     <div class="progress-wrapper">
         <div class="d-flex justify-content-between">
@@ -23,8 +63,8 @@ const maxKcal = ref(2500);
             max="100">
         </progress>
         </div>
-    </div>
-</div>
+    </div> 
+</div>-->
 <!-- 
 <div class="progress bigpro progress-container"
     role="progressbar"
@@ -85,7 +125,36 @@ const maxKcal = ref(2500);
 </template>
 
 <style scoped>
+
+
 .progress-container {
+  display:flex;
+  gap: 0px;
+}
+.inprogressbar
+{  
+  width: 40%;
+  gap: 1px;             /* ← 항목 사이 간격 조절 */
+  margin-top: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.tansu {  
+
+  margin: 0px 0px 0px 30px;
+  padding: 0px;
+}
+.protein {  
+ margin: 0px 0px 0px 0px;
+  padding: 0px;
+}
+.jibang {  
+  margin: 0px 0px 0px 0px;
+  padding: 0px;
+}
+
+
+/* .progress-container {
     max-width: 1024px;
     margin: 30px 30px 10px 30px;   
 }
@@ -127,7 +196,7 @@ const maxKcal = ref(2500);
     background: -webkit-linear-gradient(to right, #88a0ec, #305ff8);
     background: linear-gradient(to right, #88a0ec, #305ff8);
 
-}
+} */
 /* .progress-container {
   margin: 30px;
   width: 50%;
