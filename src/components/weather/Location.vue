@@ -1,9 +1,6 @@
 <script setup>
 import { ref, onMounted, reactive, computed } from "vue";
-import {
-  getLocalName,
-  getWeather,
-} from "@/services/weather/weatherHomeService";
+import { getLocalName } from "@/services/weather/LocationService";
 
 const state = reactive({
   items: [],

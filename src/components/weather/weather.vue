@@ -41,7 +41,7 @@ const skyEmoji = computed(() => {
     </div>
     <div class="weather-basetime">
       <div class="label">날씨예보 기준 시간</div>
-      <div class="value">{{ weather.date }}</div>
+      <div class="value">{{ weather.baseTime }}</div>
     </div>
   </div>
 </template>
@@ -52,9 +52,8 @@ const skyEmoji = computed(() => {
   border-radius: 16px;
   padding: 1.5rem;
   margin-top: 2rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  font-family: "Segoe UI", sans-serif;
   max-width: 400px;
+  // box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 
   .weather-header {
     display: flex;

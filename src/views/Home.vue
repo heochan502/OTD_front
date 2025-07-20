@@ -1,10 +1,10 @@
 <script setup>
-import weatherHome from "@/components/weather/weatherHome.vue";
+import location from "@/components/weather/Location.vue";
 import weather from "@/components/weather/weather.vue";
 </script>
 
 <template>
-  <weatherHome />
+  <location />
   <weather />
 </template>
 
