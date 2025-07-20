@@ -1,17 +1,20 @@
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue';
-import { getLocalName } from '@/services/weather/weatherHomeService';
+import { ref, onMounted, reactive, computed } from "vue";
+import {
+  getLocalName,
+  getWeather,
+} from "@/services/weather/weatherHomeService";
 
 const state = reactive({
   items: [],
 });
 
-const searchText = ref('');
+const searchText = ref("");
 const showList = ref(false);
 // 검색어에 맞는 항목만 필터링
 const filterItems = computed(() => {
   if (!searchText.value) {
-    return alert('지역명을 입력하세요');
+    return alert("지역명을 입력하세요");
   }
   return state.items.filter((item) =>
     (item.city + item.county + item.town).includes(searchText.value)
