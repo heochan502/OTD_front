@@ -1,5 +1,6 @@
 <script setup>
 import HealthReportCard from "@/components/health/HealthReportCard.vue";
+import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
 </script>
 
 <template>
@@ -12,8 +13,8 @@ import HealthReportCard from "@/components/health/HealthReportCard.vue";
         <div class="report justify-center">
           <HealthReportCard />
         </div>
-        <!-- 달력영역 -->
-        <div>달력</div>
+        <!-- 달력 -->
+        <HealthLogCalendar />
       </div>
       <!-- 하단 -->
       <div class="main_bottom">
@@ -49,7 +50,8 @@ import HealthReportCard from "@/components/health/HealthReportCard.vue";
 }
 .main_top {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 50px;
 
   .card {
     justify-content: center;
