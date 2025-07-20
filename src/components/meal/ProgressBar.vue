@@ -33,11 +33,13 @@ defineProps({
 <style scoped>
 
 
-.tansu {    font-size: 20px;
+.tansu {    
+    font-size: 20px;
     color: #ff6b6b ;
-       .progress::-webkit-progress-bar {
+       .progress::-webkit-progress-bar {            
+        height: 15px;
         background: #ffffff;
-        border-radius: 15px;
+        border-radius: 15px;        
         box-shadow: inset 3px 3px 10px #ffffff;
     }
     .progress::-webkit-progress-value {
@@ -47,7 +49,8 @@ defineProps({
         background: linear-gradient(to right, #ff8787, #ff6b6b);
     }
 }
-.protein {    font-size: 20px;
+.protein {    
+    font-size: 20px;
     color: #4dabf7;
     .progress {
     appearance: none;
@@ -70,6 +73,7 @@ defineProps({
 }
 .jibang {    font-size: 20px;
     color: #ffd43b;
+    
     .progress {
     appearance: none;
     border-radius: 15px;
@@ -119,7 +123,6 @@ defineProps({
 .progress {
     appearance: none;
     border-radius: 15px;
-    height: 23px;
 }
 .progress::-webkit-progress-bar {
     background:#cbe7f1;
