@@ -1,9 +1,9 @@
 <script setup>
-
 import { useRoute } from 'vue-router';
-import { watch,onMounted} from 'vue';
+import { watch, onMounted } from 'vue';
 import { useAccountStore } from './stores/counter';
 import { check } from './services/accountService';
+import App from '@/App.vue';
 
 const route = useRoute();
 const counter = useAccountStore();
@@ -11,31 +11,32 @@ const counter = useAccountStore();
 const checkAccount = async () => {
   console.log('로그인 체크');
   const res = await check();
-  console.log('res:',res);
-  if(res === null || res.status != 200){
-      counter.setChecked(false);
-      return;
-    }else{
-      counter.setChecked(true);
-      counter.setLoggedIn(res.data > 0);
+  console.log('res:', res);
+  if (res === null || res.status != 200) {
+    counter.setChecked(false);
+    return;
+  } else {
+    counter.setChecked(true);
+    counter.setLoggedIn(res.data > 0);
   }
-}
+};
 
-onMounted(()=>{
+onMounted(() => {
   checkAccount();
-})
-watch(() => route.path,() => {
+});
+watch(
+  () => route.path,
+  () => {
     checkAccount();
   }
 );
 </script>
 
 <template>
-  <div>
-   
-  </div>
+  <template v-if="account.state.checked">
+    <App />
+  </template>
+  <template v-else>서버 통신 오류</template>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

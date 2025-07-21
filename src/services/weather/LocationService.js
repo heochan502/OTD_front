@@ -1,5 +1,5 @@
-import axios from "@/services/weather/weatherRequester";
+// import axios from "@/services/weather/weatherRequester";
 
-export const getLocalName = () => {
-  return axios.get("/weather").catch((e) => e.response);
-};
+// export const getLocalName = () => {
+//   return axios.get("/weather").catch((e) => e.response);
+// };

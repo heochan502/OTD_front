@@ -1,10 +1,9 @@
 <script setup>
 import Layout from './views/layout/Layout.vue';
-
 </script>
 
 <template>
-  <div class="layout">
+  <div>
     <Layout />
   </div>
 </template>
