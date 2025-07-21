@@ -24,6 +24,7 @@ const jibang = ref(20); // 지방 비율
 // const divHeight = ref(0);
 
 onMounted(() => {
+  
   // const div = myDiv.value;
   // if (div) {
   //   const rect = div.getBoundingClientRect();
@@ -88,7 +89,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="bottom " >
-      <WeeklyCalorie "/>
+      <WeeklyCalorie />
     </div>
   </div>
   <!-- </div> -->

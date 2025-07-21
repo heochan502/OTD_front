@@ -63,10 +63,14 @@ const option = {
 };
 
 onMounted(async () => {
+  
+
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화
     myChart.setOption(option); // 차트 옵션 설정
+  } else {
+    console.warn('chartRef is null');
   }
 });
 </script>
