@@ -5,7 +5,7 @@ import * as echarts from 'echarts';
 import { bottom } from '@popperjs/core';
 
 const xData = ['월', '화', '수', '목', '금', '토', '일'];
-const yData = xData.map(() => parseInt(Math.random() * 100));
+const yData = xData.map(() => parseInt(Math.random() * 2400));
 const chartRef = ref(null); // 차트 DOM 요소 참조
 let myChart = null; // ECharts 인스턴스
 
@@ -52,7 +52,7 @@ const option = {
   },
   yAxis: {
     min: 0,
-    max: 300,
+    max: 2400,
     type: 'value',
     axisLabel: {
       color: '#ffffff',
