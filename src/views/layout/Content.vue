@@ -1,3 +1,7 @@
+<script setup>
+
+</script>
+
 <template>
   <main class="content">
     <div class="box">
@@ -8,10 +12,6 @@
     </div>
   </main>
 </template>
-
-<script setup>
-
-</script>
 
 <style scoped>
 .content {
