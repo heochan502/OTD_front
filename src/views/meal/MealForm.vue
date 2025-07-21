@@ -169,13 +169,14 @@ onMounted(() => {});
   display: flex;
   flex-direction: column;
   margin-left: 30px;
-  gap: 4px;
-  margin-bottom: 16px
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .main-title{
   font-weight: bold;
-  font-size: 25px;
+  font-size: 30px;
 
 }
 .sub-title{

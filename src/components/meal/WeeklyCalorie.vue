@@ -24,20 +24,49 @@ const option = {
     },
   },
   legend:{
-    show:true,
+    show:false,
     top : 'top',
     left:'center',
+    textStyle: {
+    color: '#ffffff',      // 텍스트 색상
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   },
   // 범례 설정
   xAxis: {
     type: 'category',
     data: xData,
-    
+    axisLabel: {
+      color: '#000000', // 텍스트 색상
+      fontSize: 14,     // 글자 크기
+      fontWeight: 'bold',
+    },
+    axisLine: {
+      lineStyle: {
+        color: '#ffffff',  // 축 색상
+        width: 1,
+        show: false,
+      }
+    }
   },
   yAxis: {
     min: 0,
     max: 300,
     type: 'value',
+    axisLabel: {
+      color: '#ffffff',
+      fontSize: 14,
+      fontWeight: 'bold',
+      formatter: '{value} kcal' // y축 값 옆에 단위 추가
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#cccccc', // 눈금선 색상
+        type: 'dashed'    // 점선으로 표시
+      }
+    }
+    
   },
   // 차트 스타일 설정
   series: [
@@ -51,7 +80,7 @@ const option = {
       barWidth: '50%',
       itemStyle: {
         borderRadius: [30, 30, 0, 0],
-        color: '#D9D9D9',
+        color: '#D9D9D9' , 
         animation: true, // 기본 애니메이션
         animationDuration: 5000, // 초기 진입 애니메이션 시간
         // animationDurationUpdate: 5000, //  데이터 업데이트 시 애니메이션 시간
@@ -68,7 +97,7 @@ const option = {
     style: {
       text: 'Kcal',
       fontSize: '25px Noto Sans KR sans-serif' ,
-      fill: '#BFBFBF',
+      fill: '#ffffff',
     },
   },
 };
