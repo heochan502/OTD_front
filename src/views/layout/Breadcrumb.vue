@@ -1,8 +1,14 @@
 <script setup>
+<<<<<<< HEAD
 import { useRouter } from "vue-router";
 
 import { useAccountStore } from "@/stores/counter";
 import { logout } from "@/services/accountService";
+=======
+import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/stores/counter';
+import { logout } from '@/services/accountService';
+>>>>>>> d5a7c31c55bb2e10dec10fb1f6ae7a8a4275578c
 
 const router = useRouter();
 const counter = useAccountStore();
