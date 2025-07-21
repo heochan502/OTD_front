@@ -22,11 +22,23 @@ const logoutAccount = async () => {
   counter.setLoggedIn(false);
 }
 
+
+const logoutAccount = async () => {
+  if(!confirm('로그아웃 하시겠습니까?')){
+    return;
+  }
+  const res = await logout();
+  if(res === undefined || res.status !== 200){
+    return;
+  }
+  counter.setLoggedIn(false);
+}
+
 </script>
 
 <template>
   <!-- 상단바 컴포넌트 -->
-  <div class="breadcrumb">
+  <header class="breadcrumb">
     <div class="inner">
       <!-- 왼쪽 로고 -->
       <div class="logo" @click="goHome" style="cursor: pointer">
@@ -61,13 +73,12 @@ const logoutAccount = async () => {
         </template>
       </div>
     </div>
-  </div>
+  </header>
 </template>
 
 <style scoped>
 .breadcrumb {
   width: 100%;
-  margin: 0;
   border-bottom: 1px solid #ddd;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -90,20 +101,20 @@ const logoutAccount = async () => {
 }
 
 .logo-one {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   color: #555;
 }
 
 .logo-today {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 15px;
+  font-size: 10px;
   color: #999;
   margin-top: -2px;
 }
@@ -112,7 +123,7 @@ const logoutAccount = async () => {
   padding: 0 60px 0 120px;
   display: flex;
   gap: 20px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #222;
 }
@@ -124,7 +135,7 @@ const logoutAccount = async () => {
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 14px;
-  color: #444;
+  font-size: 12px;
+  color: #00bd7e;
 }
 </style>

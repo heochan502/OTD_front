@@ -5,6 +5,7 @@ import CommunityList from '@/components/community/CommunityList.vue';
 import ReminderHome from '@/components/reminder/ReminderHome.vue';
 import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/components/reminder/ReminderForm.vue';
+
 import MealForm from '@/components/meal/MealForm.vue';
 
 import HealthMain from '@/views/health/HealthMain.vue';
@@ -16,6 +17,7 @@ import HlogForm from '@/views/health/HlogForm.vue';
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +48,7 @@ const router = createRouter({
       component: ReminderForm,
     },
     {
+
       path: '/meal',
       name: 'MealForm',
       component: MealForm,
@@ -80,16 +83,18 @@ const router = createRouter({
       name: 'join',
       component: Join,
     },
+
     {
       path: '/login',
       name: 'login',
       component: Login,
-    },
+
+    }, 
     {
       path: '/profile',
       name: 'profile',
       component: Profile,
-    },
+    }, 
   ],
 });
 

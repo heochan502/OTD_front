@@ -7,9 +7,9 @@ import Content from './Content.vue';
   <!-- 레이아웃을 통일해서 재사용할 컴포넌트를 보여줌 -->
   <div class="layout">
     <!-- 스크롤시 상단바가 화면에 딸려 내려오는 기능 구현할 예정 -->
-    <hearder class="headerlayout">
+    <header class="headerlayout">
       <Breadcrumb />
-    </hearder>
+    </header>
     <main class="contentlayout">
       <Content />
     </main>
