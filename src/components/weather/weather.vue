@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted, reactive, computed } from "vue";
-import { getWeather } from "@/services/weather/weatherHomeService";
+import { ref, onMounted, reactive, computed } from 'vue';
+import { getWeather } from '@/services/weather/weatherHomeService';
 
-const memberId = ref("");
+const memberId = ref('');
 const weather = ref(null);
 
 const LocalWeather = async () => {
@@ -13,13 +13,13 @@ const LocalWeather = async () => {
 
 // 디자인
 const skyEmojiList = {
-  맑음: "☀️",
-  흐림: "☁️",
-  구름많음: "🌤️",
-  비: "🌧️",
-  눈: "❄️",
-  비눈: "🌨️",
-  default: "🌈",
+  맑음: '☀️',
+  흐림: '☁️',
+  구름많음: '🌤️',
+  비: '🌧️',
+  눈: '❄️',
+  비눈: '🌨️',
+  default: '🌈',
 };
 
 const skyEmoji = computed(() => {
@@ -28,8 +28,18 @@ const skyEmoji = computed(() => {
 </script>
 
 <template>
-  <input v-model="memberId" placeholder="회원번호 입력" />
-  <button @click="LocalWeather">날씨 조회</button>
+  <div class="weather-live">
+    <input
+      class="weather-livetime"
+      v-model="memberId"
+      placeholder="회원번호 입력"
+    />
+    <button class="weather-livetime" @click="LocalWeather">날씨 조회</button>
+    <div class="weather-basetime">
+      <div class="label">날씨예보 기준 시간</div>
+      <div class="value">{{ weather.baseTime }}</div>
+    </div>
+  </div>
   <div class="weather-card" v-if="weather">
     <div class="weather-location">{{ weather.localName }}</div>
     <div class="weather-header">
@@ -39,21 +49,32 @@ const skyEmoji = computed(() => {
         <div class="condition">{{ weather.condition }}</div>
       </div>
     </div>
-    <div class="weather-basetime">
-      <div class="label">날씨예보 기준 시간</div>
-      <div class="value">{{ weather.baseTime }}</div>
-    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.weather-live {
+  display: flex;
+  flex-direction: row;
+
+  max-width: fit-content;
+
+  .weather-livetime {
+    border-radius: 16px 16px 0 0;
+    background: #fff;
+  }
+}
+
 .weather-card {
-  background: linear-gradient(to right top, #e0f7ff, #f2fbff);
-  border-radius: 16px;
+  background: #f2fbff;
+  border-radius: 0px 16px 16px 16px;
   padding: 1.5rem;
-  margin-top: 2rem;
-  max-width: 400px;
+  // max-width: 400px;
   // box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  .weather-location {
+    color: #222;
+  }
 
   .weather-header {
     display: flex;
@@ -83,6 +104,7 @@ const skyEmoji = computed(() => {
 
   .weather-basetime {
     margin-top: 1rem;
+    max-width: 100px;
 
     .label {
       font-weight: 500;
