@@ -7,13 +7,12 @@ const props = defineProps({
     default: () => [],
   },
 });
-const emitselect = defineEmits(['selected-date']);
-const emitMonth = defineEmits(['reminder-date']);
+const emit = defineEmits(['selected-date', 'reminder-date']);
 
 const pickDate = (day) => {
   if (!day) return;
   const selectedDate = new Date(currentYear.value, currentMonth.value - 1, day);
-  emitselect('selected-date', selectedDate);
+  emit('selected-date', selectedDate);
 };
 
 const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -95,7 +94,7 @@ onMounted(() => {
 // console.log('calendar', calendarMatrix);
 
 const changeMonth = () => {
-  emitMonth('reminder-date', {
+  emit('reminder-date', {
     year: currentYear.value,
     month: currentMonth.value,
   });
@@ -192,6 +191,10 @@ const todayColor = (day) => {
     }
     .sunday_color {
       color: tomato;
+    }
+    .reminder_color {
+      background-color: slategray;
+      border-radius: 50%;
     }
     td {
       height: 70px;
