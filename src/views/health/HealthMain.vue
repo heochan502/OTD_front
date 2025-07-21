@@ -1,16 +1,18 @@
 <script setup>
 import HealthReportCard from "@/components/health/HealthReportCard.vue";
 import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
+import ExercuseLogList from "@/components/health/ExercuseLogList.vue";
+import HealthLogList from "@/components/health/HealthLogList.vue";
 </script>
 
 <template>
   <!-- 레이아웃 -->
-  <div class="container layout">
+  <div class="container">
     <main>
       <!-- 상단 -->
       <div class="main_top">
         <!-- 리포트영역 -->
-        <div class="report justify-center">
+        <div class="report">
           <HealthReportCard />
         </div>
         <!-- 달력 -->
@@ -18,26 +20,15 @@ import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
       </div>
       <!-- 하단 -->
       <div class="main_bottom">
-        <!-- 운동기록목록 -->
         <div class="log_list">
-          <div class="log_list_top">
-            <div class="log_title">운동기록</div>
-            <router-link to="/elog/add"
-              ><i class="bi bi-plus-circle"></i
-            ></router-link>
+          <div class="exerciselog_list">
+            <!-- 운동기록목록 -->
+            <ExercuseLogList />
           </div>
-          <div class="health_list_log">운동기록 리스트</div>
-          <router-link to="/elog/1">운동기록상세보기 임시</router-link>
-        </div>
-        <!-- 건강기록목록 -->
-        <div class="log_list">
-          <div class="log_list_top">
-            <div class="log_title">건강기록</div>
-            <router-link to="/hlog/add"
-              ><i class="bi bi-plus-circle"></i
-            ></router-link>
+          <div class="healthlog_list">
+            <!-- 건강기록목록 -->
+            <HealthLogList />
           </div>
-          <div class="health_list_log">건강기록 리스트</div>
         </div>
       </div>
     </main>
@@ -45,25 +36,20 @@ import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
 </template>
 
 <style lang="scss" scoped>
-.container {
-  padding: 50px 50px 30px;
-}
 .main_top {
   display: flex;
-  justify-content: center;
-  gap: 50px;
+  justify-content: space-between;
 
   .card {
     justify-content: center;
     width: 380px;
   }
 }
-.main_bottom {
+
+.log_list {
   display: flex;
   justify-content: space-between;
-  .log_list_top {
-    display: flex;
-    justify-content: space-between;
-  }
+  align-items: center;
+  margin-top: 30px;
 }
 </style>

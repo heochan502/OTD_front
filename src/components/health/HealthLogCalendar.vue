@@ -19,14 +19,20 @@ function formatYearMonth(date) {
 </script>
 
 <template>
-  <v-card class="pa-6" max-width="400">
+  <v-card
+    class="calendar_card"
+    width="400"
+    height="300"
+    style="overflow: hidden"
+  >
     <v-calendar
       is-expanded
       v-model="selectedDate"
       :attributes="calendarAttributes"
       :locale="'ko'"
-      style="border: none"
       :show-adjacent-months="false"
+      style="width: 100%; height: 100%; border: none"
+      class="calendar"
     >
       <!-- 타이틀 디자인 수정 -->
       <template #title="{ start, prev, next }">

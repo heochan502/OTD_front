@@ -1,5 +1,5 @@
 <script setup></script>
 
-<template>운동기록 추가화면</template>
+<template>건강 상세 페이지</template>
 
 <style scoped></style>

@@ -8,6 +8,8 @@ import MealForm from "@/components/meal/MealForm.vue";
 import HealthMain from "@/views/health/HealthMain.vue";
 import ElogDetail from "@/views/health/ElogDetail.vue";
 import ElogForm from "@/views/health/ElogForm.vue";
+import HlogDetail from "@/views/health/HlogDetail.vue";
+import HlogForm from "@/views/health/HlogForm.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +58,16 @@ const router = createRouter({
       path: "/elog/add",
       name: "ElogForm",
       component: ElogForm,
+    },
+    {
+      path: "/hlog/:healthlog_id",
+      name: "HlogDetail",
+      component: HlogDetail,
+    },
+    {
+      path: "/hlog/add",
+      name: "HlogForm",
+      component: HlogForm,
     },
   ],
 });

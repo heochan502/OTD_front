@@ -4,12 +4,13 @@ const tab = ref("null");
 </script>
 
 <template>
-  <v-card class="card">
+  <v-card class="card" width="400" height="300">
     <v-tabs
       v-model="tab"
-      bg-color="#3BBEFF"
+      bg-color="#9DDEFF"
       color="#fff"
-      class="justify-center"
+      grow
+      style="border-radius: 25px 25px 0 0"
     >
       <v-tab value="one">운동 리포트</v-tab>
       <v-tab value="two">건강 리포트</v-tab>
@@ -23,4 +24,13 @@ const tab = ref("null");
   </v-card>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.v-tab {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+}
+.v-tab.v-tab--selected {
+  background-color: #3bbeff;
+}
+</style>
