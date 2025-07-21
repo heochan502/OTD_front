@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from "vue";
-const tab = ref("null");
+import HealthReportCard from "@/components/health/HealthReportCard.vue";
+import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
 </script>
 
 <template>
@@ -11,30 +11,10 @@ const tab = ref("null");
       <div class="main_top">
         <!-- 리포트영역 -->
         <div class="report justify-center">
-          <v-card class="card">
-            <v-tabs
-              v-model="tab"
-              bg-color="#3BBEFF"
-              color="#fff"
-              class="justify-center"
-            >
-              <v-tab value="one">운동 리포트</v-tab>
-              <v-tab value="two">건강 리포트</v-tab>
-            </v-tabs>
-            <v-card-text>
-              <v-tabs-window v-model="tab">
-                <v-tabs-window-item value="one">
-                  운동리포트 내용
-                </v-tabs-window-item>
-                <v-tabs-window-item value="two">
-                  건강리포트 내용
-                </v-tabs-window-item>
-              </v-tabs-window>
-            </v-card-text>
-          </v-card>
+          <HealthReportCard />
         </div>
-        <!-- 달력영역 -->
-        <div>달력</div>
+        <!-- 달력 -->
+        <HealthLogCalendar />
       </div>
       <!-- 하단 -->
       <div class="main_bottom">
@@ -70,7 +50,8 @@ const tab = ref("null");
 }
 .main_top {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 50px;
 
   .card {
     justify-content: center;
