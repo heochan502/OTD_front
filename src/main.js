@@ -8,7 +8,7 @@ import router from "./router";
 import vuetify from "./plugins/vuetify";
 import VCalendar from "v-calendar";
 import "v-calendar/style.css";
-
+import "vuetify/styles";
 const app = createApp(App);
 
 app.use(createPinia());

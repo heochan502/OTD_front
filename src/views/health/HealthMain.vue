@@ -7,49 +7,46 @@ import HealthLogList from "@/components/health/HealthLogList.vue";
 
 <template>
   <!-- 레이아웃 -->
-  <div class="container">
-    <main>
-      <!-- 상단 -->
-      <div class="main_top">
-        <!-- 리포트영역 -->
-        <div class="report">
-          <HealthReportCard />
-        </div>
-        <!-- 달력 -->
+  <v-container class="container" fluid>
+    <!-- 상단 -->
+    <v-row class="top" justify="center" align="center">
+      <!-- 리포트영역 -->
+      <v-col cols="auto">
+        <HealthReportCard />
+      </v-col>
+      <!-- 달력 -->
+      <v-col cols="auto">
         <HealthLogCalendar />
-      </div>
-      <!-- 하단 -->
-      <div class="main_bottom">
-        <div class="log_list">
-          <div class="exerciselog_list">
-            <!-- 운동기록목록 -->
-            <ExercuseLogList />
-          </div>
-          <div class="healthlog_list">
-            <!-- 건강기록목록 -->
-            <HealthLogList />
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+      </v-col>
+    </v-row>
+    <!-- 하단 -->
+    <v-row class="bottom">
+      <v-col cols="auto">
+        <!-- 운동기록목록 -->
+        <ExercuseLogList />
+      </v-col>
+      <v-col cols="auto">
+        <!-- 건강기록목록 -->
+        <HealthLogList />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <style lang="scss" scoped>
-.main_top {
+.container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-content: center;
 
-  .card {
+  .top,
+  .bottom {
+    display: flex;
     justify-content: center;
-    width: 380px;
   }
-}
 
-.log_list {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 30px;
+  .top {
+    margin-bottom: 50px;
+  }
 }
 </style>
