@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref, onBeforeUnmount, nextTick } from 'vue';
 import { VueEcharts } from 'vue3-echarts';
 import * as echarts from 'echarts';
+import { bottom } from '@popperjs/core';
 
 const xData = ['월', '화', '수', '목', '금', '토', '일'];
 const yData = xData.map(() => parseInt(Math.random() * 100));
@@ -35,6 +36,7 @@ const option = {
   // 차트 스타일 설정
   series: [
     {
+      
       type: 'bar',
       seriesLayoutBy: 'row',
       data: yData,
@@ -51,6 +53,7 @@ const option = {
         // animationEasing: 'elasticOut', // 애니메이션 효과
         // animationDelay: (idx) => idx * 100, // 각 막대마다 애니메이션 지연 시간
       },
+     
       grid: {
         left: '1%',
         right: '4%',
@@ -89,6 +92,7 @@ onMounted(async () => {
 .weekly-calorie {
   width: 100%;
   height: 100%;
+  position: static
 }
 .main-container{
   display: flex;
@@ -99,6 +103,7 @@ onMounted(async () => {
 .echarts canvas {
   bottom: 0 !important;
   top: auto !important;
+  position: static
 }
 
 </style>

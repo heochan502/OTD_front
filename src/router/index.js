@@ -1,33 +1,19 @@
-<<<<<<< HEAD
+
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import CommunityList from "@/components/community/CommunityList.vue";
+
 import ReminderHome from "@/components/reminder/ReminderHome.vue";
 import RoutineHome from "@/components/routine/RoutineHome.vue";
 import ReminderForm from "@/components/reminder/ReminderForm.vue";
-import MealForm from "@/components/meal/MealForm.vue";
+
+import MealForm from "@/views/meal/MealForm.vue";
+
 import HealthMain from "@/views/health/HealthMain.vue";
 import ElogDetail from "@/views/health/ElogDetail.vue";
 import ElogForm from "@/views/health/ElogForm.vue";
 import HlogDetail from "@/views/health/HlogDetail.vue";
 import HlogForm from "@/views/health/HlogForm.vue";
-=======
-import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home.vue';
-import CommunityList from '@/components/community/CommunityList.vue';
-import ReminderHome from '@/components/reminder/ReminderHome.vue';
-import RoutineHome from '@/components/routine/RoutineHome.vue';
-import ReminderForm from '@/components/reminder/ReminderForm.vue';
-
-import MealForm from '@/views/MealForm.vue';
-
-
-import Join from '@/views/Join.vue';
-import Login from '@/views/Login.vue';
-import Profile from '@/views/Profile.vue';
-
-import MealForm from '@/components/meal/MealForm.vue';
->>>>>>> 73850258ee489ef750b86f02d55413454bf1d1bd
 
 
 const router = createRouter({
@@ -59,7 +45,6 @@ const router = createRouter({
       component: ReminderForm,
     },
     {
-<<<<<<< HEAD
       path: "/meal",
       name: "MealForm",
       component: MealForm,
@@ -89,29 +74,6 @@ const router = createRouter({
       name: "HlogForm",
       component: HlogForm,
     },
-=======
-
-      path: '/signup',
-      name: 'join',
-      component: Join,
-    }, 
-    {
-      path: '/login',
-      name: 'login',
-      component: Login,
-    }, 
-    {
-      path: '/profile',
-      name: 'profile',
-      component: Profile,
-    }, 
-    {
-      path: '/meal',
-      name: 'MealForm',
-      component: MealForm
-    }
-
->>>>>>> 73850258ee489ef750b86f02d55413454bf1d1bd
   ],
 });
 
