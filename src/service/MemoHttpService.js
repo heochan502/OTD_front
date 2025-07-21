@@ -1,9 +1,9 @@
 import axios from 'axios';
-axios.defaults.baseURL = 'api/otd/memo';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 class MemoHttpService {
     async create(userId, formData) {
-        const res = await axios.post(`/${userId}`, formData, {
+        const res = await axios.post("/", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -19,11 +19,11 @@ class MemoHttpService {
         return res.data;
     }
     async modify(id, jsonBody) {
-        const res = await axios.put("/", jsonBody);
+        const res = await axios.put(`/${id}`, jsonBody);
         return res.data;
     }
     async deleteById(id) {
-        const res = await axios.delete(`/?id=${id}`);
+        const res = await axios.delete(`/${id}`);
         return res.data;
     }
 }

@@ -8,11 +8,8 @@ const router = useRouter();
 
 const state = reactive({
   memo: {
-    id: "0",
     title: "",
     content: "",
-    createdAt: "",
-    image: ""
   }
 });
 
