@@ -8,8 +8,20 @@ const counter = useAccountStore();
 
 
 function goHome() {
-  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
+  router.push({ name: "home" }); // 라우트에 name 설정이 되어 있어야 함
 }
+
+const logoutAccount = async () => {
+  if(!confirm('로그아웃 하시겠습니까?')){
+    return;
+  }
+  const res = await logout();
+  if(res === undefined || res.status !== 200){
+    return;
+  }
+  counter.setLoggedIn(false);
+}
+
 
 const logoutAccount = async () => {
   if(!confirm('로그아웃 하시겠습니까?')){
@@ -42,8 +54,8 @@ const logoutAccount = async () => {
         <a href="#">홈</a>
         <router-link to="/reminder" href="#">리마인더</router-link>
         <router-link to="/routine" href="#">루틴</router-link>
-        <a href="#">식단</a>
-        <a href="#">건강</a>
+        <router-link to="/meal" href="#">식단</router-link>
+        <router-link to="/health" href="#">건강</router-link>
         <a href="#">일기</a>
         <a href="#">위치</a>
         <router-link to="/community" href="#">커뮤니티</router-link>

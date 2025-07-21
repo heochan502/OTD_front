@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router';
 import { login } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
 
-
 const router = useRouter();
 const counter = useAccountStore();
 
@@ -29,7 +28,6 @@ const submit = async () => {
     }
 }
 </script>
-
 
 <template>
     <div class="login-page">
@@ -140,3 +138,4 @@ const submit = async () => {
   }
  
   </style>
+

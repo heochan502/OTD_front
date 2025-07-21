@@ -1,5 +1,4 @@
 <script setup>
-import Layout from './views/layout/Layout.vue';
 
 import { useRoute } from 'vue-router';
 import { watch,onMounted} from 'vue';
@@ -29,20 +28,14 @@ watch(() => route.path,() => {
     checkAccount();
   }
 );
-
-
 </script>
 
 <template>
-  <div class="layout">
-    <Layout />
+  <div>
+   
   </div>
 </template>
 
-<style >
+<style scoped>
 
-.layout {
-  width: 100%;
-  min-height: 100vh;
-}
 </style>

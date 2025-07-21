@@ -9,7 +9,7 @@ const state = reactive({
     form:{
         memberId: '',
         memberPw: '',
-        memberPw2:'',
+        memberPW2:'',
         email: '',
         name: '',
         birthDate: '',
@@ -41,8 +41,6 @@ const submit = async () => {
     <div class="form-container">
       <h2 class="title">회원가입</h2>
       <form @submit.prevent="submit" class="join-form">
-
-
         <div class="form-group">
           <label for="memberId">아이디 *</label>
           <div class="input-wrapper">
@@ -50,14 +48,10 @@ const submit = async () => {
             <button type="button" class="btn-small">중복확인</button>
           </div>
         </div>
-
-
         <div class="form-group">
           <label for="memberPw">비밀번호 *</label>
           <input type="password" id="memberPw" placeholder="비밀번호를 입력해주세요" v-model="state.form.memberPw" />
         </div>
-
-
         <div class="form-group">
           <label for="memberPw2">비밀번호 확인*</label>
           <input type="password" id="memberPw2" placeholder="비밀번호를 한번더 확인해주세요" v-model="state.form.memberPw2" />
@@ -107,7 +101,6 @@ const submit = async () => {
         </div>
 
         <button type="submit" class="btn-submit">회원가입</button>
-
       </form>
     </div>
   </div>
@@ -118,13 +111,10 @@ const submit = async () => {
           </div>
           <router-link to="/" class="goHome">홈화면으로</router-link>  
         </div>
-
 </template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-
-
 
 .join-page {
   display: flex;
@@ -245,6 +235,7 @@ const submit = async () => {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
 }
+
 .log{
   color: #B9B9B9;
   text-align: center;
@@ -254,9 +245,6 @@ const submit = async () => {
   flex-direction: row;
   text-align: center;
   color: #5D5D5D;
-
 }
-
-
 
 </style>

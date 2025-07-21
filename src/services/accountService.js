@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 axios.defaults.baseURL = '/api/OTD';
 
 
@@ -18,4 +19,5 @@ export const logout = () => {
 }
 export const profile = () => {
     return axios.post('/user/profile').catch(e => e.response);
+
 }
