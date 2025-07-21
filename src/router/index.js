@@ -13,6 +13,10 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
+import Join from '@/views/Join.vue';
+import Login from '@/views/Login.vue';
+import Profile from '@/views/Profile.vue';
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
