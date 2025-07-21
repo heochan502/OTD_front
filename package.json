@@ -19,7 +19,8 @@
     "vue": "^3.5.17",
     "vue-router": "^4.5.1",
     "vue3-echarts": "^1.1.0",
-    "vuetify": "^3.9.2"
+    "vuetify": "^3.9.2",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.0",
