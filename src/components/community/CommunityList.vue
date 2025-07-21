@@ -12,7 +12,7 @@
           style="max-width: 400px"
         />
 
-        <v-btn color="primary" rounded="lg" @click="goToWrite"> 글쓰기 </v-btn>
+        <v-btn color="primary" rounded="lg" @click="goToWrite">글쓰기</v-btn>
       </v-row>
 
       <v-select
@@ -36,18 +36,19 @@
         <v-row no-gutters align="center" justify="space-between">
           <v-row align="center">
             <v-avatar class="mr-4" size="40">
-              <v-img :src="post.avatar" alt="프로필" />
+              <v-img :src="post.avatar || defaultAvatar" alt="프로필" />
             </v-avatar>
             <div>
               <div class="text-caption text-grey-darken-1">
-                {{ post.category }} · {{ post.time }}
+                {{ post.nickname || '익명' }} · {{ formatTime(post.createdAt) }}
               </div>
               <div class="font-weight-medium">{{ post.title }}</div>
             </div>
           </v-row>
 
           <v-img
-            :src="post.image"
+            v-if="post.filePath"
+            :src="post.filePath"
             alt="썸네일"
             width="60"
             height="60"
@@ -58,12 +59,12 @@
 
         <v-row class="mt-3" dense>
           <v-icon size="18" color="grey" class="mr-1">mdi-heart-outline</v-icon>
-          <span class="text-caption mr-4">{{ post.likes }}</span>
+          <span class="text-caption mr-4">{{ post.like }}</span>
 
           <v-icon size="18" color="grey" class="mr-1"
             >mdi-comment-outline</v-icon
           >
-          <span class="text-caption">{{ post.comments }}</span>
+          <span class="text-caption">{{ post.comments ?? 0 }}</span>
         </v-row>
       </v-card>
     </v-card>
@@ -72,43 +73,49 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import dayjs from 'dayjs';
+
+const router = useRouter();
 
 const search = ref('');
 const sort = ref('최신순');
 const sortOptions = ['최신순', '인기순', '댓글순'];
+const defaultAvatar =
+  'https://cdn.vuetifyjs.com/images/profiles/default_avatar.png';
 
+// 나중에 실제 axios로 API 연동 시 replace
 const posts = ref([
   {
+    postId: 1,
+    memberNoLogin: 12,
     nickname: '교동불주먹',
-    time: '1시간 전',
     title: '오늘 점메추 가능하신분',
-    likes: 0,
+    createdAt: '2025-07-18T11:03:00',
+    filePath: 'https://cdn.vuetifyjs.com/images/cards/road.jpg',
+    like: 0,
     comments: 3,
     avatar: 'https://cdn.vuetifyjs.com/images/john.jpg',
-    image: 'https://cdn.vuetifyjs.com/images/cards/road.jpg',
   },
   {
+    postId: 2,
+    memberNoLogin: 5,
     nickname: '대구상남자',
-    time: '2시간 전',
     title: '오늘밤 주인공은 나야나',
-    likes: 0,
-    comments: 3,
+    createdAt: '2025-07-18T09:00:00',
+    filePath: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
+    like: 0,
+    comments: 5,
     avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-    image: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-  },
-  {
-    nickname: '요아정러버',
-    time: '5시간 전',
-    title: '오늘 간식은 요아정',
-    likes: 0,
-    comments: 3,
-    avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-    image: 'https://cdn.vuetifyjs.com/images/cards/house.jpg',
   },
 ]);
 
 const goToWrite = () => {
-  // 글쓰기 이동 로직 추가
+  router.push('/community/write');
+};
+
+const formatTime = (time) => {
+  return dayjs(time).fromNow(); // 예: 1시간 전
 };
 </script>
 
