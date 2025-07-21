@@ -62,18 +62,18 @@ const save = async () => {
 
   // 2. FormData 구성
   const formData = new FormData();
-  formData.append(
-    'req',
-    new Blob([JSON.stringify(reqPayload)], { type: 'application/json' }),
-    'memoData.json'
-  );
-
-  // 3. 이미지가 있으면 추가
-  if (fileInputRef.value && fileInputRef.value.files.length > 0) {
-   formData.append('memoImageFile', fileInputRef.value.files[0]);
+  formData.append("req", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
+  
+  const imageFile = fileInputRef.value?.files[0] || null;
+  if (imageFile) {
+    if (!fileTypeCheck({ value: imageFile.name })) {
+     showAlert("이미지 파일 형식이 올바르지 않습니다.");
+     return;
   }
+  formData.append("memoImageFile", imageFile);
+}
 
-  // 4. API 호출
+  // 3. API 호출
   let result;
   try {
     if (isUpdateMode) {
@@ -87,13 +87,13 @@ const save = async () => {
     return;
   }
 
-  // 5. 응답 처리
-  if (!result || result.status !== 200 || !result.resultData) {
+  // 4. 응답 처리
+  if (!result?.resultData) {
     showAlert("메모 등록/수정 실패: " + (result?.message || "알 수 없는 오류"));
     return;
-  }
+}
 
-  // 6. 성공 처리
+  // 5. 성공 처리
   showAlert(isUpdateMode ? "메모가 수정되었습니다." : "메모가 등록되었습니다.");
   const id = result.resultData.id;
   if (id) {
@@ -119,10 +119,10 @@ const handleImageChange = async (e) => {
   if(!files || files.length === 0) return;
 
   // 유효성 검사 (파일 형식)
-  if (!fileTypeCheck(e.target)) {
-    showAlert("이미지 파일 형식이 올바르지 않습니다.");
-    return;
-  }
+  if (!fileTypeCheck({ value: file.name })) {
+  showAlert("이미지 파일 형식이 올바르지 않습니다.");
+  return;
+}
 
   const validFiles = [];
   for(let i=0; i<files.length; i++) {

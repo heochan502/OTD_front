@@ -4,11 +4,7 @@ console.log("API_URL:", import.meta.env.VITE_API_URL);
 
 class MemoHttpService {
   async create(userId, formData) {
-    const res = await axios.post(`/api/otd/memo/${userId}`, formData, {
-  headers: {
-    'Content-Type': 'multipart/form-data',
-  },
-});
+    const res = await axios.post(`/api/otd/memo/${userId}`, formData,);
     return res.data;
   }
 
