@@ -26,7 +26,7 @@ const logoutAccount = async () => {
 
 <template>
   <!-- 상단바 컴포넌트 -->
-  <header class="breadcrumb">
+  <div class="breadcrumb">
     <div class="inner">
       <!-- 왼쪽 로고 -->
       <div class="logo" @click="goHome" style="cursor: pointer">
@@ -42,7 +42,7 @@ const logoutAccount = async () => {
         <a href="#">홈</a>
         <router-link to="/reminder" href="#">리마인더</router-link>
         <router-link to="/routine" href="#">루틴</router-link>
-        <a href="#">식단</a>
+        <router-link to="/meal" href="#">식단</router-link>
         <a href="#">건강</a>
         <a href="#">일기</a>
         <a href="#">위치</a>
@@ -61,12 +61,13 @@ const logoutAccount = async () => {
         </template>
       </div>
     </div>
-  </header>
+  </div>
 </template>
 
 <style scoped>
 .breadcrumb {
   width: 100%;
+  margin: 0;
   border-bottom: 1px solid #ddd;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -89,20 +90,20 @@ const logoutAccount = async () => {
 }
 
 .logo-one {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   color: #555;
 }
 
 .logo-today {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 10px;
+  font-size: 15px;
   color: #999;
   margin-top: -2px;
 }
@@ -111,7 +112,7 @@ const logoutAccount = async () => {
   padding: 0 60px 0 120px;
   display: flex;
   gap: 20px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #222;
 }
@@ -123,7 +124,7 @@ const logoutAccount = async () => {
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14px;
   color: #444;
 }
 </style>
