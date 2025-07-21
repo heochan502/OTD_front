@@ -7,6 +7,14 @@ import vuetify from 'vite-plugin-vuetify';
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      '/api/OTD/user': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
+    },
+  },
   build: {
     outDir: 'D:/hc/projectOTD/OneToDay_Back/src/main/resources/static',
     emptyOutDir: true,
