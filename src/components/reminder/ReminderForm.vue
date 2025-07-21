@@ -1,43 +1,77 @@
 <script setup>
 import { ref, computed, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import Calendar from './Calendar.vue';
+
+const router = useRouter();
 
 const state = reactive({
   title: '',
   content: '',
   date: '',
   repeat: false,
-  repeatDow: '',
+  repeatDow: [],
   alarm: false,
 });
 
 const showCalendar = ref(false);
 const selectedDate = ref(new Date());
 
-const selectedDone = (date) => {
-  selectedDate.value = date;
-  showCalendar.value = false;
+// 캘린더에서 날짜 선택했을때 실행할 로직
+const selectedDone = (day) => {
+  state.repeat = false; // 요일 반복 비활성화
+  selectedDate.value = day; // 화면에 나타날 날짜 데이터값 변경
+  showCalendar.value = false; // 달력 닫기
+  const y = day.getFullYear();
+  const m = String(day.getMonth() + 1).padStart(2, '0');
+  const d = String(day.getDate()).padStart(2, '0');
+  state.date = `${y}.${m}.${d}`; // 넘길 데이터 저장
 };
 
+// 화면에 나타낼 날짜 포맷 변경
 const formattedDate = computed(() => {
-  if (!selectedDate.value) return '날짜를 선택하세요';
   const y = selectedDate.value.getFullYear();
   const m = String(selectedDate.value.getMonth() + 1).padStart(2, '0');
   const d = String(selectedDate.value.getDate()).padStart(2, '0');
   return `${y}. ${m}. ${d}`;
 });
 
+// 이미지 토글, 요일 선택시 배열 추가/변경 로직
 const dowImage = ref([
+  { name: '일', key: 'sun', isOn: false },
   { name: '월', key: 'mon', isOn: false },
   { name: '화', key: 'tue', isOn: false },
   { name: '수', key: 'wed', isOn: false },
   { name: '목', key: 'thu', isOn: false },
   { name: '금', key: 'fri', isOn: false },
   { name: '토', key: 'sat', isOn: false },
-  { name: '일', key: 'sun', isOn: false },
 ]);
 const imageToggle = (index) => {
   dowImage.value[index].isOn = !dowImage.value[index].isOn;
+
+  if (dowImage.value[index].isOn) {
+    if (!state.repeatDow.includes(index)) {
+      // 배열에 해당 인덱스값이 없으면 추가
+      state.repeatDow.push(index);
+    } else {
+      state.repeatDow = state.repeat.filter((i) => i != index); // 배열에 해당 인덱스값이 있으면 filter로 제거
+    }
+  }
+  state.repeat = dowImage.value.some((item) => item.isOn); // 배열 값들 중 하나라도 true면 state.repeat true로 저장
+};
+
+// 서버 통신 로직
+const submitTest = () => {
+  console.log('보낼 데이터 확인', {
+    title: state.title,
+    content: state.content,
+    date: state.date,
+    repeat: state.repeat,
+    dow: state.repeatDow,
+    alarm: state.alarm,
+  });
+  alert('일정을 추가했어요!');
+  router.push('/reminder');
 };
 </script>
 
@@ -48,32 +82,26 @@ const imageToggle = (index) => {
       <div>
         <span title="취소"></span>
       </div>
-      <div>
+      <div :class="{ disabled: state.repeat }">
         <span>{{ formattedDate }}</span>
         <img
           src="/src/image/button.png"
           alt="날짜 선택하기"
-          @click="showCalendar = !showCalendar"
+          @click="!state.repeat && (showCalendar = !showCalendar)"
           class="pickButton"
         />
         <calendar v-if="showCalendar" @selected-date="selectedDone"></calendar>
       </div>
       <div>
         <img
-          v-if="isOn"
-          src="/src/image/alarm_on.png"
-          alt="알람허용"
-          @click="imageToggle"
-        />
-        <img
-          v-else
-          src="/src/image/alarm_off.png"
-          alt="알람비허용"
+          :src="
+            state.alarm ? '/src/image/alarm_on.png' : '/src/image/alarm_off.png'
+          "
+          alt="알람 상태"
           class="alarm"
-          @click="imageToggle"
         />
         <span class="toggle">
-          <input type="checkbox" id="toggle-slider" />
+          <input type="checkbox" id="toggle-slider" v-model="state.alarm" />
           <label for="toggle-slider">On/Off</label>
         </span>
       </div>
@@ -83,7 +111,9 @@ const imageToggle = (index) => {
           :key="index"
           :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
           :alt="요일"
-          @click="imageToggle(index)"
+          @click="imageToggle(index) && !state.date"
+          class="toggle-img"
+          :class="{ disabled: state.date }"
         />
       </div>
       <div>
@@ -101,7 +131,7 @@ const imageToggle = (index) => {
           v-model="state.content"
         ></textarea>
       </div>
-      <button>저장하기</button>
+      <button @click="submitTest">저장하기</button>
     </div>
   </div>
 </template>
@@ -144,5 +174,14 @@ label::after {
 }
 #toggle-slider {
   display: none;
+}
+.toggle-img {
+  width: 60px;
+  margin: 10px;
+  cursor: pointer;
+}
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }
 </style>
