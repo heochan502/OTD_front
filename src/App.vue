@@ -29,8 +29,6 @@ watch(() => route.path,() => {
     checkAccount();
   }
 );
-
-
 </script>
 
 <template>
