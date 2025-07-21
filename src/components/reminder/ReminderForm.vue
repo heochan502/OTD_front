@@ -26,6 +26,19 @@ const formattedDate = computed(() => {
   const d = String(selectedDate.value.getDate()).padStart(2, '0');
   return `${y}. ${m}. ${d}`;
 });
+
+const dowImage = ref([
+  { name: '월', key: 'mon', isOn: false },
+  { name: '화', key: 'tue', isOn: false },
+  { name: '수', key: 'wed', isOn: false },
+  { name: '목', key: 'thu', isOn: false },
+  { name: '금', key: 'fri', isOn: false },
+  { name: '토', key: 'sat', isOn: false },
+  { name: '일', key: 'sun', isOn: false },
+]);
+const imageToggle = (index) => {
+  dowImage.value[index].isOn = !dowImage.value[index].isOn;
+};
 </script>
 
 <template>
@@ -46,14 +59,32 @@ const formattedDate = computed(() => {
         <calendar v-if="showCalendar" @selected-date="selectedDone"></calendar>
       </div>
       <div>
-        <img src="/src/image/alarm_off.png" alt="알람비허용" class="alarm" />
+        <img
+          v-if="isOn"
+          src="/src/image/alarm_on.png"
+          alt="알람허용"
+          @click="imageToggle"
+        />
+        <img
+          v-else
+          src="/src/image/alarm_off.png"
+          alt="알람비허용"
+          class="alarm"
+          @click="imageToggle"
+        />
         <span class="toggle">
           <input type="checkbox" id="toggle-slider" />
           <label for="toggle-slider">On/Off</label>
         </span>
       </div>
       <div>
-        <!-- 월화수목금토일 -->
+        <img
+          v-for="(dow, index) in dowImage"
+          :key="index"
+          :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
+          :alt="요일"
+          @click="imageToggle(index)"
+        />
       </div>
       <div>
         <input
