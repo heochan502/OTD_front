@@ -34,10 +34,16 @@ defineProps({
 
 
 .tansu {    
-    font-size: 20px;
+    font-size: 25px;
+    margin-top: 5px;
     color: #ff6b6b ;
+    width: 200px;
+    .progress {
+    appearance: none;
+    border-radius: 15px;
+    height: 25px;
+    }
        .progress::-webkit-progress-bar {            
-        height: 15px;
         background: #ffffff;
         border-radius: 15px;        
         box-shadow: inset 3px 3px 10px #ffffff;
@@ -50,12 +56,14 @@ defineProps({
     }
 }
 .protein {    
-    font-size: 20px;
+    font-size: 25px;
+    margin-top: 5px;
     color: #4dabf7;
+    width: 200px;
     .progress {
     appearance: none;
     border-radius: 15px;
-    height: 15px;
+    height: 25px;
     }
     
     
@@ -71,13 +79,15 @@ defineProps({
         background: linear-gradient(to right, #74c0fc, #4dabf7);
     }
 }
-.jibang {    font-size: 20px;
+.jibang {    
+    font-size: 25px;
     color: #ffd43b;
-    
+    margin-top: 5px;
+    width: 200px;
     .progress {
     appearance: none;
     border-radius: 15px;
-    height: 15px;
+    height: 25px;
     }
     
     
@@ -110,29 +120,31 @@ defineProps({
 }
 .moreeat {
     font-size: 18px;
+    margin-bottom: -5px;
     color: #000000;   /* 텍스트 색상 변경 */
     font-weight: 400;
-    
     size: 100%;
     white-space: nowrap; /* 줄바꿈 방지 */
  }
 .progress-wrapper {
     padding: 10px 0px 0px 10px;
+    
 }
 
 .progress {
     appearance: none;
     border-radius: 15px;
+    height: 30px;
 }
 .progress::-webkit-progress-bar {
-    background:#cbe7f1;
+    background:#ffffff;
     border-radius:15px;
-    box-shadow: inset 3px 3px 10px #cbe7f1;
+    box-shadow: inset 3px 3px 10px #f7f7f7;
     border: 1.5px solid black;
 }
 .progress::-webkit-progress-value {
     border-radius:15px;
-    background: #c1e5f3;
+    background: #ffffff;
     background: -webkit-linear-gradient(to right, #88a0ec, #305ff8);
     background: linear-gradient(to right, #88a0ec, #305ff8);
 }

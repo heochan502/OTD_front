@@ -20,23 +20,29 @@ const option = {
       // data.marker는 색상 표시
       // data.data는 해당 데이터 값
       // data.axisValue는 x축의 값
-      return `${data.axisValue} <br />${data.marker} ${data.data} kcal`;
+      return `${data.axisValue}요일 <br />${data.marker} ${data.data} kcal`;
     },
+  },
+  legend:{
+    show:true,
+    top : 'top',
+    left:'center',
   },
   // 범례 설정
   xAxis: {
     type: 'category',
     data: xData,
+    
   },
   yAxis: {
     min: 0,
-    max: 100,
+    max: 300,
     type: 'value',
   },
   // 차트 스타일 설정
   series: [
     {
-      
+      name: '요일',
       type: 'bar',
       seriesLayoutBy: 'row',
       data: yData,
@@ -53,21 +59,21 @@ const option = {
         // animationEasing: 'elasticOut', // 애니메이션 효과
         // animationDelay: (idx) => idx * 100, // 각 막대마다 애니메이션 지연 시간
       },
-     
-      grid: {
-        left: '1%',
-        right: '4%',
-        bottom: '10%',
-        top: '10%',
-        containLabel: true,
-      },
     },
   ],
+  graphic: {
+    type: 'text',
+    right: '5%',
+    top: 10,
+    style: {
+      text: 'Kcal',
+      fontSize: '25px Noto Sans KR sans-serif' ,
+      fill: '#BFBFBF',
+    },
+  },
 };
 
 onMounted(async () => {
-  
-
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화
@@ -83,7 +89,7 @@ onMounted(async () => {
     <div
       ref="chartRef"
       class="main-container"
-      style="height: 350px; width: 100%; "
+      style="height: 500px; width: 100%"
     />
   </div>
 </template>
@@ -92,18 +98,12 @@ onMounted(async () => {
 .weekly-calorie {
   width: 100%;
   height: 100%;
-  position: static
+  position: static;
 }
-.main-container{
+.main-container {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   position: relative;
 }
-.echarts canvas {
-  bottom: 0 !important;
-  top: auto !important;
-  position: static
-}
-
 </style>
