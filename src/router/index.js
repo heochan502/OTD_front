@@ -4,6 +4,11 @@ import CommunityList from '@/components/community/CommunityList.vue';
 import ReminderHome from '@/components/reminder/ReminderHome.vue';
 import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/components/reminder/ReminderForm.vue';
+
+import Join from '@/views/Join.vue';
+import Login from '@/views/Login.vue';
+import Profile from '@/views/Profile.vue';
+
 import MealForm from '@/components/meal/MealForm.vue';
 
 const router = createRouter({
@@ -35,10 +40,27 @@ const router = createRouter({
       component: ReminderForm
     },
     {
+
+      path: '/signup',
+      name: 'join',
+      component: Join,
+    }, 
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
+    }, 
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile,
+    }, 
+
       path: '/meal',
       name: 'MealForm',
       component: MealForm
     }
+
   ],
 });
 

@@ -1,12 +1,15 @@
-import { ref, computed } from 'vue'
+import { reactive } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  function increment() {
-    count.value++
-  }
+export const useAccountStore = defineStore("counter", () => {
+    const state = reactive({
+        checked: false,
+        loggedIn: false
+    });
 
-  return { count, doubleCount, increment }
-})
+    const setChecked = val => state.checked = val;
+
+    const setLoggedIn = val => state.loggedIn = val;
+
+    return { state, setChecked, setLoggedIn };
+});
