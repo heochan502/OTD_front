@@ -13,3 +13,6 @@ export const login = params => {
 export const check = params => {
     return axios.get('/check', params).catch(e => e.response);
 }
+export const logout = () => {
+    return axios.post('/logout').catch(e => e.response);
+}
