@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue';
 import { getWeather } from '@/services/weather/weatherHomeService';
-import { login } from '@/services/accountService';
+
 const staste = reactive({});
 
 const memberId = ref('');
@@ -34,30 +34,32 @@ const skyEmoji = computed(() => {
 
 const dayTimes = computed(() => {
   const hour = new Date().getHours();
-  console.log('hour', hour);
   let timeName = '';
-  if (hour < 18) {
-    return (timeName = 'AM');
-  } else {
-    return (timeName = 'PM');
-  }
+  if (hour < 12) return (timeName = 'morning');
+  else if (hour < 18) return (timeName = 'evening');
+  else return (timeName = 'night');
 });
 
 const backgroundImg = {
-  '맑음-AM': 'url(src/image/weather/clear_morning.jpg)',
-  '맑음-PM': 'url(src/image/weather/clear_afternoon.jpg)',
-  '흐림-AM': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-PM': 'url(src/image/weather/cloudy.jpg)',
-  '구름많음-AM': 'url(src/image/weather/little_cloudy_morning.jpg)',
-  '구름많음-PM': 'url(src/image/weather/little_cloudy.jpg)',
-  '비-AM': 'url(src/image/weather/rain.jpg)',
-  '비-PM': 'url(src/image/weather/rain.jpg)',
+  '맑음-morning': 'url(src/image/weather/clear_morning.jpg)',
+  '맑음-evening': 'url(src/image/weather/clear_afternoon.jpg)',
+  '맑음-night': 'url(src/imgage/weather/clear_night.jpg)',
+  '흐림-morning': 'url(src/image/weather/cloudy.jpg)',
+  '흐림-evening': 'url(src/image/weather/cloudy.jpg)',
+  '흐림-night': 'url(src/image/weather/cloudy_night.jpg)',
+  '구름 많음-morning': 'url(src/image/weather/littlecloudy_morning.jpg)',
+  '구름 많음-evening': 'url(src/image/weather/littlecloudy.jpg)',
+  '구름 많음-night': 'url(src/image/weather/littlecloudy_night.jpg)',
+  '비-morning': 'url(src/image/weather/rain.jpg)',
+  '비-evening': 'url(src/image/weather/rain.jpg)',
+  '비-night': 'url(src/image/weather/rain.jpg)',
   default: 'url(src/image/weahter/default.png)',
 };
 
 const weatherBackground = computed(() => {
   const condition = weather.value?.condition || '';
-  const time = dayTimes.value ? 'AM' : 'PM';
+  const time = dayTimes.value;
+  console.log('time', time);
   return backgroundImg[`${condition}-${time}`] || backgroundImg.default;
 });
 </script>

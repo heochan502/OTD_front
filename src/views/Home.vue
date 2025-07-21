@@ -1,9 +1,5 @@
-<script setup>
-import weather from '@/components/weather/weather.vue';
-</script>
+<script setup></script>
 
-<template>
-  <weather />
-</template>
+<template></template>
 
 <style scoped></style>
