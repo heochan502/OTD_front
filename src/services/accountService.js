@@ -3,6 +3,7 @@ import axios from 'axios';
 axios.defaults.baseURL = '/api/OTD';
 
 
+
 export const join = params => {
     return axios.post('/user/signup', params).catch(e => e.response);
 }

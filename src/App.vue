@@ -30,7 +30,6 @@ watch(() => route.path,() => {
   }
 );
 </script>
-
 <template>
   <div class="layout">
     <Layout />
