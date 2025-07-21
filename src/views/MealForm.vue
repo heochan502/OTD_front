@@ -36,47 +36,70 @@ onMounted(() => {
 
 <template>
   <!-- <div ref="myDiv"> -->
-    <!-- 내용
+  <!-- 내용
     너비: {{ divWidth }} / 높이: {{ divHeight }} -->
 
-
-    <div id="mealForm" class="main-container">
-      <div class="left">
-        <div class="progress-container w-full">
-          <ProgressBar class="totalcal" :value="value" :leftString="`${totalKcal}/${maxKcal}kcal`"
-            :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`" customsize="totalcal" />
-          <div class="inprogressbar">
-            <ProgressBar class="tansu" :value="tansu" :leftString="`탄수화물`" :rightString="`${tansu}%`"
-              customsize="tansu" />
-            <ProgressBar class="protein" :value="protein" :leftString="`단백질`" :rightString="`${protein}%`"
-              customsize="protein" />
-            <ProgressBar class="jibang" :value="jibang" :leftString="`지방`" :rightString="`${jibang}%`"
-              customsize="jibang" />
-          </div>
+  <div id="mealForm" class="main-container" >
+    <div class="left">
+      <div class="progress-container w-full">
+        <ProgressBar
+          class="totalcal"
+          :value="value"
+          :leftString="`${totalKcal}/${maxKcal}kcal`"
+          :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`"
+          customsize="totalcal"
+        />
+        <div class="inprogressbar">
+          <ProgressBar
+            class="tansu"
+            :value="tansu"
+            :leftString="`탄수화물`"
+            :rightString="`${tansu}%`"
+            customsize="tansu"
+          />
+          <ProgressBar
+            class="protein"
+            :value="protein"
+            :leftString="`단백질`"
+            :rightString="`${protein}%`"
+            customsize="protein"
+          />
+          <ProgressBar
+            class="jibang"
+            :value="jibang"
+            :leftString="`지방`"
+            :rightString="`${jibang}%`"
+            customsize="jibang"
+          />
         </div>
-
-      </div>
-      <div class="right ">
-        <div class="dailymeal ">
-          <button class="btn btn-primary mealsaday  " @click="value += 10"><span>아침</span> <span>✚</span></button>
-          <button class="btn btn-primary mealsaday  " @click="value += 10"><span>점심</span> <span>✚</span></button>
-          <button class="btn btn-primary mealsaday  " @click="value += 10"><span>저녁</span> <span>✚</span></button>
-        </div>
-      </div>
-      <div class="bottom d-flex justify-center ">
-        <WeeklyCalorie />
       </div>
     </div>
+    <div class="right">
+      <div class="dailymeal">
+        <button class="btn btn-primary mealsaday" @click="value += 10">
+          <span>아침</span> <span>✚</span>
+        </button>
+        <button class="btn btn-primary mealsaday" @click="value += 10">
+          <span>점심</span> <span>✚</span>
+        </button>
+        <button class="btn btn-primary mealsaday" @click="value += 10">
+          <span>저녁</span> <span>✚</span>
+        </button>
+      </div>
+    </div>
+    <div class="bottom " >
+      <WeeklyCalorie "/>
+    </div>
+  </div>
   <!-- </div> -->
-
-
 </template>
 
 <style scoped>
 #mealForm {
   padding-top: 1px;
   padding-left: 10px;
-  width: 100%;
+  width: 100%;  
+  position: relative;
 }
 
 #mealForm .left {
@@ -88,20 +111,26 @@ onMounted(() => {
 
 #mealForm .right {
   height: 50%;
-  width: 50%;  
+  width: 50%;
   float: right;
 }
-#mealForm .bottom{  
+#mealForm .bottom {
   width: 100%;
   height: 100%;
   margin-top: 15%;
   margin-left: -20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
 
 }
+
+
 .dailymeal {
   display: flex;
   flex-direction: column;
-  gap : 10px;
+  gap: 10px;
   align-items: center;
   margin-top: 20px;
 }
@@ -110,7 +139,7 @@ onMounted(() => {
   margin-left: 60px;
   height: 50px;
   font-size: 20px;
-  background-color: #3BBEFF;
+  background-color: #3bbeff;
   color: white;
   border: none;
   display: flex;
@@ -123,9 +152,9 @@ onMounted(() => {
   border-radius: 30px;
 }
 
-.main-container>.test {
+.main-container > .test {
   text-align: center;
-
+  position: relative;
   margin-bottom: 10px;
 }
 
@@ -159,7 +188,6 @@ onMounted(() => {
 }
 
 .tansu {
-
   margin: 0px 0px 0px 30px;
   padding: 0px;
 }
@@ -173,7 +201,4 @@ onMounted(() => {
   margin: 0px 0px 0px 0px;
   padding: 0px;
 }
-
 </style>
-
-

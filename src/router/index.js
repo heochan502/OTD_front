@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '@/views/layout/Layout.vue';
+import Home from '../views/Home.vue';
 import CommunityList from '@/components/community/CommunityList.vue';
 import ReminderHome from '@/components/reminder/ReminderHome.vue';
 import RoutineHome from '@/components/routine/RoutineHome.vue';
@@ -20,7 +20,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Login,
+      component: Home,
     },
     {
       path: '/community',
