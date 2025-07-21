@@ -1,31 +1,26 @@
 <script setup>
-<<<<<<< HEAD
 import { useRouter } from "vue-router";
-=======
-import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/stores/counter';
-import { logout } from '@/services/accountService';
->>>>>>> 73850258ee489ef750b86f02d55413454bf1d1bd
+
+import { useAccountStore } from "@/stores/counter";
+import { logout } from "@/services/accountService";
 
 const router = useRouter();
 const counter = useAccountStore();
-
 
 function goHome() {
   router.push({ name: "home" }); // 라우트에 name 설정이 되어 있어야 함
 }
 
 const logoutAccount = async () => {
-  if(!confirm('로그아웃 하시겠습니까?')){
+  if (!confirm("로그아웃 하시겠습니까?")) {
     return;
   }
   const res = await logout();
-  if(res === undefined || res.status !== 200){
+  if (res === undefined || res.status !== 200) {
     return;
   }
   counter.setLoggedIn(false);
-}
-
+};
 </script>
 
 <template>
@@ -57,11 +52,11 @@ const logoutAccount = async () => {
       <div class="auth">
         <template v-if="counter.state.loggedIn">
           <a @click="logoutAccount">로그아웃</a>
-          <router-link to="/profile">회원정보</router-link>  
+          <router-link to="/profile">회원정보</router-link>
         </template>
         <template v-else>
-          <router-link to="/login" href="#">로그인</router-link>  
-          <router-link to="/signup" href="#">회원가입</router-link>  
+          <router-link to="/login" href="#">로그인</router-link>
+          <router-link to="/signup" href="#">회원가입</router-link>
         </template>
       </div>
     </div>

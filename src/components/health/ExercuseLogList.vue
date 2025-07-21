@@ -90,7 +90,7 @@ ul {
 
     width: 400px;
     height: 80px;
-    margin: 15px 0;
+    margin: 10px 0;
     padding: 5px 40px;
     border-radius: 40px;
     background-color: #3bbeff;
