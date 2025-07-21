@@ -1,10 +1,11 @@
 <script setup>
 import { ref, computed, reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import Calendar from './Calendar.vue';
-import { postReminder } from '@/services/reminderService';
+import { save } from '@/services/reminder/reminderService';
 
 const router = useRouter();
+const route = useRoute();
 
 const state = reactive({
   title: '',
@@ -107,7 +108,7 @@ const submitTest = async () => {
     dow: state.repeatDow,
     alarm: state.alarm,
   };
-  const res = await postReminder(jsonBody);
+  const res = await save(jsonBody);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
@@ -133,7 +134,12 @@ const submitTest = async () => {
           @click="openCalendar"
           class="pickButton"
         />
-        <calendar v-if="showCalendar" @selected-date="selectedDone"></calendar>
+        <div class="calendar">
+          <calendar
+            v-if="showCalendar"
+            @selected-date="selectedDone"
+          ></calendar>
+        </div>
       </div>
       <div>
         <span :class="{ on: state.alarm, off: !state.alarm }">
@@ -188,38 +194,38 @@ const submitTest = async () => {
 .alarm {
   width: 60px;
 }
-label {
-  cursor: pointer;
-  text-indent: -9999px;
-  width: 100px;
-  height: 50px;
-  background-color: #dff7fa;
-  border-radius: 25px;
-  display: inline-block;
-  position: relative;
-  transition: 0.4s;
-}
-label::after {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 4px;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #a5cace;
-  transition: 0.4s;
-}
-#toggle-slider:checked + label {
-  background: #96e7ef;
-}
-#toggle-slider:checked + label::after {
-  left: 54px;
-  background: #1d6369;
-}
-#toggle-slider {
-  display: none;
-}
+// label {
+//   cursor: pointer;
+//   text-indent: -9999px;
+//   width: 100px;
+//   height: 50px;
+//   background-color: #dff7fa;
+//   border-radius: 25px;
+//   display: inline-block;
+//   position: relative;
+//   transition: 0.4s;
+// }
+// label::after {
+//   content: '';
+//   position: absolute;
+//   left: 5px;
+//   top: 4px;
+//   width: 42px;
+//   height: 42px;
+//   border-radius: 50%;
+//   background: #a5cace;
+//   transition: 0.4s;
+// }
+// #toggle-slider:checked + label {
+//   background: #96e7ef;
+// }
+// #toggle-slider:checked + label::after {
+//   left: 54px;
+//   background: #1d6369;
+// }
+// #toggle-slider {
+//   display: none;
+// }
 .toggle-img {
   width: 60px;
   margin: 10px;
