@@ -18,10 +18,13 @@ import Content from './Content.vue';
 
 <style scoped>
 .headerlayout {
-  min-width: 100vw;
+  min-width: 90vw;
   background-color: white;
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 .contentlayout {
   min-width: 100vw;
