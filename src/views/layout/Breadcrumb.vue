@@ -124,6 +124,6 @@ const logoutAccount = async () => {
   display: flex;
   gap: 12px;
   font-size: 12px;
-  color: #444;
+  color: #00bd7e;
 }
 </style>
