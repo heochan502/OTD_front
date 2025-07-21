@@ -4,6 +4,8 @@ import CommunityList from '@/components/community/CommunityList.vue';
 import ReminderHome from '@/components/reminder/ReminderHome.vue';
 import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/components/reminder/ReminderForm.vue';
+import Memo from '@/components/memo/MemoDetail.vue';
+import Diary from '@/components/memo/DiaryDetail.vue';
 
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
@@ -40,7 +42,6 @@ const router = createRouter({
       component: ReminderForm
     },
     {
-
       path: '/signup',
       name: 'join',
       component: Join,
@@ -55,12 +56,21 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
     }, 
-{
+    {
       path: '/meal',
       name: 'MealForm',
       component: MealForm
+    },
+    {
+      path: '/memo',
+      name: 'Memo',
+      component: Memo
+    },
+    {
+      path: '/diary',
+      name: 'Diary',
+      component: Diary
     }
-
   ],
 });
 
