@@ -1,12 +1,13 @@
+<script setup>
+import Layout from './views/layout/Layout.vue';
+
+</script>
+
 <template>
   <div class="layout">
     <Layout />
   </div>
 </template>
-
-<script setup>
-import Layout from './views/layout/Layout.vue';
-</script>
 
 <style scoped>
 .layout {
