@@ -2,6 +2,7 @@
 import { ref, computed, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import Calendar from './Calendar.vue';
+import { postReminder } from '@/services/reminderService';
 
 const router = useRouter();
 
@@ -81,7 +82,7 @@ const isDateMode = computed(() => state.date !== '');
 const isRepeatMode = computed(() => state.repeat);
 
 // 서버 통신 로직
-const submitTest = () => {
+const submitTest = async () => {
   if (!isDateMode.value && !isRepeatMode.value) {
     alert('날짜 혹은 요일을 지정해주세요!');
     return;
@@ -97,14 +98,20 @@ const submitTest = () => {
     alert('내용은 30자 이내로 작성해 주세요!');
     return;
   }
-  console.log('보낼 데이터 확인', {
+
+  const jsonBody = {
     title: state.title,
     content: state.content,
     date: state.date,
     repeat: state.repeat,
     dow: state.repeatDow,
     alarm: state.alarm,
-  });
+  };
+  const res = await postReminder(jsonBody);
+  if (res === undefined || res.status !== 200) {
+    alert('오류발생');
+    return;
+  }
   alert('일정을 추가했어요!');
   router.push('/reminder');
 };
