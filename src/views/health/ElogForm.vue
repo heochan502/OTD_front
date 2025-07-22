@@ -72,7 +72,7 @@ const exercise = [
         ></v-select>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
-          <div class="text-h2 font-weight-light">
+          <div class="text-h3 font-weight-light">
             {{ exerciselog.effortLevel }}
           </div>
         </div>
@@ -90,9 +90,10 @@ const exercise = [
           </template>
         </v-slider>
         <div class="desbox">
-          <span>
+          <p>{{ effortLevels[exerciselog.effortLevel - 1].label }}</p>
+          <p class="description">
             {{ effortLevels[exerciselog.effortLevel - 1].description }}
-          </span>
+          </p>
         </div>
       </v-col>
     </v-row>
@@ -128,15 +129,25 @@ const exercise = [
     font-size: 20px;
   }
   .desbox {
-    text-align: center;
-    align-content: center;
+    display: flex;
+
+    justify-content: center;
 
     width: 300px;
-    height: 50px;
+    height: 40px;
+    padding: 3px 6px;
     background-color: #e0e0e0;
     border-radius: 6px;
 
     font-size: 18px;
+    p {
+      padding: 3px;
+    }
+    .description {
+      display: flex;
+
+      font-size: 12px;
+    }
   }
 
   .btns {
