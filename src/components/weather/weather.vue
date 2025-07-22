@@ -17,11 +17,11 @@ onMounted(async () => {
   LocalWeather();
 });
 
-// 디자인
+// 이모트 및 사진
 const skyEmojiList = {
   맑음: '☀️',
   흐림: '☁️',
-  구름많음: '🌤️',
+  '구름 많음': '🌤️',
   비: '🌧️',
   눈: '❄️',
   비눈: '🌨️',
@@ -65,14 +65,6 @@ const weatherBackground = computed(() => {
 </script>
 
 <template>
-  <div class="weather-live">
-    <input
-      class="weather-livetime"
-      v-model="memberId"
-      placeholder="회원번호 입력"
-    />
-    <button class="weather-livetime" @click="LocalWeather">날씨 조회</button>
-  </div>
   <div class="weather-basetime" v-if="weather">
     <div class="basetime">날씨예보 기준 시간</div>
     <div class="basetime">{{ weather.baseTime }}</div>
