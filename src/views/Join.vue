@@ -55,8 +55,12 @@ const submit = async () => {
         </div>
         <div class="form-group">
           <label for="memberPw">비밀번호 *</label>
-          <input type="password" id="memberPw" placeholder="비밀번호를 입력해주세요" v-model="state.form.memberPw" />
-
+          <input
+            type="password"
+            id="memberPw"
+            placeholder="비밀번호를 입력해주세요"
+            v-model="state.form.memberPw"
+          />
         </div>
         <div class="form-group">
           <label for="memberPw2">비밀번호 확인*</label>
@@ -141,12 +145,12 @@ const submit = async () => {
     </div>
   </div>
   <div>
-          <div class="already">
-          <p class="log">이미 계정이 있으신가요?</p>
-            <router-link to="/login" class="goLogin">로그인</router-link>  
-          </div>
-          <router-link to="/" class="goHome">홈화면으로</router-link>  
-        </div>
+    <div class="already">
+      <p class="log">이미 계정이 있으신가요?</p>
+      <router-link to="/login" class="goLogin">로그인</router-link>
+    </div>
+    <router-link to="/" class="goHome">홈화면으로</router-link>
+  </div>
 </template>
 
 <style scoped>
@@ -271,15 +275,14 @@ const submit = async () => {
   box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
 }
 
-.log{
-  color: #B9B9B9;
+.log {
+  color: #b9b9b9;
   text-align: center;
 }
-.already{
+.already {
   display: flex;
   flex-direction: row;
   text-align: center;
-  color: #5D5D5D;
+  color: #5d5d5d;
 }
-
 </style>
