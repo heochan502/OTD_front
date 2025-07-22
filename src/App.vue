@@ -31,16 +31,9 @@ const checkAccount = async () => {
 
 onMounted(() => {
   checkAccount();
-<<<<<<< HEAD
-});
-watch(
-  () => route.path,
-  () => {
-=======
   counter.setLoggedIn(false);
 })
 watch(() => route.path,() => {
->>>>>>> 9827de1f66087cfcb72d5fc01b2861797fd8afc0
     checkAccount();
   }
 );
