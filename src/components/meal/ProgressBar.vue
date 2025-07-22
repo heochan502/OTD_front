@@ -1,32 +1,38 @@
 <script setup>
+import { number } from 'echarts';
+import { ref, reactive, onMounted } from 'vue';
+
 defineProps({
     value:Number,   
+    max:Number,   
     leftString:String,
     rightString:String,
-    customsize : String,
+    customsize:String,
 });
+
+
+// onMounted(() => {
+//     console.log('totalKcal2:', value.value);
+//     console.log('maxKcal2:', maxKcal.value);
+// });
 
 </script>
 
 
 <template>
-<div>
-    <div class="progress-wrapper">
-        <div class="bar-header  d-flex justify-content-between"> 
-            <span :class="customsize"> {{leftString}}</span>
-            <span class="moreeat">{{rightString}}</span>
-        </div>
-        <div >
-        
-            <progress
-                :class="`progress ${customsize} `"                
-                :value="value"
-                min="0"
-                max="100">
-            </progress>
+    <div>
+        <div class="progress-wrapper">
+            <div class="bar-header  d-flex justify-content-between">
+                <span :class="customsize"> {{leftString}}</span>
+                <span class="moreeat">{{rightString}}</span>
+            </div>
+            <div>
+                <progress :class="`progress ${customsize} `" 
+                :value="value" min="0" :max="max" >
+                </progress>
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 

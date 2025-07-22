@@ -50,7 +50,10 @@ const totalMemos = ref(0);
 
 const fetchMemos = async () => {
   try {
-    const { resultData, totalCount } = await MemoHttpService.findAll(currentPage.value, pageSize.value);
+    const { resultData, totalCount } = await MemoHttpService.findAll({
+      currentPage: pageSize.value,
+      pageSize: pageSize.value
+    });
     memoList.value = resultData;
     totalMemos.value = totalCount;
   } catch (error) {

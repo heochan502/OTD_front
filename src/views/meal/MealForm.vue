@@ -4,13 +4,16 @@ import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted } from 'vue';
 const value = ref(10);
 const moreMeal = ref(500);
-const totalKcal = ref(2000);
+const totalKcal = ref(300);
 const maxKcal = ref(2500);
-const tansu = ref(30); // 탄수화물 비율
+const tansu = ref(1000); // 탄수화물 비율
 const protein = ref(40); // 단백질 비율
-const jibang = ref(20); // 지방 비율
+const jibang = ref(400); // 지방 비율
 
-onMounted(() => {});
+onMounted(() => {
+  console.log('totalKcal:', totalKcal.value);
+  console.log('maxKcal:', maxKcal.value);
+});
 </script>
 
 <template>
@@ -18,56 +21,36 @@ onMounted(() => {});
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-          <ProgressBar
-            class="totalcal"
-            :value="value"
-            :leftString="`${totalKcal}/${maxKcal}kcal`"
-            :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`"
-            customsize="totalcal"
-          />
+          <ProgressBar class="totalcal" :value="totalKcal" :leftString="`${totalKcal}/${maxKcal}kcal`"
+            :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`" :max="maxKcal" customsize="totalcal" />
           <div class="inprogressbar">
-            <ProgressBar
-              class="tansu"
-              :value="tansu"
-              :leftString="`탄수화물`"
-              :rightString="`${tansu}%`"
-              customsize="tansu"
-            />
-            <ProgressBar
-              class="protein"
-              :value="protein"
-              :leftString="`단백질`"
-              :rightString="`${protein}%`"
-              customsize="protein"
-            />
-            <ProgressBar
-              class="jibang"
-              :value="jibang"
-              :leftString="`지방`"
-              :rightString="`${jibang}%`"
-              customsize="jibang"
-            />
+            <ProgressBar class="tansu" :value="tansu" :leftString="`탄수화물`" :rightString="`${(tansu / (maxKcal * 0.6) * 100).toFixed(1)}%`" :max="maxKcal*0.6"
+              customsize="tansu" />
+            <ProgressBar class="protein" :value="protein" :leftString="`단백질`" :rightString="`${protein}%`"
+              customsize="protein" :max="maxKcal * 0.15" />
+            <ProgressBar class="jibang" :value="jibang" :leftString="`지방`" :rightString="`${jibang}%`"
+              customsize="jibang" :max="maxKcal * 0.25" />
           </div>
         </div>
       </div>
 
       <div class="right">
         <div class="dailymeal">
-          <button class="btn btn-primary mealsaday" @click="value += 10">
+          <button class="btn btn-primary mealsaday" @click="totalKcal += 10">
             <span>아침</span> <span>✚</span>
           </button>
-          <button class="btn btn-primary mealsaday" @click="value += 20">
+          <button class="btn btn-primary mealsaday" @click="totalKcal += 20">
             <span>점심</span> <span>✚</span>
           </button>
-          <button class="btn btn-primary mealsaday" @click="value -= 10">
+          <button class="btn btn-primary mealsaday" @click="totalKcal -= 10">
             <span>저녁</span> <span>✚</span>
           </button>
         </div>
       </div>
     </div>
     <div class="weeky-title">
-     <span  class="main-title"> 주간 기록 </span>
-     <span class="sub-title">이번주에 평균 {{ value }}kcal 먹었어요</span>
+      <span class="main-title"> 주간 기록 </span>
+      <span class="sub-title">이번주에 평균 {{ value }}kcal 먹었어요</span>
     </div>
     <div class="bottom">
       <WeeklyCalorie />
