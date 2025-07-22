@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted, reactive, ref, onBeforeUnmount, nextTick } from 'vue';
-import { VueEcharts } from 'vue3-echarts';
+import { onMounted, ref, nextTick } from 'vue';
+
 import * as echarts from 'echarts';
-import { bottom } from '@popperjs/core';
+
 
 const xData = ['월', '화', '수', '목', '금', '토', '일'];
 const yData = xData.map(() => parseInt(Math.random() * 2400));

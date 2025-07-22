@@ -48,10 +48,12 @@ const submit = async () => {
             <button type="button" class="btn-small">중복확인</button>
           </div>
         </div>
+
         <div class="form-group">
           <label for="memberPw">비밀번호 *</label>
           <input type="password" id="memberPw" placeholder="비밀번호를 입력해주세요" v-model="state.form.memberPw" />
         </div>
+        
         <div class="form-group">
           <label for="memberPw2">비밀번호 확인*</label>
           <input type="password" id="memberPw2" placeholder="비밀번호를 한번더 확인해주세요" v-model="state.form.memberPw2" />
