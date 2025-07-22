@@ -98,8 +98,8 @@ const router = createRouter({
       component: Profile,
     },
         {
-      path: "/memo/:id",
-      name: "memoDetail",
+      path: "/memo/",
+      name: "memo",
       component: Memo,
       props: true,
     },

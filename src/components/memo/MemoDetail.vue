@@ -43,6 +43,57 @@ const showConfirm = (message) => {
   });
 };
 
+const memoList = ref([]);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const totalMemos = ref(0);
+
+const fetchMemos = async () => {
+  try {
+    const { resultData, totalCount } = await MemoHttpService.findAll(currentPage.value, pageSize.value);
+    memoList.value = resultData;
+    totalMemos.value = totalCount;
+  } catch (error) {
+    console.error("메모 목록을 불러오는 중 오류 발생:", error);
+    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
+  }
+};
+
+const goToMemoDetail = (id) => {
+  router.push(`/memo/${id}`);
+  if (isUpdateMode && route.params.id === id) {
+    // 현재 페이지가 수정 모드인 경우, 새로고침 없이 상태를 업데이트
+    fetchCurrentMemo(id);
+  } else {
+    // 새 페이지로 이동
+    router.push(`/memo/${id}`);
+  }
+};
+
+const fetchCurrentMemo = async (id) => {
+  try {
+    const { resultData } = await MemoHttpService.findById(id);
+    state.memo = resultData;
+    showImages.value = []; // 기존 이미지 초기화
+    // 백엔드에서 이미지 URL을 반환하는 경우 대비하여 처리
+    if (state.memo.imageUrls && Array.isArray(state.memo.imageUrls)) {
+      showImages.value = state.memo.imageUrls;
+    } else if (state.memo.image) {
+      showImages.value.push(state.memo.image);
+    }
+  } catch (e) {
+    showAlert("메모 정보를 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
+    router.push("/memo");
+  }
+};
+
+const changePage = (page) => {
+  if (page < 0 && page <= Math.ceil(totalMemos.value / pageSize.value)) {
+    currentPage.value = page;
+    fetchMemos();
+  }
+};
+
 onMounted( async () => {
     if (isUpdateMode) {
     const id = route.params.id;
@@ -61,6 +112,7 @@ onMounted( async () => {
       return;
     }
   }
+  fetchMemos();
 });
 
 const save = async () => {
@@ -117,8 +169,11 @@ const save = async () => {
   const id = result.resultData.id;
   if (id) {
     router.push(`/memo/${id}`);
+    fetchMemos();
+    fetchCurrentMemo(id);
   } else {
     router.push("/memo");
+    fetchMemos();
   }
 };
 
@@ -129,6 +184,7 @@ const remove = async () => {
     if(result.resultData === 1) {
         showAlert("메모가 삭제되었습니다.");
         router.push("/memo");
+        fetchMemos();
     } else {
     showAlert("메모 삭제에 실패하였습니다: ", + (result.message || "알 수 없는 오류가 발생하였습니다."));
     }  
@@ -260,8 +316,33 @@ const fileTypeCheck = (fileName) => {
       <button v-if="isUpdateMode" class="btn btn-danger" @click="remove">
         삭제
       </button>
+      <button class="btn btn-secondary" @click="router.push('/memo')">
+        목록
+      </button>
     </div>
-  </div>
+
+    <hr style="margin: 40px 0; border-top: 1px solid #eee;">
+    <h3 style="text-align: center; color: #666; margin-bottom: 20px;">메모 목록</h3>
+
+    <div class="memo-list-section">
+      <div v-if="memoList.length === 0" class="no-memos">
+        <p>등록된 메모가 없습니다. 새로운 메모를 작성해보세요!</p>
+      </div>
+      <ul v-else class="memo_items">
+        <li v-for="memo in memoList" :key="memo.id" class="memo-item" @click="goToMemoDetail(memo.id)">
+          <div class="memo-title">{{ memo.title }}</div>
+          <div class="memo-content">{{ memo.content.length > 100 ? memo.content.substring(0, 100) + '...' : memo.content }}</div>
+          <div class="memo-date">{{ memo.createdAt }}</div>
+        </li>
+      </ul>
+
+      <div class="pagination">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage <= 1">이전</button>
+        <span>페이지 {{ currentPage }} / {{ Math.ceil(totalMemos / pageSize) || 1 }}</span>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage >= Math.ceil(totalMemos / pageSize)">다음</button>
+      </div>
+      </div>
+    </div>
 
     <div v-if="alertModal.show" class="modal-overlay">
       <div class="modal-content">
@@ -280,210 +361,5 @@ const fileTypeCheck = (fileName) => {
     </div>
   </div>
   </template>
-  
-  <style scoped>
-  
-  .memo-detail-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #f9f9f9;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
 
-  .page-title {
-    font-size: 2.2rem;
-    color: #333;
-    text-align: center;
-    margin-bottom: 30px;
-    font-weight: 700;
-}
-  .input-section {
-  margin-bottom: 25px;
-}
-  .input-section label {
-  display: block;
-  font-size: 1.1rem;
-  color: #555;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-  .form-control {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #333;
-  transition: border-color 0.3s ease;
-}
-
-  .form-control:focus {
-  border-color: skyblue;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.3);
-}
-
-  textarea.form-control {
-  resize: vertical;
-  min-height: 120px;
-}
-  .preview-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-  .preview-item {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #e9e9e9;
-}
-
-  .preview-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-  .remove-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(255, 0, 0, 0.7);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-weight: bold;
-    width: 25px;
-    height: 25px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease;
-}
-
-  .remove-btn:hover {
-    background: red;
-}
-
-  .info-section {
-    font-size: 1rem;
-    color: #666;
-    margin-top: 25px;
-    padding-top: 15px;
-    border-top: 1px dashed #e0e0e0;
-}
-
-  .button-group {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-    justify-content: center;
-}
-
-  .btn {
-    padding: 12px 25px;  
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-  .btn-primary {
-    background-color: skyblue;
-    color: black;
-    border: none;
-}
-
-  .btn-primary:hover {
-    background-color: #87ceeb;
-    transform: translateY(-2px);
-}
-
-  .btn-danger {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-}
-
-  .btn-danger:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  min-width: 300px;
-  max-width: 90%;
-  color: black;
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.modal-content p {
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.modal-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background-color 0.2s ease;
-}
-
-.modal-btn:hover {
-  opacity: 0.9;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.modal-btn.confirm-yes {
-  background-color: skyblue;
-  color: black;
-}
-
-.modal-btn.confirm-no {
-  background-color: #ccc;
-  color: #333;
-}
-</style>
+  <style scoped src="./MemoDetail.css"></style>
