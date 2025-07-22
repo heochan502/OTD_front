@@ -22,7 +22,7 @@ const checkAccount = async () => {
   }
 }
 
-onMounted(()=>{
+onMounted(() => {
   checkAccount();
   counter.setLoggedIn(false);
 })
@@ -37,8 +37,7 @@ watch(() => route.path,() => {
   </div>
 </template>
 
-<style >
-
+<style>
 .layout {
   width: 100%;
   min-height: 100vh;

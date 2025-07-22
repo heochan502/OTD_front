@@ -1,0 +1,62 @@
+[
+  {
+    "level": 1,
+    "label": "아주 가벼움",
+    "emoji": "\uD83D\uDE0D",
+    "description": "가벼운 스트레칭"
+  },
+  {
+    "level": 2,
+    "label": "매우 낮음",
+    "emoji": "\uD83D\uDE04",
+    "description": "천천히 걷는 정도"
+  },
+  {
+    "level": 3,
+    "label": "낮음",
+    "emoji": "\uD83D\uDE01",
+    "description": "편안하게 호흡 가능"
+  },
+  {
+    "level": 4,
+    "label": "보통",
+    "emoji": "\uD83D\uDE0A",
+    "description": "대화를 나눌 수 있는 가벼운 운동"
+  },
+  {
+    "level": 5,
+    "label": "높음",
+    "emoji": "\uD83D\uDE42",
+    "description": "심박수가 증가하고 땀나는 정도"
+  },
+  {
+    "level": 6,
+    "label": "어려움",
+    "emoji": "\uD83D\uDE10",
+    "description": "호흡이 증가하고 대화가 버거움"
+  },
+  {
+    "level": 7,
+    "label": "고강도",
+    "emoji": "\uD83D\uDE41",
+    "description": "운동이 힘들고 대화가 어려움"
+  },
+  {
+    "level": 8,
+    "label": "매우 강함",
+    "emoji": "\u2639\uFE0F",
+    "description": "호흡이 힘들고 전신이 지침"
+  },
+  {
+    "level": 9,
+    "label": "극도로 어려움",
+    "emoji": "\uD83D\uDE22",
+    "description": "대화가 불가능하며 탈진 직전 느낌"
+  },
+  {
+    "level": 10,
+    "label": "최대치",
+    "emoji": "\uD83D\uDE2D",
+    "description": "한계에 도달하여 지속 불가"
+  }
+]

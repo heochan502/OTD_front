@@ -44,7 +44,7 @@ const option = {
     },
     axisLine: {
       lineStyle: {
-        color: '#ffffff',  // 축 색상
+        color: 'none',  // 축 색상
         width: 1,
         show: false,
       }
