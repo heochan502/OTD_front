@@ -1,4 +1,5 @@
 <script setup>
+
 import { useRouter } from "vue-router";
 import { useAccountStore } from "@/stores/counter";
 import { logout } from "@/services/accountService";
@@ -7,13 +8,15 @@ const router = useRouter();
 const counter = useAccountStore();
 
 function goHome() {
-  router.push({ name: "home" }); // 라우트에 name 설정이 되어 있어야 함
+  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
 }
 
 
 
 const logoutAccount = async () => {
+
   if (!confirm("로그아웃 하시겠습니까?")) {
+
     return;
   }
   const res = await logout();
@@ -67,18 +70,17 @@ const logoutAccount = async () => {
 <style scoped>
 .breadcrumb {
   width: 100%;
-  border-bottom: 1px solid #ddd;
   background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 32px;
-  display: flex;
+  padding: 16px 32px 0px;
+  display: flex;  
   justify-content: space-between;
   align-items: center;
+  font-size: 25px;
 }
 
 .logo {
@@ -89,20 +91,20 @@ const logoutAccount = async () => {
 }
 
 .logo-one {
-  font-size: 20px;
+  /* font-size: 20px; */
   font-weight: bold;
   color: #555;
 }
 
 .logo-today {
-  font-size: 20px;
+  /* font-size: 20px; */
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 10px;
+  font-size: 13px;
   color: #999;
   margin-top: -2px;
 }
@@ -111,8 +113,8 @@ const logoutAccount = async () => {
   padding: 0 60px 0 120px;
   display: flex;
   gap: 20px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 1200;
   color: #222;
 }
 
@@ -123,7 +125,7 @@ const logoutAccount = async () => {
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14px;
   color: #00bd7e;
 }
 </style>
