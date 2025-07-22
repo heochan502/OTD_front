@@ -136,13 +136,12 @@ const save = async () => {
 
   // 2. FormData 구성
   const formData = new FormData();
-  formData.append("req", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
-  
+  formData.append("memoImageFiles", file);  
   const selectedNewFiles = fileInputRef.value?.files;
   if (selectedNewFiles && selectedNewFiles.length > 0) {
     for (let i = 0; i < selectedNewFiles.length; i++) {
       const file = selectedNewFiles[i];
-      formData.append("memoImageFiles", file);
+      files.forEach(file => formData.append("memoImageFiles", file));
     }
   }
 

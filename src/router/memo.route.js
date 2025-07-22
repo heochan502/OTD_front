@@ -7,24 +7,27 @@ const routes = [
         path: '/memo',
         name: 'Memo',
         component: Memo,
-    },
-    {
-        path: '/memo/add',
+        children: [
+        {
+        path: '',
+        name: 'MemoList',
+        component: MemoList,
+        },
+        {
+        path: 'add',
         name: 'MemoAdd',
         component: MemoDetail,
-    },
-    {
-        path: '/memo',
-        name: 'MemoList',
-        component: MemoList
-    },
-    {
-        path: '/memo/:id',
+        },
+        {
+        path: ':id',
         name: 'MemoDetail',
         component: MemoDetail,
-        props: true
-    },
-]
+        props: true,
+        },
+      ],
+    }, 
+];
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes

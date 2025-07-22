@@ -3,16 +3,6 @@ import { number } from 'echarts';
 import { ref, reactive, onMounted } from 'vue';
 
 defineProps({
-<<<<<<< HEAD
-    value:Number,   
-    max:Number,   
-    leftString:String,
-    rightString:String,
-    customsize:String,
-});
-
-
-=======
   value: Number,
   max: Number,
   leftString: String,
@@ -20,33 +10,13 @@ defineProps({
   customsize: String,
 });
 
->>>>>>> 9827de1f66087cfcb72d5fc01b2861797fd8afc0
 // onMounted(() => {
 //     console.log('totalKcal2:', value.value);
 //     console.log('maxKcal2:', maxKcal.value);
 // });
-<<<<<<< HEAD
-
-=======
->>>>>>> 9827de1f66087cfcb72d5fc01b2861797fd8afc0
 </script>
 
 <template>
-<<<<<<< HEAD
-    <div>
-        <div class="progress-wrapper">
-            <div class="bar-header  d-flex justify-content-between">
-                <span :class="customsize"> {{leftString}}</span>
-                <span class="moreeat">{{rightString}}</span>
-            </div>
-            <div>
-                <progress :class="`progress ${customsize} `" 
-                :value="value" min="0" :max="max" >
-                </progress>
-            </div>
-        </div>
-    </div>
-=======
   <div>
     <div class="progress-wrapper">
       <div class="bar-header d-flex justify-content-between">
@@ -63,7 +33,6 @@ defineProps({
       </div>
     </div>
   </div>
->>>>>>> 9827de1f66087cfcb72d5fc01b2861797fd8afc0
 </template>
 
 <style scoped>

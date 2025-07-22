@@ -95,13 +95,13 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
     },
-        {
+    {
       path: "/memo/",
       name: "memo",
       component: Memo,
       props: true,
     },
-        {
+    {
       path: "/diary",
       name: "diary",
       component: Diary,
