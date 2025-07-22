@@ -1,6 +1,7 @@
 <script setup>
 import Layout from './views/layout/Layout.vue';
 
+
 import { useRoute } from 'vue-router';
 import { watch,onMounted} from 'vue';
 import { useAccountStore } from './stores/counter';
