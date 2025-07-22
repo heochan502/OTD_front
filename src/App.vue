@@ -31,6 +31,7 @@ const checkAccount = async () => {
 
 onMounted(() => {
   checkAccount();
+  counter.setChecked(false);
 });
 watch(
   () => route.path,
