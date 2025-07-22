@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue';
-import { getWeather } from '@/services/weather/weatherHomeService';
+import { ref, onMounted, reactive, computed } from "vue";
+import { getWeather } from "@/services/weather/weatherHomeService";
 
 const staste = reactive({});
 
-const memberId = ref('');
+const memberId = ref("");
 const weather = ref(null);
 
 const LocalWeather = async () => {
@@ -19,13 +19,13 @@ onMounted(async () => {
 
 // 이모트 및 사진
 const skyEmojiList = {
-  맑음: '☀️',
-  흐림: '☁️',
-  '구름 많음': '🌤️',
-  비: '🌧️',
-  눈: '❄️',
-  비눈: '🌨️',
-  default: '🌈',
+  맑음: "☀️",
+  흐림: "☁️",
+  "구름 많음": "🌤️",
+  비: "🌧️",
+  눈: "❄️",
+  비눈: "🌨️",
+  default: "🌈",
 };
 
 const skyEmoji = computed(() => {
@@ -34,32 +34,32 @@ const skyEmoji = computed(() => {
 
 const dayTimes = computed(() => {
   const hour = new Date().getHours();
-  let timeName = '';
-  if (hour < 12) return (timeName = 'morning');
-  else if (hour < 18) return (timeName = 'evening');
-  else return (timeName = 'night');
+  let timeName = "";
+  if (hour < 12) return (timeName = "morning");
+  else if (hour < 18) return (timeName = "evening");
+  else return (timeName = "night");
 });
 
 const backgroundImg = {
-  '맑음-morning': 'url(src/image/weather/clear_morning.jpg)',
-  '맑음-evening': 'url(src/image/weather/clear_afternoon.jpg)',
-  '맑음-night': 'url(src/imgage/weather/clear_night.jpg)',
-  '흐림-morning': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-evening': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-night': 'url(src/image/weather/cloudy_night.jpg)',
-  '구름 많음-morning': 'url(src/image/weather/littlecloudy_morning.jpg)',
-  '구름 많음-evening': 'url(src/image/weather/littlecloudy.jpg)',
-  '구름 많음-night': 'url(src/image/weather/littlecloudy_night.jpg)',
-  '비-morning': 'url(src/image/weather/rain.jpg)',
-  '비-evening': 'url(src/image/weather/rain.jpg)',
-  '비-night': 'url(src/image/weather/rain.jpg)',
-  default: 'url(src/image/weahter/default.png)',
+  "맑음-morning": "url(src/image/weather/clear_morning.jpg)",
+  "맑음-evening": "url(src/image/weather/clear_afternoon.jpg)",
+  "맑음-night": "url(src/image/weather/clear_night.jpg)",
+  "흐림-morning": "url(src/image/weather/cloudy.jpg)",
+  "흐림-evening": "url(src/image/weather/cloudy.jpg)",
+  "흐림-night": "url(src/image/weather/cloudy_night.jpg)",
+  "구름 많음-morning": "url(src/image/weather/littlecloudy_morning.jpg)",
+  "구름 많음-evening": "url(src/image/weather/littlecloudy.jpg)",
+  "구름 많음-night": "url(src/image/weather/littlecloudy_night.jpg)",
+  "비-morning": "url(src/image/weather/rain.jpg)",
+  "비-evening": "url(src/image/weather/rain.jpg)",
+  "비-night": "url(src/image/weather/rain.jpg)",
+  default: "url(src/image/weahter/default.png)",
 };
 
 const weatherBackground = computed(() => {
-  const condition = weather.value?.condition || '';
+  const condition = weather.value?.condition || "";
   const time = dayTimes.value;
-  console.log('time', time);
+  console.log("time", time);
   return backgroundImg[`${condition}-${time}`] || backgroundImg.default;
 });
 </script>
