@@ -62,6 +62,7 @@ const exercise = [
         </div>
       </v-col>
       <v-col cols="6">
+        <!-- 운동 종목 데이터 통신 필요 -->
         <div class="subtitle">운동</div>
         <v-select
           v-model="exerciselog.exercise"
