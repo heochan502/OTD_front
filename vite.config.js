@@ -11,7 +11,7 @@ export default defineConfig({
     proxy: {
       '/api/OTD/user': {
         target: 'http://localhost:8080',
-        changeOrigin: true
+        changeOrigin: true,
       },
     },
   },
