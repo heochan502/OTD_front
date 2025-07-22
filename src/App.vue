@@ -12,6 +12,7 @@ const counter = useAccountStore();
 console.log('z', counter);
 const checkAccount = async () => {
   console.log('로그인 체크');
+
   try {
     const res = await check();
     console.log('res:', res);
@@ -25,6 +26,7 @@ const checkAccount = async () => {
     console.error('check 에러:', e);
     counter.setChecked(false);
   }
+
 };
 
 onMounted(() => {

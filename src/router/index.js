@@ -17,6 +17,7 @@ import HlogForm from '@/views/health/HlogForm.vue';
 
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
+
 import Profile from '@/views/Profile.vue';
 
 const router = createRouter({
@@ -25,7 +26,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: () => import('@/views/Home.vue'),
     },
     {
       path: '/community',
