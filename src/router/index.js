@@ -91,8 +91,13 @@ const router = createRouter({
       component: Login,
     },
     {
+<<<<<<< HEAD
       path: '/profile',
       name: 'profile',
+=======
+      path: "/profil",
+      name: "profile",
+>>>>>>> 9827de1f66087cfcb72d5fc01b2861797fd8afc0
       component: Profile,
     },
         {
