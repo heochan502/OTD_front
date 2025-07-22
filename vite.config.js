@@ -9,7 +9,7 @@ import vuetify from 'vite-plugin-vuetify';
 export default defineConfig({
   server: {
     proxy: {
-      '/api/OTD/user': {
+      '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
