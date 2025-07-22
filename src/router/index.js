@@ -1,6 +1,5 @@
-import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
-
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '../views/Home.vue';
 
 import CommunityList from '@/components/community/CommunityList.vue';
 
@@ -16,9 +15,9 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
-import Join from "@/views/Join.vue";
-import Login from "@/views/Login.vue";
-import Profile from "@/views/Profile.vue";
+import Join from '@/views/Join.vue';
+import Login from '@/views/Login.vue';
+import Profile from '@/views/Profile.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,13 +38,13 @@ const router = createRouter({
       component: ReminderHome,
     },
     {
-      path: "/routine",
-      name: "routine",
+      path: '/routine',
+      name: 'routine',
       component: RoutineHome,
     },
     {
-      path: "/reminderadd",
-      name: "reminderadd",
+      path: '/reminderadd',
+      name: 'reminderadd',
       component: ReminderForm,
     },
     {
@@ -87,8 +86,7 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: Login,
-
-    }, 
+    },
     {
       path: '/profile',
       name: 'profile',
