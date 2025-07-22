@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+axios.defaults.withCredentials = true;
 axios.defaults.baseURL = '/api/OTD';
 
 
@@ -18,6 +18,6 @@ export const check = () => {
 export const logout = () => {
     return axios.post('/user/logout').catch(e => e.response);
 }
-export const getProfile = (id) => {
-    return axios.get(`/user/profile/${id}`).catch(e => e.response);
+export const getProfile = () => {
+    return axios.get('/user').catch(e => e.response);
   };

@@ -91,7 +91,7 @@ const router = createRouter({
 
     }, 
     {
-      path: "/profil",
+      path: "/profile",
       name: "profile",
       component: Profile,
     },

@@ -1,9 +1,9 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+
 import { getProfile } from '@/services/accountService';
 
-const route = useRoute();
+
 
 const state = reactive({
   form: {
@@ -13,17 +13,17 @@ const state = reactive({
     name: '',
     birthDate: '',
     memberNick: '',
+    profileImage: '',  // 필드 추가
   },
 });
 
 onMounted(async () => {
-  const memid = route.params.memberNoLogin;
-  const res = await getProfile(memid);
-  if (res === undefined || res.status !== 200) {
-    alert('오류 발생');
-    return;
+  const res = await getProfile();
+  if (res.status === 200) {
+    state.form = res.data;
+  } else {
+    alert('프로필 정보를 불러올 수 없습니다.');
   }
-  Object.assign(state.form, res.data);
 });
 </script>
 
@@ -60,9 +60,7 @@ onMounted(async () => {
         </tr>
         <tr>
           <th>닉네임</th>
-          <td>
-            {{ state.form.memberNick }}
-          </td>
+          <td>{{ state.form.memberNick }}</td>
         </tr>
       </tbody>
     </table>
