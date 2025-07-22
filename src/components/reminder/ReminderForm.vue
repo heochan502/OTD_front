@@ -105,7 +105,7 @@ const submitTest = async () => {
     content: state.content,
     date: state.date,
     repeat: state.repeat,
-    dow: state.repeatDow,
+    repeatDow: state.repeatDow,
     alarm: state.alarm,
   };
   const res = await save(jsonBody);

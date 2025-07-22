@@ -3,6 +3,7 @@ import axios from 'axios';
 axios.defaults.baseURL = 'api/OTD/';
 
 export const save = (jsonBody) => {
+  console.log('json', jsonBody);
   return axios.post('reminder', jsonBody).catch((e) => e.response);
 };
 
