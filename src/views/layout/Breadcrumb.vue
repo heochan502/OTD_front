@@ -1,32 +1,32 @@
 <script setup>
-import { useRouter } from 'vue-router';
-import { useAccountStore } from '@/stores/counter';
-import { logout } from '@/services/accountService';
+import { useRouter } from "vue-router";
+import { useAccountStore } from "@/stores/counter";
+import { logout } from "@/services/accountService";
 
 const router = useRouter();
 const counter = useAccountStore();
 
-
 function goHome() {
-  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
+  router.push({ name: "home" }); // 라우트에 name 설정이 되어 있어야 함
 }
 
+
+
 const logoutAccount = async () => {
-  if(!confirm('로그아웃 하시겠습니까?')){
+  if (!confirm("로그아웃 하시겠습니까?")) {
     return;
   }
   const res = await logout();
-  if(res === undefined || res.status !== 200){
+  if (res === undefined || res.status !== 200) {
     return;
   }
   counter.setLoggedIn(false);
-}
-
+};
 </script>
 
 <template>
   <!-- 상단바 컴포넌트 -->
-  <div class="breadcrumb">
+  <header class="breadcrumb">
     <div class="inner">
       <!-- 왼쪽 로고 -->
       <div class="logo" @click="goHome" style="cursor: pointer">
@@ -43,8 +43,8 @@ const logoutAccount = async () => {
         <router-link to="/reminder" href="#">리마인더</router-link>
         <router-link to="/routine" href="#">루틴</router-link>
         <router-link to="/meal" href="#">식단</router-link>
-        <a href="#">건강</a>
-        <router-link to="/memo" href="#">일기</router-link>
+        <router-link to="/health" href="#">건강</router-link>
+        <router-link to="/memo" href="#">건강</router-link>
         <a href="#">위치</a>
         <router-link to="/community" href="#">커뮤니티</router-link>
       </nav>
@@ -53,21 +53,20 @@ const logoutAccount = async () => {
       <div class="auth">
         <template v-if="counter.state.loggedIn">
           <a @click="logoutAccount">로그아웃</a>
-          <router-link to="/profile">회원정보</router-link>  
+          <router-link to="/profile">회원정보</router-link>
         </template>
         <template v-else>
-          <router-link to="/login" href="#">로그인</router-link>  
-          <router-link to="/signup" href="#">회원가입</router-link>  
+          <router-link to="/login" href="#">로그인</router-link>
+          <router-link to="/signup" href="#">회원가입</router-link>
         </template>
       </div>
     </div>
-  </div>
+  </header>
 </template>
 
 <style scoped>
 .breadcrumb {
   width: 100%;
-  margin: 0;
   border-bottom: 1px solid #ddd;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -90,20 +89,20 @@ const logoutAccount = async () => {
 }
 
 .logo-one {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   color: #555;
 }
 
 .logo-today {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 15px;
+  font-size: 10px;
   color: #999;
   margin-top: -2px;
 }
@@ -112,7 +111,7 @@ const logoutAccount = async () => {
   padding: 0 60px 0 120px;
   display: flex;
   gap: 20px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #222;
 }
@@ -124,7 +123,7 @@ const logoutAccount = async () => {
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 14px;
-  color: #444;
+  font-size: 12px;
+  color: #00bd7e;
 }
 </style>
