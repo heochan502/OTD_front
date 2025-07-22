@@ -9,13 +9,13 @@ import { check } from './services/accountService';
 const route = useRoute();
 const counter = useAccountStore();
 
-console.log('z', counter);
+// console.log('z', counter);
 const checkAccount = async () => {
   console.log('로그인 체크');
 
   try {
     const res = await check();
-    console.log('res:', res);
+    // console.log('res:', res);
     if (!res || res.status != 200) {
       counter.setChecked(false);
       return;
