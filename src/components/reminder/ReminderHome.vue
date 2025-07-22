@@ -23,9 +23,11 @@ const getDate = async (year, month) => {
 
 <template>
   <div class="reminder">
-    <Calendar @reminder-date="getDate"></Calendar>
-    <div class="list">
-      <div><router-link to="/reminderadd">일정 추가하기</router-link></div>
+    <div>
+      <Calendar @reminder-date="getDate"></Calendar>
+    </div>
+    <div><router-link to="/reminderform">일정 추가하기</router-link></div>
+    <router-link to="/reminderlist" class="list">
       <div>
         <span class="list_title">오늘의 일정</span>
         <br />
@@ -36,7 +38,7 @@ const getDate = async (year, month) => {
       <div>
         <!-- 일정리스트 -->
       </div>
-    </div>
+    </router-link>
   </div>
 </template>
 
