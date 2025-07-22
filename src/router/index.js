@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
 
 import CommunityList from "@/components/community/CommunityList.vue";
 
@@ -17,7 +16,6 @@ import HlogForm from "@/views/health/HlogForm.vue";
 
 import Join from "@/views/Join.vue";
 import Login from "@/views/Login.vue";
-
 import Profile from "@/views/Profile.vue";
 
 const router = createRouter({
