@@ -1,4 +1,5 @@
 <script setup>
+
 import { useRouter } from "vue-router";
 import { useAccountStore } from "@/stores/counter";
 import { logout } from "@/services/accountService";
@@ -7,13 +8,15 @@ const router = useRouter();
 const counter = useAccountStore();
 
 function goHome() {
-  router.push({ name: "home" }); // 라우트에 name 설정이 되어 있어야 함
+  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
 }
 
 
 
 const logoutAccount = async () => {
+
   if (!confirm("로그아웃 하시겠습니까?")) {
+
     return;
   }
   const res = await logout();
