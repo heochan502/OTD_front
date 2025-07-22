@@ -12,6 +12,7 @@ export const login = (params) => {
 export const check = () => {
   return axios.get('/user/check').catch((e) => e.response);
 };
+
 export const logout = () => {
   return axios.post('/user/logout').catch((e) => e.response);
 };
