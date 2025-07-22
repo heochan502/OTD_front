@@ -97,6 +97,18 @@ const router = createRouter({
       name: "profile",
       component: Profile,
     },
+        {
+      path: "/memo/:id",
+      name: "memoDetail",
+      component: Memo,
+      props: true,
+    },
+        {
+      path: "/diary",
+      name: "diary",
+      component: Diary,
+      props: true,
+    },
   ],
 });
 

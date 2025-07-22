@@ -15,7 +15,8 @@ const state = reactive({
   }
 });
 
-const isUpdateMode = route.params.id !== undefined;
+const isUpdateMode = route.params.id != null;
+
 const showImages = ref([]);
 
 const alertModal = reactive({
@@ -45,15 +46,33 @@ const showConfirm = (message) => {
 onMounted( async () => {
     if (isUpdateMode) {
     const id = route.params.id;
-    const { resultData } = await MemoHttpService.findById(id);
-    state.memo = resultData;
-    if(state.memo.image) {
-      showImages.value.push(state.memo.image);
+    try {
+      const { resultData } = await MemoHttpService.findById(id);
+      state.memo = resultData;
+      // 백엔드에서 이미지 URL을 반환하는 경우 대비하여 처리
+      if (state.memo. imageUrls && Array.isArray(state.memo.imageUrls)) {
+        showImages.value = state.memo.imageUrls;
+      } else if (state.memo.image) {
+        showImages.value.push(state.memo.image);
+      }
+    } catch (e) {
+      showAlert("메모 정보를 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
+      router.push("/memo");
+      return;
     }
   }
 });
 
 const save = async () => {
+  // 제목, 내용이 비어있는지 확인
+  if (!state.memo.title.trim()) {
+    showAlert("제목을 입력해주세요.");
+    return;
+  }
+  if (!state.memo.content || typeof state.memo.content !== 'string' || !state.memo.content.trim() || state.memo.content.length < 10 || state.memo.content.length > 500) {
+      showAlert("내용은 10자 이상, 500자 이하로 입력해주세요.");
+      return;
+  }
   // 1. JSON 데이터 준비
   const reqPayload = {
     title: state.memo.title,
@@ -64,14 +83,13 @@ const save = async () => {
   const formData = new FormData();
   formData.append("req", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
   
-  const imageFile = fileInputRef.value?.files[0] || null;
-  if (imageFile) {
-    if (!fileTypeCheck({ value: imageFile.name })) {
-     showAlert("이미지 파일 형식이 올바르지 않습니다.");
-     return;
+  const selectedNewFiles = fileInputRef.value?.files;
+  if (selectedNewFiles && selectedNewFiles.length > 0) {
+    for (let i = 0; i < selectedNewFiles.length; i++) {
+      const file = selectedNewFiles[i];
+      formData.append("memoImageFiles", file);
+    }
   }
-  formData.append("memoImageFile", imageFile);
-}
 
   // 3. API 호출
   let result;
@@ -83,12 +101,13 @@ const save = async () => {
       result = await MemoHttpService.create(userId, formData);
     }
   } catch (e) {
-    showAlert("서버 요청 중 오류 발생: " + e.message);
+    console.error("서버 요청 중 오류 발생:", e);
+    showAlert("서버 요청 중 오류 발생: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
     return;
   }
 
   // 4. 응답 처리
-  if (!result?.resultData) {
+  if (!result || !result?.resultData) {
     showAlert("메모 등록/수정 실패: " + (result?.message || "알 수 없는 오류"));
     return;
 }
@@ -105,53 +124,72 @@ const save = async () => {
 
 const remove = async () => {
     if(!await showConfirm("삭제하시겠습니까?")) return;
+    try {
     const result = await MemoHttpService.deleteById(state.memo.id);
     if(result.resultData === 1) {
-        showAlert("삭제되었습니다.");
-        router.push("/otd/memo");
+        showAlert("메모가 삭제되었습니다.");
+        router.push("/memo");
     } else {
-    showAlert("메모 삭제 실패: ", + (result.message || "알 수 없는 오류가 발생하였습니다."));
-    }
+    showAlert("메모 삭제에 실패하였습니다: ", + (result.message || "알 수 없는 오류가 발생하였습니다."));
+    }  
+  } catch (e) {
+    console.error("메모 삭제 중 오류 발생:", e);
+    showAlert("메모 삭제 중 오류 발생: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
+  }
 };
 
-const handleImageChange = async (e) => {
-  const files = e.target.files;
-  if(!files || files.length === 0) return;
+const handleImageChange = (e) => {
+  const selectedFiles = e.target.files;
+  if(!selectedFiles || selectedFiles.length === 0) {
+    if (fileInputRef.value) {
+      fileInputRef.value.value = ''; // 파일 입력 초기화
+    }
+    return;
+  }
+  const validFilesToAdd = [];
+  const currentTotalImages = showImages.value.length;
+  const maxImages = 5;
 
-  // 유효성 검사 (파일 형식)
-  if (!fileTypeCheck({ value: file.name })) {
-  showAlert("이미지 파일 형식이 올바르지 않습니다.");
-  return;
-}
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
 
-  const validFiles = [];
-  for(let i=0; i<files.length; i++) {
-    const file = files[i];
+  // 최대 이미지 수 체크
+  if (currentTotalImages + validFilesToAdd.length >= maxImages) {
+    showAlert(`최대 ${maxImages}장의 이미지만 업로드할 수 있습니다.`);
+    break;
+    }
+
+  // 파일 형식 체크
+  if (!fileTypeCheck(file.name)) {
+    continue;
+  }
+
+  // 파일 크기 체크
     const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
     if (file && file.size > maxSizeInBytes) {
       showAlert(`파일 "${file.name}"의 크기(${formatBytes(file.size)})가 5MB를 초과하여 업로드할 수 없습니다.`);
       continue;
     }
-    validFiles.push(file);
+  // 유효성 검사를 통과한 파일만 추가 대상 포함  
+    validFilesToAdd.push(file);
   }
-
-  let newImageUrlLists = [...showImages.value];
-
-  for(let i=0; i<validFiles.length; i++) {
-    const file = validFiles[i];
+  // 유효한 파일드를 미리보기 항목 추가
+  validFilesToAdd.forEach(file => {
     const currentImageUrl = URL.createObjectURL(file);
-    newImageUrlLists.push(currentImageUrl);
-  }
-  if(newImageUrlLists.length > 5) {
-    newImageUrlLists = newImageUrlLists.slice(0, 5);
-    showAlert("최대 5장의 이미지만 업로드할 수 있습니다.");
-  }
-  showImages.value = newImageUrlLists;
-  e.target.value = '';
-};
+    showImages.value.push(currentImageUrl);
+  });
+  // 파일 입력 필드 초기화, 동일 파일을 다시 선택해도 change 이벤트 발생
+    if (fileInputRef.value) {
+      fileInputRef.value.value = ''; // 파일 입력 초기화
+    }
+  };
 
+// removeImage 함수 재정의, 메모리 해제
 const removeImage = (index) => {
-  URL.revokeObjectURL(showImages.value[index]);
+const imageUrlToRemove = showImages.value[index];
+if (imageUrlToRemove && imageUrlToRemove.startsWith('blob:')) {
+    URL.revokeObjectURL(imageUrlToRemove);
+  }
   showImages.value.splice(index, 1);
 };
 
@@ -167,13 +205,14 @@ const formatBytes = (bytes, decimals = 2) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-const fileTypeCheck = (obj) => {
-  const fileName = obj.value;
+const fileTypeCheck = (fileName) => {
   const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
   const allowed = ['jpg', 'jpeg', 'png', 'gif'];
   if(!allowed.includes(fileExtension)) {
     showAlert('jpg, jpeg, png, gif 형식의 파일만 등록 가능합니다.');
-    obj.value = '';
+    // if (fileInputRef.value) {
+    //   fileInputRef.value.value = ''; // 파일 입력 초기화
+    // }
     return false;
   }
   return true;
