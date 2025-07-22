@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
 
-const tab = ref("null");
+const tab = ref("one");
 </script>
 
 <template>
