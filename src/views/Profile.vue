@@ -7,6 +7,7 @@ const route = useRoute();
 
 const state = reactive({
   form: {
+    memberNoLogin: 0,
     memberId: '',
     email: '',
     name: '',
@@ -16,7 +17,7 @@ const state = reactive({
 });
 
 onMounted(async () => {
-  const memid = route.params.id;
+  const memid = route.params.memberNoLogin;
   const res = await getProfile(memid);
   if (res === undefined || res.status !== 200) {
     alert('오류 발생');

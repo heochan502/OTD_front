@@ -24,6 +24,7 @@ const checkAccount = async () => {
 
 onMounted(()=>{
   checkAccount();
+  counter.setLoggedIn(false);
 })
 watch(() => route.path,() => {
     checkAccount();
