@@ -10,9 +10,9 @@ import Content from './Content.vue';
     <div class="headerlayout">
       <Breadcrumb />
     </div>
-    <main class="contentlayout">
+    <div class="contentlayout">
       <Content />
-    </main>
+    </div>
   </div>
 </template>
 
