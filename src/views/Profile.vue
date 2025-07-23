@@ -18,6 +18,7 @@ const state = reactive({
     birthDate: '',
     memberNick: '',
   },
+
   loading: true,
   error: null
 });
@@ -252,3 +253,4 @@ onMounted(async () => {
   }
 }
 </style>
+

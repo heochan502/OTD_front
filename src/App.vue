@@ -9,7 +9,7 @@ const route = useRoute();
 const router = useRouter();
 const counter = useAccountStore();
 
-// 초기 로딩 상태 추가
+
 const isInitializing = ref(true);
 
 const checkAccount = async () => {
@@ -23,7 +23,7 @@ const checkAccount = async () => {
       counter.setChecked(true);
       counter.setLoggedIn(true);
       
-      // 현재 경로가 login 또는 signup이면 홈으로 리다이렉트
+
       if (route.path === '/login' || route.path === '/signup') {
         router.push('/');
       }
@@ -31,8 +31,7 @@ const checkAccount = async () => {
       // 로그아웃 상태
       counter.setChecked(true);
       counter.setLoggedIn(false);
-      
-      // 보호된 경로에 접근 시 로그인 페이지로 리다이렉트
+
       const protectedRoutes = ['/profile', '/profile/edit'];
       if (protectedRoutes.includes(route.path)) {
         router.push('/login');
@@ -47,18 +46,13 @@ const checkAccount = async () => {
   }
 };
 
-onMounted(async () => {
-  // 초기 로딩 시 로그인 체크
-  await checkAccount();
+onMounted(() => {
+  checkAccount();
+  counter.setLoggedIn(false);
+   router.push('/login');
 });
-
-// 라우트 변경 감지
-watch(
-  () => route.path,
-  () => {
-    if (!isInitializing.value) {
-      checkAccount();
-    }
+watch(() => route.path,() => {
+    checkAccount();
   }
 );
 </script>

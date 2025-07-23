@@ -9,7 +9,6 @@ defineProps({
   rightString: String,
   customsize: String,
 });
-
 // onMounted(() => {
 //     console.log('totalKcal2:', value.value);
 //     console.log('maxKcal2:', maxKcal.value);

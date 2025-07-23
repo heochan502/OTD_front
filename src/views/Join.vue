@@ -261,7 +261,6 @@ const submit = async () => {
             v-model="state.form.memberPw"
           />
         </div>
-
         <div class="form-group">
           <label for="memberPw2">비밀번호 확인*</label>
           <input

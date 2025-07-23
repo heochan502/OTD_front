@@ -12,6 +12,7 @@
     "@mdi/font": "^7.4.47",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.10.0",
+    "dayjs": "^1.11.13",
     "bootstrap-icons": "^1.13.1",
     "echarts": "^5.6.0",
     "pinia": "^3.0.3",

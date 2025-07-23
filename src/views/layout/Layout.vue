@@ -7,12 +7,12 @@ import Content from './Content.vue';
   <!-- 레이아웃을 통일해서 재사용할 컴포넌트를 보여줌 -->
   <div class="layout">
     <!-- 스크롤시 상단바가 화면에 딸려 내려오는 기능 구현할 예정 -->
-    <header class="headerlayout">
+    <div class="headerlayout">
       <Breadcrumb />
-    </header>
-    <main class="contentlayout">
+    </div>
+    <div class="contentlayout">
       <Content />
-    </main>
+    </div>
   </div>
 </template>
 
@@ -23,8 +23,10 @@ import Content from './Content.vue';
   display: flex;
   flex-direction: column;
   position: sticky;
-  top: 0;
-  z-index: 1000;
+  z-index: 1000;    
+  height: auto;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .contentlayout {
   min-width: 100vw;
