@@ -9,7 +9,7 @@ const weather = ref(null);
 
 const LocalWeather = async () => {
   const res = await getWeather(memberId.value);
-  console.log(res.data);
+  // console.log(res.data);
   weather.value = res.data;
 };
 
@@ -59,7 +59,7 @@ const backgroundImg = {
 const weatherBackground = computed(() => {
   const condition = weather.value?.condition || '';
   const time = dayTimes.value;
-  console.log('time', time);
+  // console.log('time', time);
   return backgroundImg[`${condition}-${time}`] || backgroundImg.default;
 });
 </script>
