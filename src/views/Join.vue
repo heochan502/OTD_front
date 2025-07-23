@@ -1,24 +1,24 @@
 <script setup>
-import { reactive ,computed } from 'vue';
+import { reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { join } from '@/services/accountService';
 
 const router = useRouter();
 
 const state = reactive({
-    form:{
-        memberId: '',
-        memberPw: '',
-        memberPW2:'',
-        email: '',
-        name: '',
-        birthDate: '',
-        memberNick: '',
-    }
+  form: {
+    memberId: '',
+    memberPw: '',
+    memberPW2: '',
+    email: '',
+    name: '',
+    birthDate: '',
+    memberNick: '',
+  },
 });
 
 const isPasswordMatch = computed(() => {
-  return state.form.memberPw && state.form.memberPw === state.form.memberPw2
+  return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
 });
 
 const submit = async () => {
@@ -44,47 +44,83 @@ const submit = async () => {
         <div class="form-group">
           <label for="memberId">아이디 *</label>
           <div class="input-wrapper">
-            <input type="text" id="memberId" placeholder="아이디를 입력해 주세요" v-model="state.form.memberId" />
+            <input
+              type="text"
+              id="memberId"
+              placeholder="아이디를 입력해 주세요"
+              v-model="state.form.memberId"
+            />
             <button type="button" class="btn-small">중복확인</button>
           </div>
         </div>
-
         <div class="form-group">
           <label for="memberPw">비밀번호 *</label>
-          <input type="password" id="memberPw" placeholder="비밀번호를 입력해주세요" v-model="state.form.memberPw" />
+          <input
+            type="password"
+            id="memberPw"
+            placeholder="비밀번호를 입력해주세요"
+            v-model="state.form.memberPw"
+          />
         </div>
-        
         <div class="form-group">
           <label for="memberPw2">비밀번호 확인*</label>
-          <input type="password" id="memberPw2" placeholder="비밀번호를 한번더 확인해주세요" v-model="state.form.memberPw2" />
-           <p :style="{ color: isPasswordMatch ? 'green' : 'red' }">
-            {{ isPasswordMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.' }}
+          <input
+            type="password"
+            id="memberPw2"
+            placeholder="비밀번호를 한번더 확인해주세요"
+            v-model="state.form.memberPw2"
+          />
+          <p :style="{ color: isPasswordMatch ? 'green' : 'red' }">
+            {{
+              isPasswordMatch
+                ? '비밀번호가 일치합니다.'
+                : '비밀번호가 일치하지 않습니다.'
+            }}
           </p>
         </div>
-
 
         <div class="form-group">
           <label for="email">이메일 *</label>
           <div class="input-wrapper">
-            <input type="email" id="email" placeholder="이메일을 입력해 주세요" v-model="state.form.email" />
+            <input
+              type="email"
+              id="email"
+              placeholder="이메일을 입력해 주세요"
+              v-model="state.form.email"
+            />
             <button type="button" class="btn-small">중복확인</button>
           </div>
         </div>
 
         <div class="form-group">
           <label for="name">이름 *</label>
-          <input type="text" id="name" placeholder="이름을 입력해 주세요" v-model="state.form.name" />
+          <input
+            type="text"
+            id="name"
+            placeholder="이름을 입력해 주세요"
+            v-model="state.form.name"
+          />
         </div>
 
         <div class="form-group">
           <label for="birthDate">생년월일 *</label>
-          <input type="text" id="birthDate" placeholder="YYYYMMDD" v-model="state.form.birthDate" />
+          <input
+            type="text"
+            id="birthDate"
+            placeholder="YYYYMMDD"
+            v-model="state.form.birthDate"
+          />
         </div>
 
         <div class="form-group">
           <label for="memberNick">닉네임 *</label>
           <div class="input-wrapper">
-            <input type="text" id="memberNick" placeholder="닉네임을 입력해 주세요" v-model="state.form.memberNick" />
+            <input
+              type="text"
+              id="memberNick"
+              placeholder="닉네임을 입력해 주세요"
+              v-model="state.form.memberNick"
+            />
             <button type="button" class="btn-small">중복확인</button>
           </div>
         </div>
@@ -96,7 +132,9 @@ const submit = async () => {
           </label>
           <ul>
             <li><input type="checkbox" /> [필수] 이용약관에 동의합니다.</li>
-            <li><input type="checkbox" /> [필수] 개인정보 수집 이용에 동의합니다.</li>
+            <li>
+              <input type="checkbox" /> [필수] 개인정보 수집 이용에 동의합니다.
+            </li>
             <li><input type="checkbox" /> [필수] 서비스 이용 동의</li>
             <li><input type="checkbox" /> [선택] 이벤트 및 알림 동의</li>
           </ul>
@@ -107,12 +145,12 @@ const submit = async () => {
     </div>
   </div>
   <div>
-          <div class="already">
-          <p class="log">이미 계정이 있으신가요?</p>
-            <router-link to="/login" class="goLogin">로그인</router-link>  
-          </div>
-          <router-link to="/" class="goHome">홈화면으로</router-link>  
-        </div>
+    <div class="already">
+      <p class="log">이미 계정이 있으신가요?</p>
+      <router-link to="/login" class="goLogin">로그인</router-link>
+    </div>
+    <router-link to="/" class="goHome">홈화면으로</router-link>
+  </div>
 </template>
 
 <style scoped>
@@ -170,7 +208,6 @@ const submit = async () => {
   border-color: #2a9df4;
   box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.15);
 }
-
 
 .input-wrapper {
   display: flex;
@@ -238,15 +275,14 @@ const submit = async () => {
   box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
 }
 
-.log{
-  color: #B9B9B9;
+.log {
+  color: #b9b9b9;
   text-align: center;
 }
-.already{
+.already {
   display: flex;
   flex-direction: row;
   text-align: center;
-  color: #5D5D5D;
+  color: #5d5d5d;
 }
-
 </style>
