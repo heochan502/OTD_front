@@ -8,7 +8,7 @@ const memberId = ref('');
 const weather = ref(null);
 
 const LocalWeather = async () => {
-  const res = await getWeather(memberId.value);
+  const res = await getWeather();
   console.log(res.data);
   weather.value = res.data;
 };
@@ -29,7 +29,7 @@ const skyEmojiList = {
 };
 
 const skyEmoji = computed(() => {
-  return skyEmojiList[weather.value?.condition] || skyEmojiList.default;
+  return skyEmojiList[weather.value?.sky] || skyEmojiList.default;
 });
 
 const dayTimes = computed(() => {
@@ -57,10 +57,10 @@ const backgroundImg = {
 };
 
 const weatherBackground = computed(() => {
-  const condition = weather.value?.condition || '';
+  const sky = weather.value?.sky || '';
   const time = dayTimes.value;
   console.log('time', time);
-  return backgroundImg[`${condition}-${time}`] || backgroundImg.default;
+  return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
 });
 </script>
 
@@ -78,9 +78,13 @@ const weatherBackground = computed(() => {
     <div class="weather-header">
       <div class="weather-icon">{{ skyEmoji }}</div>
       <div class="weather-info">
-        <div class="temperature">{{ weather.temperature }} ℃</div>
-        <div class="condition">{{ weather.condition }}</div>
+        <div class="temperature">{{ weather.tem }} ℃</div>
+        <div class="condition">{{ weather.sky }}</div>
+        <div class="humidity">습도 : {{ weather.reh }}%</div>
       </div>
+      <p class="weather-info">
+        최저/최고 : {{ weather.tmn + '°/' + weather.tmx }}°
+      </p>
     </div>
   </div>
 </template>
