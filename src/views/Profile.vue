@@ -1,11 +1,13 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
+
 import { useRouter } from 'vue-router';
 import { getProfile } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
 
 const router = useRouter();
 const counter = useAccountStore();
+
 
 const state = reactive({
   form: {
@@ -254,3 +256,4 @@ const goToEdit = () => {
   }
 }
 </style>
+

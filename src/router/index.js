@@ -1,15 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
 
+import CommunityList from "@/components/community/CommunityList.vue";
 
-import CommunityList from '@/components/community/CommunityList.vue';
+import ReminderHome from "@/components/reminder/ReminderHome.vue";
+import RoutineHome from "@/components/routine/RoutineHome.vue";
+import ReminderForm from "@/components/reminder/ReminderForm.vue";
 
-import ReminderHome from '@/components/reminder/ReminderHome.vue';
-import RoutineHome from '@/components/routine/RoutineHome.vue';
-import ReminderForm from '@/components/reminder/ReminderForm.vue';
-
-import MealForm from '@/views/meal/MealForm.vue';
-
+import MealForm from "@/views/meal/MealForm.vue";
 
 import HealthMain from "@/views/health/HealthMain.vue";
 import ElogDetail from "@/views/health/ElogDetail.vue";
@@ -27,7 +24,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: Home,
+      component: () => import("@/views/Home.vue"),
     },
     {
       path: "/community",
@@ -45,13 +42,13 @@ const router = createRouter({
       component: RoutineHome,
     },
     {
-      path: "/reminderadd",
-      name: "reminderadd",
+      path: "/reminderform",
+      name: "reminderform",
       component: ReminderForm,
     },
     {
-      path: '/meal',
-      name: 'MealForm',
+      path: "/meal",
+      name: "MealForm",
       component: MealForm,
     },
     {
@@ -88,8 +85,7 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: Login,
-
-    }, 
+    },
     {
       path: "/profile",
       name: "profile",

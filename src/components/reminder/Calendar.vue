@@ -1,22 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-// const props = defineProps({
-//   initialDate: {
-//     type: [Date, String],
-//     required: false,
-//     dafault: () => new Date(),
-//   },
-//   data() {
-//     return { selectedDate: this.initialDate };
-//   },
-// });
-const emit = defineEmits(['selected-date']);
+const props = defineProps({
+  reminderDate: {
+    type: Array,
+    default: () => [],
+  },
+});
+const emit = defineEmits(['selected-date', 'reminder-date']);
 
 const pickDate = (day) => {
   if (!day) return;
   const selectedDate = new Date(currentYear.value, currentMonth.value - 1, day);
-  console.log('emit', selectedDate);
   emit('selected-date', selectedDate);
 };
 
@@ -71,12 +66,18 @@ const makeCalendar = () => {
     const row = [];
     for (let k = 0; k < 7; k++) {
       if (i === 0 && k < startIdx) {
-        row.push('');
+        row.push({ date: '', hasReminder: false });
       } else if (day <= endDay) {
-        row.push(day);
+        const fullDate = `${currentYear.value}.${String(
+          currentMonth.value
+        ).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
+
+        const hasReminder = props.reminderDate.includes(fullDate);
+
+        row.push({ date: day, hasReminder });
         day++;
       } else {
-        row.push('');
+        row.push({ date: '', hasReminder: false });
       }
     }
     matrix.push(row);
@@ -92,6 +93,13 @@ onMounted(() => {
 });
 // console.log('calendar', calendarMatrix);
 
+const changeMonth = () => {
+  emit('reminder-date', {
+    year: currentYear.value,
+    month: currentMonth.value,
+  });
+};
+
 const prevMonth = () => {
   if (currentMonth.value === 1) {
     currentMonth.value = 12;
@@ -100,6 +108,7 @@ const prevMonth = () => {
     currentMonth.value--;
   }
   makeCalendar();
+  changeMonth();
 };
 
 const nextMonth = () => {
@@ -110,14 +119,15 @@ const nextMonth = () => {
     currentMonth.value++;
   }
   makeCalendar();
+  changeMonth();
 };
 
-const todayColor = (dayOfMonth) => {
+const todayColor = (day) => {
   const today = new Date();
   return (
     currentYear.value === today.getFullYear() &&
     currentMonth.value === today.getMonth() + 1 &&
-    dayOfMonth === today.getDate()
+    day === today.getDate()
   );
 };
 </script>
@@ -141,15 +151,19 @@ const todayColor = (dayOfMonth) => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="rowOfMonth in calendarMatrix" :key="rowOfMonth">
+        <tr v-for="(rowOfMonth, index) in calendarMatrix" :key="index">
           <td
-            v-for="dayOfMonth in rowOfMonth"
-            :key="dayOfMonth"
-            :class="{ today_color: todayColor(dayOfMonth) }"
+            v-for="(dayOfMonth, index) in rowOfMonth"
+            :key="index"
+            :class="{
+              today_color: todayColor(dayOfMonth.date),
+              reminder_color: dayOfMonth.hasReminder,
+              sunday_color: index === 0,
+            }"
             class="day"
-            @click="pickDate(dayOfMonth)"
+            @click="pickDate(dayOfMonth.date)"
           >
-            {{ dayOfMonth }}
+            {{ dayOfMonth.date }}
           </td>
         </tr>
       </tbody>
@@ -158,29 +172,32 @@ const todayColor = (dayOfMonth) => {
 </template>
 
 <style lang="scss" scoped>
-.reminder {
---cal-width : 500px
-  display: flex;
-  gap: 30px;
-  .calendar {
-    width: 500px;
-    .calendar_title {
-      a > img {
-        width: 25px;
-      }
+.calendar {
+  width: 500px;
+  .calendar_title {
+    a > img {
+      width: 25px;
     }
-    .table {
-      td {
-        text-align: center;
-        vertical-align: middle;
-        border-bottom: none;
-      }
-      .today_color {
-        color: steelblue;
-      }
-      td {
-        height: 70px;
-      }
+  }
+  .table {
+    td {
+      text-align: center;
+      vertical-align: middle;
+      border-bottom: none;
+      cursor: pointer;
+    }
+    .today_color {
+      color: steelblue;
+    }
+    .sunday_color {
+      color: tomato;
+    }
+    .reminder_color {
+      background-color: slategray;
+      border-radius: 50%;
+    }
+    td {
+      height: 70px;
     }
   }
 }

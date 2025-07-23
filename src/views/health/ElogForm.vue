@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import effortLevels from "@/api/health/effortLevels.json";
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -11,9 +12,8 @@ const exerciselog = ref({
   exercise: "",
   exerciseKcal: 0,
   exerciseDuration: 0,
-  effortLevel: 0,
+  effortLevel: 1,
 });
-const selected = ref("");
 const exercise = [
   {
     id: 1,
@@ -31,21 +31,6 @@ const exercise = [
     met: 10,
   },
 ];
-
-const level = ref(0);
-
-const satisfactionEmojis = [
-  "\uD83D\uDE0D",
-  "\uD83D\uDE04",
-  "\uD83D\uDE01",
-  "\uD83D\uDE0A",
-  "\uD83D\uDE42",
-  "\uD83D\uDE10",
-  "\uD83D\uDE41",
-  "\u2639\uFE0F",
-  "\uD83D\uDE22",
-  "\uD83D\uDE2D",
-];
 </script>
 
 <template>
@@ -53,17 +38,17 @@ const satisfactionEmojis = [
     <v-row class="title">
       <h4>운동 기록하기</h4>
     </v-row>
-    <v-row>
-      <v-col>
+    <v-row class="content">
+      <v-col cols="6">
         <div class="subtitle">운동일자</div>
         <input type="datetime-local" v-model="exerciselog.exerciseDatetime" />
-
         <div class="duration">
-          <div class="subtitle">운동시간</div>
+          <div class="subtitle">운동시간(분)</div>
           <v-number-input
             control-variant="split"
             v-model="exerciselog.exerciseDuration"
             width="200px"
+            density="compact"
           ></v-number-input>
         </div>
         <div class="kcal">
@@ -72,20 +57,22 @@ const satisfactionEmojis = [
             control-variant="split"
             v-model="exerciselog.exerciseKcal"
             width="200px"
+            density="compact"
           ></v-number-input>
         </div>
       </v-col>
-      <v-col>
+      <v-col cols="6">
+        <!-- 운동 종목 데이터 통신 필요 -->
         <div class="subtitle">운동</div>
         <v-select
           v-model="exerciselog.exercise"
           :items="exercise.map((e) => e.exercise)"
           variant="outlined"
+          density="compact"
         ></v-select>
-        <div>
+        <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
-
-          <div class="text-h2 font-weight-light">
+          <div class="text-h3 font-weight-light">
             {{ exerciselog.effortLevel }}
           </div>
         </div>
@@ -99,16 +86,20 @@ const satisfactionEmojis = [
           max="10"
         >
           <template v-slot:thumb-label="{ modelValue }">
-            {{ satisfactionEmojis[Math.min(modelValue - 1, 9)] }}
+            {{ effortLevels[modelValue - 1].emoji }}
           </template>
         </v-slider>
+        <div class="desbox">
+          <p>{{ effortLevels[exerciselog.effortLevel - 1].label }}</p>
+          <p class="description">
+            {{ effortLevels[exerciselog.effortLevel - 1].description }}
+          </p>
+        </div>
       </v-col>
     </v-row>
-    <v-row class="buttons">
-      <v-col>
-        <v-btn>추가</v-btn>
-        <v-btn>취소</v-btn>
-      </v-col>
+    <v-row class="btns">
+      <v-btn>추가</v-btn>
+      <v-btn>취소</v-btn>
     </v-row>
   </v-container>
 </template>
@@ -117,9 +108,11 @@ const satisfactionEmojis = [
 .container {
   display: flex;
   justify-content: center;
-  align-content: center;
+  align-items: center;
 
   flex-direction: column;
+
+  padding-top: 100px;
 
   .title {
     display: flex;
@@ -132,11 +125,35 @@ const satisfactionEmojis = [
   }
 
   .subtitle {
+    padding: 15px 0 3px;
     font-size: 20px;
   }
-
-  .buttons {
+  .desbox {
     display: flex;
+
+    justify-content: center;
+
+    width: 300px;
+    height: 40px;
+    padding: 3px 6px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+
+    font-size: 18px;
+    p {
+      padding: 3px;
+    }
+    .description {
+      display: flex;
+
+      font-size: 12px;
+    }
+  }
+
+  .btns {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
   }
 }
 </style>

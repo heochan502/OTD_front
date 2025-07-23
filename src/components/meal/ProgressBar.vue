@@ -3,6 +3,7 @@ import { number } from 'echarts';
 import { ref, reactive, onMounted } from 'vue';
 
 defineProps({
+
   value: Number,
   max: Number,
   leftString: String,
@@ -14,6 +15,7 @@ defineProps({
 //     console.log('totalKcal2:', value.value);
 //     console.log('maxKcal2:', maxKcal.value);
 // });
+
 </script>
 
 <template>
