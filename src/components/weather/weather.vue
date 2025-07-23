@@ -9,7 +9,7 @@ const weather = ref(null);
 
 const LocalWeather = async () => {
   const res = await getWeather(memberId.value);
-  console.log(res.data);
+  // console.log(res.data);
   weather.value = res.data;
 };
 
@@ -17,11 +17,11 @@ onMounted(async () => {
   LocalWeather();
 });
 
-// 디자인
+// 이모트 및 사진
 const skyEmojiList = {
   맑음: '☀️',
   흐림: '☁️',
-  구름많음: '🌤️',
+  '구름 많음': '🌤️',
   비: '🌧️',
   눈: '❄️',
   비눈: '🌨️',
@@ -43,7 +43,7 @@ const dayTimes = computed(() => {
 const backgroundImg = {
   '맑음-morning': 'url(src/image/weather/clear_morning.jpg)',
   '맑음-evening': 'url(src/image/weather/clear_afternoon.jpg)',
-  '맑음-night': 'url(src/imgage/weather/clear_night.jpg)',
+  '맑음-night': 'url(src/image/weather/clear_night.jpg)',
   '흐림-morning': 'url(src/image/weather/cloudy.jpg)',
   '흐림-evening': 'url(src/image/weather/cloudy.jpg)',
   '흐림-night': 'url(src/image/weather/cloudy_night.jpg)',
@@ -53,26 +53,18 @@ const backgroundImg = {
   '비-morning': 'url(src/image/weather/rain.jpg)',
   '비-evening': 'url(src/image/weather/rain.jpg)',
   '비-night': 'url(src/image/weather/rain.jpg)',
-  default: 'url(src/image/weahter/default.png)',
+  default: 'url(src/image/weather/default.png)',
 };
 
 const weatherBackground = computed(() => {
   const condition = weather.value?.condition || '';
   const time = dayTimes.value;
-  console.log('time', time);
+  // console.log('time', time);
   return backgroundImg[`${condition}-${time}`] || backgroundImg.default;
 });
 </script>
 
 <template>
-  <div class="weather-live">
-    <input
-      class="weather-livetime"
-      v-model="memberId"
-      placeholder="회원번호 입력"
-    />
-    <button class="weather-livetime" @click="LocalWeather">날씨 조회</button>
-  </div>
   <div class="weather-basetime" v-if="weather">
     <div class="basetime">날씨예보 기준 시간</div>
     <div class="basetime">{{ weather.baseTime }}</div>
