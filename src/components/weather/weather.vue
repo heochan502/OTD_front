@@ -60,7 +60,7 @@ const weatherBackground = computed(() => {
   const sky = weather.value?.sky || '';
   const time = dayTimes.value;
   console.log('time', time);
-  return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
+  return backgroundImg[`${condition}-${time}`] || backgroundImg.default;
 });
 </script>
 
