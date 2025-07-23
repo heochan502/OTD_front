@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import CommunityList from "@/components/community/CommunityList.vue";
+
+import CommunityView from '@/views/community/CommunityView.vue';
+
 
 import ReminderHome from "@/components/reminder/ReminderHome.vue";
 import RoutineHome from "@/components/routine/RoutineHome.vue";
@@ -27,9 +29,9 @@ const router = createRouter({
       component: () => import("@/views/Home.vue"),
     },
     {
-      path: "/community",
-      name: "community",
-      component: CommunityList,
+      path: '/community',
+      name: 'community',
+      component: CommunityView,
     },
     {
       path: "/reminder",
