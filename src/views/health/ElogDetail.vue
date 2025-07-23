@@ -22,7 +22,7 @@ const formatDate = (dateStr) => {
       <div class="exercise_datetime">
         {{ formatDate(exerciselog.exerciseDatetime) }}
       </div>
-      <div class="btns">
+      <div class="btns ">
         <v-btn class="btn_modify">수정</v-btn>
         <v-btn class="btn_delete">삭제</v-btn>
       </div>
