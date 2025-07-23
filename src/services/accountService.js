@@ -20,4 +20,16 @@ export const logout = () => {
 }
 export const getProfile = () => {
   return axios.get('/user/profile').catch((e) => e.response);
+}
+export const checkMemberId = (memberId) => {
+  return axios.get(`/user/check/id/${memberId}`).catch((e) => e.response);
 };
+
+export const checkEmail = (email) => {
+  return axios.get(`/user/check/email/${email}`).catch((e) => e.response);
+};
+
+export const checkNickname = (nickname) => {
+  return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
+};
+
