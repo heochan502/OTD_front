@@ -43,8 +43,8 @@ const router = createRouter({
       component: RoutineHome,
     },
     {
-      path: '/reminderadd',
-      name: 'reminderadd',
+      path: '/reminderform',
+      name: 'reminderform',
       component: ReminderForm,
     },
     {

@@ -105,9 +105,10 @@ const submitTest = async () => {
     content: state.content,
     date: state.date,
     repeat: state.repeat,
-    dow: state.repeatDow,
+    repeatDow: state.repeatDow,
     alarm: state.alarm,
   };
+  console.log('jsonBody', jsonBody);
   const res = await save(jsonBody);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
