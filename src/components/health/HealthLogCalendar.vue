@@ -6,12 +6,15 @@ const healthLogDate = ref(["2025-07-08", "2025-07-09"]);
 const exerciseLogDate = ref(["2025-07-08", "2025-07-16"]);
 
 const calendarAttributes = ref([]);
+
 function formatDate(date) {
   return date.toISOString().split("T")[0];
 }
 
 const selectedDate = ref(new Date());
+
 function formatYearMonth(date) {
+  // if (!date) return "";
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   return `${year}년 ${month}월`;
@@ -19,12 +22,13 @@ function formatYearMonth(date) {
 </script>
 
 <template>
-  <v-card
-    class="calendar_card"
-    width="400"
-    height="300"
-    style="overflow: hidden"
-  >
+  <v-card class="calendar_card" width="400" height="300">
+    <div class="caption d-flex align-center">
+      <span class="dot dot-health"></span>
+      <span>건강</span>
+      <span class="dot dot-exercise"> </span>
+      <span>운동</span>
+    </div>
     <v-calendar
       is-expanded
       v-model="selectedDate"
@@ -36,11 +40,11 @@ function formatYearMonth(date) {
     >
       <!-- 타이틀 디자인 수정 -->
       <template #title="{ start, prev, next }">
-        <div class="d-flex align-center justify-start">
+        <div class="d-flex align-center">
           <v-btn icon variant="text" @click="prev">
             <v-icon>mdi-menu-left</v-icon>
           </v-btn>
-          <div class="text-subtitle-1">
+          <div class="text-subtitle-1" v-if="start">
             {{ formatYearMonth(start) }}
           </div>
           <v-btn icon variant="text" @click="next">
@@ -69,12 +73,6 @@ function formatYearMonth(date) {
         </div>
       </template>
     </v-calendar>
-    <div class="caption">
-      <span class="dot dot-health"></span>
-      <span>건강</span>
-      <span class="dot dot-exercise"> </span>
-      <span>운동</span>
-    </div>
   </v-card>
 </template>
 
@@ -115,5 +113,6 @@ function formatYearMonth(date) {
   gap: 5px;
   align-items: center;
   font-size: 10px;
+  margin: 5px 5px 0 0;
 }
 </style>
