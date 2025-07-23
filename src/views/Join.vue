@@ -53,6 +53,7 @@ const submit = async () => {
             <button type="button" class="btn-small">중복확인</button>
           </div>
         </div>
+
         <div class="form-group">
           <label for="memberPw">비밀번호 *</label>
           <input
@@ -62,6 +63,7 @@ const submit = async () => {
             v-model="state.form.memberPw"
           />
         </div>
+        
         <div class="form-group">
           <label for="memberPw2">비밀번호 확인*</label>
           <input

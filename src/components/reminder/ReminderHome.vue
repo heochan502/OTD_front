@@ -11,13 +11,15 @@ const todayDate = today.getDate();
 
 const state = reactive({ reminderDate: [] });
 
-const getDate = async (year, month) => {
-  const res = await getByMonth(year, month);
+const getDate = async (date) => {
+  const res = await getByMonth(date.year, date.month);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
   }
   state.reminderDate = res.data;
+  console.log('res1', res);
+  console.log('res2', state.reminderDate);
 };
 </script>
 
