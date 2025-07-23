@@ -51,19 +51,18 @@ const totalMemos = ref(0);
 const fetchMemos = async () => {
   try {
     const { resultData, totalCount } = await MemoHttpService.findAll({
-      currentPage: pageSize.value,
+      currentPage: currentPage.value,
       pageSize: pageSize.value
     });
     memoList.value = resultData;
     totalMemos.value = totalCount;
   } catch (error) {
     console.error("메모 목록을 불러오는 중 오류 발생:", error);
-    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
+    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (error.response?.data?.message || e.message || "알 수 없는 오류"));
   }
 };
 
 const goToMemoDetail = (id) => {
-  router.push(`/memo/${id}`);
   if (isUpdateMode && route.params.id === id) {
     // 현재 페이지가 수정 모드인 경우, 새로고침 없이 상태를 업데이트
     fetchCurrentMemo(id);
@@ -79,10 +78,11 @@ const fetchCurrentMemo = async (id) => {
     state.memo = resultData;
     showImages.value = []; // 기존 이미지 초기화
     // 백엔드에서 이미지 URL을 반환하는 경우 대비하여 처리
-    if (state.memo.imageUrls && Array.isArray(state.memo.imageUrls)) {
-      showImages.value = state.memo.imageUrls;
-    } else if (state.memo.image) {
-      showImages.value.push(state.memo.image);
+    
+    if (state.memo.imageUrls && Array.isArray(resultData.imageUrls)) {
+      showImages.value = resultData.imageUrls;
+    } else if (resultData.image) {
+      showImages.value.push(resultData.image);
     }
   } catch (e) {
     showAlert("메모 정보를 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
@@ -90,35 +90,51 @@ const fetchCurrentMemo = async (id) => {
   }
 };
 
-const changePage = (page) => {
-  if (page < 0 && page <= Math.ceil(totalMemos.value / pageSize.value)) {
-    currentPage.value = page;
-    fetchMemos();
-  }
-};
+// const changePage = (page) => {
+//   if (page < 0 && page <= Math.ceil(totalMemos.value / pageSize.value)) {
+//     currentPage.value = page;
+//     fetchMemos();
+//   }
+// };
+
+    const changePage = (pageNumber) => {
+      const Maxpage = Math.ceil(totalMemos.value / pageSize.value) || 1;
+      if (pageNumber >= 1 || pageNumber <= Maxpage) {
+          currentPage.value = pageNumber;
+          fetchMemos();
+      }
+    };
+
 
 onMounted( async () => {
     if (isUpdateMode) {
     const id = route.params.id;
-    try {
-      const { resultData } = await MemoHttpService.findById(id);
-      state.memo = resultData;
-      // 백엔드에서 이미지 URL을 반환하는 경우 대비하여 처리
-      if (state.memo. imageUrls && Array.isArray(state.memo.imageUrls)) {
-        showImages.value = state.memo.imageUrls;
-      } else if (state.memo.image) {
-        showImages.value.push(state.memo.image);
-      }
-    } catch (e) {
-      showAlert("메모 정보를 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
-      router.push("/memo");
-      return;
-    }
+    await fetchCurrentMemo(id);
+    // try {
+    //   const { resultData } = await MemoHttpService.findById(id);
+    //   state.memo.title = resultData.title;
+    //   state.memo.content = resultData.content;
+    //   state.memo.id = resultData.id;
+    //   state.memo.createdAt = resultData.createdAt;
+    //   showImages.value = []; // 기존 이미지 초기화
+    //   // 메모가 이미지 URL을 포함하는 경우 처리
+    //   if (resultData.imageUrls && Array.isArray(resultData.imageUrls)) {
+    //     showImages.value = resultData.imageUrls;
+    //   } else if (resultData.image) {
+    //     showImages.value.push(resultData.image);
+    //   }
+    // } catch (e) {
+    //   showAlert("메모 정보를 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
+    //   router.push("/memo");
+    //   return;
+    // } 중복된 코드 주석
   }
   fetchMemos();
 });
 
 const save = async () => {
+  console.log("프론트엔드 save 함수 실행: state.memo.title=", state.memo.title);
+  console.log("프론트엔드 save 함수 실행: state.memo.content=", state.memo.content);
   // 제목, 내용이 비어있는지 확인
   if (!state.memo.title.trim()) {
     showAlert("제목을 입력해주세요.");
@@ -128,20 +144,24 @@ const save = async () => {
       showAlert("내용은 10자 이상, 500자 이하로 입력해주세요.");
       return;
   }
+  const userId = 1; // TODO: 실제 로그인 사용자 ID로 교체
+
   // 1. JSON 데이터 준비
   const reqPayload = {
+    memberNoLogin: userId,
     title: state.memo.title,
     content: state.memo.content,
   };
 
   // 2. FormData 구성
   const formData = new FormData();
-  formData.append("memoImageFiles", file);  
+  formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
+
   const selectedNewFiles = fileInputRef.value?.files;
   if (selectedNewFiles && selectedNewFiles.length > 0) {
     for (let i = 0; i < selectedNewFiles.length; i++) {
       const file = selectedNewFiles[i];
-      files.forEach(file => formData.append("memoImageFiles", file));
+      formData.append("memoImageFiles", file);
     }
   }
 
@@ -151,7 +171,6 @@ const save = async () => {
     if (isUpdateMode) {
       result = await MemoHttpService.modify(state.memo.id, formData);
     } else {
-      const userId = 1; // TODO: 실제 로그인 사용자 ID로 교체
       result = await MemoHttpService.create(userId, formData);
     }
   } catch (e) {
@@ -188,7 +207,7 @@ const remove = async () => {
         router.push("/memo");
         fetchMemos();
     } else {
-    showAlert("메모 삭제에 실패하였습니다: ", + (result.message || "알 수 없는 오류가 발생하였습니다."));
+    showAlert("메모 삭제에 실패하였습니다: " + (result.message || "알 수 없는 오류가 발생하였습니다."));
     }  
   } catch (e) {
     console.error("메모 삭제 중 오류 발생:", e);
