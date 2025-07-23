@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Calendar from './Calendar.vue';
+import Calendar from '@/components/reminder/Calendar.vue';
 import { save } from '@/services/reminder/reminderService';
 
 const router = useRouter();
@@ -139,6 +139,7 @@ const submitTest = async () => {
           <calendar
             v-if="showCalendar"
             @selected-date="selectedDone"
+            use-page="form"
           ></calendar>
         </div>
       </div>

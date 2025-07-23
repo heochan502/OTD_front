@@ -1,21 +1,49 @@
 <script setup>
 import { reactive, ref } from 'vue';
+import { useReminderStore } from '@/stores/reminderStore';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const reminderStore = useReminderStore();
 
 const state = reactive({
   reminder: [],
 });
 
+state.reminder = reminderStore.state.dayReminder;
+
 const dowImage = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
 const content = ref(false);
 
 const viewDetail = () => {
   content.value = !content.value;
 };
+
+const remove = async (id) => {
+  if (!confirm('이 일정을 삭제할까요?')) {
+    return;
+  }
+  const res = await deleteById(id);
+  if (res === undefined || res.status !== 200) {
+    alert('오류발생');
+    return;
+  }
+  alert('일정을 삭제했어요!');
+  if (state.reminder.length === 0) {
+    router.push('/reminder');
+  }
+};
+
+const modify = (id) => {
+  router.push({ path: '/reminder', quary: { id } });
+};
 </script>
 <template>
   <div>
     <div>
-      <router-link to="/reminderform">일정 추가하기</router-link>
+      <router-link to="/reminder/form">일정 추가하기</router-link>
     </div>
     <ul class="remider">
       <template v-for="reminder in state.reminder" :key="reminder.id">
@@ -52,10 +80,16 @@ const viewDetail = () => {
             {{ state.reminder.conctent }}
           </div>
         </li>
-        <img src="/src/image/delete.png" alt="삭제" />
-        <router-link to="reminderform>"
-          ><img src="/src/image/modify.png" alt="수정"
-        /></router-link>
+        <img
+          src="/src/image/delete.png"
+          alt="삭제"
+          @click="remove(reminder.id)"
+        />
+        <img
+          src="/src/image/modify.png"
+          alt="수정"
+          @click="modify(reminder.id)"
+        />
       </template>
     </ul>
   </div>
