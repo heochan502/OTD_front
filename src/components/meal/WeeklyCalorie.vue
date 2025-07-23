@@ -113,21 +113,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="weekly-calorie">
-    <div ref="chartRef" class="main-container" style="height: 500px; width: 100%"></div>
+  <div class="weekly-calorie  ">
+    <div ref="chartRef" class="main-container  " style="height: 500px; width: 100%"></div>
   </div>
 </template>
 
 <style scoped>
 .weekly-calorie {
-  width: 100%;
+  width: 80%;
   height: 100%;
-  position: static;
 }
 .main-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  position: relative;
+  width: 80%;
 }
 </style>

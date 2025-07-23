@@ -40,7 +40,7 @@ defineProps({
 
 
 .tansu {    
-    font-size: 25px;
+    font-size: 16px;
     margin-top: 5px;
     color: #ff6b6b ;
     width: 200px;
@@ -62,7 +62,7 @@ defineProps({
     }
 }
 .protein {    
-    font-size: 25px;
+    font-size: 16px;
     margin-top: 5px;
     color: #4dabf7;
     width: 200px;
@@ -86,7 +86,7 @@ defineProps({
     }
 }
 .jibang {    
-    font-size: 25px;
+    font-size: 16px;
     color: #ffd43b;
     margin-top: 5px;
     width: 200px;
@@ -112,7 +112,7 @@ defineProps({
 .totalcal {    
     margin-left: 10px;
     inline-size: 650px;
-    font-size: 30px;  
+    font-size: 20px;  
     top: 0px;
     font-weight: 500;
 }
