@@ -114,9 +114,7 @@ onMounted(async () => {
 
 <template>
   <div class="weekly-calorie">
-    <div>
-      ref="chartRef" class="main-container" style="height: 500px; width: 100%"
-    </div>
+    <div ref="chartRef" class="main-container" style="height: 500px; width: 100%"></div>
   </div>
 </template>
 

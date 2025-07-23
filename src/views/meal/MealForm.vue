@@ -49,8 +49,8 @@ onMounted(() => {
       </div>
     </div>
     <div class="weeky-title">
-      <span class="main-title"> 주간 기록 </span>
-      <span class="sub-title">이번주에 평균 {{ value }}kcal 먹었어요</span>
+      <span class="main-title text-h6"> 주간 기록 </span>
+      <span class="sub-title text-subtitle-1">이번주에 평균 {{ value }}kcal 먹었어요</span>
     </div>
     <div class="bottom">
       <WeeklyCalorie />
@@ -159,12 +159,12 @@ onMounted(() => {
 
 .main-title{
   font-weight: bold;
-  font-size: 30px;
+  /* font-size: 30px; */
 
 }
 .sub-title{
   margin-left: 10px;
-  font-size: 16px;
+  /* font-size: 16px; */
   font-weight: 500;
   color: #333;
   
