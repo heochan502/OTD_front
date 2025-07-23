@@ -7,7 +7,7 @@ import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/components/reminder/ReminderForm.vue';
 
 import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/components/meal/Mealadd.vue';
+import MealAdd from '@/components/meal/MealAdd.vue'
 
 import HealthMain from '@/views/health/HealthMain.vue';
 import ElogDetail from '@/views/health/ElogDetail.vue';

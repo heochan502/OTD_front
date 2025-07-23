@@ -1,6 +1,9 @@
 <script setup>
 import { reactive, ref, watch } from 'vue';
 import { debounce } from 'lodash';
+import { getFoodNames } from '@/services/meal/mealService';
+
+
 const searchQuery = reactive({
   foodName: '',
 });
@@ -11,8 +14,10 @@ const items = reactive({
 
 
 
-const search = () => {
+const searchFoodName = async () => {
   console.log(searchQuery.foodName);
+  items.foodname =  await getFoodNames(searchQuery.foodName);
+  console.log('items.foodname:', items.foodname);
 };
 
 // 아래는 입력창에 글을 쓰거나 뭘하면 바로바로 받아 들이긴하지만 
@@ -21,6 +26,7 @@ const search = () => {
 const changeText = debounce((value)=>{
     const searchFood = value;
     console.log('foodName change:', searchFood);
+    searchFoodName(searchFood);
 }, 1000);
 
 
@@ -37,8 +43,8 @@ const changeText = debounce((value)=>{
       variant="solo-inverted"
       placeholder="음식명"
       append-icon="mdi-magnify"
-      @click:append="search"
-      @keyup.enter="search"
+      @click:append="searchFoodName"
+      @keyup.enter="searchFoodName"
     ></v-combobox>
   </div>
 </template>
