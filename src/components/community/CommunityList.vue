@@ -1,8 +1,13 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
 
 const store = usecommunityStore();
+
+onMounted(() => {
+  store.loadPosts(); // 🔥 API 데이터 호출
+  console.log('store.posts:', store.posts); // 여기서 확인
+});
 
 const filteredPosts = computed(() => {
   const query = store.search.trim().toLowerCase();
@@ -11,14 +16,13 @@ const filteredPosts = computed(() => {
   return store.sortedPosts.filter(
     (post) =>
       post.title.toLowerCase().includes(query) ||
-      post.nickname.toLowerCase().includes(query)
+      (post.memberNick || '').toLowerCase().includes(query)
   );
 });
 </script>
 
 <template>
   <v-container class="pa-6" fluid>
-    <!-- ✅ 중앙 정렬된 콘텐츠 래퍼 -->
     <div class="list-wrap mx-auto">
       <v-row align="center" no-gutters class="mb-3">
         <v-col cols="9">
@@ -47,12 +51,12 @@ const filteredPosts = computed(() => {
         class="mb-4"
       >
         <v-btn value="latest">최신순</v-btn>
-        <v-btn value="likes">좋아요순</v-btn>
+        <v-btn value="like">좋아요순</v-btn>
       </v-btn-toggle>
 
       <v-card
-        v-for="(post, index) in filteredPosts"
-        :key="index"
+        v-for="post in filteredPosts"
+        :key="post.postId"
         class="mb-3 px-3 py-4 hover-effect"
         elevation="0"
         rounded="xl"
@@ -66,25 +70,17 @@ const filteredPosts = computed(() => {
             </v-avatar>
             <div>
               <div class="text-caption text-grey-darken-1">
-                {{ post.nickname }} · {{ post.time }}
+                {{ post.memberNick }} ·
+                {{ new Date(post.createdAt).toLocaleString() }}
               </div>
               <div class="text-body-1 font-weight-medium">
                 {{ post.title }}
               </div>
               <div class="text-caption text-grey mt-1">
-                ❤️ {{ post.likes }} · 💬 {{ post.comments }}
+                ❤️ {{ post.like }} · 💬 {{ post.commentCount }}
               </div>
             </div>
           </v-row>
-          <v-img
-            :src="post.thumbnail || ''"
-            width="60"
-            height="60"
-            cover
-            rounded
-            class="ms-3"
-            :class="{ 'bg-grey-lighten-3': !post.thumbnail }"
-          />
         </v-row>
       </v-card>
     </div>

@@ -10,6 +10,7 @@ const route = useRoute();
 const counter = useAccountStore();
 
 console.log('z', counter);
+
 const checkAccount = async () => {
   console.log('로그인 체크');
   try {
@@ -21,6 +22,8 @@ const checkAccount = async () => {
     }
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
+    //커뮤니티 유저 id 저장
+    counter.setLoggedInId(res.data);
   } catch (e) {
     console.error('check 에러:', e);
     counter.setChecked(false);

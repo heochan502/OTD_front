@@ -1,15 +1,21 @@
-import { reactive } from 'vue'
-import { defineStore } from 'pinia'
+import { reactive, ref } from 'vue';
+import { defineStore } from 'pinia';
 
-export const useAccountStore = defineStore("counter", () => {
-    const state = reactive({
-        checked: false,
-        loggedIn: false
-    });
+export const useAccountStore = defineStore('counter', () => {
+  const state = reactive({
+    checked: false,
+    loggedIn: false,
+  });
 
-    const setChecked = val => state.checked = val;
+  // 커뮤니티에서 필요한 로그인된 유저 아이디
+  const loggedInId = ref(null);
 
-    const setLoggedIn = val => state.loggedIn = val;
+  const setChecked = (val) => (state.checked = val);
 
-    return { state, setChecked, setLoggedIn };
+  const setLoggedIn = (val) => (state.loggedIn = val);
+
+  //커뮤니티 게시글 유저 번호 받아오기
+  const setLoggedInId = (val) => (loggedInId.value = val);
+
+  return { state, loggedInId, setChecked, setLoggedIn, setLoggedInId };
 });

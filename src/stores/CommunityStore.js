@@ -1,56 +1,41 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { fetchPosts } from '@/services/community/communityService'; // ✅ 추가
 
 export const usecommunityStore = defineStore('community', () => {
-  const posts = ref([
-    {
-      nickname: '교동 불주먹',
-      time: '1시간 전',
-      title: '오늘 점메추 가능하신분',
-      likes: 3,
-      comments: 2,
-      thumbnail: '',
-      ments: [],
-    },
-    {
-      nickname: '사나이',
-      time: '2시간 전',
-      title: '오늘밤 주인공은 나야나',
-      likes: 5,
-      comments: 1,
-      thumbnail: '',
-      ments: [],
-    },
-    {
-      nickname: '요아정 맛있어',
-      time: '5시간 전',
-      title: '오늘 간식은 요아정임',
-      likes: 1,
-      comments: 4,
-      thumbnail: '',
-      ments: [],
-    },
-  ]);
+  const posts = ref([]);
+
+  // API 호출 함수
+  const loadPosts = async () => {
+    try {
+      const res = await fetchPosts();
+      console.log('res:', res); // ← 확인 완료
+      posts.value = res.data.content || res.data; // 구조에 따라 조정
+    } catch (err) {
+      console.error('게시글 목록 조회 실패', err);
+    }
+  };
 
   const search = ref('');
   const sortOption = ref('latest');
   const selectedPost = ref(null);
 
   const filteredPosts = computed(() => {
-    const text = search.value.trim().toLowerCase();
-    if (!text) return posts.value;
+    const query = search.value.trim().toLowerCase();
+    if (!query) return posts.value;
+
     return posts.value.filter(
       (post) =>
         post.title.toLowerCase().includes(text) ||
-        post.nickname.toLowerCase().includes(text)
+        post.nickname?.toLowerCase().includes(text)
     );
   });
 
   const sortedPosts = computed(() => {
     const sorted = [...filteredPosts.value];
-    return sortOption.value === 'likes'
-      ? sorted.sort((a, b) => b.likes - a.likes)
-      : sorted;
+    return sortOption.value === 'like'
+      ? sorted.sort((a, b) => b.like - a.like)
+      : sorted.sort((a, b) => b.postId - a.postId);
   });
 
   const selectPost = (post) => {
@@ -96,5 +81,6 @@ export const usecommunityStore = defineStore('community', () => {
     goDetail,
     goEdit,
     goWrite,
+    loadPosts,
   };
 });

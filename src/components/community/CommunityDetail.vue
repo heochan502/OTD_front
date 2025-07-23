@@ -1,9 +1,21 @@
 <script setup>
 import { usecommunityStore } from '@/stores/communityStore';
+import { useAccountStore } from '@/stores/counter';
 import { ref, computed } from 'vue';
 
 const store = usecommunityStore();
+const account = useAccountStore();
+
+// post는 store에서 가져오기
 const post = computed(() => store.selectedPost);
+
+// 현재 로그인한 사용자와 글 작성자 비교
+const isOwner = computed(() => {
+  console.log('post.memberNoLogin:', post.value?.memberNoLogin);
+  console.log('loggedInId:', account.loggedInId);
+  return Number(post.value?.memberNoLogin) === Number(account.loggedInId);
+});
+
 // 더미 댓글
 const dummyMents = ref([
   { nickname: '대구 티타늄', time: '3분 전', text: '굶으세요' },
@@ -28,14 +40,11 @@ const dummyMents = ref([
         </div>
 
         <div class="text-body-1 mb-6" style="white-space: pre-line">
-          인력거로 장사를 하는 가난한 집 청지에게 가중이라는 병으로 생사를
-          넘나드는 아내와 세 살배기 가형동이가 있었다. 평소 아내를 매정하게
-          대하는 집 청지였지만 오늘 따라 아픈 아내는 장사를 나서는 집 청지에게
-          유독 매달리는 느낌이 들었다. 그런 아내를 애써 무시하며 집 청지는
-          장사를 하러 떠났다.
+          {{ post.content }}
         </div>
 
-        <div class="d-flex justify-end mb-4">
+        <!-- 본인 글일 때만 노출 -->
+        <div class="d-flex justify-end mb-4" v-if="isOwner">
           <v-btn variant="text" color="blue" @click="store.goEdit()"
             >수정하기</v-btn
           >
