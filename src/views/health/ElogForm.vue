@@ -1,16 +1,19 @@
 <script setup>
-import { computed, reactive } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
 import { saveElog } from "@/services/health/elogService";
-import { watchEffect } from "vue";
+import { useExerciseStore } from "@/stores/exerciseStore";
 
+const exerciseStore = useExerciseStore();
+onMounted(() => {
+  exerciseStore.fetchExercises();
+});
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
 const state = reactive({
-  exercise: [],
   form: {
     exerciseDatetime: "",
     exerciseId: "",
@@ -21,9 +24,9 @@ const state = reactive({
 });
 
 // 선택된 운동의 met 가져오기
-const selectedExercise = computed(() => {
-  exercise.find((e) => e.id === state.form.exerciseId);
-});
+// const selectedExercise = computed(() => {
+//   exercise.find((e) => e.id === state.form.exerciseId);
+// });
 
 // const userWeight = 60;
 // const calcuatedKcal = computed(() => {
@@ -31,24 +34,6 @@ const selectedExercise = computed(() => {
 //   const durationInHours = state.form.exerciseDuration / 60;
 //   return Math.round(met * durationInHours * userWeight * 1.05);
 // });
-
-const exercise = [
-  {
-    id: 1,
-    exercise: "수영",
-    met: 10,
-  },
-  {
-    id: 2,
-    exercise: "수영",
-    met: 10,
-  },
-  {
-    id: 3,
-    exercise: "수영",
-    met: 10,
-  },
-];
 
 const submit = async () => {
   if (!confirm("저장하시겠습니까?")) {
@@ -61,6 +46,9 @@ const submit = async () => {
   }
   alert("운동 기록 저장!");
 };
+
+// click event
+const clear = () => (state.form.exerciseId = "");
 </script>
 
 <template>
@@ -96,13 +84,29 @@ const submit = async () => {
       </v-col>
       <v-col cols="6">
         <!-- 운동 종목 데이터 통신 필요 -->
-        <div class="subtitle">운동</div>
-        <v-select
-          v-model="state.form.exerciseId"
-          :items="exercise.map((e) => ({ title: e.exercise, value: e.id }))"
-          variant="outlined"
-          density="compact"
-        ></v-select>
+        <v-row>
+          <div class="subtitle">운동</div>
+        </v-row>
+        <v-row>
+          <v-select
+            v-model="state.form.exerciseId"
+            :items="
+              exerciseStore.list.map((e) => ({
+                title: e.exerciseName,
+                value: e.exerciseId,
+              }))
+            "
+            variant="solo"
+            density="compact"
+            hint="운동을 선택하세요"
+          ></v-select>
+
+          <v-icon
+            icon="mdi-close-thick"
+            class="cursor-pointer"
+            @click="clear"
+          ></v-icon>
+        </v-row>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
           <div class="text-h3 font-weight-light">
