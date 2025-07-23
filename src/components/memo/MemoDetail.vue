@@ -1,7 +1,8 @@
 <script setup>
 import MemoHttpService from '@/services/MemoHttpService.js';
-import { reactive, onMounted, ref } from "vue";
+import { reactive, onMounted, ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import './MemoDetail.css';
 
 const route = useRoute();
 const router = useRouter();
@@ -12,6 +13,7 @@ const state = reactive({
   memo: {
     title: "",
     content: "",
+    createdAt: "2025-07-23 05:30:24" // 예시 데이터
   }
 });
 
@@ -45,25 +47,96 @@ const showConfirm = (message) => {
 
 const memoList = ref([]);
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(5);
 const totalMemos = ref(0);
+
+// 날짜 형식 변환 함수
+const formatDateTime = (isoString) => {
+  if(!isoString || typeof isoString !== 'string') {
+    console.error("formatDateTime: 유효하지 않은 입력, 문자열이 아니거나 비어있습니다: ", isoString);
+    return '';
+  }
+  const date = new Date(isoString.replace(' ', 'T') + 'Z'); // ISO 문자열을 Date 객체로 변환
+  
+  if(isNaN(date.getTime())) {
+    console.error("유효하지 않은 날짜 형식 (파싱 실패): ", isoString);
+    return ''; // 유효하지 않은 날짜 형식 처리
+  }
+  const formatter = new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short', // 'short'는 '수' (수요일)
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true, // 오전/오후 사용
+    timeZone: 'Asia/Seoul' // 서울 시간대 명시
+  });
+
+  // 포맷팅된 문자열을 parts 배열로 가져옴 (예: 2025. 07. 23. (수) 오전 05:30:24)
+  const parts = formatter.formatToParts(date);
+  let formattedString = '';
+  let year = '';
+  let month = '';
+  let day = '';
+  let weekday = '';
+  let hour = '';
+  let minute = '';
+  let second = '';
+  let dayPeriod = ''; // 오전/오후
+
+  parts.forEach(part => {
+    switch (part.type) {
+      case 'year': year = part.value; break;
+      case 'month': month = part.value; break;
+      case 'day': day = part.value; break;
+      case 'weekday': weekday = `(${part.value})`; break; // (수)
+      case 'hour': hour = part.value; break;
+      case 'minute': minute = part.value; break;
+      case 'second': second = part.value; break;
+      case 'dayPeriod': dayPeriod = part.value; break; // 오전/오후
+    }
+  });
+
+  return `${year}. ${month}. ${day}. ${weekday} ${dayPeriod} ${hour}:${minute}:${second}`;
+};
+
+// 현재 메모의 생성일시를 포맷팅
+const formattedCurrentCreatedAt = computed(() => {
+  if (!state.memo.createdAt) return '';
+  return formatDateTime(state.memo.createdAt);
+});
 
 const fetchMemos = async () => {
   try {
-    const { resultData, totalCount } = await MemoHttpService.findAll({
+    const apiResponse = await MemoHttpService.findAll({
       currentPage: currentPage.value,
       pageSize: pageSize.value
     });
-    memoList.value = resultData;
-    totalMemos.value = totalCount;
+    const actualMemoListRes = apiResponse.data;
+
+    if (!actualMemoListRes && Array.isArray(actualMemoListRes.resultData)) {
+      memoList.value = actualMemoListRes.resultData.map(memo => ({
+        id: memo.id,
+        title: memo.title,
+        content: memo.content,
+        createdAt: formatDateTime(memo.createdAt)
+      }));
+      
+      totalMemos.value = actualMemoListRes.totalCount;
+  } else {
+    console.error("fetchMemos: 백엔드 응답 데이터 구조가 예상과 다릅니다.", actualMemoListRes);
+    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다. 데이터 형식이 올바르지 않습니다.");
+  }
   } catch (error) {
     console.error("메모 목록을 불러오는 중 오류 발생:", error);
-    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (error.response?.data?.message || e.message || "알 수 없는 오류"));
+    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (error.response?.data?.message || error.message || "알 수 없는 오류"));
   }
 };
 
 const goToMemoDetail = (id) => {
-  if (isUpdateMode && route.params.id === id) {
+  if (isUpdateMode && String(route.params.id) === String(id)) {
     // 현재 페이지가 수정 모드인 경우, 새로고침 없이 상태를 업데이트
     fetchCurrentMemo(id);
   } else {
@@ -90,16 +163,9 @@ const fetchCurrentMemo = async (id) => {
   }
 };
 
-// const changePage = (page) => {
-//   if (page < 0 && page <= Math.ceil(totalMemos.value / pageSize.value)) {
-//     currentPage.value = page;
-//     fetchMemos();
-//   }
-// };
-
     const changePage = (pageNumber) => {
       const Maxpage = Math.ceil(totalMemos.value / pageSize.value) || 1;
-      if (pageNumber >= 1 || pageNumber <= Maxpage) {
+      if (pageNumber >= 1 && pageNumber <= Maxpage) {
           currentPage.value = pageNumber;
           fetchMemos();
       }
@@ -110,24 +176,6 @@ onMounted( async () => {
     if (isUpdateMode) {
     const id = route.params.id;
     await fetchCurrentMemo(id);
-    // try {
-    //   const { resultData } = await MemoHttpService.findById(id);
-    //   state.memo.title = resultData.title;
-    //   state.memo.content = resultData.content;
-    //   state.memo.id = resultData.id;
-    //   state.memo.createdAt = resultData.createdAt;
-    //   showImages.value = []; // 기존 이미지 초기화
-    //   // 메모가 이미지 URL을 포함하는 경우 처리
-    //   if (resultData.imageUrls && Array.isArray(resultData.imageUrls)) {
-    //     showImages.value = resultData.imageUrls;
-    //   } else if (resultData.image) {
-    //     showImages.value.push(resultData.image);
-    //   }
-    // } catch (e) {
-    //   showAlert("메모 정보를 불러오는 중 오류가 발생했습니다: " + (e.response?.data?.message || e.message || "알 수 없는 오류"));
-    //   router.push("/memo");
-    //   return;
-    // } 중복된 코드 주석
   }
   fetchMemos();
 });
@@ -307,7 +355,7 @@ const fileTypeCheck = (fileName) => {
       </div>
 
       <div class="input-section">
-      <label for="memoContent">내용</label>
+      <label for="memoContent" >내용</label>
       <textarea id="memoContent" class="form-control" rows="8" v-model="state.memo.content" required></textarea>
       </div>
 
@@ -326,7 +374,7 @@ const fileTypeCheck = (fileName) => {
   </div>
 
     <div class="info-section" v-if="state.memo.createdAt">
-      <strong>등록일시:</strong> {{ state.memo.createdAt }}
+      <strong>등록일시:</strong> {{ formattedCurrentCreatedAt  }}
     </div>
 
     <div class="button-group">
@@ -349,11 +397,11 @@ const fileTypeCheck = (fileName) => {
       <div v-if="memoList.length === 0" class="no-memos">
         <p>등록된 메모가 없습니다. 새로운 메모를 작성해보세요!</p>
       </div>
-      <ul v-else class="memo_items">
+        <ul v-else class="memo-items">
         <li v-for="memo in memoList" :key="memo.id" class="memo-item" @click="goToMemoDetail(memo.id)">
           <div class="memo-title">{{ memo.title }}</div>
           <div class="memo-content">{{ memo.content.length > 100 ? memo.content.substring(0, 100) + '...' : memo.content }}</div>
-          <div class="memo-date">{{ memo.createdAt }}</div>
+          <div class="memo-date">{{ memo.createdAt  }}</div>
         </li>
       </ul>
 
@@ -383,4 +431,4 @@ const fileTypeCheck = (fileName) => {
   </div>
   </template>
 
-  <style scoped src="./MemoDetail.css"></style>
+<style scoped></style>
