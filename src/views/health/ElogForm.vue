@@ -1,19 +1,37 @@
 <script setup>
-import { ref } from "vue";
+import { computed, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
+import { saveElog } from "@/services/health/elogService";
+import { watchEffect } from "vue";
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-const exerciselog = ref({
-  exerciseDatetime: "",
-  exercise: "",
-  exerciseKcal: 0,
-  exerciseDuration: 0,
-  effortLevel: 1,
+const state = reactive({
+  exercise: [],
+  form: {
+    exerciseDatetime: "",
+    exerciseId: "",
+    exerciseKcal: 0,
+    exerciseDuration: 0,
+    effortLevel: 1,
+  },
 });
+
+// 선택된 운동의 met 가져오기
+const selectedExercise = computed(() => {
+  exercise.find((e) => e.id === state.form.exerciseId);
+});
+
+// const userWeight = 60;
+// const calcuatedKcal = computed(() => {
+//   const met = selectedExercise.value.met;
+//   const durationInHours = state.form.exerciseDuration / 60;
+//   return Math.round(met * durationInHours * userWeight * 1.05);
+// });
+
 const exercise = [
   {
     id: 1,
@@ -31,6 +49,18 @@ const exercise = [
     met: 10,
   },
 ];
+
+const submit = async () => {
+  if (!confirm("저장하시겠습니까?")) {
+    return;
+  }
+  const res = await saveElog(state.form);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("운동 기록 저장!");
+};
 </script>
 
 <template>
@@ -41,21 +71,24 @@ const exercise = [
     <v-row class="content">
       <v-col cols="6">
         <div class="subtitle">운동일자</div>
-        <input type="datetime-local" v-model="exerciselog.exerciseDatetime" />
+        <input type="datetime-local" v-model="state.form.exerciseDatetime" />
         <div class="duration">
           <div class="subtitle">운동시간(분)</div>
           <v-number-input
             control-variant="split"
-            v-model="exerciselog.exerciseDuration"
+            v-model="state.form.exerciseDuration"
+            :min="0"
             width="200px"
             density="compact"
           ></v-number-input>
         </div>
         <div class="kcal">
           <div class="subtitle">활동에너지</div>
+
           <v-number-input
             control-variant="split"
-            v-model="exerciselog.exerciseKcal"
+            v-model="state.form.exerciseKcal"
+            :min="0"
             width="200px"
             density="compact"
           ></v-number-input>
@@ -65,19 +98,19 @@ const exercise = [
         <!-- 운동 종목 데이터 통신 필요 -->
         <div class="subtitle">운동</div>
         <v-select
-          v-model="exerciselog.exercise"
-          :items="exercise.map((e) => e.exercise)"
+          v-model="state.form.exerciseId"
+          :items="exercise.map((e) => ({ title: e.exercise, value: e.id }))"
           variant="outlined"
           density="compact"
         ></v-select>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
           <div class="text-h3 font-weight-light">
-            {{ exerciselog.effortLevel }}
+            {{ state.form.effortLevel }}
           </div>
         </div>
         <v-slider
-          v-model="exerciselog.effortLevel"
+          v-model="state.form.effortLevel"
           thumb-label="always"
           color="#3bbeff"
           track-color="E0E0E0"
@@ -90,15 +123,15 @@ const exercise = [
           </template>
         </v-slider>
         <div class="desbox">
-          <p>{{ effortLevels[exerciselog.effortLevel - 1].label }}</p>
+          <p>{{ effortLevels[state.form.effortLevel - 1].label }}</p>
           <p class="description">
-            {{ effortLevels[exerciselog.effortLevel - 1].description }}
+            {{ effortLevels[state.form.effortLevel - 1].description }}
           </p>
         </div>
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn>추가</v-btn>
+      <v-btn @click="submit">추가</v-btn>
       <v-btn>취소</v-btn>
     </v-row>
   </v-container>
