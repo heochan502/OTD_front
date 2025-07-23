@@ -28,7 +28,6 @@ onMounted(() => {
   counter.setLoggedIn(false);
 });
 watch(() => route.path,() => {
-
     checkAccount();
   }
 );
