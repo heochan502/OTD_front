@@ -2,6 +2,7 @@
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted } from 'vue';
+import {useRouter} from "vue-router";
 const value = ref(10);
 const moreMeal = ref(500);
 const totalKcal = ref(300);
@@ -10,6 +11,11 @@ const tansu = ref(1000); // 탄수화물 비율
 const protein = ref(40); // 단백질 비율
 const jibang = ref(400); // 지방 비율
 
+const router = useRouter();
+
+const  mealadd = ()=>{
+  router.push({name : 'MealAdd'});
+};
 onMounted(() => {
   console.log('totalKcal:', totalKcal.value);
   console.log('maxKcal:', maxKcal.value);
@@ -17,42 +23,77 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="mealForm" class="main-container">
+  <div id="mealForm" class="main-container flex-column">
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-          <ProgressBar class="totalcal" :value="totalKcal" :leftString="`${totalKcal}/${maxKcal}kcal`"
-            :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`" :max="maxKcal" customsize="totalcal" />
+          <ProgressBar
+            class="totalcal"
+            :value="totalKcal"
+            :leftString="`${totalKcal}/${maxKcal}kcal`"
+            :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`"
+            :max="maxKcal"
+            customsize="totalcal"
+          />
           <div class="inprogressbar">
-            <ProgressBar class="tansu" :value="tansu" :leftString="`탄수화물`" :rightString="`${(tansu / (maxKcal * 0.6) * 100).toFixed(1)}%`" :max="maxKcal*0.6"
-              customsize="tansu" />
-            <ProgressBar class="protein" :value="protein" :leftString="`단백질`" :rightString="`${protein}%`"
-              customsize="protein" :max="maxKcal * 0.15" />
-            <ProgressBar class="jibang" :value="jibang" :leftString="`지방`" :rightString="`${jibang}%`"
-              customsize="jibang" :max="maxKcal * 0.25" />
+            <ProgressBar
+              class="tansu"
+              :value="tansu"
+              :leftString="`탄수화물`"
+              :rightString="`${((tansu / (maxKcal * 0.6)) * 100).toFixed(1)}%`"
+              :max="maxKcal * 0.6"
+              customsize="tansu"
+            />
+            <ProgressBar
+              class="protein"
+              :value="protein"
+              :leftString="`단백질`"
+              :rightString="`${protein}%`"
+              customsize="protein"
+              :max="maxKcal * 0.15"
+            />
+            <ProgressBar
+              class="jibang"
+              :value="jibang"
+              :leftString="`지방`"
+              :rightString="`${jibang}%`"
+              customsize="jibang"
+              :max="maxKcal * 0.25"
+            />
           </div>
         </div>
       </div>
 
       <div class="right">
         <div class="dailymeal">
-          <button class="btn btn-primary mealsaday" @click="totalKcal += 10">
+          <button
+            class="btn btn-primary mealsaday font-weight-black text-body-1"
+            @click="totalKcal += 10"
+          >
             <span>아침</span> <span>✚</span>
           </button>
-          <button class="btn btn-primary mealsaday" @click="totalKcal += 20">
+          <button
+            class="btn btn-primary mealsaday font-weight-black text-body-1"
+            @click="totalKcal += 20"
+          >
             <span>점심</span> <span>✚</span>
           </button>
-          <button class="btn btn-primary mealsaday" @click="totalKcal -= 10">
+          <button
+            class="btn btn-primary mealsaday font-weight-black text-body-1"
+            @click="mealadd"
+          >
             <span>저녁</span> <span>✚</span>
           </button>
         </div>
       </div>
     </div>
     <div class="weeky-title">
-      <span class="main-title"> 주간 기록 </span>
-      <span class="sub-title">이번주에 평균 {{ value }}kcal 먹었어요</span>
+      <span class="main-title text-h6"> 주간 기록 </span>
+      <span class="sub-title text-subtitle-1"
+        >이번주에 평균 {{ value }}kcal 먹었어요</span
+      >
     </div>
-    <div class="bottom">
+    <div class="bottom d-flex justify-center mb-6">
       <WeeklyCalorie />
     </div>
   </div>
@@ -61,10 +102,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 #mealForm {
   display: flex;
-  flex-direction: column;
   height: 100vh;
   padding-left: 10px;
   padding-top: 10px;
@@ -78,7 +117,7 @@ onMounted(() => {
   width: 50%;
   /* height: 50%; */
   /* float: left; */
-  
+
   margin-top: 5px;
 }
 
@@ -112,7 +151,6 @@ onMounted(() => {
 .mealsaday {
   width: 350px;
   height: 70px;
-  font-size: 25px;
   background-color: #3bbeff;
   color: white;
   border: none;
@@ -120,7 +158,6 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 1000;
   padding-left: 20px;
   padding-right: 20px;
   border-radius: 50px;
@@ -138,7 +175,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  
+
   gap: 10px;
   /* ← 항목 사이 간격 조절 */
   margin-top: 0px;
@@ -146,9 +183,8 @@ onMounted(() => {
   margin-right: 0px;
 }
 
-.weeky-title{
-  
-  font-family : 'Noto Sans KR', sans-serif;
+.weeky-title {
+  font-family: 'Noto Sans KR', sans-serif;
   display: flex;
   flex-direction: column;
   margin-left: 30px;
@@ -157,17 +193,15 @@ onMounted(() => {
   margin-top: 10px;
 }
 
-.main-title{
+.main-title {
   font-weight: bold;
-  font-size: 30px;
-
+  /* font-size: 30px; */
 }
-.sub-title{
+.sub-title {
   margin-left: 10px;
-  font-size: 16px;
+  /* font-size: 16px; */
   font-weight: 500;
   color: #333;
-  
 }
 
 .totalkcal {

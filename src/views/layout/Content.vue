@@ -1,5 +1,5 @@
 <script setup>
-
+import Weather from '@/views/weather/weather.vue';
 </script>
 
 <template>

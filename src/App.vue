@@ -11,15 +11,17 @@ const counter = useAccountStore();
 
 console.log('z', counter);
 
+// console.log('z', counter);
 const checkAccount = async () => {
   console.log('로그인 체크');
+  const res = await check();
+  console.log('res:', res);
+
+  if (res === null || res.status != 200) {
+    counter.setChecked(false);
+    return;
+  }
   try {
-    const res = await check();
-    console.log('res:', res);
-    if (!res || res.status != 200) {
-      counter.setChecked(false);
-      return;
-    }
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
     //커뮤니티 유저 id 저장
@@ -32,6 +34,7 @@ const checkAccount = async () => {
 
 onMounted(() => {
   checkAccount();
+  counter.setLoggedIn(false);
 });
 watch(
   () => route.path,

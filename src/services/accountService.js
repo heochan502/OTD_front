@@ -1,5 +1,7 @@
 import axios from 'axios';
+
 axios.defaults.withCredentials = true;
+
 axios.defaults.baseURL = '/api/OTD';
 
 export const join = (params) => {
@@ -7,23 +9,16 @@ export const join = (params) => {
 };
 
 export const login = (params) => {
-  return axios
-    .post('/user/login', params, { withCredentials: true })
-    .catch((e) => e.response);
+  return axios.post('/user/login', params).catch((e) => e.response);
 };
 
 export const check = () => {
-  return axios
-    .get('/user/check', { withCredentials: true })
-    .catch((e) => e.response);
-};
-
+    return axios.get('/user/check').catch(e => e.response);
+}
 export const logout = () => {
-  return axios
-    .post('/user/logout', { withCredentials: true })
-    .catch((e) => e.response);
-};
+    return axios.post('/user/logout').catch(e => e.response);
+}
 
-export const profile = () => {
-  return axios.post('/user/profile').catch((e) => e.response);
+export const getProfile = () => {
+  return axios.get('/user/profile').catch((e) => e.response);
 };

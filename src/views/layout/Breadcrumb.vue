@@ -11,12 +11,10 @@ function goHome() {
   router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
 }
 
-
-
 const logoutAccount = async () => {
 
-  if (!confirm("로그아웃 하시겠습니까?")) {
 
+  if (!confirm("로그아웃 하시겠습니까?")) {
     return;
   }
   const res = await logout();
@@ -42,12 +40,12 @@ const logoutAccount = async () => {
 
       <!-- 가운데 메뉴 -->
       <nav class="nav">
-        <a href="#">홈</a>
+        <router-link to="/">홈</router-link>
         <router-link to="/reminder" href="#">리마인더</router-link>
         <router-link to="/routine" href="#">루틴</router-link>
         <router-link to="/meal" href="#">식단</router-link>
         <router-link to="/health" href="#">건강</router-link>
-        <a href="#">일기</a>
+        <router-link to="/memo" href="#">메모</router-link>
         <a href="#">위치</a>
         <router-link to="/community" href="#">커뮤니티</router-link>
       </nav>
