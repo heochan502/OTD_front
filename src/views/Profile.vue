@@ -31,7 +31,7 @@ const formatBirthDate = (birthDate) => {
 
 onMounted(async () => {
   if (!counter.state.loggedIn) {
-    alert('로그인이 필요합니다.');
+    //alert('로그인이 필요합니다.');
     router.push('/login');
     return;
   }
@@ -106,7 +106,7 @@ onMounted(async () => {
       </table>
       
       <div class="button-group">
-        <button @click="goToEdit" class="btn-edit">정보 수정</button>
+         <router-link to="/detail" class="btn-edit">정보 수정</router-link>
       </div>
     </div>
   </div>
