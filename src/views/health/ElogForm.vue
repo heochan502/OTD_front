@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, reactive } from "vue";
+import { onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
-import { saveElog } from "@/services/health/elogService";
+import { saveElog, updateElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRouter } from "vue-router";
 
@@ -18,43 +18,64 @@ const state = reactive({
     effortLevel: 1,
   },
 });
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
+
+// const formatDate = (dateStr) => {
+//   const date = new Date(dateStr);
+//   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+// };
 
 const passData = history.state.data;
 onMounted(() => {
   exerciseStore.fetchExercises();
-  console.log(history.state.data);
+  console.log(passData);
   if (passData) {
-    state.form = passData;
+    state.form = JSON.parse(passData);
   }
 });
+
 // click event
+// 기록 저장/수정
 const submit = async () => {
-  if (!confirm("저장하시겠습니까?")) {
-    return;
-  }
   const convertDateTimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
   };
   state.form.exerciseDatetime = convertDateTimeFormat(
     state.form.exerciseDatetime
   );
-  const res = await saveElog(state.form);
-  console.log(res.data);
+  const jsonBody = {
+    exerciseId: state.form.exerciseId,
+    exerciseDatetime: state.form.exerciseDatetime,
+    exerciseKcal: state.form.exerciseKcal,
+    exerciseDuration: state.form.exerciseDuration,
+    effortLevel: state.form.effortLevel,
+  };
+
+  let res = null;
+  let path = "/health";
+
+  if (passData) {
+    console.log(passData);
+    jsonBody.exerciselogId = state.form.exerciselogId;
+    res = await updateElog(jsonBody);
+    path = `${state.form.exerciselogId}`;
+  } else {
+    res = await saveElog(jsonBody);
+  }
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("운동 기록 저장!");
-  router.push("/health");
+  alert("완료!");
+  router.push({ path });
 };
 
 const cancel = () => {
   if (!confirm("취소하고 돌아가시겠습니까?")) return;
-  router.push("/health");
+  let path = "/health";
+  if (state.form.exerciselogId > 0) {
+    path = `${state.form.exerciselogId}`;
+  }
+  router.push({ path });
 };
 </script>
 
@@ -103,7 +124,7 @@ const cancel = () => {
             :items="
               exerciseStore.list.map((e) => ({
                 title: e.exerciseName,
-                value: e.exerciseId,
+                value: e.exerciseId - 1,
               }))
             "
             variant="solo"
@@ -147,7 +168,9 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn @click="submit">추가</v-btn>
+      <v-btn @click="submit">{{
+        state.form.exerciselogId > 0 ? "수정" : "추가"
+      }}</v-btn>
       <v-btn @click="cancel">취소</v-btn>
     </v-row>
   </v-container>

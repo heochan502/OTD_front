@@ -24,6 +24,6 @@ export const getExercise = () => {
 };
 
 // 운동기록수정
-export const updateElog = () => {
-  return axios.get(path).catch((e) => e.response);
+export const updateElog = (args) => {
+  return axios.get(path, args).catch((e) => e.response);
 };

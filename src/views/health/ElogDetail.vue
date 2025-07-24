@@ -46,12 +46,12 @@ onMounted(async () => {
 });
 
 // @click
-const updateLog = () => {
-  const json = JSON.stringify(state.elog);
+const moveToForm = () => {
+  console.log(state.elog);
   router.push({
     path: "/elog/form",
     state: {
-      data: json,
+      data: JSON.stringify(state.elog),
     },
   });
 };
@@ -64,7 +64,7 @@ const updateLog = () => {
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
       <div class="btns">
-        <v-btn class="btn_modify" @click="updateLog">수정</v-btn>
+        <v-btn class="btn_modify" @click="moveToForm">수정</v-btn>
         <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn>
       </div>
     </v-row>

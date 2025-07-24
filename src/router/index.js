@@ -70,7 +70,7 @@ const router = createRouter({
       component: ElogForm,
     },
     {
-      path: "/hlog/:healthlog_id",
+      path: "/hlog/:healthlogId",
       name: "HlogDetail",
       component: HlogDetail,
     },
