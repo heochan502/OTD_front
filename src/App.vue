@@ -15,12 +15,12 @@ console.log('z', counter);
 const checkAccount = async () => {
   console.log('로그인 체크');
   const res = await check();
+  console.log('res:', res);
 
   if (res === null || res.status != 200) {
     counter.setChecked(false);
-    counter.setLoggedIn(false);
-    return false;
-  }  
+    return;
+  }
   try {
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
@@ -32,21 +32,18 @@ const checkAccount = async () => {
 
 }};
 
-onMounted(async () => {
-  const isLoggedIn = await checkAccount();
-  if (!isLoggedIn) {
-    router.push('/login');
-  } else {
-    router.push('/');
-  }
+onMounted(() => {
+  checkAccount();
+  counter.setLoggedIn(false);
+   router.push('/login');
 });
 
-watch(() => route.path,() => {
+watch(
+  () => route.path,
+  () => {
     checkAccount();
   }
 );
-
-
 </script>
 
 <template>
@@ -85,12 +82,8 @@ watch(() => route.path,() => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .loading-container p {
