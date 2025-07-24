@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
-import { getElog } from "@/services/health/elogService";
+import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRoute, useRouter } from "vue-router";
 
@@ -55,6 +55,19 @@ const moveToForm = () => {
     },
   });
 };
+
+const deleteLog = async () => {
+  if (!confirm("삭제하시겠습니까?")) return;
+  const exerciselogId = state.elog.exerciselogId;
+  console.log(exerciselogId);
+  const res = await deleteElog(exerciselogId);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("삭제되었습니다.");
+  router.push("/health");
+};
 </script>
 
 <template>
@@ -65,7 +78,7 @@ const moveToForm = () => {
       </div>
       <div class="btns">
         <v-btn class="btn_modify" @click="moveToForm">수정</v-btn>
-        <!-- <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn> -->
+        <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn>
       </div>
     </v-row>
     <v-row class="align-center">

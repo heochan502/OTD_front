@@ -24,6 +24,13 @@ export const getExercise = () => {
 };
 
 // 운동기록수정
-export const updateElog = (args) => {
-  return axios.put(path, args).catch((e) => e.response);
+export const updateElog = ({ args }) => {
+  return axios.put(path, { args }).catch((e) => e.response);
+};
+
+// 운동기록 삭제
+export const deleteElog = (exerciselogId) => {
+  return axios
+    .delete(`${path}?exerciselog_id=${exerciselogId}`)
+    .catch((e) => e.response);
 };
