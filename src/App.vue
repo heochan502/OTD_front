@@ -1,7 +1,7 @@
 <script setup>
 import Layout from './views/layout/Layout.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { watch, onMounted, ref } from 'vue';
+import { watch, onMounted } from 'vue';
 import { useAccountStore } from './stores/counter';
 import { check } from './services/accountService';
 
@@ -10,39 +10,15 @@ const router = useRouter();
 const counter = useAccountStore();
 
 
-const isInitializing = ref(true);
-
 const checkAccount = async () => {
   console.log('로그인 체크');
-  try {
-    const res = await check();
-    console.log('res:', res);
-    
-    if (res && res.status === 200 && res.data > 0) {
-      // 로그인 상태
+  const res = await check();
+  if(res === null || res.status != 200){
+      counter.setChecked(false);
+      return;
+    }else{
       counter.setChecked(true);
-      counter.setLoggedIn(true);
-      
-
-      if (route.path === '/login' || route.path === '/signup') {
-        router.push('/');
-      }
-    } else {
-      // 로그아웃 상태
-      counter.setChecked(true);
-      counter.setLoggedIn(false);
-
-      const protectedRoutes = ['/profile', '/profile/edit'];
-      if (protectedRoutes.includes(route.path)) {
-        router.push('/login');
-      }
-    }
-  } catch (error) {
-    console.error('로그인 체크 에러:', error);
-    counter.setChecked(true);
-    counter.setLoggedIn(false);
-  } finally {
-    isInitializing.value = false;
+      counter.setLoggedIn(res.data > 0);
   }
 };
 
@@ -59,12 +35,10 @@ watch(() => route.path,() => {
 
 <template>
   <div class="layout">
-    <!-- 초기 로딩 중에는 로딩 표시 -->
     <div v-if="isInitializing" class="loading-container">
       <div class="spinner"></div>
       <p>로딩 중...</p>
     </div>
-    <!-- 로딩 완료 후 레이아웃 표시 -->
     <Layout v-else />
   </div>
 </template>

@@ -26,7 +26,7 @@ const state = reactive({
 
 const formatBirthDate = (birthDate) => {
   if (!birthDate || birthDate.length !== 8) return birthDate;
-  return `${birthDate.substring(0, 4)}년 ${birthDate.substring(4, 6)}월 ${birthDate.substring(6, 8)}일`;
+  return `${birthDate.slice(0, 4)}년 ${birthDate.slice(4, 6)}월 ${birthDate.substring(6, 8)}일`;
 };
 
 onMounted(async () => {
