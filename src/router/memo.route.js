@@ -1,4 +1,3 @@
-import Memo from '@/components/memo/Memo.vue';
 import MemoDetail from '@/components/memo/MemoDetail.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -6,7 +5,7 @@ const routes = [
     {
         path: '/memo',
         name: 'Memo',
-        component: Memo,
+        component: MemoDetail,
         children: [
         {
         path: '',
