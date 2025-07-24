@@ -3,11 +3,15 @@ import { computed, onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
 import { saveElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const exerciseStore = useExerciseStore();
 onMounted(() => {
   exerciseStore.fetchExercises();
 });
+
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
@@ -23,32 +27,31 @@ const state = reactive({
   },
 });
 
-// 선택된 운동의 met 가져오기
-// const selectedExercise = computed(() => {
-//   exercise.find((e) => e.id === state.form.exerciseId);
-// });
-
-// const userWeight = 60;
-// const calcuatedKcal = computed(() => {
-//   const met = selectedExercise.value.met;
-//   const durationInHours = state.form.exerciseDuration / 60;
-//   return Math.round(met * durationInHours * userWeight * 1.05);
-// });
-
+// click event
 const submit = async () => {
   if (!confirm("저장하시겠습니까?")) {
     return;
   }
+  const convertDateTimeFormat = (datetimeStr) => {
+    return datetimeStr.replace("T", " ");
+  };
+  state.form.exerciseDatetime = convertDateTimeFormat(
+    state.form.exerciseDatetime
+  );
   const res = await saveElog(state.form);
+  console.log(res.data);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
   alert("운동 기록 저장!");
+  router.push("/health");
 };
 
-// click event
-const clear = () => (state.form.exerciseId = "");
+const cancel = () => {
+  if (!confirm("취소하고 돌아가시겠습니까?")) return;
+  router.push("/health");
+};
 </script>
 
 <template>
@@ -59,7 +62,11 @@ const clear = () => (state.form.exerciseId = "");
     <v-row class="content">
       <v-col cols="6">
         <div class="subtitle">운동일자</div>
-        <input type="datetime-local" v-model="state.form.exerciseDatetime" />
+        <input
+          type="datetime-local"
+          id="exerciselogDatetime"
+          v-model="state.form.exerciseDatetime"
+        />
         <div class="duration">
           <div class="subtitle">운동시간(분)</div>
           <v-number-input
@@ -72,7 +79,6 @@ const clear = () => (state.form.exerciseId = "");
         </div>
         <div class="kcal">
           <div class="subtitle">활동에너지</div>
-
           <v-number-input
             control-variant="split"
             v-model="state.form.exerciseKcal"
@@ -98,14 +104,16 @@ const clear = () => (state.form.exerciseId = "");
             "
             variant="solo"
             density="compact"
-            hint="운동을 선택하세요"
+            placeholder="운동을 선택하세요"
+            clearable
+            width="274px"
           ></v-select>
 
-          <v-icon
+          <!-- <v-icon
             icon="mdi-close-thick"
             class="cursor-pointer"
             @click="clear"
-          ></v-icon>
+          ></v-icon> -->
         </v-row>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
@@ -136,7 +144,7 @@ const clear = () => (state.form.exerciseId = "");
     </v-row>
     <v-row class="btns">
       <v-btn @click="submit">추가</v-btn>
-      <v-btn>취소</v-btn>
+      <v-btn @click="cancel">취소</v-btn>
     </v-row>
   </v-container>
 </template>
