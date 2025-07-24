@@ -22,6 +22,9 @@ export const logout = () => {
 export const getProfile = () => {
   return axios.get('/user/profile').catch((e) => e.response);
 }
+export const getDetail = () => {
+  return axios.get('/user/profile/detail').catch((e) => e.response);
+}
 export const checkMemberId = (memberId) => {
   return axios.get(`/user/check/id/${memberId}`).catch((e) => e.response);
 };

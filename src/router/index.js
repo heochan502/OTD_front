@@ -23,6 +23,7 @@ import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
 
 import Location from '@/components/location/Location.vue';
+import ProfileDetail from '@/views/ProfileDetail.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -118,6 +119,11 @@ const router = createRouter({
       name: "diary",
       component: Diary,
       props: true,
+    },
+        {
+      path: '/profile/detail',
+      name: 'profile_detail',
+      component: ProfileDetail,
     },
   ],
 });
