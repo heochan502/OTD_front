@@ -18,7 +18,7 @@ export const check = () => {
 export const logout = () => {
     return axios.post('/user/logout').catch(e => e.response);
 }
+
 export const getProfile = () => {
   return axios.get('/user/profile').catch((e) => e.response);
 };
-

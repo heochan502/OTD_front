@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
 
+
 import { useRouter } from 'vue-router';
 import { getProfile } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
@@ -18,6 +19,7 @@ const state = reactive({
     birthDate: '',
     memberNick: '',
   },
+
   loading: true,
   error: null
 });
