@@ -27,6 +27,6 @@ export const getByMonth = (year, month) => {
 
 export const getByDay = (year, month, day) => {
   return axios
-    .get('remider', { params: { year, month, day } })
+    .get('remider/today', { params: { year, month, day } })
     .catch((e) => e.response);
 };

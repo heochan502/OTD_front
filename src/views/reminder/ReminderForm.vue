@@ -1,19 +1,23 @@
 <script setup>
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import Calendar from '@/components/reminder/Calendar.vue';
 import { save } from '@/services/reminder/reminderService';
+import { useReminderStore } from '@/stores/reminderStore';
 
 const router = useRouter();
 const route = useRoute();
+const reminderStore = useReminderStore();
 
 const state = reactive({
-  title: '',
-  content: '',
-  date: '',
-  alarm: false,
-  repeat: false,
-  repeatDow: [],
+  reminder: {
+    title: '',
+    content: '',
+    date: '',
+    alarm: false,
+    repeat: false,
+    repeatDow: [],
+  },
 });
 
 const showCalendar = ref(false);
@@ -35,9 +39,9 @@ const selectedDone = (day) => {
 };
 
 const openCalendar = () => {
-  if (state.repeat) {
-    state.repeat = false;
-    state.repeatDow = [];
+  if (state.reminder.repeat) {
+    state.reminder.repeat = false;
+    state.reminder.repeatDow = [];
     dowImage.value.forEach((item) => (item.isOn = false));
   }
   showCalendar.value = !showCalendar.value;
@@ -65,63 +69,96 @@ const imageToggle = (index) => {
   dowImage.value[index].isOn = !dowImage.value[index].isOn;
 
   if (dowImage.value[index].isOn) {
-    if (!state.repeatDow.includes(index)) {
+    if (!state.reminder.repeatDow.includes(index)) {
       // 배열에 해당 인덱스값이 없으면 추가
-      state.repeatDow.push(index);
+      state.reminder.repeatDow.push(index);
     } else {
-      state.repeatDow = state.repeatDow.filter((i) => i != index); // 배열에 해당 인덱스값이 있으면 filter로 제거
+      state.reminder.repeatDow = state.reminder.repeatDow.filter(
+        (i) => i != index
+      ); // 배열에 해당 인덱스값이 있으면 filter로 제거
     }
   }
-  state.repeat = dowImage.value.some((item) => item.isOn); // 배열 값들 중 하나라도 true면 state.repeat true 리턴
-  if (state.repeat) {
-    state.date = '';
+  state.reminder.repeat = dowImage.value.some((item) => item.isOn); // 배열 값들 중 하나라도 true면 state.repeat true 리턴
+  if (state.reminder.repeat) {
+    state.reminder.date = '';
   }
 };
 
 // 날짜-요일 활성화 비활성화 처리
-const isDateMode = computed(() => state.date !== '');
-const isRepeatMode = computed(() => state.repeat);
+const isDateMode = computed(() => state.reminder.date !== '');
+const isRepeatMode = computed(() => state.reminder.repeat);
 
+//
+const reminderId = route.query.id;
+
+onMounted(() => {
+  if (reminderId) {
+    state.reminder = reminderStore.state.fullReminder.find(
+      (item = item.id === reminderId)
+    );
+
+    if (state.reminder.date) {
+      const [y, m, d] = state.reminder.date.split('.'); //.map((s) => s.trim());
+      selectedDate.value = new Date(`${y}.${m}.${d}`);
+    } else if (state.reminder.repeat) {
+      dowImage.value.forEach((item, index) => {
+        item.isOn = state.reminder.repeatDow.includes(index);
+      });
+    }
+  }
+});
 // 서버 통신 로직
-const submitTest = async () => {
+const submit = async () => {
   if (!isDateMode.value && !isRepeatMode.value) {
     alert('날짜 혹은 요일을 지정해주세요!');
     return;
   }
-  if (!state.title) {
+  if (!state.reminder.title) {
     alert('제목이 없어요!');
     return;
-  } else if (state.title.length > 15) {
+  } else if (state.reminder.title.length > 15) {
     alert('제목은 15자 이내로 작성해 주세요!');
     return;
   }
-  if (state.content.length > 30) {
+  if (state.reminder.content.length > 30) {
     alert('내용은 30자 이내로 작성해 주세요!');
     return;
   }
 
   const jsonBody = {
-    title: state.title,
-    content: state.content,
-    date: state.date,
-    repeat: state.repeat,
-    repeatDow: state.repeatDow,
-    alarm: state.alarm,
+    title: state.reminder.title,
+    content: state.reminder.content,
+    date: state.reminder.date,
+    repeat: state.reminder.repeat,
+    repeatDow: state.reminder.repeatDow,
+    alarm: state.reminder.alarm,
   };
   console.log('jsonBody', jsonBody);
-  const res = await save(jsonBody);
-  if (res === undefined || res.status !== 200) {
+  if (state.reminder.id) {
+    jsonBody.id = state.reminder.id;
+    res = await modify(jsonBody);
+    if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
+    }
+    alert('일정을 추가했어요!');
+    if(reminderStore.state.dayReminder){
+      router.push('/reminder/list')}
+  } else {
+    res = await save(jsonBody);
+    if (res === undefined || res.status !== 200) {
+      alert('오류발생');
+      return;
+    }
+    alert('일정을 추가했어요!');
   }
-  alert('일정을 추가했어요!');
   router.push('/reminder');
 };
 </script>
 
 <template>
   <div>
-    <h2>리마인더 추가하기</h2>
+    <h2>{{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}</h2>
     <div>
       <div>
         <span title="취소"></span>
@@ -144,16 +181,16 @@ const submitTest = async () => {
         </div>
       </div>
       <div>
-        <span :class="{ on: state.alarm, off: !state.alarm }">
+        <span :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }">
           <img
             :src="
-              state.alarm
+              state.reminder.alarm
                 ? '/src/image/alarm_on.png'
                 : '/src/image/alarm_off.png'
             "
             alt="알람 상태"
             class="alarm"
-            @click="state.alarm = !state.alarm"
+            @click="state.reminder.alarm = !state.reminder.alarm"
           />알람 설정</span
         >
       </div>
@@ -172,7 +209,7 @@ const submitTest = async () => {
         <input
           type="text"
           placeholder="어떤 일정이 있으신가요?"
-          v-model="state.title"
+          v-model="state.reminder.title"
         />
       </div>
       <div>
@@ -180,10 +217,12 @@ const submitTest = async () => {
           name="내용"
           id="content"
           placeholder="내용을 추가해주세요!"
-          v-model="state.content"
+          v-model="state.reminder.content"
         ></textarea>
       </div>
-      <button @click="submitTest">저장하기</button>
+      <button @click="submit">
+        {{ state.reminder.id > 0 ? '수정하기' : '저장하기' }}
+      </button>
     </div>
   </div>
 </template>
