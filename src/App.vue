@@ -30,8 +30,6 @@ const checkAccount = async () => {
     console.error('check 에러:', e);
     counter.setChecked(false);
 
-}};
-
 onMounted(() => {
   checkAccount();
   counter.setLoggedIn(false);
