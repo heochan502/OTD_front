@@ -1,14 +1,60 @@
+:root {
+  --color-primary: #50C3F7; /* Primary color */
+  --color-text-dark: #000;
+  --color-text-light: #555;
+  --spacing-sm: 5px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --border-radius-base: 8px;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+  --color-gray-e0: #e0e0e0;
+  --color-gray-ccc: #ccc;
+  --color-gray-a0: #a0a0a0;
+  --color-red-danger: #dc3545;
+  --color-red-danger-hover: #c82333;
+  --color-skyblue-hover: #87ceeb;
+  --memo-clicked-bg: #f0f8ff; /* 클릭된 메모의 배경색 */
+  --memo-hover-bg: #f5f5f5; /* 메모 hover 시 배경색 */
+  --color-skyblue: #87ceeb; /* 스카이블루 색상 */
+  --color-gray-eee: #eee; /* 연한 회색 */
+}
+
+.memo-item {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-base);
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  display: flex; /* memo-header와 memo-content를 세로로 정렬 */
+  flex-direction: column; /* 세로 정렬 */
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.memo-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px var(--shadow-light);
+}
+
+/* Primary Button Styles */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-dark);
+}
+
 /* Memo List Section Styles */
 .memo-list-section {
   margin-top: 30px;
-  border-top: 1px dashed #e0e0e0;
-  padding-top: 20px;
+  border-top: 1px dashed var(--color-gray-e0);
+  padding-top: var(--spacing-lg);
 }
 
 .no-memos {
   text-align: center;
-  color: #888;
-  padding: 20px;
+  color: var(--color-text-light);
+  padding: var(--spacing-lg);
 }
 
 .memo-items {
@@ -17,38 +63,46 @@
   margin: 0;
 }
 
-.memo-item {
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px 20px;
-  margin-bottom: 10px;
+.memo-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.memo-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  width: 100%; /* 너비 100% 확보 */
 }
 
 .memo-title {
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-  flex-grow: 1;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  flex-grow: 1; /* 남은 공간을 제목이 차지 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-right: 15px;
+  margin-right: var(--spacing-md); /* 날짜와의 간격 */
+}
+
+.memo-content {
+  font-size: 1rem;
+  color: var(--color-text-dark);
+  /* overflow: hidden; /* 내용이 넘칠 경우 숨기고 ... */
+  /* text-overflow: ellipsis; */
+  /* display: -webkit-box; /* 여러 줄 말줄임표 */
+  /* -webkit-line-clamp: 2; 2줄까지만 표시 */
+  -webkit-box-orient: vertical; /* 세로 방향 박스 모델 */
+  text-overflow: elipsis; /* 넘치는 내용은 ...으로 표시 */
+  white-space: normal; /* 줄바꿈 허용 */
+  line-height: 1.4; /* 가독성을 위한 줄 간격 */
+  display: -webkit-box; /* 여러 줄 말줄임표 */
+  overflow: hidden; /* 초과 내용 숨김 */
+  text-overflow: ellipsis; /* 넘치는 내용은 ...으로 표시 */
+  margin-bottom: var(--spacing-sm); /* 내용과 날짜 사이의 간격 */
 }
 
 .memo-date {
   font-size: 0.9rem;
-  color: #888;
+  color: var(--color-text-dark);
+  flex-shrink: 0; /* 날짜가 줄어들지 않도록 */
+  white-space: nowrap; /* 줄바꿈 방지 */
 }
 
 /* Pagination Styles */
@@ -56,33 +110,33 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
-  margin-top: 20px;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
 .pagination button {
-  padding: 8px 15px;
-  border: 1px solid skyblue;
-  border-radius: 5px;
-  background-color: skyblue;
+  padding: 8px var(--spacing-md);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--spacing-sm);
+  background-color: var(--color-primary);
   color: black;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .pagination button:hover:not(:disabled) {
-  background-color: #87ceeb;
+  background-color: var(--color-skyblue-hover);
 }
 
 .pagination button:disabled {
-  background-color: #e0e0e0;
-  color: #a0a0a0;
+  background-color: var(--color-gray-e0);
+  color: var(--color-gray-a0);
   cursor: not-allowed;
 }
 
 .pagination span {
   font-size: 1rem;
-  color: #555;
+  color: var(--color-text-dark);
   font-weight: 500;
 }
 
@@ -93,7 +147,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* 변경: 0.6에서 0.5로 약간 투명하게 */
+  background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -102,27 +156,21 @@
 
 .modal-content {
   background: white;
-  padding: 20px; /* 변경: 30px에서 20px로 */
+  padding: var(--spacing-lg);
   border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px var(--shadow-medium);
   text-align: center;
   min-width: 300px;
   max-width: 90%;
   color: black;
-  font-size: 1rem; /* 변경: 1.2rem에서 1rem으로 */
+  font-size: 1rem;
   font-weight: 500;
-}
-
-.modal-content p {
-  margin-bottom: 15px; /* 변경: 20px에서 15px로 */
-  font-size: 1rem; /* 변경: 1.1rem에서 1rem으로 */
-  color: #333;
 }
 
 .modal-btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--spacing-sm);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
@@ -136,17 +184,17 @@
 .modal-actions {
   display: flex;
   justify-content: center;
-  gap: 10px; /* 변경: 15px에서 10px로 */
+  gap: 10px;
 }
 
 .modal-btn.confirm-yes {
-  background-color: skyblue;
-  color: black;
+  background-color: var(--color-primary);
+  color: black; 
 }
 
 .modal-btn.confirm-no {
-  background-color: #ccc;
-  color: #333;
+  background-color: var(--color-gray-ccc);
+  color: var(--color-text-dark);
 }
 
 /* Memo Detail Container Styles */
@@ -161,10 +209,10 @@
 
 .page-title {
   font-size: 2.2rem;
-  color: #333;
+  color: var(--color-text-dark);
   text-align: center;
   margin-bottom: 30px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .input-section {
@@ -174,23 +222,23 @@
 .input-section label {
   display: block;
   font-size: 1.1rem;
-  color: #555;
+  color: var(--color-text-dark);
   margin-bottom: 8px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .form-control {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: var(--border-radius-base);
   font-size: 1rem;
-  color: #333;
+  color: var(--color-text-dark);
   transition: border-color 0.3s ease;
 }
 
 .form-control:focus {
-  border-color: skyblue;
+  border-color: var(--color-primary);
   outline: none;
   box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.3);
 }
@@ -203,16 +251,16 @@ textarea.form-control {
 .preview-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 15px;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
 }
 
 .preview-item {
   position: relative;
   width: 120px;
   height: 120px;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  border: 1px solid var(--color-gray-eee);
+  border-radius: var(--border-radius-base);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -224,13 +272,13 @@ textarea.form-control {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: var(--border-radius-base);
 }
 
 .remove-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   background: rgba(255, 0, 0, 0.7);
   color: white;
   border: none;
@@ -252,15 +300,15 @@ textarea.form-control {
 
 .info-section {
   font-size: 1rem;
-  color: #666;
+  color: var(--color-text-dark);
   margin-top: 25px;
-  padding-top: 15px;
-  border-top: 1px dashed #e0e0e0;
+  padding-top: var(--spacing-md);
+  border-top: 1px dashed var(--color-gray-e0);
 }
 
 .button-group {
   display: flex;
-  gap: 15px;
+  gap: var(--spacing-md);
   margin-top: 30px;
   justify-content: center;
 }
@@ -269,29 +317,23 @@ textarea.form-control {
   padding: 12px 25px;
   font-size: 1.1rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--border-radius-base);
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-primary {
-  background-color: skyblue;
-  color: black;
-  border: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .btn-primary:hover {
-  background-color: #87ceeb;
+  background-color: var(--color-skyblue-hover);
   transform: translateY(-2px);
 }
 
 .btn-danger {
-  background-color: #dc3545;
+  background-color: var(--color-red-danger);
   color: white;
   border: none;
 }
 
 .btn-danger:hover {
-  background-color: #c82333;
+  background-color: var(--color-red-danger-hover);
   transform: translateY(-2px);
 }

@@ -24,3 +24,9 @@ export const getByMonth = (year, month) => {
     .get('reminder', { params: { year, month } })
     .catch((e) => e.response);
 };
+
+export const getByDay = (year, month, day) => {
+  return axios
+    .get('remider/today', { params: { year, month, day } })
+    .catch((e) => e.response);
+};
