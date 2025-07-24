@@ -1,39 +1,42 @@
 <script setup>
 import { ref } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
+import { useAccountStore } from '@/stores/counter';
+import axios from 'axios';
 
 const store = usecommunityStore();
+const account = useAccountStore();
 
 // 작성 중인 게시글 상태
 const title = ref('');
 const content = ref('');
 
-// 작성 완료 버튼 핸들러
-function submitPost() {
+const submitPost = async () => {
   if (!title.value.trim() || !content.value.trim()) {
     alert('제목과 내용을 모두 입력해주세요.');
     return;
   }
 
-  const newPost = {
-    nickname: '새 유저',
-    time: '방금 전',
-    title: title.value,
-    content: content.value,
-    likes: 0,
-    comments: 0,
-    thumbnail: '',
-    ments: [],
-  };
+  const formData = new FormData();
+  formData.append('title', title.value);
+  formData.append('content', content.value);
+  formData.append('memberNoLogin', account.loggedInId); // ✅ 로그인 유저 번호
 
-  store.posts.unshift(newPost);
-  store.goList(); // 글 등록 후 목록으로 이동
-}
+  try {
+    const res = await axios.post('/community/create', formData);
+    console.log('글 등록 성공', res.data);
 
-// 취소 버튼
-function cancelWrite() {
+    // 등록 후 목록에 추가 (임시)
+    store.goList();
+  } catch (err) {
+    console.error('글 등록 실패', err);
+    alert('글 등록에 실패했습니다.');
+  }
+};
+
+const cancelWrite = () => {
   store.goList();
-}
+};
 </script>
 
 <template>
