@@ -6,3 +6,7 @@ export const getLocalName = (keyword) => {
     .get('/location/search', { params: { keyword } })
     .catch((e) => e.response);
 };
+
+export const saveLocation = (localId) => {
+  return axios.post('/location/save', { localId }).catch((e) => e.response);
+};
