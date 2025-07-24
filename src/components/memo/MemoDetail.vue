@@ -114,9 +114,14 @@ const fetchMemos = async () => {
       currentPage: currentPage.value,
       pageSize: pageSize.value
     });
+    if (!apiResponse || !apiResponse.data) {
+      console.error("fetchMemos: 백엔드 응답이 비어있거나 유효한 데이터 객체가 없습니다.", apiResponse);
+      showAlert("메모 목록을 불러오는 중 오류가 발생했습니다. 서버 응답이 비어있습니다.");
+      return;
+    }
     const actualMemoListRes = apiResponse.data;
 
-    if (!actualMemoListRes && Array.isArray(actualMemoListRes.resultData)) {
+    if (actualMemoListRes && Array.isArray(actualMemoListRes.resultData)) {
       memoList.value = actualMemoListRes.resultData.map(memo => ({
         id: memo.id,
         title: memo.title,
@@ -196,30 +201,31 @@ const save = async () => {
 
   // 1. JSON 데이터 준비
   const reqPayload = {
+    id: state.memo.id || null,
     memberNoLogin: userId,
     title: state.memo.title,
     content: state.memo.content,
   };
 
-  // 2. FormData 구성
-  const formData = new FormData();
-  formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
-
-  const selectedNewFiles = fileInputRef.value?.files;
-  if (selectedNewFiles && selectedNewFiles.length > 0) {
-    for (let i = 0; i < selectedNewFiles.length; i++) {
-      const file = selectedNewFiles[i];
-      formData.append("memoImageFiles", file);
-    }
-  }
-
   // 3. API 호출
   let result;
   try {
     if (isUpdateMode) {
-      result = await MemoHttpService.modify(state.memo.id, formData);
+      // 수정 모드인 경우, JSON 데이터만 전송
+      result = await MemoHttpService.modify(state.memo.id, reqRayload);
     } else {
-      result = await MemoHttpService.create(userId, formData);
+      // 등록 모드인 경우, FormData 사용, JSON과 파일을 함꼐 전송
+  const formData = new FormData();
+    formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
+
+  const selectedNewFiles = fileInputRef.value?.files;
+    if (selectedNewFiles && selectedNewFiles.length > 0) {
+      for (let i = 0; i < selectedNewFiles.length; i++) {
+        const file = selectedNewFiles[i];
+        formData.append("memoImageFiles", file);
+      }
+    }
+    result = await MemoHttpService.create(userId, formData);
     }
   } catch (e) {
     console.error("서버 요청 중 오류 발생:", e);
