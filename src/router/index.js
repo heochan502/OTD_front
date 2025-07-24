@@ -131,6 +131,11 @@ const router = createRouter({
       component: Diary,
       props: true,
     },
+    {
+      path: "/profile/detail",
+      name: "profile_detail",
+      component: ProfileDetail,
+    },
   ],
 });
 

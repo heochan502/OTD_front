@@ -104,7 +104,7 @@ const checkDuplicateEmail = async () => {
     return;
   }
 
-  // 이메일 형식 검증
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(trimmedEmail)) {
     alert('올바른 이메일 형식이 아닙니다.');
@@ -118,7 +118,6 @@ const checkDuplicateEmail = async () => {
       state.validation.emailAvailable = res.data.available;
       state.validation.emailMessage = res.data.message;
 
-      // alert로도 알림
       if (res.data.available) {
         alert('사용 가능한 이메일입니다.');
       } else {
@@ -153,7 +152,6 @@ const checkDuplicateNickname = async () => {
       state.validation.nickAvailable = res.data.available;
       state.validation.nickMessage = res.data.message;
 
-      // alert로도 알림
       if (res.data.available) {
         alert('사용 가능한 닉네임입니다.');
       } else {
@@ -191,7 +189,6 @@ const submit = async () => {
     return;
   }
 
-  // 중복 확인 체크
   if (
     !state.validation.memberIdChecked ||
     !state.validation.memberIdAvailable
