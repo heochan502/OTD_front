@@ -35,8 +35,8 @@ const formatTime = (dateStr) => {
 
 onMounted(async () => {
   exerciseStore.fetchExercises();
-  const exerciselogId = route.params.exerciselogId;
-  const res = await getElog(exerciselogId);
+  state.elog.exerciselogId = route.params.exerciselogId;
+  const res = await getElog(state.elog.exerciselogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
@@ -49,7 +49,7 @@ onMounted(async () => {
 // @click
 const moveToForm = () => {
   router.push({
-    path: "/elog/form",
+    path: "/elog/Form",
     state: {
       data: JSON.stringify(state.elog),
     },
@@ -65,7 +65,7 @@ const moveToForm = () => {
       </div>
       <div class="btns">
         <v-btn class="btn_modify" @click="moveToForm">수정</v-btn>
-        <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn>
+        <!-- <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn> -->
       </div>
     </v-row>
     <v-row class="align-center">

@@ -16,6 +16,7 @@ import MealAdd from "@/components/meal/MealAdd.vue";
 import HealthMain from "@/views/health/HealthMain.vue";
 import ElogDetail from "@/views/health/ElogDetail.vue";
 import ElogForm from "@/views/health/ElogForm.vue";
+import ELogUpdate from "@/views/health/ELogUpdate.vue";
 import HlogDetail from "@/views/health/HlogDetail.vue";
 import HlogForm from "@/views/health/HlogForm.vue";
 
@@ -82,6 +83,11 @@ const router = createRouter({
       path: "/elog/form",
       name: "ElogForm",
       component: ElogForm,
+    },
+    {
+      path: "/elog/update",
+      name: "ElogUpdate",
+      component: ELogUpdate,
     },
     {
       path: "/hlog/:healthlogId",
