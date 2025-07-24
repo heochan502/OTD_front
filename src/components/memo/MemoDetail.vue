@@ -1,11 +1,14 @@
 <script setup>
 import MemoHttpService from '@/services/memo/MemoHttpService.js';
+import './MemoDetail.css';
 import { reactive, onMounted, ref, computed, onBeforeUnmount, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import './MemoDetail.css';
+import { useAccountStore } from "@/stores/counter";
+import { check } from "@/services/accountService";
 
 const route = useRoute();
 const router = useRouter();
+const accountStore = useAccountStore();
 
 const fileInputRef = ref(null);
 
@@ -226,8 +229,29 @@ const fetchCurrentMemo = async (id) => {
 
 
 onMounted( async () => {
+  // 1. 기존 setupComponentMode 호출 비동기. await
     await setupComponentMode();
-  // 1. 현재 시간을 1초마다 업데이트
+
+  // 2. 로그인 상태 확인
+  try {
+    const res = await check();
+    if (!res || res.status!== 200 || res.status === 0) {
+      console.warn("MemoDetail.vue: 로그인되지 않은 사용자입니다. 로그인 페이지로 이동합니다.");
+      accountStore.setLoggedIn(false);
+      router.push({ name: 'login' });
+      return;
+    } else {
+      console.log("MemoDetail.vue: 로그인된 사용자입니다.");
+      accountStore.setLoggedIn(true);
+  }
+    } catch (error) {
+      console.error("MemoDetail.vue: 로그인 상태 확인 중 오류 발생:", error);
+      accountStore.setLoggedIn(false);
+      router.push({ name: 'login' });
+      return;
+    }
+
+  // 3. 시간 업데이트
   intervalId = setInterval(() => {
     currentTime.value = new Date();
   }, 1000);
@@ -285,13 +309,14 @@ const save = async () => {
   try {
     if (isUpdateMode.value) {
       // 수정 모드인 경우, JSON 데이터만 전송
-      result = await MemoHttpService.modify(state.memo.id, reqPayload);
+      result = await MemoHttpService.modify(state.memo.id, formData);
     } else if (isCreateMode.value) {
       // 등록 모드인 경우, FormData 사용, JSON과 파일을 함꼐 전송
-    const formData = new FormData();
     formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
 
   const selectedNewFiles = fileInputRef.value?.files;
+  const formData = new FormData();
+  formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
     if (selectedNewFiles && selectedNewFiles.length > 0) {
       for (let i = 0; i < selectedNewFiles.length; i++) {
         const file = selectedNewFiles[i];
