@@ -21,7 +21,7 @@ const checkAccount = async () => {
       counter.setChecked(true);
       counter.setLoggedIn(res.data > 0);
   }
-};
+}};
 
 onMounted(() => {
   checkAccount();
