@@ -6,27 +6,31 @@ import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 const exerciseStore = useExerciseStore();
-onMounted(() => {
-  exerciseStore.fetchExercises();
-});
-
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 const state = reactive({
   form: {
+    exerciselogId: 0,
+    exerciseId: null,
     exerciseDatetime: "",
-    exerciseId: "",
     exerciseKcal: 0,
     exerciseDuration: 0,
     effortLevel: 1,
   },
 });
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
 
+const passData = history.state.data;
+onMounted(() => {
+  exerciseStore.fetchExercises();
+  console.log(history.state.data);
+  if (passData) {
+    state.form = passData;
+  }
+});
 // click event
 const submit = async () => {
   if (!confirm("저장하시겠습니까?")) {

@@ -13,7 +13,17 @@ export const getElogs = () => {
   return axios.get(`${path}/elog`).catch((e) => e.response);
 };
 
+// 운동기록상세 목록
+export const getElog = (exerciselogId) => {
+  return axios.get(`${path}/elog/${exerciselogId}`).catch((e) => e.response);
+};
+
 // 운동 목록
 export const getExercise = () => {
+  return axios.get(path).catch((e) => e.response);
+};
+
+// 운동기록수정
+export const updateElog = () => {
   return axios.get(path).catch((e) => e.response);
 };

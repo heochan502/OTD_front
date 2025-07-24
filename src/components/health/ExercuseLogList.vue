@@ -38,7 +38,7 @@ const detail = (exerciselogId) => {
   router.push(`/elog/${exerciselogId}`);
 };
 const add = () => {
-  router.push("/elog/add");
+  router.push("/elog/form");
 };
 </script>
 
@@ -50,6 +50,7 @@ const add = () => {
     </div>
   </div>
   <ul>
+    <li v-if="state.logs.length < 1" class="title">운동 기록을 추가하세요</li>
     <li
       v-for="item in state.logs"
       :key="item.exerciselogId"
@@ -106,21 +107,20 @@ ul {
     border-radius: 40px;
     background-color: #3bbeff;
     cursor: pointer;
-
-    .title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      text-align: right;
-
-      color: #fff;
-    }
   }
+}
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+
+  color: #fff;
 }
 </style>

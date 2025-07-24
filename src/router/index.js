@@ -1,11 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+import Memo from "@/components/memo/MemoDetail.vue";
+import Diary from "@/components/memo/DiaryDetail.vue";
 
-
-import Memo from '@/components/memo/MemoDetail.vue';
-import Diary from '@/components/memo/DiaryDetail.vue';
-
-import CommunityView from '@/views/community/CommunityView.vue';
+import CommunityView from "@/views/community/CommunityView.vue";
 
 import ReminderHome from "@/components/reminder/ReminderHome.vue";
 import RoutineHome from "@/components/routine/RoutineHome.vue";
@@ -32,8 +30,8 @@ const router = createRouter({
       component: () => import("@/views/Home.vue"),
     },
     {
-      path: '/community',
-      name: 'community',
+      path: "/community",
+      name: "community",
       component: CommunityView,
     },
     {
@@ -62,12 +60,12 @@ const router = createRouter({
       component: HealthMain,
     },
     {
-      path: "/elog/:exerciselog_id",
+      path: "/elog/:exerciselogId",
       name: "ElogDetail",
       component: ElogDetail,
     },
     {
-      path: "/elog/add",
+      path: "/elog/form",
       name: "ElogForm",
       component: ElogForm,
     },
