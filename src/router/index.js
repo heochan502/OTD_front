@@ -1,13 +1,18 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from "vue-router";
 
-import CommunityList from '@/components/community/CommunityList.vue';
+
+
+import Memo from '@/components/memo/MemoDetail.vue';
+import Diary from '@/components/memo/DiaryDetail.vue';
+
+import CommunityView from '@/views/community/CommunityView.vue';
 
 import ReminderHome from '@/components/reminder/ReminderHome.vue';
 import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/components/reminder/ReminderForm.vue';
 
 import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/components/meal/Mealadd.vue';
+import MealAdd from '@/components/meal/MealAdd.vue'
 
 import HealthMain from '@/views/health/HealthMain.vue';
 import ElogDetail from '@/views/health/ElogDetail.vue';
@@ -30,7 +35,7 @@ const router = createRouter({
     {
       path: '/community',
       name: 'community',
-      component: CommunityList,
+      component: CommunityView,
     },
     {
       path: '/reminder',
@@ -98,7 +103,18 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
     },
-
+    {
+      path: "/memo/",
+      name: "memo",
+      component: Memo,
+      props: true,
+    },
+    {
+      path: "/diary",
+      name: "diary",
+      component: Diary,
+      props: true,
+    },
   ],
 });
 

@@ -1,30 +1,41 @@
 <script setup>
-import { reactive } from "vue";
+import { onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { getElogs } from "@/services/health/elogService";
+import { useExerciseStore } from "@/stores/exerciseStore";
 
 const router = useRouter();
-const logs = reactive([
-  {
-    exerciselog_id: 1,
-    exercise: "수영",
-    duration: 60,
-    date: "2025-07-08",
-  },
-  {
-    exerciselog_id: 2,
-    exercise: "달리기",
-    duration: 60,
-    date: "2025-07-16",
-  },
-]);
+const exerciseStore = useExerciseStore();
 
+// 응답받은 기록들
+const state = reactive({
+  logs: [],
+});
+
+// 운동기록불러오기
+const load = async () => {
+  const res = await getElogs();
+  if (res === undefined || res.status !== 200) {
+    alert(res.status + "오류발생!");
+    return;
+  }
+  state.logs = res.data;
+};
+
+onMounted(async () => {
+  await exerciseStore.fetchExercises();
+  await load();
+});
+
+// 날짜 형식 변경
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-const detail = (exerciselog_id) => {
-  router.push(`/elog/${exerciselog_id}`);
+// click event
+const detail = (exerciselogId) => {
+  router.push(`/elog/${exerciselogId}`);
 };
 const add = () => {
   router.push("/elog/add");
@@ -40,17 +51,17 @@ const add = () => {
   </div>
   <ul>
     <li
-      v-for="item in logs"
-      :key="item.exerciselog_id"
-      @click="detail(item.exerciselog_id)"
+      v-for="item in state.logs"
+      :key="item.exerciselogId"
+      @click="detail(item.exerciselogId)"
     >
       <div class="title">
-        {{ item.exercise }}
+        {{ exerciseStore.list[item.exerciseId]?.exerciseName }}
       </div>
       <div class="content">
-        <div>{{ item.duration }}분</div>
+        <div>{{ item.exerciseDuration }}분</div>
         <div>
-          {{ formatDate(item.date) }}
+          {{ formatDate(item.exerciseDatetime) }}
         </div>
       </div>
     </li>
