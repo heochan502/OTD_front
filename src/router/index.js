@@ -27,36 +27,6 @@ import Profile from '@/views/Profile.vue';
 import Location from '@/components/location/Location.vue';
 
 
-import ReminderHome from '@/views/reminder/ReminderHome.vue';
-import RoutineHome from '@/components/routine/RoutineHome.vue';
-import ReminderForm from '@/views/reminder/ReminderForm.vue';
-import ReminderList from '@/views/reminder/ReminderList.vue';
-
-
-
-
-
-import Memo from '@/components/memo/MemoDetail.vue';
-import Diary from '@/components/memo/DiaryDetail.vue';
-
-import CommunityView from '@/views/community/CommunityView.vue';
-
-import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/components/meal/MealAdd.vue'
-
-import HealthMain from '@/views/health/HealthMain.vue';
-import ElogDetail from '@/views/health/ElogDetail.vue';
-import ElogForm from '@/views/health/ElogForm.vue';
-import HlogDetail from '@/views/health/HlogDetail.vue';
-import HlogForm from '@/views/health/HlogForm.vue';
-
-import Join from '@/views/Join.vue';
-import Login from '@/views/Login.vue';
-import Profile from '@/views/Profile.vue';
-
-import Location from '@/components/location/Location.vue';
-
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
