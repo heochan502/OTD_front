@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = "/api/OTD";
+axios.defaults.baseURL = "api/OTD/";
 
 const path = "/health";
 
