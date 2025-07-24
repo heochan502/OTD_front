@@ -102,7 +102,7 @@ const formatDateTime = (isoString) => {
   return `${year}. ${month}. ${day}. ${weekday} ${dayPeriod} ${hour}:${minute}:${second}`;
 };
 
-// 현재 메모의 생성일시를 포맷팅
+// 1. 현재 메모의 생성일시를 포맷팅
 const formattedCurrentCreatedAt = computed(() => {
   if (!state.memo.createdAt) return '';
   return formatDateTime(state.memo.createdAt);
@@ -114,9 +114,12 @@ const fetchMemos = async () => {
       currentPage: currentPage.value,
       pageSize: pageSize.value
     });
+    // API 응답이 성공적으로 왔으나 데이터가 비어있거나 예상과 다른 경우
     if (!apiResponse || !apiResponse.data) {
-      console.error("fetchMemos: 백엔드 응답이 비어있거나 유효한 데이터 객체가 없습니다.", apiResponse);
-      showAlert("메모 목록을 불러오는 중 오류가 발생했습니다. 서버 응답이 비어있습니다.");
+      console.warn("fetchMemos: 백엔드 응답이 비어있거나 유효한 데이터 객체가 없습니다. (메모가 없을 수 있음)");
+      // showAlert("메모 목록을 불러오는 중 오류가 발생했습니다. 서버 응답이 비어있습니다.");
+      memoList.value = []; // 메모 리스트 초기화
+      totalMemos.value = 0; // 총 메모 수를 0으로 초기화
       return;
     }
     const actualMemoListRes = apiResponse.data;
@@ -128,15 +131,34 @@ const fetchMemos = async () => {
         content: memo.content,
         createdAt: formatDateTime(memo.createdAt)
       }));
-      
       totalMemos.value = actualMemoListRes.totalCount;
   } else {
-    console.error("fetchMemos: 백엔드 응답 데이터 구조가 예상과 다릅니다.", actualMemoListRes);
-    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다. 데이터 형식이 올바르지 않습니다.");
+    console.warn("fetchMemos: 백엔드 응답 데이터 구조가 예상과 다릅니다. (메모가 없을 수 있음)");
+    // showAlert("메모 목록을 불러오는 중 오류가 발생했습니다. 데이터 형식이 올바르지 않습니다.");
   }
   } catch (error) {
     console.error("메모 목록을 불러오는 중 오류 발생:", error);
-    showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (error.response?.data?.message || error.message || "알 수 없는 오류"));
+    // showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (error.response?.data?.message || error.message || "알 수 없는 오류"));
+    
+    // 2. 네트워크 오류 또는 404 오류 처리
+    // error.response가 undifined인 경우
+    const statusCode = error.response ? error.response.status : null;
+    if (statusCode === 404) {
+      console.warn("API 엔드포인트를 찾을 수 없습니다. (메모가 없을 수 있거나, 경로 문제)");
+      showAlert("메모 목록을 찾을 수 없습니다. 서버 구성을 확인해주세요."); // 개발자를 위한 메시지
+      // 사용자에게는 더 부드러운 메시지 또는 아무 메시지 없이 넘어갈 수 있음
+      memoList.value = []; // 메모 리스트를 비움
+      totalMemos.value = 0; // 총 메모 수를 0으로 설정
+    } else if (error.code === 'ERR_NETWORK') {
+      showAlert("네트워크 연결에 문제가 발생했습니다. 인터넷 연결을 확인해주세요.");
+      memoList.value = [];
+      totalMemos.value = 0;
+    } else {
+      // 그 외 알 수 없는 오류
+      showAlert("메모 목록을 불러오는 중 오류가 발생했습니다: " + (error.response?.data?.message || error.message || "알 수 없는 오류"));
+      memoList.value = [];
+      totalMemos.value = 0;
+    }
   }
 };
 
