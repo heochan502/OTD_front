@@ -1,7 +1,6 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
 
-
 import { useRouter } from 'vue-router';
 import { getProfile } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
@@ -27,12 +26,12 @@ const state = reactive({
 
 const formatBirthDate = (birthDate) => {
   if (!birthDate || birthDate.length !== 8) return birthDate;
-  return `${birthDate.substring(0, 4)}년 ${birthDate.substring(4, 6)}월 ${birthDate.substring(6, 8)}일`;
+  return `${birthDate.slice(0, 4)}년 ${birthDate.slice(4, 6)}월 ${birthDate.substring(6, 8)}일`;
 };
 
 onMounted(async () => {
   if (!counter.state.loggedIn) {
-    alert('로그인이 필요합니다.');
+    //alert('로그인이 필요합니다.');
     router.push('/login');
     return;
   }
@@ -54,10 +53,6 @@ onMounted(async () => {
   }
 });
 
-
-const goToEdit = () => {
-  router.push('/profile/edit');
-};
 </script>
 
 <template>
@@ -111,7 +106,7 @@ const goToEdit = () => {
       </table>
       
       <div class="button-group">
-        <button @click="goToEdit" class="btn-edit">정보 수정</button>
+         <router-link to="/detail" class="btn-edit">정보 수정</router-link>
       </div>
     </div>
   </div>
