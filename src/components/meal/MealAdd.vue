@@ -23,7 +23,12 @@ const searchFoodName = async (type) => {
   // console.log(JSON.stringify(items.foodName, null, 2));
   // 아래는 객체 형태로 받아와서 받아온걸 배열 형태로 수정하는것 (중복 제거 추가 )
   if (type ==='name'){
-  items.foodName = [...new Set(res.map(item => item.foodName))];
+  items.foodName = [...new Set(res.map(item => item.foodName + ('10 kcal')))];
+//   items.foodName = [
+//   ...new Set(
+//     res.map(item => item.foodName + ' (' + item.calorie + 'kcal)')
+//   )
+// ];
   }
   if (type ==='category'){
     
@@ -77,10 +82,10 @@ const changeText = debounce((type) => {
       append-icon="mdi-magnify" @click:append="()=>searchFoodName('category')" @keyup.enter="() => searchFoodName('category')"></v-combobox>
   </div>
   <div class="d-flex flex-row">
-    <v-combobox ref="nameBox" v-model="searchFood.foodName" :items="items.foodName" item-text="foodName"
+    <v-combobox  ref="nameBox" v-model="searchFood.foodName" :items="items.foodName" item-text="foodName"
       @update:model-value="onNameInput" label="음식명을 입력하세요" variant="solo-inverted" placeholder="음식명"
       append-icon="mdi-magnify" @click:append="()=>searchFoodName('name')" @keyup.enter="() => searchFoodName('name')"
-      ></v-combobox>
+      >df</v-combobox>
   </div>
 
 </template>
