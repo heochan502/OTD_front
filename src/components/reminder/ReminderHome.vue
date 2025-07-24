@@ -9,9 +9,7 @@ const todayYear = today.getFullYear();
 const todayMonth = today.getMonth() + 1;
 const todayDate = today.getDate();
 
-const state = reactive({
-  reminderDate: [],
-});
+const state = reactive({ reminderDate: [] });
 
 const getDate = async (date) => {
   const res = await getByMonth(date.year, date.month);
