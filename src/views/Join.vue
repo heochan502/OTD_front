@@ -35,12 +35,10 @@ const state = reactive({
   }
 });
 
-// 비밀번호 일치 확인
 const isPasswordMatch = computed(() => {
   return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
 });
 
-// 전체 동의 체크박스 처리
 const handleAllCheck = () => {
   const value = state.terms.all;
   state.terms.terms1 = value;
@@ -49,18 +47,15 @@ const handleAllCheck = () => {
   state.terms.terms4 = value;
 };
 
-// 개별 체크박스 변경 시 전체 동의 업데이트
 const updateAllCheck = () => {
   state.terms.all = state.terms.terms1 && state.terms.terms2 && 
                    state.terms.terms3 && state.terms.terms4;
 };
 
-// 아이디 중복 확인
 const checkDuplicateId = async () => {
-  // 공백 제거
+
   const trimmedId = state.form.memberId.trim();
   
-  console.log('아이디 체크:', trimmedId); // 디버깅용
   
   if (!trimmedId) {
     alert('아이디를 입력해주세요.');
@@ -74,14 +69,12 @@ const checkDuplicateId = async () => {
   
   try {
     const res = await checkMemberId(trimmedId);
-    console.log('중복확인 응답:', res); // 디버깅용
     
     if (res.status === 200) {
       state.validation.memberIdChecked = true;
       state.validation.memberIdAvailable = res.data.available;
       state.validation.memberIdMessage = res.data.message;
       
-      // alert로도 알림
       if (res.data.available) {
         alert('사용 가능한 아이디입니다.');
       } else {
@@ -94,18 +87,16 @@ const checkDuplicateId = async () => {
   }
 };
 
-// 이메일 중복 확인
+
 const checkDuplicateEmail = async () => {
   const trimmedEmail = state.form.email.trim();
   
-  console.log('이메일 체크:', trimmedEmail); // 디버깅용
   
   if (!trimmedEmail) {
     alert('이메일을 입력해주세요.');
     return;
   }
-  
-  // 이메일 형식 검증
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(trimmedEmail)) {
     alert('올바른 이메일 형식이 아닙니다.');
@@ -119,7 +110,6 @@ const checkDuplicateEmail = async () => {
       state.validation.emailAvailable = res.data.available;
       state.validation.emailMessage = res.data.message;
       
-      // alert로도 알림
       if (res.data.available) {
         alert('사용 가능한 이메일입니다.');
       } else {
@@ -132,11 +122,9 @@ const checkDuplicateEmail = async () => {
   }
 };
 
-// 닉네임 중복 확인
 const checkDuplicateNickname = async () => {
   const trimmedNick = state.form.memberNick.trim();
   
-  console.log('닉네임 체크:', trimmedNick); // 디버깅용
   
   if (!trimmedNick) {
     alert('닉네임을 입력해주세요.');
@@ -155,7 +143,6 @@ const checkDuplicateNickname = async () => {
       state.validation.nickAvailable = res.data.available;
       state.validation.nickMessage = res.data.message;
       
-      // alert로도 알림
       if (res.data.available) {
         alert('사용 가능한 닉네임입니다.');
       } else {
@@ -168,7 +155,6 @@ const checkDuplicateNickname = async () => {
   }
 };
 
-// 입력값 변경 시 중복확인 상태 리셋
 const resetIdValidation = () => {
   state.validation.memberIdChecked = false;
   state.validation.memberIdAvailable = false;
@@ -187,15 +173,14 @@ const resetNickValidation = () => {
   state.validation.nickMessage = '';
 };
 
-// 회원가입 제출
+
 const submit = async () => {
-  // 비밀번호 확인
+
   if (!isPasswordMatch.value) {
     alert('비밀번호가 일치하지 않습니다.');
     return;
   }
   
-  // 중복 확인 체크
   if (!state.validation.memberIdChecked || !state.validation.memberIdAvailable) {
     alert('아이디 중복 확인을 해주세요.');
     return;
@@ -211,7 +196,7 @@ const submit = async () => {
     return;
   }
   
-  // 필수 약관 동의 확인
+
   if (!state.terms.terms1 || !state.terms.terms2 || !state.terms.terms3) {
     alert('필수 약관에 모두 동의해주세요.');
     return;
