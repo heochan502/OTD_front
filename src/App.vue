@@ -1,21 +1,21 @@
 <script setup>
-import Layout from './views/layout/Layout.vue';
-import { useRoute, useRouter } from 'vue-router';
-import { watch, onMounted } from 'vue';
-import { useAccountStore } from './stores/counter';
-import { check } from './services/accountService';
+import Layout from "./views/layout/Layout.vue";
+import { useRoute, useRouter } from "vue-router";
+import { watch, onMounted } from "vue";
+import { useAccountStore } from "./stores/counter";
+import { check } from "./services/accountService";
 
 const route = useRoute();
 const router = useRouter();
 const counter = useAccountStore();
 
-console.log('z', counter);
+console.log("z", counter);
 
 // console.log('z', counter);
 const checkAccount = async () => {
-  console.log('로그인 체크');
+  console.log("로그인 체크");
   const res = await check();
-  console.log('res:', res);
+  console.log("res:", res);
 
   if (res === null || res.status != 200) {
     counter.setChecked(false);
@@ -27,15 +27,15 @@ const checkAccount = async () => {
     //커뮤니티 유저 id 저장
     counter.setLoggedInId(res.data);
   } catch (e) {
-    console.error('check 에러:', e);
+    console.error("check 에러:", e);
     counter.setChecked(false);
-
-}};
+  }
+};
 
 onMounted(() => {
   checkAccount();
   counter.setLoggedIn(false);
-   router.push('/login');
+  // router.push("/login");
 });
 watch(
   () => route.path,
@@ -67,7 +67,7 @@ watch(
   align-items: center;
   justify-content: center;
   height: 100vh;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .spinner {
@@ -81,8 +81,12 @@ watch(
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-container p {

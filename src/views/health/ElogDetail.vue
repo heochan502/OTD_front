@@ -16,7 +16,7 @@ const state = reactive({
     exerciseDatetime: "",
     exerciseKcal: 0,
     exerciseDuration: 0,
-    effortLevel: 0,
+    effortLevel: 1,
   },
 });
 
@@ -36,18 +36,18 @@ const formatTime = (dateStr) => {
 onMounted(async () => {
   exerciseStore.fetchExercises();
   const exerciselogId = route.params.exerciselogId;
-  console.log(exerciselogId);
   const res = await getElog(exerciselogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
   state.elog = res.data;
+  console.log(state.elog);
+  console.log(res.data);
 });
 
 // @click
 const moveToForm = () => {
-  console.log(state.elog);
   router.push({
     path: "/elog/form",
     state: {
@@ -97,7 +97,7 @@ const moveToForm = () => {
           <v-col>
             <div class="subtitle">운동강도</div>
             <div class="content">
-              {{ effortLevels[state.elog.effortLevel].label }}
+              {{ effortLevels[state.elog.effortLevel - 1].label }}
             </div>
           </v-col>
         </v-row>
