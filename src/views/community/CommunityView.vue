@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/CommunityStore';
 import CommunityList from '@/components/community/CommunityList.vue';
 import CommunityDetail from '@/components/community/CommunityDetail.vue';
 import CommunityEdit from '@/components/community/CommunityEdit.vue';
