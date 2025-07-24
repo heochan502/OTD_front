@@ -4,8 +4,13 @@ import { fetchPosts } from '@/services/community/communityService'; // ✅ 추�
 
 export const usecommunityStore = defineStore('community', () => {
   const posts = ref([]);
+  const search = ref('');
+  const sortOption = ref('latest');
+  const selectedPost = ref(null);
+  const viewMode = ref('list'); // 'list' | 'detail' | 'edit' | 'write'
+  const hasLiked = ref(false);
 
-  // API 호출 함수
+  // 게시글 목록 조회
   const loadPosts = async () => {
     try {
       const res = await fetchPosts();
@@ -16,18 +21,14 @@ export const usecommunityStore = defineStore('community', () => {
     }
   };
 
-  const search = ref('');
-  const sortOption = ref('latest');
-  const selectedPost = ref(null);
-
   const filteredPosts = computed(() => {
     const query = search.value.trim().toLowerCase();
     if (!query) return posts.value;
 
     return posts.value.filter(
       (post) =>
-        post.title.toLowerCase().includes(text) ||
-        post.nickname?.toLowerCase().includes(text)
+        post.title.toLowerCase().includes(query) ||
+        post.nickname?.toLowerCase().includes(query)
     );
   });
 
@@ -46,15 +47,15 @@ export const usecommunityStore = defineStore('community', () => {
     selectedPost.value = null;
   };
 
-  const viewMode = ref('list');
-
   const goList = () => {
     clearPost();
     viewMode.value = 'list';
   };
 
   const goDetail = (post) => {
-    selectPost(post);
+    if (post) {
+      selectPost(post); // 리스트에서 클릭 시
+    }
     viewMode.value = 'detail';
   };
 
@@ -65,6 +66,13 @@ export const usecommunityStore = defineStore('community', () => {
   const goWrite = () => {
     clearPost();
     viewMode.value = 'write';
+  };
+
+  const replacePost = (updatedPost) => {
+    const index = posts.value.findIndex((p) => p.postId === updatedPost.postId);
+    if (index !== -1) {
+      posts.value[index] = updatedPost;
+    }
   };
 
   return {
@@ -82,5 +90,7 @@ export const usecommunityStore = defineStore('community', () => {
     goEdit,
     goWrite,
     loadPosts,
+
+    replacePost,
   };
 });

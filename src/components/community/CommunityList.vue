@@ -51,7 +51,7 @@ const filteredPosts = computed(() => {
         class="mb-4"
       >
         <v-btn value="latest">최신순</v-btn>
-        <v-btn value="like">좋아요순</v-btn>
+        <v-btn value="like">인기순</v-btn>
       </v-btn-toggle>
 
       <v-card

@@ -1,6 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
+import {
+  updatePost,
+  fetchPostById,
+} from '@/services/community/communityService';
 
 const store = usecommunityStore();
 const post = computed(() => store.selectedPost || {});
@@ -9,14 +13,32 @@ const post = computed(() => store.selectedPost || {});
 const editedTitle = ref(post.value.title);
 const editedContent = ref(post.value.content);
 
-// 저장 핸들러
-function saveChanges() {
-  // 실제 API 연동 전: store에 반영만 예시
-  post.value.title = editedTitle.value;
-  post.value.content = editedContent.value;
+watch(post, (newPost) => {
+  editedTitle.value = newPost.title;
+  editedContent.value = newPost.content;
+});
 
-  store.goDetail(post.value); // 저장 후 상세보기로 이동
-}
+// 수정한 값을 저장하는 핸들러
+const saveChanges = async () => {
+  if (!post.value.postId) return;
+
+  try {
+    const formData = new FormData();
+    formData.append('title', editedTitle.value);
+    formData.append('content', editedContent.value);
+
+    await updatePost(post.value.postId, formData);
+
+    const res = await fetchPostById(post.value.postId);
+    store.selectPost(res.data);
+    store.goDetail(res.data);
+
+    alert('수정이 완료되었습니다.');
+  } catch (err) {
+    console.error('수정 실패:', err);
+    alert('수정 중 오류가 발생했습니다.');
+  }
+};
 
 // 취소 핸들러
 function cancelEdit() {
