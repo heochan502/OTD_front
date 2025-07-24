@@ -1,10 +1,7 @@
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { getWeather } from '@/services/weather/weatherHomeService';
 
-const staste = reactive({});
-
-const memberId = ref('');
 const weather = ref(null);
 
 const LocalWeather = async () => {

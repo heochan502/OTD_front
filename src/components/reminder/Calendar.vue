@@ -1,18 +1,25 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
+
 const props = defineProps({
   reminderDate: {
     type: Array,
     default: () => [],
   },
+  usePage: { type: String, default: 'home' },
 });
-const emit = defineEmits(['selected-date', 'reminder-date']);
+const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
 
+// 캘린더 날짜 선택시의 홈, 폼 emit 분기문
 const pickDate = (day) => {
   if (!day) return;
   const selectedDate = new Date(currentYear.value, currentMonth.value - 1, day);
-  emit('selected-date', selectedDate);
+  if (props.usePage === 'form') {
+    emit('selected-date', selectedDate);
+  } else if (props.usePage) {
+    emit('click-date', selectedDate);
+  }
 };
 
 const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -53,6 +60,7 @@ const startIdxOfMonth = (thisYear, thisMonth) => {
 };
 // console.log('idx', startIdxOfMonth(2025, 7));
 
+// 캘린더 그리기 로직
 const makeCalendar = () => {
   const startIdx = startIdxOfMonth(currentYear.value, currentMonth.value);
   const endDay = lastDayOfMonth(currentYear.value, currentMonth.value);
@@ -90,9 +98,11 @@ const makeCalendar = () => {
 
 onMounted(() => {
   makeCalendar();
+  changeMonth();
 });
 // console.log('calendar', calendarMatrix);
 
+// 달 이동 버튼 눌렀을때 홈 화면에 보낼 년, 월 정보 에밋
 const changeMonth = () => {
   emit('reminder-date', {
     year: currentYear.value,
@@ -100,6 +110,7 @@ const changeMonth = () => {
   });
 };
 
+// 이전 달 보기
 const prevMonth = () => {
   if (currentMonth.value === 1) {
     currentMonth.value = 12;
@@ -111,6 +122,7 @@ const prevMonth = () => {
   changeMonth();
 };
 
+// 다음 달 보기
 const nextMonth = () => {
   if (currentMonth.value === 12) {
     currentMonth.value = 1;
@@ -122,6 +134,7 @@ const nextMonth = () => {
   changeMonth();
 };
 
+// 오늘 날짜 색 표시
 const todayColor = (day) => {
   const today = new Date();
   return (
