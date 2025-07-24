@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-
+import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps({
   reminderDate: {
@@ -10,14 +9,19 @@ const props = defineProps({
   usePage: { type: String, default: 'home' },
 });
 const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
-
+console.log('props', props.reminderDate);
 // 캘린더 날짜 선택시의 홈, 폼 emit 분기문
 const pickDate = (day) => {
   if (!day) return;
-  const selectedDate = new Date(currentYear.value, currentMonth.value - 1, day);
+  const selectedDate = new Date(
+    `${currentYear.value}-${String(currentMonth.value).padStart(
+      2,
+      '0'
+    )}-${String(day).padStart(2, '0')}`
+  );
   if (props.usePage === 'form') {
     emit('selected-date', selectedDate);
-  } else if (props.usePage) {
+  } else if (props.usePage === 'home') {
     emit('click-date', selectedDate);
   }
 };
@@ -76,9 +80,9 @@ const makeCalendar = () => {
       if (i === 0 && k < startIdx) {
         row.push({ date: '', hasReminder: false });
       } else if (day <= endDay) {
-        const fullDate = `${currentYear.value}.${String(
+        const fullDate = `${currentYear.value}-${String(
           currentMonth.value
-        ).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
+        ).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
         const hasReminder = props.reminderDate.includes(fullDate);
 
@@ -102,6 +106,13 @@ onMounted(() => {
 });
 // console.log('calendar', calendarMatrix);
 
+watch(
+  () => props.reminderDate,
+  () => {
+    makeCalendar();
+  },
+  { immediate: true, deep: true }
+);
 // 달 이동 버튼 눌렀을때 홈 화면에 보낼 년, 월 정보 에밋
 const changeMonth = () => {
   emit('reminder-date', {
@@ -206,8 +217,7 @@ const todayColor = (day) => {
       color: tomato;
     }
     .reminder_color {
-      background-color: slategray;
-      border-radius: 50%;
+      background-color: rgb(205, 236, 250);
     }
     td {
       height: 70px;

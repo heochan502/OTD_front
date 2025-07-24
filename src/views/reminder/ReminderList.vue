@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
 import { useRouter } from 'vue-router';
 
@@ -11,7 +11,10 @@ const state = reactive({
   reminder: [],
 });
 
-state.reminder = reminderStore.state.dayReminder;
+onMounted(() => {
+  console.log('dayre', reminderStore.state.dayReminder);
+  state.reminder = reminderStore.state.dayReminder;
+});
 
 const dowImage = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
@@ -47,7 +50,7 @@ const modify = (id) => {
     </div>
     <ul class="remider">
       <template v-for="reminder in state.reminder" :key="reminder.id">
-        <li>
+        <li class="list">
           <div>
             <span class="title">{{ reminder.title }}</span>
             <img
@@ -59,6 +62,7 @@ const modify = (id) => {
                   : 'off'
               }.png`"
               :alt="dow"
+              class="img"
             />
             <span class="date">{{ reminder.date }}</span>
             <img
@@ -68,12 +72,14 @@ const modify = (id) => {
                   : '/src/image/alarm_off.png'
               "
               alt="알람 유무"
+              class="img"
             />
             <img
               v-if="state.reminder.content"
               src="/src/image/button.png"
               alt="상세보기"
               @click="viewDetail"
+              class="img"
             />
           </div>
           <div v-if="content">
@@ -84,14 +90,24 @@ const modify = (id) => {
           src="/src/image/delete.png"
           alt="삭제"
           @click="remove(reminder.id)"
+          class="img"
         />
         <img
           src="/src/image/modify.png"
           alt="수정"
           @click="modify(reminder.id)"
+          class="img"
         />
       </template>
     </ul>
   </div>
 </template>
-<style></style>
+<style scoped>
+.list {
+  background-color: #d8f3ff;
+  color: #fff;
+}
+.img {
+  width: 50px;
+}
+</style>

@@ -2,7 +2,7 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import Calendar from '@/components/reminder/Calendar.vue';
-import { save } from '@/services/reminder/reminderService';
+import { save} from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 
 const router = useRouter();
@@ -31,7 +31,7 @@ const selectedDone = (day) => {
   const y = day.getFullYear();
   const m = String(day.getMonth() + 1).padStart(2, '0');
   const d = String(day.getDate()).padStart(2, '0');
-  state.date = `${y}.${m}.${d}`; // 넘길 데이터 저장
+  state.reminder.date = `${y}.${m}.${d}`; // 넘길 데이터 저장
 
   state.repeat = false; // 요일 반복 비활성화
   state.repeatDow = [];
@@ -49,9 +49,10 @@ const openCalendar = () => {
 
 // 화면에 나타낼 날짜 포맷 변경
 const formattedDate = computed(() => {
-  const y = selectedDate.value.getFullYear();
-  const m = String(selectedDate.value.getMonth() + 1).padStart(2, '0');
-  const d = String(selectedDate.value.getDate()).padStart(2, '0');
+  const selected = new Date(selectedDate.value)
+  const y = selected.getFullYear();
+  const m = String(selected.getMonth() + 1).padStart(2, '0');
+  const d = String(selected.getDate()).padStart(2, '0');
   return `${y}. ${m}. ${d}`;
 });
 
@@ -98,7 +99,7 @@ onMounted(() => {
     );
 
     if (state.reminder.date) {
-      const [y, m, d] = state.reminder.date.split('.'); //.map((s) => s.trim());
+      const [y, m, d] = state.reminder.date.split('.');
       selectedDate.value = new Date(`${y}.${m}.${d}`);
     } else if (state.reminder.repeat) {
       dowImage.value.forEach((item, index) => {
@@ -134,18 +135,21 @@ const submit = async () => {
     alarm: state.reminder.alarm,
   };
   console.log('jsonBody', jsonBody);
+  let res = null;
   if (state.reminder.id) {
     jsonBody.id = state.reminder.id;
     res = await modify(jsonBody);
     if (res === undefined || res.status !== 200) {
-    alert('오류발생');
-    return;
+      alert('오류발생');
+      return;
     }
     alert('일정을 추가했어요!');
-    if(reminderStore.state.dayReminder){
-      router.push('/reminder/list')}
+    if (reminderStore.state.dayReminder) {
+      router.push('/reminder/list');
+    }
   } else {
     res = await save(jsonBody);
+    console.log('res!!', res.data);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;

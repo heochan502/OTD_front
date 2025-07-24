@@ -23,22 +23,34 @@ const state = reactive({
 
 const getDate = async (date) => {
   const res = await getByMonth(date.year, date.month);
+  console.log('res.date', res.data);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
   }
   reminderStore.setFullReminder(res.data);
-  state.reminderDate = state.fullReminder.filter((item) => item.date);
+  state.reminderDate = res.data.map((item) => item.date);
+  console.log('date1111', state.reminderDate);
 };
 
 // 캘린더 날짜 선택시의 홈, 폼 router 분기문
 const routerDate = (date) => {
-  console.log(date);
+  console.log('date333', date);
   // 넘어오는 데이터 확인 후 수정 예정
-  const hasReminder = state.reminderDate.find((item) => item.date === date);
+  const formattedDate = `${date.getFullYear()}-${String(
+    date.getMonth() + 1
+  ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
+  const hasReminder = state.reminderDate.includes(formattedDate);
+  console.log('state', state.reminderDate);
+  console.log('has', hasReminder);
+  console.log('dateee', date);
   if (hasReminder) {
-    const dayReminder = state.fullReminder.filter((item) => item.date === date);
+    const dayReminder = reminderStore.state.fullReminder.filter(
+      (item) => item.date === formattedDate
+    );
+    // console.log('fullrminder', reminderStore.state.fullReminder);
+    // console.log('dayreminder', dayReminder);
     reminderStore.setDayReminder(dayReminder);
     router.push('/reminder/list');
   } else {
@@ -49,13 +61,26 @@ const routerDate = (date) => {
 // 일정 미리보기 영역 클릭시 리스트 페이지로 라우팅 처리 될 때의 피니아 값 주입
 const setTodayReminder = () => {
   // 형식 변경 가능성 있음
-  const todayReminder = state.fullReminder.filter(
-    (item) => item === `${todayYear}.${todayMonth}.${todayDate}`
+  const todayReminder = reminderStore.state.fullReminder.filter(
+    (item) =>
+      item.date ===
+      `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
+        2,
+        '0'
+      )}-${String(today.getDate()).padStart(2, '0')}`
   );
+  console.log(todayYear);
+  console.log(todayMonth);
+  console.log(todayDate);
+  console.log('date', `${todayYear}-${todayMonth}-${todayDate}`);
+  console.log('fullreminder', reminderStore.state.fullReminder);
+  console.log('todayReminder', todayReminder);
   reminderStore.setDayReminder(todayReminder);
 };
+
 onMounted(async () => {
   const res = await getByDay(todayYear, todayMonth, todayDate);
+  console.log('res.data', res.data);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
