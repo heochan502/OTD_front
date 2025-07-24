@@ -2,7 +2,7 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-axios.defaults.baseURL = '/api/OTD';
+axios.defaults.baseURL = '/api/otd';
 
 export const join = (params) => {
   return axios.post('/user/signup', params).catch((e) => e.response);
