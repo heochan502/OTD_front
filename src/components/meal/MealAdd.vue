@@ -5,6 +5,7 @@ import { getFoodNames } from '@/services/meal/mealService';
 
 const nameBox = ref(null);
 const categoryBox = ref(null);
+const categoryClick = ref(false);
 
 const searchFood = reactive({
   foodName: '',
@@ -25,7 +26,8 @@ const searchFoodName = async (type) => {
   items.foodName = [...new Set(res.map(item => item.foodName))];
   }
   if (type ==='category'){
-    items.foodCategory = [...new Set(res.map(item => item.foodName))];}
+    
+    items.foodCategory = [...new Set(res.map(item => item.foodCategory))];}
 
   // items.foodname = Array.from(new Map(items.foodname.map(item => [item.foodName, item])).values());
   // console.log('items.foodname:', items.foodname);
@@ -37,9 +39,11 @@ const onNameInput = () => {
   changeText('name');
   forceOpenDropdown('name');
 };
-
+// 다시 카테고리 눌렀을때 name 쪽 비워서 검색에 무리없게 만들기
 const onCategoryInput = () => {
   changeText('category');
+  searchFood.foodName ='';
+  items.foodName=[];
   forceOpenDropdown('category');
 };
 
@@ -75,7 +79,8 @@ const changeText = debounce((type) => {
   <div class="d-flex flex-row">
     <v-combobox ref="nameBox" v-model="searchFood.foodName" :items="items.foodName" item-text="foodName"
       @update:model-value="onNameInput" label="음식명을 입력하세요" variant="solo-inverted" placeholder="음식명"
-      append-icon="mdi-magnify" @click:append="()=>searchFoodName('name')" @keyup.enter="() => searchFoodName('name')"></v-combobox>
+      append-icon="mdi-magnify" @click:append="()=>searchFoodName('name')" @keyup.enter="() => searchFoodName('name')"
+      ></v-combobox>
   </div>
 
 </template>
