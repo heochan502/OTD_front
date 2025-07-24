@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted, reactive, ref, onBeforeUnmount, nextTick } from 'vue';
-import { VueEcharts } from 'vue3-echarts';
+import { onMounted, ref, nextTick } from 'vue';
+
 import * as echarts from 'echarts';
-import { bottom } from '@popperjs/core';
+
 
 const xData = ['월', '화', '수', '목', '금', '토', '일'];
 const yData = xData.map(() => parseInt(Math.random() * 2400));
@@ -113,23 +113,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="weekly-calorie">
-    <div>
-      ref="chartRef" class="main-container" style="height: 500px; width: 100%"
-    </div>
+  <div class="weekly-calorie  ">
+    <div ref="chartRef" class="main-container  " style="height: 500px; width: 100%"></div>
   </div>
 </template>
 
 <style scoped>
 .weekly-calorie {
-  width: 100%;
+  width: 80%;
   height: 100%;
-  position: static;
 }
 .main-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  position: relative;
+  width: 80%;
 }
 </style>
