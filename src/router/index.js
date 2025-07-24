@@ -16,7 +16,6 @@ import MealAdd from "@/components/meal/MealAdd.vue";
 import HealthMain from "@/views/health/HealthMain.vue";
 import ElogDetail from "@/views/health/ElogDetail.vue";
 import ElogForm from "@/views/health/ElogForm.vue";
-import ELogUpdate from "@/views/health/ELogUpdate.vue";
 import HlogDetail from "@/views/health/HlogDetail.vue";
 import HlogForm from "@/views/health/HlogForm.vue";
 
@@ -26,6 +25,7 @@ import Profile from "@/views/Profile.vue";
 
 import Location from "@/components/location/Location.vue";
 import ProfileDetail from "@/views/ProfileDetail.vue";
+import ElogEdit from "@/views/health/ElogEdit.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,10 +86,11 @@ const router = createRouter({
       component: ElogForm,
     },
     {
-      path: "/elog/update",
-      name: "ElogUpdate",
-      component: ELogUpdate,
+      path: "/elog/edit",
+      name: "ElogEdit",
+      component: ElogEdit,
     },
+
     {
       path: "/hlog/:healthlogId",
       name: "HlogDetail",

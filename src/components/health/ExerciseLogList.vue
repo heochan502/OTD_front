@@ -57,7 +57,7 @@ const add = () => {
       @click="detail(item.exerciselogId)"
     >
       <div class="title">
-        {{ exerciseStore.list[item.exerciseId]?.exerciseName }}
+        {{ exerciseStore.list[item.exerciseId - 1]?.exerciseName }}
       </div>
       <div class="content">
         <div>{{ item.exerciseDuration }}분</div>

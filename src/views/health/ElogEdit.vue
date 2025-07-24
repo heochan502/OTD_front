@@ -22,7 +22,6 @@ const state = reactive({
 const passData = history.state.data;
 onMounted(() => {
   exerciseStore.fetchExercises();
-  console.log(passData);
   if (passData) {
     state.form = JSON.parse(passData);
   }
@@ -31,12 +30,24 @@ onMounted(() => {
 // click event
 // 기록 저장/수정
 const submit = async () => {
+  const convertDatetimeFormat = (datetimeStr) => {
+    return datetimeStr.replace("T", " ");
+  };
+  state.form.exerciseDatetime = convertDatetimeFormat(
+    state.form.exerciseDatetime
+  );
+
   const res = await updateElog(state.form);
-  console.log(res.data);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("수정완료!");
+  router.push("/health");
 };
 
 const cancel = () => {
-  if (!confirm("취소하고 돌아가시겠습니까?")) return;
+  if (!confirm("수정 취소하시겠습니까?")) return;
   router.push(`${state.form.exerciselogId}`);
 };
 </script>
@@ -86,7 +97,7 @@ const cancel = () => {
             :items="
               exerciseStore.list.map((e) => ({
                 title: e.exerciseName,
-                value: e.exerciseId - 1,
+                value: e.exerciseId,
               }))
             "
             variant="solo"
@@ -124,7 +135,7 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn @click="submit">"수정" </v-btn>
+      <v-btn @click="submit">수정</v-btn>
       <v-btn @click="cancel">취소</v-btn>
     </v-row>
   </v-container>

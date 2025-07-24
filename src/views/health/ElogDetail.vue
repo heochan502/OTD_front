@@ -12,7 +12,7 @@ const router = useRouter();
 const state = reactive({
   elog: {
     exerciselogId: 0,
-    exerciseId: 0,
+    exerciseId: null,
     exerciseDatetime: "",
     exerciseKcal: 0,
     exerciseDuration: 0,
@@ -42,14 +42,12 @@ onMounted(async () => {
     return;
   }
   state.elog = res.data;
-  console.log(state.elog);
-  console.log(res.data);
 });
 
 // @click
-const moveToForm = () => {
+const moveToEdit = () => {
   router.push({
-    path: "/elog/Form",
+    path: "/elog/edit",
     state: {
       data: JSON.stringify(state.elog),
     },
@@ -59,7 +57,6 @@ const moveToForm = () => {
 const deleteLog = async () => {
   if (!confirm("삭제하시겠습니까?")) return;
   const exerciselogId = state.elog.exerciselogId;
-  console.log(exerciselogId);
   const res = await deleteElog(exerciselogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
@@ -77,7 +74,7 @@ const deleteLog = async () => {
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
       <div class="btns">
-        <v-btn class="btn_modify" @click="moveToForm">수정</v-btn>
+        <v-btn class="btn_modify" @click="moveToEdit">수정</v-btn>
         <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn>
       </div>
     </v-row>
@@ -85,7 +82,7 @@ const deleteLog = async () => {
       <v-col class="col_left">
         <div class="exercise">
           <span>
-            {{ exerciseStore.list[state.elog.exerciseId]?.exerciseName }}
+            {{ exerciseStore.list[state.elog.exerciseId - 1]?.exerciseName }}
           </span>
         </div>
       </v-col>

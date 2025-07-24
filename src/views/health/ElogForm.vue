@@ -27,7 +27,6 @@ const state = reactive({
 const passData = history.state.data;
 onMounted(() => {
   exerciseStore.fetchExercises();
-  console.log(passData);
   if (passData) {
     state.form = JSON.parse(passData);
   }
@@ -36,13 +35,13 @@ onMounted(() => {
 // click event
 // 기록 저장/수정
 const submit = async () => {
-  const convertDateTimeFormat = (datetimeStr) => {
+  const convertDatetimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
   };
 
   const jsonBody = {
     exerciseId: state.form.exerciseId,
-    exerciseDatetime: convertDateTimeFormat(state.form.exerciseDatetime),
+    exerciseDatetime: convertDatetimeFormat(state.form.exerciseDatetime),
     exerciseKcal: state.form.exerciseKcal,
     exerciseDuration: state.form.exerciseDuration,
     effortLevel: state.form.effortLevel,
@@ -51,7 +50,7 @@ const submit = async () => {
   let res = null;
   let path = "/health";
 
-  if (history.state.data) {
+  if (passData) {
     jsonBody.exerciselogId = state.form.exerciselogId;
     console.log("보내는 데이터", jsonBody);
 
@@ -65,9 +64,7 @@ const submit = async () => {
     return;
   }
   alert("완료!");
-  if (res.status === 200) {
-    router.push({ path });
-  }
+  router.push({ path });
 };
 
 const cancel = () => {
