@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { getElogs } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 
 const router = useRouter();
@@ -13,18 +12,19 @@ const state = reactive({
 });
 
 // 운동기록불러오기
-const load = async () => {
-  const res = await getElogs();
-  if (res === undefined || res.status !== 200) {
-    alert(res.status + "오류발생!");
-    return;
-  }
-  state.logs = res.data;
-};
+// const load = async () => {
+//   const res = await getElogs();
+//   if (res === undefined || res.status !== 200) {
+//     alert(res.status + "오류발생!");
+//     return;
+//   }
+//   state.logs = res.data;
+// };
 
 onMounted(async () => {
   await exerciseStore.fetchExercises();
-  await load();
+  await exerciseStore.fetchExerciselogs();
+  state.logs = exerciseStore.logs;
 });
 
 // 날짜 형식 변경
