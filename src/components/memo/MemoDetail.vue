@@ -74,17 +74,15 @@ const currentTime = ref(new Date());
 let intervalId = null; // setInterval Id
 
 // 날짜 형식 변환 함수
-const formatDateTime = (isoString) => {
-  if(!isoString || typeof isoString !== 'string') {
-    console.error("formatDateTime: 유효하지 않은 입력, 문자열이 아니거나 비어있습니다: ", isoString);
+const formatDateTime = (dateInput) => {
+  let date = new Date(dateInput);
+  date = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+
+  if (isNaN(date.getTime())) {
+    console.error("formatDateTime: 유효하지 않은 날짜 형식입니다:", dateInput);
     return '';
   }
-  const date = new Date(isoString.replace(/-/g, '/').replace('T', ' ')); // ISO 문자열을 Date 객체로 변환
-  
-  if(isNaN(date.getTime())) {
-    console.error("유효하지 않은 날짜 형식 (파싱 실패): ", isoString);
-    return ''; // 유효하지 않은 날짜 형식 처리
-  }
+
   const formatter = new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -96,13 +94,12 @@ const formatDateTime = (isoString) => {
     hour12: true, // 오전/오후 사용
     timeZone: 'Asia/Seoul' // 서울 시간대 명시
   });
-  // part 배열 생성, 재조합하는 부분 없이 직접 format() 사용
   return formatter.format(date);
 };
 
 // 현재 시간을 포맷팅하는 computed 속성
 const currentTimeFormatted = computed(() => {
-  return formatDateTime(currentTime.value.toISOString());
+  return formatDateTime(currentTime.value);
 });
 
 // 1. 현재 메모의 생성일시를 포맷팅
@@ -157,14 +154,26 @@ const fetchMemos = async () => {
     }
     const actualMemoListRes = apiResponse.data;
 
+    if (!actualMemoListRes.resultData || !Array.isArray(actualMemoListRes.resultData)) {
+      console.warn("fetchMemos: resultData가 존재하지 않거나 배열이 아닙니다.", actualMemoListRes.resultData);
+      memoList.value = [];
+      totalMemos.value = 0;
+      return;
+    }
+    if (actualMemoListRes.resultData.length === 0) {
+      console.info("fetchMemos: 저장된 메모가 없습니다. (메모 목록 비어 있음)");
+      memoList.value = [];
+      totalMemos.value = 0;
+      return;
+    }
+
     if (actualMemoListRes && Array.isArray(actualMemoListRes.resultData)) {
       memoList.value = actualMemoListRes.resultData.map(memo => ({
         id: memo.id,
         title: memo.title,
         content: memo.content,
         createdAt: formatDateTime(memo.createdAt),
-        representativeImage: memo.imageUrls && memo.imageUrls.length > 0 ? memo.imageUrls.at(0) : (memo.image ? memo.image : null)
-      }));
+        representativeImage: memo.imageFileName ? `/pic/${memo.imageFileName}` : null,      }));
       totalMemos.value = actualMemoListRes.totalCount;
   } else {
     console.error("fetchMemos: 백엔드 응답 데이터 구조가 예상과 다릅니다. (메모가 없을 수 있음)", actualMemoListRes);
@@ -207,8 +216,11 @@ const fetchCurrentMemo = async (id) => {
     state.memo = resultData;
     showImages.value = []; // 기존 이미지 초기화
     // 백엔드에서 이미지 URL을 반환하는 경우 대비하여 처리
-    
-    if (state.memo.imageUrls && Array.isArray(resultData.imageUrls)) {
+    if(Array.isArray(resultData, imageFileNames)) {
+      showImages.value = resultData.imageFileNames.map(fileName => `/pic/${fileName}`);
+    } else if (resultData.imageFileName) {
+      showImages.value = [`/pic/${resultData.imageFileName}`];
+    } else if (Array.isArray(resultData.imageUrls)) {
       showImages.value = resultData.imageUrls;
     } else if (resultData.image) {
       showImages.value.push(resultData.image);
@@ -306,17 +318,16 @@ const save = async () => {
 
   // 3. API 호출
   let result;
+  const formData = new FormData();
   try {
     if (isUpdateMode.value) {
       // 수정 모드인 경우, JSON 데이터만 전송
-      result = await MemoHttpService.modify(state.memo.id, formData);
+      result = await MemoHttpService.modify(state.memo.id, reqPayload);
     } else if (isCreateMode.value) {
       // 등록 모드인 경우, FormData 사용, JSON과 파일을 함꼐 전송
     formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
 
   const selectedNewFiles = fileInputRef.value?.files;
-  const formData = new FormData();
-  formData.append("memoData", new Blob([JSON.stringify(reqPayload)], { type: "application/json" }));
     if (selectedNewFiles && selectedNewFiles.length > 0) {
       for (let i = 0; i < selectedNewFiles.length; i++) {
         const file = selectedNewFiles[i];
@@ -393,7 +404,7 @@ const handleImageChange = (e) => {
     const file = selectedFiles[i];
 
   // 최대 이미지 수 체크
-  if (currentTotalImages + validFilesToAdd.length >= maxImages) {
+  if (currentTotalImages + validFilesToAdd.length > maxImages) {
     showAlert(`최대 ${maxImages}장의 이미지만 업로드할 수 있습니다.`);
     break;
     }
@@ -488,7 +499,7 @@ const fileTypeCheck = (fileName) => {
                ref="fileInputRef" />
         <div class="preview-list">
       <div v-for="(img, index) in showImages" :key="index" class="preview-item">
-        <img :src="img" alt="미리보기 이미지" />
+      <img :src="img" alt="미리보기 이미지" />
         <button v-if="!isViewMode" class="remove-btn" @click="removeImage(index)">X</button>
       </div>
       <p v-if="isViewMode && showImages.length === 0" class="no-images-text">등록된 이미지가 없습니다.</p>

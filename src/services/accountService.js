@@ -36,4 +36,3 @@ export const checkEmail = (email) => {
 export const checkNickname = (nickname) => {
   return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
 };
-
