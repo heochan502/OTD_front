@@ -10,7 +10,7 @@ import {
   calcKcal,
   calcDuration,
   calcEffortAvg,
-} from "@/utils/exerciseLogUtils";
+} from "@/utils/exerciseReportUtils";
 
 const tab = ref("one");
 const exerciseStore = useExerciseStore();
