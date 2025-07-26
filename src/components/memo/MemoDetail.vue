@@ -77,14 +77,20 @@ const fetchMemoList = async (retry = false) => {
       currentPage: currentPage.value
     });
 
-    const resultList = res.resultData.memoList;
-    const total = res.resultData.totalCount;
+    // resultData가 undefined이거나 memoList가 배열이 아닐 경우 예외 처리
+    const resultData = res.data;
+    if (!resultData || !Array.isArray(resultData.memoList)) {
+    throw new Error("서버 응답이 올바르지 않습니다. (memoList 누락)");
+    }
+
+    const resultList = resultData.memoList;
+    const total = resultData.totalCount ?? 0;
 
     memoList.value = resultList.map(m => ({
       ...m,
       createdAt: formatDateTime(m.createdAt),
       representativeImage: m.imageFileName ? `/pic/${m.imageFileName}` : null,
-}));
+    }));
     totalMemos.value = total;
 
     if (memoList.value.length === 0 && currentPage.value > 1 && !retry) {
@@ -93,6 +99,7 @@ const fetchMemoList = async (retry = false) => {
     }
 
   } catch (err) {
+    console.error("fetchMemoList 에러:", err);
     showAlert('메모 목록 로딩 실패: ' + getErrorMessage(err));
   }
 };
