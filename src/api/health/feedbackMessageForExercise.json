@@ -1,0 +1,74 @@
+[
+  {
+    "id": "moreDuration",
+    "type": "duration",
+    "condition": "today > yesterday",
+    "message": "어제보다 더 오랜 시간 움직였어요!"
+  },
+  {
+    "id": "muchMoreDuration",
+    "type": "duration",
+    "condition": "today > yesterday + 10",
+    "message": "오늘 꽤 오랫동안 활동하셨어요. 멋져요!"
+  },
+  {
+    "id": "lessDuration",
+    "type": "duration",
+    "condition": "today < yesterday",
+    "message": "어제보다 짧게 운동하셨네요! 오늘도 파이팅"
+  },
+  {
+    "id": "equalDuration",
+    "type": "duration",
+    "condition": "today ≈ yesterday",
+    "message": "꾸준히 움직이고 있어요. 좋은 습관입니다."
+  },
+  {
+    "id": "moreEffort",
+    "type": "effort",
+    "condition": "today > yesterday",
+    "message": "오늘 운동 강도가 높았어요. 내일은 휴식도 필요해요"
+  },
+  {
+    "id": "lessEffort",
+    "type": "effort",
+    "condition": "today < yesterday",
+    "message": "오늘은 가볍게 몸을 풀었어요."
+  },
+  {
+    "id": "equalEffort",
+    "type": "effort",
+    "condition": "today ≈ yesterday",
+    "message": "균형 잡힌 운동 루틴을 유지 중이에요."
+  },
+  {
+    "id": "highCalories",
+    "type": "kcal",
+    "condition": "today > threshold",
+    "message": "오늘 정말 활발히 움직이셨어요"
+  },
+  {
+    "id": "lowCalories",
+    "type": "kcal",
+    "condition": "today < threshold",
+    "message": "소소한 활동도 충분히 가치 있어요"
+  },
+  {
+    "id": "firstWorkout",
+    "type": "milestone",
+    "condition": "first",
+    "message": "첫 운동 기록을 축하드려요! 오늘이 시작입니다"
+  },
+  {
+    "id": "comeback",
+    "type": "milestone",
+    "condition": "afterBreak",
+    "message": "잠시 쉬었지만 다시 시작한 게 중요해요!"
+  },
+  {
+    "id": "restDay",
+    "type": "rest",
+    "condition": "lowEffort && lowDuration",
+    "message": "오늘은 회복하는 날이었어요. 몸도 마음도 쉬어가요."
+  }
+]

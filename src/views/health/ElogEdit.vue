@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
-import { saveElog, updateElog } from "@/services/health/elogService";
+import { updateElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRouter } from "vue-router";
 
@@ -19,11 +19,6 @@ const state = reactive({
   },
 });
 
-// const formatDate = (dateStr) => {
-//   const date = new Date(dateStr);
-//   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-// };
-
 const passData = history.state.data;
 onMounted(() => {
   exerciseStore.fetchExercises();
@@ -38,42 +33,22 @@ const submit = async () => {
   const convertDatetimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
   };
+  state.form.exerciseDatetime = convertDatetimeFormat(
+    state.form.exerciseDatetime
+  );
 
-  const jsonBody = {
-    exerciseId: state.form.exerciseId,
-    exerciseDatetime: convertDatetimeFormat(state.form.exerciseDatetime),
-    exerciseKcal: state.form.exerciseKcal,
-    exerciseDuration: state.form.exerciseDuration,
-    effortLevel: state.form.effortLevel,
-  };
-
-  let res = null;
-  let path = "/health";
-
-  if (passData) {
-    jsonBody.exerciselogId = state.form.exerciselogId;
-    console.log("보내는 데이터", jsonBody);
-
-    res = await updateElog(jsonBody);
-    path = `${state.form.exerciselogId}`;
-  } else {
-    res = await saveElog(jsonBody);
-  }
+  const res = await updateElog(state.form);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("완료!");
-  router.push({ path });
+  alert("수정완료!");
+  router.push("/health");
 };
 
 const cancel = () => {
-  if (!confirm("취소하고 돌아가시겠습니까?")) return;
-  let path = "/health";
-  if (state.form.exerciselogId > 0) {
-    path = `${state.form.exerciselogId}`;
-  }
-  router.push({ path });
+  if (!confirm("수정 취소하시겠습니까?")) return;
+  router.push(`${state.form.exerciselogId}`);
 };
 </script>
 
@@ -131,12 +106,6 @@ const cancel = () => {
             clearable
             width="274px"
           ></v-select>
-
-          <!-- <v-icon
-            icon="mdi-close-thick"
-            class="cursor-pointer"
-            @click="clear"
-          ></v-icon> -->
         </v-row>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
@@ -166,9 +135,7 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn @click="submit">{{
-        state.form.exerciselogId > 0 ? "수정" : "추가"
-      }}</v-btn>
+      <v-btn @click="submit">수정</v-btn>
       <v-btn @click="cancel">취소</v-btn>
     </v-row>
   </v-container>
