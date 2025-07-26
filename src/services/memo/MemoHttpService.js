@@ -1,11 +1,12 @@
 import axios from 'axios';
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+// axios.defaults.withCredentials = true;
 console.log("API_URL (from env, now OTD):", import.meta.env.VITE_API_URL);
 
 
 class MemoHttpService {
-  async create(userId, formData) {
-  const res = await axios.post(`/memo/${userId}`, formData);
+  async create(formData) {
+  const res = await axios.post("/memo", formData);
   return res.data;
   }
 
