@@ -45,5 +45,21 @@ async deleteById(id) {
   return res.data;
   }
 }
-
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      console.error("인증 오류 발생, 로그인 페이지로 리다이렉트");
+      window.location.href = "/login"; // 로그인 페이지로 리다이렉트
+    }
+    return Promise.reject(error);
+  }
+);
 export default new MemoHttpService();
