@@ -16,5 +16,5 @@ export const getLocalList = () => {
 };
 
 export const selectLocation = (localId) => {
-  return axios.put(`/location/select`, { localId });
+  return axios.put("/location/select", { localId });
 };
