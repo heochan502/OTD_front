@@ -1,12 +1,13 @@
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue';
+import { ref, reactive, watch, onMounted } from "vue";
 import {
   getLocalName,
   saveLocation,
   getLocalList,
-} from '@/services/weather/locationService';
+  selectLocation,
+} from "@/services/weather/locationService";
 
-const keyword = ref('');
+const keyword = ref("");
 const selectedLocation = ref(null);
 const state = reactive({
   items: [], // 지역 검색 결과 리스트
@@ -16,7 +17,7 @@ const state = reactive({
 
 const searchLocation = async () => {
   if (!keyword.value.trim()) {
-    alert('지역명을 입력하세요');
+    alert("지역명을 입력하세요");
     return;
   }
   const res = await getLocalName(keyword.value);
@@ -32,25 +33,34 @@ const saveLocal = (searchText) => {
     (item) => `${item.city} ${item.county} ${item.town}` === searchText
   );
 };
-const selectLocation = async () => {
-  if (!keyword.value) {
-    alert('지역 정보가 일치하지 않습니다');
+
+const selectWeatherLocation = async (localId) => {
+  const res = await selectLocation(localId);
+  if (res && res.status === 200) {
+    alert("해당 지역이 홈화면에 표시됩니다.");
+  }
+};
+
+const saveSelectLocation = async () => {
+  if (!selectedLocation.value || !selectedLocation.value.localId) {
+    alert("지역 정보가 일치하지 않습니다");
     return;
   }
   await saveLocation(selectedLocation.value.localId);
-  alert('지역이 저장되었습니다');
+  alert("지역이 저장되었습니다");
+  await LocalList();
 };
-
-watch(keyword, async (val) => {
-  if (!val || typeof val !== 'string' || !val.trim()) return {};
-  await searchLocation();
-});
 
 const LocalList = async () => {
   const res = await getLocalList();
   state.list = res.data;
-  console.log('locallist', state.list);
+  console.log("locallist", state.list);
 };
+
+watch(keyword, async (val) => {
+  if (!val || typeof val !== "string" || !val.trim()) return {};
+  await searchLocation();
+});
 
 onMounted(() => {
   LocalList();
@@ -70,17 +80,26 @@ onMounted(() => {
       @keyup.enter="searchLocation"
     ></v-combobox>
   </div>
-  <div class="list">
+
+  <div class="mt-2">
+    <button class="btn btn-primary" @click="saveSearchedLocation">
+      검색한 지역 저장
+    </button>
+  </div>
+
+  <div class="list mt-4">
     <h2>저장한 지역 목록</h2>
     <ul>
       <li v-for="(item, index) in state.list" :key="index">
         {{ item.city }} {{ item.county }} {{ item.town }}
+        <button
+          class="btn btn-outline-primary btn-sm"
+          @click="selectWeatherLocation(item.localId)"
+        >
+          홈화면에 표시
+        </button>
       </li>
     </ul>
-  </div>
-  <div class="mt-3">
-    <p>선택된 지역: {{ keyword }}</p>
-    <button class="btn btn-primary" @click="selectLocation">저장</button>
   </div>
 </template>
 

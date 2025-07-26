@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { getWeather } from '@/services/weather/weatherHomeService';
+import { ref, onMounted, computed } from "vue";
+import { getWeather } from "@/services/weather/weatherHomeService";
 
 const weather = ref(null);
 
@@ -10,19 +10,15 @@ const LocalWeather = async () => {
   weather.value = res.data;
 };
 
-onMounted(async () => {
-  LocalWeather();
-});
-
 // 이모트 및 사진
 const skyEmojiList = {
-  맑음: '☀️',
-  흐림: '☁️',
-  '구름 많음': '🌤️',
-  비: '🌧️',
-  눈: '❄️',
-  비눈: '🌨️',
-  default: '🌈',
+  맑음: "☀️",
+  흐림: "☁️",
+  "구름 많음": "🌤️",
+  비: "🌧️",
+  눈: "❄️",
+  비눈: "🌨️",
+  default: "🌈",
 };
 
 const skyEmoji = computed(() => {
@@ -31,38 +27,45 @@ const skyEmoji = computed(() => {
 
 const dayTimes = computed(() => {
   const hour = new Date().getHours();
-  let timeName = '';
-  if (hour > 6 && hour < 19) return (timeName = 'morning');
-  else if (hour < 22) return (timeName = 'evening');
-  else return (timeName = 'night');
+  let timeName = "";
+  if (hour > 6 && hour < 19) return (timeName = "morning");
+  else if (hour < 22) return (timeName = "evening");
+  else return (timeName = "night");
 });
 
 const backgroundImg = {
-  '맑음-morning': 'url(src/image/weather/clear_morning.jpg)',
-  '맑음-evening': 'url(src/image/weather/clear_afternoon.jpg)',
-  '맑음-night': 'url(src/image/weather/clear_night.jpg)',
-  '구름 많음-morning': 'url(src/image/weather/littlecloudy_morning.jpg)',
-  '구름 많음-evening': 'url(src/image/weather/littlecloudy.jpg)',
-  '구름 많음-night': 'url(src/image/weather/littlecloudy_night.jpg)',
-  '흐림-morning': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-evening': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-night': 'url(src/image/weather/cloudy_night.jpg)',
-  '비-morning': 'url(src/image/weather/rain.jpg)',
-  '비-evening': 'url(src/image/weather/rain.jpg)',
-  '비-night': 'url(src/image/weather/rain.jpg)',
-  default: 'url(src/image/weather/default.png)',
+  "맑음-morning": "url(src/image/weather/clear_morning.jpg)",
+  "맑음-evening": "url(src/image/weather/clear_afternoon.jpg)",
+  "맑음-night": "url(src/image/weather/clear_night.jpg)",
+  "구름 많음-morning": "url(src/image/weather/littlecloudy_morning.jpg)",
+  "구름 많음-evening": "url(src/image/weather/littlecloudy.jpg)",
+  "구름 많음-night": "url(src/image/weather/littlecloudy_night.jpg)",
+  "흐림-morning": "url(src/image/weather/cloudy.jpg)",
+  "흐림-evening": "url(src/image/weather/cloudy.jpg)",
+  "흐림-night": "url(src/image/weather/cloudy_night.jpg)",
+  "비-morning": "url(src/image/weather/rain.jpg)",
+  "비-evening": "url(src/image/weather/rain.jpg)",
+  "비-night": "url(src/image/weather/rain.jpg)",
+  default: "url(src/image/weather/default.png)",
 };
 
 const weatherBackground = computed(() => {
-  const sky = weather.value?.sky || '';
+  const sky = weather.value?.sky || "";
   const time = dayTimes.value;
-  console.log('time', time);
+  console.log("time", time);
   return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
+});
+
+onMounted(async () => {
+  LocalWeather();
 });
 </script>
 
 <template>
-  <router-link :to="'/location'" class="button">지역 변경</router-link>
+  <div class="top">
+    <router-link :to="'/location'" class="button">지역 변경</router-link>
+    <button @click="toggleList" class="change-btn">▼</button>
+  </div>
   <div>
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">
       <div v-if="weather" class="weather-content">
@@ -80,7 +83,7 @@ const weatherBackground = computed(() => {
             <div class="temperature">{{ weather.tem }}℃</div>
           </div>
           <div class="max_min_temperature">
-            {{ '최저 :' + weather.tmn + '° / 최고 : ' + weather.tmx }}°
+            {{ "최저 :" + weather.tmn + "° / 최고 : " + weather.tmx }}°
           </div>
           <div class="humidity">습도: {{ weather.reh }}%</div>
         </div>
