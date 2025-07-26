@@ -133,7 +133,7 @@ const router = createRouter({
       props: true,
     },
         {
-      path: '/profile/detail',
+      path: '/detail',
       name: 'profile_detail',
       component: ProfileDetail,
     },
