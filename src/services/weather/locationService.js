@@ -18,3 +18,7 @@ export const getLocalList = () => {
 export const selectLocation = (localId) => {
   return axios.put("/location/select", { localId });
 };
+
+export const removeLocation = (localId) => {
+  return axios.delete(`/location/delete/${localId}`).catch((e) => e.response);
+};
