@@ -1,13 +1,11 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
-
 import { useRouter } from 'vue-router';
 import { getProfile } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
 
 const router = useRouter();
 const counter = useAccountStore();
-
 
 const state = reactive({
   form: {
@@ -17,21 +15,23 @@ const state = reactive({
     name: '',
     birthDate: '',
     memberNick: '',
+    profileImage: ''
   },
-
   loading: true,
   error: null
 });
-
 
 const formatBirthDate = (birthDate) => {
   if (!birthDate || birthDate.length !== 8) return birthDate;
   return `${birthDate.slice(0, 4)}년 ${birthDate.slice(4, 6)}월 ${birthDate.substring(6, 8)}일`;
 };
 
+const handleImageError = (e) => {
+  state.form.profileImage = '';
+};
+
 onMounted(async () => {
   if (!counter.state.loggedIn) {
-    //alert('로그인이 필요합니다.');
     router.push('/login');
     return;
   }
@@ -52,205 +52,418 @@ onMounted(async () => {
     state.loading = false;
   }
 });
-
 </script>
 
 <template>
-  <div class="profile-container">
-    <h2 class="title">회원정보</h2>
-    
-    <div v-if="state.loading" class="loading">
-      로딩 중...
-    </div>
-    
-    <div v-else-if="state.error" class="error">
-      {{ state.error }}
-    </div>
-    
-    <div v-else class="profile-content">
-      <table class="profile-table">
-        <tbody>
-          <tr>
-            <th>프로필 사진</th>
-            <td>
-              <div class="profile-image">
-                <img
-                  :src="state.form.profileImage || '/default-avatar.png'"
-                  alt="프로필"
-                  @error="(e) => e.target.src = '/default-avatar.png'"
-                />
+  <div class="page-wrapper">
+    <div class="container">
+      <div class="header">
+        <h1>회원정보</h1>
+      </div>
+
+      <div class="content-container">
+        <!-- 로딩 상태 -->
+        <div v-if="state.loading" class="loading-wrapper">
+          <div class="loading-spinner"></div>
+          <p>정보를 불러오는 중...</p>
+        </div>
+        
+        <!-- 프로필 정보 -->
+        <div v-else class="profile-content">
+          <!-- 프로필 사진 섹션 -->
+          <div class="profile-photo-section">
+            <div class="photo-wrapper">
+              <div v-if="state.form.profileImage" class="profile-img-container">
+                <img 
+                  :src="state.form.profileImage" 
+                  alt="프로필 사진" 
+                  class="profile-img"
+                  @error="handleImageError"
+                >
               </div>
-            </td>
-          </tr>
-          <tr>
-            <th>아이디</th>
-            <td>{{ state.form.memberId }}</td>
-          </tr>
-          <tr>
-            <th>이메일</th>
-            <td>{{ state.form.email }}</td>
-          </tr>
-          <tr>
-            <th>이름</th>
-            <td>{{ state.form.name }}</td>
-          </tr>
-          <tr>
-            <th>생년월일</th>
-            <td>{{ formatBirthDate(state.form.birthDate) }}</td>
-          </tr>
-          <tr>
-            <th>닉네임</th>
-            <td>{{ state.form.memberNick }}</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <div class="button-group">
-         <router-link to="/detail" class="btn-edit">정보 수정</router-link>
+              <div v-else class="profile-img default-avatar">
+                <span>{{ (state.form.name || '사용자').charAt(0) }}</span>
+              </div>
+            </div>
+            <div class="user-info">
+              <h2>{{ state.form.name || '사용자명 없음' }}</h2>
+              <p>@{{ state.form.memberNick || state.form.memberId || '닉네임 없음' }}</p>
+            </div>
+          </div>
+
+          <!-- 정보 카드들 -->
+          <div class="info-cards">
+            <div class="info-card">
+              <div class="card-header">
+                <h3>기본 정보</h3>
+              </div>
+              <div class="card-content">
+                <div class="info-item">
+                  <span class="label">아이디</span>
+                  <span class="value">{{ state.form.memberId }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">이메일</span>
+                  <span class="value">{{ state.form.email }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">이름</span>
+                  <span class="value">{{ state.form.name }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">닉네임</span>
+                  <span class="value">{{ state.form.memberNick }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">생년월일</span>
+                  <span class="value">{{ formatBirthDate(state.form.birthDate) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 버튼 그룹 -->
+          <div class="button-group">
+                <button 
+              @click="router.go(-1)" 
+              class="btn btn-secondary"
+            >
+              뒤로가기
+            </button>
+            <router-link 
+              to="/detail" 
+              class="btn btn-primary"
+            >
+              정보 수정
+            </router-link>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+* {
+  box-sizing: border-box;
+}
 
-.profile-container {
+.page-wrapper {
+  min-height: 100vh;
+  background: #f8fafb;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+.container {
   max-width: 800px;
-  margin: 40px auto;
-  padding: 0 20px;
-  font-family: 'Noto Sans KR', sans-serif;
-}
-
-.title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 30px;
-  color: #333;
-  text-align: center;
-}
-
-.loading, .error {
-  text-align: center;
-  padding: 40px;
-  font-size: 16px;
-}
-
-.error {
-  color: #f44336;
-}
-
-.profile-content {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
 
-.profile-table {
-  width: 100%;
-  border-collapse: collapse;
+.header {
+  color: #555555;;
+  padding: 40px 30px;
+
+  text-align: center;
 }
 
-.profile-table th,
-.profile-table td {
-  padding: 20px 30px;
-  text-align: left;
-  border-bottom: 1px solid #f0f0f0;
+.header h1 {
+  font-size: 1.75rem;
+  margin: 0 0 -50px 0;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
-.profile-table th {
-  background-color: #f8f9fa;
-  font-weight: 500;
-  color: #666;
-  width: 150px;
+.header p {
+  opacity: 0.9;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 400;
 }
 
-.profile-table td {
-  color: #333;
-  font-size: 16px;
+.content-container {
+  padding: 40px;
 }
 
-.profile-table tr:last-child th,
-.profile-table tr:last-child td {
-  border-bottom: none;
+/* 로딩 상태 */
+.loading-wrapper {
+  text-align: center;
+  padding: 60px 20px;
 }
 
-.profile-image {
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f1f3f5;
+  border-top: 3px solid #5BA7F7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-wrapper p {
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.profile-content {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-photo-section {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  padding: 30px;
+  background: #f8fafb;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.photo-wrapper {
+  position: relative;
+}
+
+.profile-img-container {
   width: 100px;
   height: 100px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #f0f0f0;
+  border: 3px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.profile-image img {
+.profile-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+.default-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5BA7F7 0%, #4A9EF5 100%);
+  border: 3px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.default-avatar span {
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.user-info h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 5px 0;
+}
+
+.user-info p {
+  color: #5BA7F7;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+
+.info-cards {
+  margin-bottom: 40px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  background: #f8fafb;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0;
+}
+
+.card-content {
+  padding: 0;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 30px;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  font-weight: 500;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.info-item .value {
+  color: #343a40;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* 버튼 그룹 */
 .button-group {
-  padding: 30px;
-  text-align: center;
-  background-color: #f8f9fa;
   display: flex;
   gap: 12px;
   justify-content: center;
+  padding-top: 32px;
+  border-top: 1px solid #e9ecef;
 }
 
-.btn-edit{
-  padding: 12px 30px;
-  border: none;
+.btn {
+  padding: 12px 24px;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
   text-decoration: none;
   display: inline-block;
-  transition: all 0.2s ease;
+  text-align: center;
+  min-width: 100px;
+  border: none;
 }
 
-.btn-edit {
-  background-color: #2a9df4;
+.btn-primary {
+  background: #5BA7F7;
   color: white;
 }
 
-.btn-edit:hover {
-  background-color: #1c7fd1;
+.btn-primary:hover {
+  background: #4A9EF5;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
+  box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
 }
 
-.btn-back {
-  background-color: #e0e0e0;
-  color: #666;
+.btn-secondary {
+  background: #6c757d;
+  color: white;
 }
 
-.btn-back:hover {
-  background-color: #d0d0d0;
+.btn-secondary:hover {
+  background: #5a6268;
   transform: translateY(-1px);
 }
 
-
-@media (max-width: 600px) {
-  .profile-table th,
-  .profile-table td {
-    padding: 15px 20px;
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 10px;
   }
   
-  .profile-table th {
-    width: 120px;
+  .container {
+    border-radius: 12px;
+  }
+  
+  .content-container {
+    padding: 24px;
+  }
+  
+  .header {
+    padding: 32px 24px;
+  }
+  
+  .profile-photo-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+    padding: 24px;
+  }
+  
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 16px 24px;
+  }
+  
+  .info-item .value {
+    font-size: 0.9rem;
   }
   
   .button-group {
     flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+
+  .card-header,
+  .info-item {
+    padding: 16px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 24px 20px;
+  }
+  
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .header p {
+    font-size: 0.9rem;
+  }
+  
+  .content-container {
     padding: 20px;
   }
   
-  .btn-edit, .btn-back {
-    width: 100%;
+  .profile-img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .user-info h2 {
+    font-size: 1.2rem;
+  }
+  
+  .user-info p {
+    font-size: 0.9rem;
   }
 }
 </style>
-
