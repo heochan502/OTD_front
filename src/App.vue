@@ -1,9 +1,9 @@
 <script setup>
-import Layout from './views/layout/Layout.vue';
-import { useRoute, useRouter } from 'vue-router';
-import { watch, onMounted } from 'vue';
-import { useAccountStore } from './stores/counter';
-import { check } from './services/accountService';
+import Layout from "./views/layout/Layout.vue";
+import { useRoute, useRouter } from "vue-router";
+import { watch, onMounted } from "vue";
+import { useAccountStore } from "./stores/counter";
+import { check } from "./services/accountService";
 
 const route = useRoute();
 const router = useRouter();
@@ -11,7 +11,7 @@ const counter = useAccountStore();
 
 
 const checkAccount = async () => {
-  console.log('로그인 체크');
+  console.log("로그인 체크");
   const res = await check();
   if (res === null || res.status != 200) {
     counter.setChecked(false);
@@ -27,9 +27,9 @@ const checkAccount = async () => {
 onMounted(async () => {
   const isLoggedIn = await checkAccount();
   if (!isLoggedIn) {
-    router.push('/login');
+    router.push("/login");
   } else {
-    router.push('/');
+    router.push("/");
   }
 });
 
@@ -63,7 +63,7 @@ watch(() => route.path,() => {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .spinner {
