@@ -9,22 +9,17 @@ const route = useRoute();
 const router = useRouter();
 const counter = useAccountStore();
 
-console.log("z", counter);
 
-// console.log('z', counter);
 const checkAccount = async () => {
   console.log("로그인 체크");
   const res = await check();
   if (res === null || res.status != 200) {
     counter.setChecked(false);
     counter.setLoggedIn(false);
-    return false;
+    return false; 
   } else {
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
-
-    //커뮤니티 유저 id 저장
-    counter.setLoggedInId(res.data);
     return res.data > 0;
   }
 };
@@ -38,12 +33,12 @@ onMounted(async () => {
   }
 });
 
-watch(
-  () => route.path,
-  () => {
+
+watch(() => route.path,() => {
     checkAccount();
   }
 );
+
 </script>
 
 <template>

@@ -53,6 +53,10 @@ const submit = async () => {
           </div>
         </div>
         <button type="submit" class="btn-submit">로그인</button>
+        <div class="already">
+           <p class="log">아직 가입하지 않으셨다면</p>
+           <router-link to="/signup" class="go-join">회원가입</router-link>
+        </div>
       </form>
     </div>
   </div>
@@ -132,5 +136,25 @@ const submit = async () => {
   background: #1c7fd1;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
+}
+
+.already {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-top: 15px;
+}
+
+.log {
+  color: #666;
+  margin: 0;
+}
+
+.go-join {
+  color: #2a9df4;
+  text-decoration: none;
+  font-weight: 500;
 }
 </style>
