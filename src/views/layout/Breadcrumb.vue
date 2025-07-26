@@ -1,8 +1,7 @@
 <script setup>
-
-import { useRouter } from "vue-router";
-import { useAccountStore } from "@/stores/counter";
-import { logout } from "@/services/accountService";
+import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/stores/counter';
+import { logout } from '@/services/accountService';
 
 const router = useRouter();
 const counter = useAccountStore();
@@ -12,9 +11,7 @@ function goHome() {
 }
 
 const logoutAccount = async () => {
-
-
-  if (!confirm("로그아웃 하시겠습니까?")) {
+  if (!confirm('로그아웃 하시겠습니까?')) {
     return;
   }
   const res = await logout();
@@ -75,7 +72,7 @@ const logoutAccount = async () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 16px 32px 0px;
-  display: flex;  
+  display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 25px;
