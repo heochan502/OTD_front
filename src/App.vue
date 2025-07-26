@@ -20,6 +20,8 @@ const checkAccount = async () => {
   } else {
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
+    //커뮤니티 유저 id 저장
+    counter.setLoggedInId(res.data);
     return res.data > 0;
   }
 };
