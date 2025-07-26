@@ -97,7 +97,7 @@ const fetchMemoList = async () => {
 const saveMemo = async () => {
   if (memo.value.title.trim().length < 10) return showAlert('제목은 10자 이상 입력해주세요.');
   if (memo.value.content.trim().length < 10 || memo.value.content.length > 500) return showAlert('내용은 10자 이상 500자 이하 입력해주세요.');
-  if (!userId.value) return showAlert('로그인 정보가 없습니다.');
+  // if (!userId.value) return showAlert('로그인 정보가 없습니다.');
 
   const reqPayload = { ...memo.value, memberNoLogin: userId.value };
 
