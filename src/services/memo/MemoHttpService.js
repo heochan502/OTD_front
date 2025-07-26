@@ -14,18 +14,22 @@ class MemoHttpService {
 
 async findAll(params) {
   const res = await axios.get("/memo", {
-    params,
+    params: { page: 1, size: 5, ...params },
   withCredentials: true,
   });
   return res.data;
   }
 
 async findById(id) {
-  const res = await axios.get(`/memo/${id}`, {
-    withCredentials: true,
-  });
-  return res.data;
+  try {
+    const res = await axios.get(`/memo/${id}`, {
+    withCredentials: true });
+    return res.data;
+  } catch (error) {
+    console.error("Memo 조회 실패:", error);
+    throw error;
   }
+}
 
 async modify(jsonBody) {
   const res = await axios.put(`/memo`, jsonBody, {

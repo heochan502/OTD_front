@@ -26,6 +26,7 @@ const fetchMemo = async () => {
 const memoList = ref([]);
 const currentPage = ref(1);
 const pageSize = ref(5);
+const showMemos = ref([]);
 const totalMemos = ref(0);
 const userId = ref(null);
 const mode = ref('view'); // 'create' | 'view' | 'edit'
@@ -71,36 +72,25 @@ const clearForm = () => {
   if (fileInputRef.value) fileInputRef.value.value = '';
 };
 
-const fetchMemoList = async (retry = false) => {
+const fetchMemoList = async () => {
   try {
     const res = await MemoHttpService.findAll({
-      currentPage: currentPage.value
+      currentPage: currentPage.value,
+      pageSize: pageSize.value,
     });
 
-    // resultData가 undefined이거나 memoList가 배열이 아닐 경우 예외 처리
     const resultData = res.data;
+
     if (!resultData || !Array.isArray(resultData.memoList)) {
-    throw new Error("서버 응답이 올바르지 않습니다. (memoList 누락)");
+      throw new Error("서버 응답이 올바르지 않습니다. (memoList 누락)");
     }
 
-    const resultList = resultData.memoList;
-    const total = resultData.totalCount ?? 0;
-
-    memoList.value = resultList.map(m => ({
-      ...m,
-      createdAt: formatDateTime(m.createdAt),
-      representativeImage: m.imageFileName ? `/pic/${m.imageFileName}` : null,
-    }));
-    totalMemos.value = total;
-
-    if (memoList.value.length === 0 && currentPage.value > 1 && !retry) {
-      currentPage.value = Math.max(1, currentPage.value - 1);
-      return fetchMemoList(true); // 재요청
-    }
+    showMemos.value = resultData.memoList;
+    totalMemos.value = resultData.totalCount || 0;
 
   } catch (err) {
     console.error("fetchMemoList 에러:", err);
-    showAlert('메모 목록 로딩 실패: ' + getErrorMessage(err));
+    alert(`메모 목록 로딩 실패: ${err.message}`);
   }
 };
 
@@ -305,7 +295,7 @@ watch(routeId, async (id, prev) => {
     <h3 style="text-align: center; color: #666; margin-bottom: 20px;">메모 목록</h3>
 
     <div class="memo-list-section">
-  <div v-if="memoList.length === 0">
+  <div v-if="showMemos.length === 0" class="empty-message">
     작성된 메모가 없습니다. 새로운 메모를 작성해보세요!
   </div>
 
