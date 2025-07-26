@@ -13,14 +13,22 @@ const routeId = computed(() => route.params.id);
 const accountStore = useAccountStore();
 const fileInputRef = ref(null);
 
-const { memo, showImages, fetch: fetchMemo } = useMemoDetail(routeId.value);
+const { memo, showImages, fetch: fetchMemoRaw } = useMemoDetail(routeId.value);
+const fetchMemo = async () => {
+  try {
+    await fetchMemoRaw();
+  } catch (e) {
+    showAlert("메모를 불러오지 못했습니다.");
+    router.push('/memo');
+  }
+};
 
 const memoList = ref([]);
 const currentPage = ref(1);
 const pageSize = ref(5);
 const totalMemos = ref(0);
 const userId = ref(null);
-const isUpdateMode = ref(false);
+const mode = ref('view'); // 'create' | 'view' | 'edit'
 
 const currentTime = ref(new Date());
 let intervalId = null;
@@ -28,8 +36,9 @@ let intervalId = null;
 const alertModal = ref({ show: false, message: '' });
 const confirmModal = ref({ show: false, message: '', resolve: null });
 
-const isCreateMode = computed(() => !route.params.id);
-const isViewMode = computed(() => routeId.value && !isUpdateMode.value);
+const isCreateMode = computed(() => mode.value === 'create');
+const isViewMode = computed(() => mode.value === 'view');
+const isUpdateMode = computed(() => mode.value === 'edit');
 const formattedCurrentCreatedAt = computed(() => formatDateTime(memo.value.createdAt));
 const currentTimeFormatted = computed(() => formatDateTime(currentTime.value));
 
@@ -62,17 +71,29 @@ const clearForm = () => {
   if (fileInputRef.value) fileInputRef.value.value = '';
 };
 
-const fetchMemoList = async () => {
+const fetchMemoList = async (retry = false) => {
   try {
-    const res = await MemoHttpService.findAll({ currentPage: currentPage.value, pageSize: pageSize.value });
-    memoList.value = res.data?.resultData.map(m => ({
+    const res = await MemoHttpService.findAll({
+      currentPage: currentPage.value
+    });
+
+    const resultList = res.resultData.memoList;
+    const total = res.resultData.totalCount;
+
+    memoList.value = resultList.map(m => ({
       ...m,
       createdAt: formatDateTime(m.createdAt),
-      representativeImage: m.imageFileName ? `/pic/${m.imageFileName}` : null
-    })) || [];
-    totalMemos.value = res.data?.totalCount || 0;
+      representativeImage: m.imageFileName ? `/pic/${m.imageFileName}` : null,
+}));
+    totalMemos.value = total;
+
+    if (memoList.value.length === 0 && currentPage.value > 1 && !retry) {
+      currentPage.value = Math.max(1, currentPage.value - 1);
+      return fetchMemoList(true); // 재요청
+    }
+
   } catch (err) {
-    showAlert('메모 목록 로딩 실패: ' + (err.response?.data?.message || err.message));
+    showAlert('메모 목록 로딩 실패: ' + getErrorMessage(err));
   }
 };
 
@@ -84,20 +105,24 @@ const saveMemo = async () => {
   const reqPayload = { ...memo.value, memberNoLogin: userId.value };
 
   try {
-    const result = isUpdateMode.value
+    const result = mode.value === 'edit'
       ? await MemoHttpService.modify(memo.value.id, reqPayload)
       : await (() => {
         const formData = new FormData();
         formData.append('memoData', new Blob([JSON.stringify(reqPayload)], { type: 'application/json' }));
-        Array.from(fileInputRef.value?.files || []).forEach(file => formData.append('memoImageFiles', file));
+        const files = Array.from(fileInputRef.value?.files || []);
+        if (files.length === 0) throw new Error('이미지 파일이 없습니다.');
+        files.forEach(file => formData.append('memoImageFiles', file));
         return MemoHttpService.create(formData);
       })();
 
-    showAlert(isUpdateMode.value ? '수정 완료' : '등록 완료');
+    showAlert(mode.value === 'edit' ? '수정 완료' : '등록 완료');
     router.push('/memo');
-    currentPage.value = 1;
+    await fetchMemoList();
+    clearForm();
+    if (mode.value === 'create') currentPage.value = 1;
   } catch (e) {
-    showAlert('저장 실패: ' + (e.response?.data?.message || e.message));
+    showAlert('저장 실패: ' + getErrorMessage(e));
   }
 };
 
@@ -108,28 +133,34 @@ const deleteMemo = async () => {
     const res = await MemoHttpService.deleteById(memo.value.id);
     res.resultData === 1 ? router.push('/memo') || showAlert('삭제 성공') : showAlert('삭제 실패');
   } catch (e) {
-    showAlert('삭제 실패: ' + (e.response?.data?.message || e.message));
+    showAlert('삭제 실패: ' + getErrorMessage(e));
   }
 };
+
+const getErrorMessage = (err) => err.response?.data?.message || err.message;
 
 const handleImageChange = (e) => {
   const files = Array.from(e.target.files);
   const maxSize = 5 * 1024 * 1024;
   const extAllowed = ['jpg', 'jpeg', 'png', 'gif'];
-  const existingNames = new Set(showImages.value.map(url => url.split('/').pop()));
-  const uploadedFileNames = new Set();
+
+  const previewUrls = new Set(showImages.value);
+  const uploadedFileKeys = new Set(showImages.value.map(url => url.split('/').pop()));
 
   files.forEach(file => {
     const ext = file.name.split('.').pop().toLowerCase();
-    if (uploadedFileNames.has(file.name)) return showAlert(`${file.name}: 이미 추가됨`);
-    uploadedFileNames.add(file.name);
+    if (showImages.value.length >= 5) return showAlert('이미지는 최대 5장까지 업로드할 수 있습니다.');
     if (!extAllowed.includes(ext)) return showAlert(`${file.name}: 허용되지 않는 형식`);
     if (file.size > maxSize) return showAlert(`${file.name}: 5MB 초과`);
-    if (existingNames.has(file.name)) return showAlert(`${file.name}: 이미 추가됨`);
+    const fileKey = file.name + '_' + file.lastModified;
+    if (uploadedFileKeys.has(fileKey)) return showAlert(`${file.name}: 중복 업로드됨`);
 
     const previewUrl = URL.createObjectURL(file);
+    if (previewUrls.has(previewUrl)) return showAlert(`${file.name}: 동일한 파일이 이미 업로드됨`);
+
     showImages.value.push(previewUrl);
-    existingNames.add(file.name);
+    uploadedFileKeys.add(fileKey);
+    previewUrls.add(previewUrl);
   });
 };
 
@@ -139,11 +170,14 @@ const removeImage = (index) => {
   showImages.value.splice(index, 1);
 };
 
-const enableUpdateMode = () => isUpdateMode.value = true;
-const goToMemoDetail = (id) => router.push(`/memo/${id}`);
+const enableUpdateMode = () => mode.value = 'edit';
+const goToMemoDetail = (id) => {
+  if (route.params.id !== id) router.push(`/memo/${id}`);
+};
+
+const totalPages = computed(() => Math.max(1, Math.ceil(totalMemos.value / pageSize.value)));
 const changePage = (num) => {
-  const max = Math.ceil(totalMemos.value / pageSize.value);
-  if (num >= 1 && num <= max) {
+  if (num >= 1 && num <= totalPages.value) {
     currentPage.value = num;
     fetchMemoList();
   }
@@ -153,21 +187,39 @@ onMounted(async () => {
   const res = await check();
   if (res?.status === 200) {
     userId.value = res.data?.id;
-    accountStore.setUserId(true, userId.value);
+    accountStore.setLoggedIn(true);
+    accountStore.setLoggedInId(userId.value);
   } else {
-    accountStore.setUserId(false, null);
+    accountStore.setLoggedIn(false);
+    accountStore.setLoggedInId(null);
     return router.push({ name: 'login' });
+    fetchMemoList();
   }
+
   intervalId = setInterval(() => (currentTime.value = new Date()), 1000);
-  if (routeId.value) await fetchMemo();
+
+  if (routeId.value) {
+    mode.value = 'view';
+    await fetchMemo();
+  } else {
+    mode.value = 'create';
+    clearForm();
+  }
+
   fetchMemoList();
 });
 
 onBeforeUnmount(() => clearInterval(intervalId));
 
-watch(routeId, async (id) => {
-  isUpdateMode.value = false;
-  id ? await fetchMemo() : clearForm();
+watch(routeId, async (id, prev) => {
+  if (!id) {
+    mode.value = 'create';
+    clearForm();
+  } else {
+    mode.value = 'view';
+    await fetchMemo();
+  }
+  if (!prev && id) currentPage.value = 1;
   fetchMemoList();
 }, { immediate: true });
 </script>
@@ -246,28 +298,40 @@ watch(routeId, async (id) => {
     <h3 style="text-align: center; color: #666; margin-bottom: 20px;">메모 목록</h3>
 
     <div class="memo-list-section">
-      <div v-if="memoList.length === 0 && !isCreateMode">
-        등록된 메모가 없습니다. 새로운 메모를 작성해보세요!
-      </div>
-      <ul v-else class="memo-items">
-        <li v-for="memo in memoList" :key="memo.id" class="memo-item" @click="goToMemoDetail(memo.id)">
-          <div v-if="memo.representativeImage" class="memo-image-preview">
-            <img :src="memo.representativeImage" alt="대표 이미지" style="max-width: 50px; max-height: 50px;" />
-          </div>
-          <div class="memo-title">{{ memo.title }}</div>
-          <div class="memo-content">
-            {{ memo.content.length > 100 ? memo.content.substring(0, 100) + '...' : memo.content }}
-          </div>
-          <div class="memo-date">{{ memo.createdAt }}</div>
-        </li>
-      </ul>
+  <div v-if="memoList.length === 0">
+    작성된 메모가 없습니다. 새로운 메모를 작성해보세요!
+  </div>
 
-      <div class="pagination">
-        <button @click="changePage(currentPage - 1)" :disabled="currentPage <= 1">이전</button>
-        <span>페이지 {{ currentPage }} / {{ Math.ceil(totalMemos / pageSize) || 1 }}</span>
-        <button @click="changePage(currentPage + 1)" :disabled="currentPage >= Math.ceil(totalMemos / pageSize)">다음</button>
+  <ul v-else class="memo-items">
+    <li
+      v-for="memo in memoList"
+      :key="memo.id"
+      class="memo-item"
+      @click="goToMemoDetail(memo.id)"
+    >
+      <div v-if="memo.imageFileName" class="memo-image-preview">
+        <img
+          :src="`/pic/${memo.imageFileName}`"
+          alt="대표 이미지"
+          style="max-width: 50px; max-height: 50px;"
+        />
       </div>
-    </div>
+
+      <div class="memo-title">{{ memo.title }}</div>
+      <div class="memo-content">
+        {{ memo.content.length > 100 ? memo.content.slice(0, 100) + '...' : memo.content }}
+      </div>
+
+      <div class="memo-date">{{ formatDate(memo.createdAt) }}</div>
+    </li>
+  </ul>
+
+  <div class="pagination">
+    <button @click="changePage(currentPage - 1)" :disabled="currentPage <= 1">이전</button>
+    <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
+    <button @click="changePage(currentPage + 1)" :disabled="currentPage >= totalPages">다음</button>
+  </div>
+</div>
 
     <div v-if="alertModal.show" class="modal-overlay">
       <div class="modal-content">
@@ -287,7 +351,5 @@ watch(routeId, async (id) => {
     </div>
   </div>
 </template>
-
-<style scoped></style>
 
 <style scoped></style>

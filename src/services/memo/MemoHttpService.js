@@ -20,7 +20,7 @@ async findById(id) {
   return res.data;
 }
 
-async modify(id, jsonBody) {
+async modify(jsonBody) {
   const res = await axios.put(`/memo`, jsonBody);
   return res.data;
 }
