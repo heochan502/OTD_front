@@ -114,13 +114,13 @@ const onItemClick = (item) => {
       아침 메뉴
     </span>
 
-    <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model="searchFood.foodCategory" :items="items.foodCategory"
+    <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model.trim="searchFood.foodCategory" :items="items.foodCategory"
       item-text="foodCategory" @update:model-value="onCategoryInput" label="음식카테고리 입력하세요" variant="solo-inverted"
       placeholder="음식카테고리" append-icon="mdi-magnify" @click:append="() => searchFoodName('category')"
       @keyup.enter="() => searchFoodName('category')" </v-combobox>
 
 
-      <v-combobox class="mt-1 w-100" ref="nameBox" v-model="searchFood.foodName" :items="items.foodList"
+      <v-combobox class="mt-1 w-100" ref="nameBox" v-model.trim="searchFood.foodName" :items="items.foodList"
         item-title="foodName" item-value="foodName" label="음식명을 입력하세요" variant="solo-inverted" placeholder="음식명"
         append-icon="mdi-magnify" @update:model-value="onNameInput" @click:append="onNameInput"
         @keyup.enter="calculFoodCalorie()">
