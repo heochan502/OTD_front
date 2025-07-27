@@ -15,6 +15,7 @@ import {
 const exerciseStore = useExerciseStore();
 const tab = ref("one");
 
+// YYYY-MM-DD
 const todayStr = getDateString();
 const yesterdayStr = getYesterdayDateString();
 
@@ -42,8 +43,10 @@ const feedbackMessage = computed(() =>
     yesterdayEffort: yesterdayEffortAvg.value,
     todayKcal: todayKcal.value,
     yesterdayKcal: yesterdayKcal.value,
-    isFirst: todayLogs.value.length > 0 && yesterdayLogs.value.length === 0,
-    isComeback: yesterdayLogs.value.length === 0,
+    isFirst: todayLogs.value.length === 1 && yesterdayLogs.value.length === 0,
+    isComeback:
+      yesterdayLogs.value.length === 0 && todayLogs.value.length === 1,
+    hasRecord: todayLogs.value.length > 0,
   })
 );
 
@@ -80,12 +83,14 @@ const effortIndex = computed(() => {
             </div>
           </v-col>
           <v-col class="content_right">
-            <div class="title">운동강도</div>
-            <div class="emoji">
-              {{ effortLevels[effortIndex].emoji }}
-            </div>
-            <div class="effort_label">
-              {{ effortLevels[effortIndex].label }}
+            <div v-if="todayEffortAvg > 0">
+              <div class="title">운동강도</div>
+              <div class="emoji">
+                {{ effortLevels[effortIndex].emoji }}
+              </div>
+              <div class="effort_label">
+                {{ effortLevels[effortIndex].label }}
+              </div>
             </div>
             <div>{{ feedbackMessage }}</div>
           </v-col>
