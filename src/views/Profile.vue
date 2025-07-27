@@ -62,15 +62,13 @@ onMounted(async () => {
       </div>
 
       <div class="content-container">
-        <!-- 로딩 상태 -->
         <div v-if="state.loading" class="loading-wrapper">
           <div class="loading-spinner"></div>
           <p>정보를 불러오는 중...</p>
         </div>
         
-        <!-- 프로필 정보 -->
+
         <div v-else class="profile-content">
-          <!-- 프로필 사진 섹션 -->
           <div class="profile-photo-section">
             <div class="photo-wrapper">
               <div v-if="state.form.profileImage" class="profile-img-container">
@@ -91,7 +89,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- 정보 카드들 -->
           <div class="info-cards">
             <div class="info-card">
               <div class="card-header">
@@ -121,15 +118,7 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-
-          <!-- 버튼 그룹 -->
           <div class="button-group">
-                <button 
-              @click="router.go(-1)" 
-              class="btn btn-secondary"
-            >
-              뒤로가기
-            </button>
             <router-link 
               to="/detail" 
               class="btn btn-primary"
@@ -156,7 +145,7 @@ onMounted(async () => {
 }
 
 .container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
   background: white;
   border-radius: 16px;
@@ -189,7 +178,6 @@ onMounted(async () => {
   padding: 40px;
 }
 
-/* 로딩 상태 */
 .loading-wrapper {
   text-align: center;
   padding: 60px 20px;
@@ -230,9 +218,6 @@ onMounted(async () => {
   gap: 30px;
   margin-bottom: 40px;
   padding: 30px;
-  background: #f8fafb;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
 }
 
 .photo-wrapper {
@@ -385,85 +370,4 @@ onMounted(async () => {
   transform: translateY(-1px);
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .page-wrapper {
-    padding: 10px;
-  }
-  
-  .container {
-    border-radius: 12px;
-  }
-  
-  .content-container {
-    padding: 24px;
-  }
-  
-  .header {
-    padding: 32px 24px;
-  }
-  
-  .profile-photo-section {
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
-    padding: 24px;
-  }
-  
-  .info-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 16px 24px;
-  }
-  
-  .info-item .value {
-    font-size: 0.9rem;
-  }
-  
-  .button-group {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .btn {
-    width: 100%;
-  }
-
-  .card-header,
-  .info-item {
-    padding: 16px 24px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    padding: 24px 20px;
-  }
-  
-  .header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .header p {
-    font-size: 0.9rem;
-  }
-  
-  .content-container {
-    padding: 20px;
-  }
-  
-  .profile-img {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .user-info h2 {
-    font-size: 1.2rem;
-  }
-  
-  .user-info p {
-    font-size: 0.9rem;
-  }
-}
 </style>
