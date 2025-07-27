@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
-import RoutineHome from '@/components/routine/RoutineHome.vue';
 import ReminderForm from '@/views/reminder/ReminderForm.vue';
 import ReminderList from '@/views/reminder/ReminderList.vue';
 
@@ -11,21 +10,19 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
-
 import Memo from '@/components/memo/MemoDetail.vue';
 import Diary from '@/components/memo/DiaryDetail.vue';
 
 import CommunityView from '@/views/community/CommunityView.vue';
 
 import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/components/meal/MealAdd.vue'
+import MealAdd from '@/components/meal/MealAdd.vue';
 
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
 
 import Location from '@/components/location/Location.vue';
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,11 +53,6 @@ const router = createRouter({
       component: ReminderList,
     },
     {
-      path: '/routine',
-      name: 'routine',
-      component: RoutineHome,
-    },
-    {
       path: '/meal',
       name: 'MealForm',
       component: MealForm,
@@ -69,7 +61,7 @@ const router = createRouter({
       path: '/meal/add',
       name: 'MealAdd',
       component: MealAdd,
-    },    
+    },
     {
       path: '/health',
       name: 'healthMain',
@@ -116,14 +108,14 @@ const router = createRouter({
       component: Location,
     },
     {
-      path: "/memo/",
-      name: "memo",
+      path: '/memo/',
+      name: 'memo',
       component: Memo,
       props: true,
     },
     {
-      path: "/diary",
-      name: "diary",
+      path: '/diary',
+      name: 'diary',
       component: Diary,
       props: true,
     },

@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { useReminderStore } from '@/stores/reminderStore';
+
+const reminderStore = useReminderStore();
 
 const props = defineProps({
   reminderDate: {
@@ -10,14 +13,16 @@ const props = defineProps({
 });
 const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
 console.log('props', props.reminderDate);
+
+const formatNumber = (n) => String(n).padStart(2, '0');
+
 // 캘린더 날짜 선택시의 홈, 폼 emit 분기문
 const pickDate = (day) => {
   if (!day) return;
   const selectedDate = new Date(
-    `${currentYear.value}-${String(currentMonth.value).padStart(
-      2,
-      '0'
-    )}-${String(day).padStart(2, '0')}`
+    `${currentYear.value}-${formatNumber(currentMonth.value)}-${formatNumber(
+      day
+    )}`
   );
   if (props.usePage === 'form') {
     emit('selected-date', selectedDate);
@@ -37,31 +42,34 @@ const currentYear = ref(today.getFullYear());
 const currentMonth = ref(today.getMonth() + 1);
 // getMonth는 0부터 시작함
 
-const startYear = 2003;
-const startDowIdx = new Date(startYear, 0, 1).getDay();
+// const startYear = 2003;
+// const startDowIdx = new Date(startYear, 0, 1).getDay();
 
 // 원하는 년, 월의 마지막 날짜 구하기(윤년처리까지)
-const lastDayOfMonth = (year, month) => {
-  if (month === 2) {
-    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
-  } else {
-    const month30 = [1, 3, 5, 7, 8, 10, 12];
-    return month30.includes(month) ? 31 : 30;
-  }
-};
+// const lastDayOfMonth = (year, month) => {
+//   if (month === 2) {
+//     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
+//   } else {
+//     const month30 = [1, 3, 5, 7, 8, 10, 12];
+//     return month30.includes(month) ? 31 : 30;
+//   }
+// };
+const lastDayOfMonth = (year, month) => new Date(year, month, 0).getDate();
 // console.log('last', lastDayOfMonth(2025, 7));
+
 // 원하는 년,월의 시작 요일 구하기
-const startIdxOfMonth = (thisYear, thisMonth) => {
-  let totalDay = startDowIdx;
-  for (let year = startYear; year < thisYear; year++) {
-    totalDay +=
-      (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
-  }
-  for (let month = 1; month < thisMonth; month++) {
-    totalDay += lastDayOfMonth(thisYear, month);
-  }
-  return totalDay % 7;
-};
+// const startIdxOfMonth = (thisYear, thisMonth) => {
+//   let totalDay = startDowIdx;
+//   for (let year = startYear; year < thisYear; year++) {
+//     totalDay +=
+//       (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
+//   }
+//   for (let month = 1; month < thisMonth; month++) {
+//     totalDay += lastDayOfMonth(thisYear, month);
+//   }
+//   return totalDay % 7;
+// };
+const startIdxOfMonth = (year, month) => new Date(year, month - 1, 1).getDay();
 // console.log('idx', startIdxOfMonth(2025, 7));
 
 // 캘린더 그리기 로직
@@ -80,9 +88,9 @@ const makeCalendar = () => {
       if (i === 0 && k < startIdx) {
         row.push({ date: '', hasReminder: false });
       } else if (day <= endDay) {
-        const fullDate = `${currentYear.value}-${String(
+        const fullDate = `${currentYear.value}-${formatNumber(
           currentMonth.value
-        ).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        )}-${formatNumber(day)}`;
 
         const hasReminder = props.reminderDate.includes(fullDate);
 
@@ -113,12 +121,16 @@ watch(
   },
   { immediate: true, deep: true }
 );
-// 달 이동 버튼 눌렀을때 홈 화면에 보낼 년, 월 정보 에밋
+
+// 달 이동 버튼 눌렀을때 홈 화면에 보낼 년, 월 정보 에밋 / 피니아 년 월 정보 업데이트
 const changeMonth = () => {
   emit('reminder-date', {
     year: currentYear.value,
     month: currentMonth.value,
   });
+
+  reminderStore.setCurrentYear(currentYear.value);
+  reminderStore.setCurrentMonth(currentMonth.value);
 };
 
 // 이전 달 보기
