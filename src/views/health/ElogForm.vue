@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
-import { saveElog, updateElog } from "@/services/health/elogService";
+import { saveElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRouter } from "vue-router";
 
@@ -24,16 +24,12 @@ const state = reactive({
 //   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 // };
 
-const passData = history.state.data;
 onMounted(() => {
   exerciseStore.fetchExercises();
-  if (passData) {
-    state.form = JSON.parse(passData);
-  }
 });
 
 // click event
-// 기록 저장/수정
+// 기록 저장
 const submit = async () => {
   const convertDatetimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
@@ -47,23 +43,13 @@ const submit = async () => {
     effortLevel: state.form.effortLevel,
   };
 
-  let res = null;
   let path = "/health";
-
-  if (passData) {
-    jsonBody.exerciselogId = state.form.exerciselogId;
-    console.log("보내는 데이터", jsonBody);
-
-    res = await updateElog(jsonBody);
-    path = `${state.form.exerciselogId}`;
-  } else {
-    res = await saveElog(jsonBody);
-  }
+  const res = await saveElog(jsonBody);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("완료!");
+  alert("운동기록 저장 완료!");
   router.push({ path });
 };
 
