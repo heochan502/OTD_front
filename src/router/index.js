@@ -5,9 +5,6 @@ import RoutineHome from "@/components/routine/RoutineHome.vue";
 import ReminderForm from "@/views/reminder/ReminderForm.vue";
 import ReminderList from "@/views/reminder/ReminderList.vue";
 
-import Memo from "@/components/memo/MemoDetail.vue";
-import Diary from "@/components/memo/DiaryDetail.vue";
-
 import CommunityView from "@/views/community/CommunityView.vue";
 
 import MealForm from "@/views/meal/MealForm.vue";
@@ -26,6 +23,10 @@ import Profile from "@/views/Profile.vue";
 import Location from "@/components/location/Location.vue";
 import ProfileDetail from "@/views/ProfileDetail.vue";
 import ElogEdit from "@/views/health/ElogEdit.vue";
+
+import MemoAndDiary from "@/views/memo/MemoAndDiary.vue"; // 폴더가 다를 경우
+import MemoDetail from "@/components/memo/MemoDetail.vue";
+import DiaryDetail from "@/components/memo/DiaryDetail.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -121,24 +122,23 @@ const router = createRouter({
       name: "location",
       component: Location,
     },
-    {
-      path: "/memo/",
-      name: "memo",
-      component: Memo,
-      props: true,
-    },
-    {
-      path: "/diary",
-      name: "diary",
-      component: Diary,
-      props: true,
-    },
-    {
-      path: '/detail',
-      name: 'profile_detail',
-
-      component: ProfileDetail,
-    },
+      {
+    path: "/memo",
+    name: "MemoMenu",
+    component: MemoAndDiary,
+  },
+  {
+    path: "/memo/:id?",
+    name: "MemoDetail",
+    component: MemoDetail,
+    props: true,
+  },
+  {
+    path: "/diary/:id?",
+    name: "DiaryDetail",
+    component: DiaryDetail,
+    props: true,
+  },
   ],
 });
 

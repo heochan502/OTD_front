@@ -1,76 +1,39 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import MemoHttpService from '@/services/memo/MemoHttpService.js';
-import { check } from '@/services/accountService';
-import { useAccountStore } from '@/stores/counter';
-import { useMemoDetail } from '@/components/memo/useMemoDetail.js';
-import './MemoDetail.css';
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAccountStore } from "../../../stores/account";
+import MemoHttpService from "../../../services/MemoHttpService";
+import { formatDateTime } from "../../../utils/formatDate";
+import useModal from "../../../composables/useModal";
+import './memoDetail.css';
 
-const route = useRoute();
-const router = useRouter();
-const routeId = computed(() => route.params.id);
 const accountStore = useAccountStore();
-const fileInputRef = ref(null);
+const router = useRouter();
+const route = useRoute();
 
-const { memo, showImages, fetch: fetchMemoRaw } = useMemoDetail(routeId.value);
-const fetchMemo = async () => {
-  try {
-    await fetchMemoRaw();
-  } catch (e) {
-    showAlert("메모를 불러오지 못했습니다.");
-    router.push('/memo');
-  }
-};
+const showMemos = ref([]);
+const state = ref({
+  memo: {
+    id: null,
+    memoName: "",
+    memoContent: "",
+  },
+});
 
-const memoList = ref([]);
+const mode = ref("view"); // view | create | edit
+const isEditMode = computed(() => mode.value === "edit");
+
 const currentPage = ref(1);
 const pageSize = ref(5);
-const showMemos = ref([]);
 const totalMemos = ref(0);
-const userId = ref(null);
-const mode = ref('view'); // 'create' | 'view' | 'edit'
 
-const currentTime = ref(new Date());
-let intervalId = null;
+const { showModal, confirmModal } = useModal();
+const showImages = ref([]);
+const selectedImageFiles = ref([]);
 
-const alertModal = ref({ show: false, message: '' });
-const confirmModal = ref({ show: false, message: '', resolve: null });
-
-const isCreateMode = computed(() => mode.value === 'create');
-const isViewMode = computed(() => mode.value === 'view');
-const isUpdateMode = computed(() => mode.value === 'edit');
-const formattedCurrentCreatedAt = computed(() => formatDateTime(memo.value.createdAt));
-const currentTimeFormatted = computed(() => formatDateTime(currentTime.value));
-
-const formatDateTime = (date) => {
-  const d = new Date(date);
-  return isNaN(d.getTime()) ? '' : new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit',
-    hour12: true, timeZone: 'Asia/Seoul'
-  }).format(d);
-};
-
-const showAlert = (message) => {
-  alertModal.value = { show: true, message };
-};
-
-const showConfirm = (message) => {
-  confirmModal.value = { show: true, message, resolve: null };
-  return new Promise(resolve => confirmModal.value.resolve = resolve);
-};
-
-const clearImages = () => {
-  showImages.value.forEach(url => url.startsWith('blob:') && URL.revokeObjectURL(url));
-  showImages.value = [];
-};
-
-const clearForm = () => {
-  memo.value = { id: null, title: '', content: '', createdAt: null };
-  clearImages();
-  if (fileInputRef.value) fileInputRef.value.value = '';
-};
+const totalPages = computed(() => {
+  return Math.ceil(totalMemos.value / pageSize.value) || 1;
+});
 
 const fetchMemoList = async () => {
   try {
@@ -78,275 +41,204 @@ const fetchMemoList = async () => {
       currentPage: currentPage.value,
       pageSize: pageSize.value,
     });
-
-    const resultData = res.data;
-
+    const resultData = res?.resultData;
     if (!resultData || !Array.isArray(resultData.memoList)) {
       throw new Error("서버 응답이 올바르지 않습니다. (memoList 누락)");
     }
 
     showMemos.value = resultData.memoList;
     totalMemos.value = resultData.totalCount || 0;
-
   } catch (err) {
     console.error("fetchMemoList 에러:", err);
     alert(`메모 목록 로딩 실패: ${err.message}`);
   }
 };
 
-const saveMemo = async () => {
-  if (memo.value.title.trim().length < 10) return showAlert('제목은 10자 이상 입력해주세요.');
-  if (memo.value.content.trim().length < 10 || memo.value.content.length > 500) return showAlert('내용은 10자 이상 500자 이하 입력해주세요.');
-  // if (!userId.value) return showAlert('로그인 정보가 없습니다.');
-
-  const reqPayload = { ...memo.value, memberNoLogin: userId.value };
-
+const fetchCurrentMemo = async (id) => {
   try {
-    const result = mode.value === 'edit'
-      ? await MemoHttpService.modify(memo.value.id, reqPayload)
-      : await (() => {
-        const formData = new FormData();
-        formData.append('memoData', new Blob([JSON.stringify(reqPayload)], { type: 'application/json' }));
-        const files = Array.from(fileInputRef.value?.files || []);
-        if (files.length === 0) throw new Error('이미지 파일이 없습니다.');
-        files.forEach(file => formData.append('memoImageFiles', file));
-        return MemoHttpService.create(formData);
-      })();
+    const { resultData } = await MemoHttpService.findById(id);
+    state.value.memo = resultData;
+    showImages.value = [];
 
-    showAlert(mode.value === 'edit' ? '수정 완료' : '등록 완료');
-    router.push('/memo');
+    if (Array.isArray(resultData.imageFileNames)) {
+      showImages.value = resultData.imageFileNames.map(file => `/pic/${file}`);
+    } else if (resultData.imageFileName) {
+      showImages.value = [`/pic/${resultData.imageFileName}`];
+    }
+  } catch (err) {
+    console.error("메모 불러오기 실패:", err);
+    alert("메모 정보를 불러올 수 없습니다.");
+  }
+};
+
+const createMemo = async () => {
+  try {
+    if (!accountStore.isLoggedIn) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    const formData = new FormData();
+    const memoData = {
+      memoName: state.value.memo.memoName,
+      memoContent: state.value.memo.memoContent,
+    };
+
+    formData.append("memoData", new Blob([JSON.stringify(memoData)], { type: "application/json" }));
+    selectedImageFiles.value.forEach(file => {
+      formData.append("memoImageFiles", file);
+    });
+
+    await MemoHttpService.create(accountStore.memberId, formData);
+    alert("메모가 등록되었습니다.");
+    router.replace({ path: "/memo" });
+    mode.value = "view";
     await fetchMemoList();
-    clearForm();
-    if (mode.value === 'create') currentPage.value = 1;
-  } catch (e) {
-    showAlert('저장 실패: ' + getErrorMessage(e));
+  } catch (err) {
+    console.error("메모 등록 실패:", err);
+    alert("메모 등록 중 오류 발생");
   }
 };
 
-const deleteMemo = async () => {
-  if (!await showConfirm('정말 삭제하시겠습니까?')) return;
+const updateMemo = async () => {
+  try {
+    await MemoHttpService.modify(state.value.memo.id, {
+      memoName: state.value.memo.memoName,
+      memoContent: state.value.memo.memoContent,
+    });
+    alert("메모가 수정되었습니다.");
+    mode.value = "view";
+    await fetchMemoList();
+  } catch (err) {
+    console.error("메모 수정 실패:", err);
+    alert("메모 수정 중 오류 발생");
+  }
+};
+
+const deleteMemo = async (id) => {
+  const confirmed = await confirmModal("정말 삭제하시겠습니까?");
+  if (!confirmed) return;
 
   try {
-    const res = await MemoHttpService.deleteById(memo.value.id);
-    res.resultData === 1 ? router.push('/memo') || showAlert('삭제 성공') : showAlert('삭제 실패');
-  } catch (e) {
-    showAlert('삭제 실패: ' + getErrorMessage(e));
+    await MemoHttpService.deleteById(id);
+    alert("메모가 삭제되었습니다.");
+    await fetchMemoList();
+  } catch (err) {
+    console.error("메모 삭제 실패:", err);
+    alert("메모 삭제 중 오류 발생");
   }
 };
 
-const getErrorMessage = (err) => err.response?.data?.message || err.message;
+const handleImageUpload = (event) => {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
 
-const handleImageChange = (e) => {
-  const files = Array.from(e.target.files);
-  const maxSize = 5 * 1024 * 1024;
-  const extAllowed = ['jpg', 'jpeg', 'png', 'gif'];
+  for (const file of files) {
+    if (selectedImageFiles.value.find(f => f.name === file.name)) {
+      alert(`이미 선택된 파일: ${file.name}`);
+      continue;
+    }
 
-  const previewUrls = new Set(showImages.value);
-  const uploadedFileKeys = new Set(showImages.value.map(url => url.split('/').pop()));
+    if (!file.type.startsWith("image/")) {
+      alert(`이미지 파일이 아닙니다: ${file.name}`);
+      continue;
+    }
 
-  files.forEach(file => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (showImages.value.length >= 5) return showAlert('이미지는 최대 5장까지 업로드할 수 있습니다.');
-    if (!extAllowed.includes(ext)) return showAlert(`${file.name}: 허용되지 않는 형식`);
-    if (file.size > maxSize) return showAlert(`${file.name}: 5MB 초과`);
-    const fileKey = file.name + '_' + file.lastModified;
-    if (uploadedFileKeys.has(fileKey)) return showAlert(`${file.name}: 중복 업로드됨`);
+    selectedImageFiles.value.push(file);
 
-    const previewUrl = URL.createObjectURL(file);
-    if (previewUrls.has(previewUrl)) return showAlert(`${file.name}: 동일한 파일이 이미 업로드됨`);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      showImages.value.push(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
 
-    showImages.value.push(previewUrl);
-    uploadedFileKeys.add(fileKey);
-    previewUrls.add(previewUrl);
-  });
+  event.target.value = "";
 };
 
 const removeImage = (index) => {
-  const url = showImages.value[index];
-  if (url?.startsWith('blob:')) URL.revokeObjectURL(url);
   showImages.value.splice(index, 1);
+  selectedImageFiles.value.splice(index, 1);
 };
 
-const enableUpdateMode = () => mode.value = 'edit';
-const goToMemoDetail = (id) => {
-  if (route.params.id !== id) router.push(`/memo/${id}`);
-};
-
-const totalPages = computed(() => Math.max(1, Math.ceil(totalMemos.value / pageSize.value)));
-const changePage = (num) => {
-  if (num >= 1 && num <= totalPages.value) {
-    currentPage.value = num;
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
     fetchMemoList();
   }
+};
+
+const resetForm = () => {
+  state.value.memo = {
+    id: null,
+    memoName: "",
+    memoContent: "",
+  };
+  selectedImageFiles.value = [];
+  showImages.value = [];
 };
 
 onMounted(async () => {
-  const res = await check();
-  if (res?.status === 200) {
-    userId.value = res.data?.id;
-    accountStore.setLoggedIn(true);
-    accountStore.setLoggedInId(userId.value);
-  } else {
-    accountStore.setLoggedIn(false);
-    accountStore.setLoggedInId(null);
-    return router.push({ name: 'login' });
-    fetchMemoList();
+  if (!accountStore.isLoggedIn) {
+    await showModal("로그인이 필요합니다.");
+    router.push("/account/login");
+    return;
   }
 
-  intervalId = setInterval(() => (currentTime.value = new Date()), 1000);
-
-  if (routeId.value) {
-    mode.value = 'view';
-    await fetchMemo();
-  } else {
-    mode.value = 'create';
-    clearForm();
+  const id = route.params.id;
+  if (id === "new") {
+    mode.value = "create";
+    resetForm();
+  } else if (id) {
+    await fetchCurrentMemo(id);
+    mode.value = "view";
   }
 
-  fetchMemoList();
+  await fetchMemoList();
 });
-
-onBeforeUnmount(() => clearInterval(intervalId));
-
-watch(routeId, async (id, prev) => {
-  if (!id) {
-    mode.value = 'create';
-    clearForm();
-  } else {
-    mode.value = 'view';
-    await fetchMemo();
-  }
-  if (!prev && id) currentPage.value = 1;
-  fetchMemoList();
-}, { immediate: true });
 </script>
 
 <template>
-  <div class="memo-detail-container">
-    <h2 class="page-title">
-      <span v-if="isCreateMode">새 메모 작성</span>
-      <span v-else-if="isUpdateMode">메모 수정</span>
-      <span v-else-if="isViewMode">메모 상세</span>
-      <span v-else>메모</span>
-    </h2>
-
-    <div class="input-section">
-      <label for="memoTitle">제목</label>
-      <input
-        type="text"
-        id="memoTitle"
-        class="form-control"
-        v-model="memo.title"
-        :readonly="isViewMode"
-        required
-      />
-    </div>
-
-    <div class="input-section">
-      <label for="memoContent">내용</label>
-      <textarea
-        id="memoContent"
-        class="form-control"
-        rows="8"
-        v-model="memo.content"
-        :readonly="isViewMode"
-        required
-      ></textarea>
-    </div>
-
-    <div class="input-section">
-      <label v-if="!isViewMode" for="memoImageUpload">이미지 업로드 (최대 5장)</label>
-      <input
-        v-if="!isViewMode"
-        type="file"
-        id="memoImageUpload"
-        name="imageUpload"
-        accept=".jpg, .png, .jpeg, .gif"
-        class="form-control"
-        @change="handleImageChange"
-        multiple
-        ref="fileInputRef"
-      />
-      <div class="preview-list">
-        <div v-for="(img, index) in showImages" :key="index" class="preview-item">
-          <img :src="img" alt="미리보기 이미지" />
-          <button v-if="!isViewMode" class="remove-btn" @click="removeImage(index)">X</button>
+  <div class="memo-detail">
+    <div v-if="mode === 'create' || isEditMode">
+      <h2>{{ mode === 'create' ? '새 메모 작성' : '메모 수정' }}</h2>
+      <input v-model="state.memo.memoName" placeholder="제목" />
+      <textarea v-model="state.memo.memoContent" placeholder="내용" />
+      <input type="file" accept="image/*" multiple @change="handleImageUpload" />
+      <div class="image-preview">
+        <div v-for="(src, index) in showImages" :key="index">
+          <img :src="src" alt="업로드된 이미지" />
+          <button @click="removeImage(index)">삭제</button>
         </div>
-        <p v-if="isViewMode && showImages.length === 0" class="no-images-text">등록된 이미지가 없습니다.</p>
       </div>
+      <button @click="mode === 'create' ? createMemo() : updateMemo()">
+        {{ mode === 'create' ? '등록' : '수정' }}
+      </button>
     </div>
 
-    <div class="info-section" v-if="isCreateMode">
-      <strong>현재 시각:</strong> {{ currentTimeFormatted }}
-    </div>
-    <div class="info-section" v-else-if="isViewMode || isUpdateMode">
-      <strong>등록 일시:</strong> {{ formattedCurrentCreatedAt }}
-    </div>
-
-    <div class="button-group">
-      <button v-if="isCreateMode" class="btn btn-primary" @click="saveMemo">등록</button>
-      <button v-if="isUpdateMode" class="btn btn-primary" @click="saveMemo">수정 완료</button>
-      <button v-if="isViewMode" class="btn btn-secondary" @click="enableUpdateMode">수정</button>
-      <button v-if="isViewMode" class="btn btn-danger" @click="deleteMemo">삭제</button>
-      <button class="btn btn-secondary" @click="router.push('/home')">홈</button>
-    </div>
-
-    <hr style="margin: 40px 0; border-top: 1px solid #eee;" />
-    <h3 style="text-align: center; color: #666; margin-bottom: 20px;">메모 목록</h3>
-
-    <div class="memo-list-section">
-  <div v-if="showMemos.length === 0" class="empty-message">
-    작성된 메모가 없습니다. 새로운 메모를 작성해보세요!
-  </div>
-
-  <ul v-else class="memo-items">
-    <li
-      v-for="memo in memoList"
-      :key="memo.id"
-      class="memo-item"
-      @click="goToMemoDetail(memo.id)"
-    >
-      <div v-if="memo.imageFileName" class="memo-image-preview">
-        <img
-          :src="`/pic/${memo.imageFileName}`"
-          alt="대표 이미지"
-          style="max-width: 50px; max-height: 50px;"
-        />
+    <div v-else>
+      <h2>{{ state.memo.memoName }}</h2>
+      <p>{{ state.memo.memoContent }}</p>
+      <div class="image-preview">
+        <img v-for="(src, index) in showImages" :key="index" :src="src" />
       </div>
-
-      <div class="memo-title">{{ memo.title }}</div>
-      <div class="memo-content">
-        {{ memo.content.length > 100 ? memo.content.slice(0, 100) + '...' : memo.content }}
-      </div>
-
-      <div class="memo-date">{{ formatDate(memo.createdAt) }}</div>
-    </li>
-  </ul>
-
-  <div class="pagination">
-    <button @click="changePage(currentPage - 1)" :disabled="currentPage <= 1">이전</button>
-    <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
-    <button @click="changePage(currentPage + 1)" :disabled="currentPage >= totalPages">다음</button>
-  </div>
-</div>
-
-    <div v-if="alertModal.show" class="modal-overlay">
-      <div class="modal-content">
-        <p>{{ alertModal.message }}</p>
-        <button @click="alertModal.show = false" class="modal-btn">확인</button>
-      </div>
+      <p>{{ formatDateTime(state.memo.createdAt, true) }}</p>
+      <button @click="mode = 'edit'">수정</button>
     </div>
 
-    <div v-if="confirmModal && confirmModal.show" class="modal-overlay">
-      <div class="modal-content">
-        <p>{{ confirmModal.message }}</p>
-        <div class="modal-actions">
-          <button @click="confirmModal.resolve(true); confirmModal.show = false;" class="modal-btn confirm-yes">예</button>
-          <button @click="confirmModal.resolve(false); confirmModal.show = false;" class="modal-btn confirm-no">아니오</button>
-        </div>
+    <div class="memo-list">
+      <h3>메모 목록</h3>
+      <ul>
+        <li v-for="memo in showMemos" :key="memo.id">
+          <router-link :to="`/memo/${memo.id}`">{{ memo.memoName }}</router-link>
+          <button @click="deleteMemo(memo.id)">삭제</button>
+        </li>
+      </ul>
+      <div class="pagination">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">이전</button>
+        <span>{{ currentPage }} / {{ totalPages }}</span>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped></style>

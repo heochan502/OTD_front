@@ -1,0 +1,58 @@
+.diary-detail-container {
+  max-width: 800px;
+  margin: 40px auto;
+}
+.input-section {
+  margin-bottom: 20px;
+}
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+.preview-list {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.preview-item {
+  position: relative;
+}
+.preview-item img {
+  max-width: 100px;
+  border-radius: 8px;
+}
+.remove-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: crimson;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.button-group {
+  margin-top: 30px;
+  display: flex;
+  gap: 10px;
+}
+.diary-list-section {
+  margin-top: 40px;
+}
+.diary-item {
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}

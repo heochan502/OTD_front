@@ -1,35 +1,27 @@
+import MemoAndDiary from '@/components/memo/MemoAndDiary.vue'; // 이전 MemoMenu.vue
+import MemoList from '@/components/memo/MemoList.vue';
 import MemoDetail from '@/components/memo/MemoDetail.vue';
-import { createRouter, createWebHistory } from 'vue-router';
 
-const routes = [
-    {
-        path: '/memo',
-        name: 'Memo',
-        component: MemoDetail,
-        children: [
-        {
-        path: '',
-        name: 'MemoList',
-        component: MemoList,
-        },
-        {
-        path: 'add',
-        name: 'MemoAdd',
-        component: MemoDetail,
-        },
-        {
-        path: ':id',
-        name: 'MemoDetail',
-        component: MemoDetail,
-        props: true,
-        },
-      ],
-    }, 
+export default [
+  {
+    path: '/memo',
+    name: 'MemoMenu',
+    component: MemoAndDiary,
+  },
+  {
+    path: '/memo/list',
+    name: 'MemoList',
+    component: MemoList,
+  },
+  {
+    path: '/memo/add',
+    name: 'MemoAdd',
+    component: MemoDetail,
+  },
+  {
+    path: '/memo/:id',
+    name: 'MemoDetail',
+    component: MemoDetail,
+    props: true,
+  },
 ];
-
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes
-});
-
-export default router;
