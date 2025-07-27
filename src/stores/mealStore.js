@@ -20,3 +20,16 @@ export const useCalorieCalcul = defineStore('calculCal', () => {
 
     return { itemInfo, inputFoodInfo, getItemInfoByIndex };
 });
+
+export const useDayDefine = defineStore("useDayDefine",()=>
+    {
+        // 0 - 아침  1 - 점심 2- 저녁 
+        const dayDefine = ref(0);
+        return {
+            dayDefine,
+        };
+        
+    }
+);
+
+
