@@ -8,9 +8,6 @@ axios.defaults.baseURL = '/api/OTD/';
 
 export const getFoodNames = async (foodInfo) => {
     
-
-
-
    console.log('음식 검색', foodInfo);
     const res = await axios.get('meal', {params : foodInfo});
     if (res.status !== 200) {
@@ -38,9 +35,30 @@ export const getFoodCalorie = async (foodInfo)=>{
 export const inputMealData = async (mealData)=>{
   // console.log('json 음식정보', foodInfo);
   const res = await axios.post('meal/saveMeal', mealData );
-  // console.log('json이겟지? :', res.data);
-  
+  // console.log('json이겟지? :', res.data);  
   // const data = res.data;
   // console.log('json이겟지222? :', data);
   return res.data;
 }
+
+
+export const getMealData = async (getlist) => {
+  // console.log('json 음식정보', foodInfo);
+  const res = await axios.get("meal/getMeal", {params :getlist});
+  console.log("json이겟지? :", res.data);
+  // const data = res.data;
+  // console.log('json이겟지222? :', data);
+  return res.data;
+};
+
+
+///수정
+
+export const modifyMealdata = async (mealData) => {
+  // console.log('json 음식정보', foodInfo);
+  const res = await axios.put("meal/modifyMeal", mealData);
+  // console.log('json이겟지? :', res.data);
+  // const data = res.data;
+  // console.log('json이겟지222? :', data);
+  return res.data;
+};
