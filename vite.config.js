@@ -16,7 +16,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'D:/hc/projectOTD/OneToDay_Back/src/main/resources/static',
+    outDir: 'C:/2025_swstudy/OTD_back/jin/src/main/resources/memo/uploads',
     emptyOutDir: true,
   },
   plugins: [
