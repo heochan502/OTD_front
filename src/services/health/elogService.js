@@ -23,11 +23,6 @@ export const getExercise = () => {
   return axios.get(path).catch((e) => e.response);
 };
 
-// 운동기록수정
-export const updateElog = (args) => {
-  return axios.put(path, args).catch((e) => e.response);
-};
-
 // 운동기록 삭제
 export const deleteElog = (exerciselogId) => {
   return axios

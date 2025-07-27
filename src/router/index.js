@@ -25,7 +25,6 @@ import Profile from "@/views/Profile.vue";
 
 import Location from "@/components/location/Location.vue";
 import ProfileDetail from "@/views/ProfileDetail.vue";
-import ElogEdit from "@/views/health/ElogEdit.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,12 +85,6 @@ const router = createRouter({
       component: ElogForm,
     },
     {
-      path: "/elog/edit",
-      name: "ElogEdit",
-      component: ElogEdit,
-    },
-
-    {
       path: "/hlog/:healthlogId",
       name: "HlogDetail",
       component: HlogDetail,
@@ -134,8 +127,8 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/detail',
-      name: 'profile_detail',
+      path: "/detail",
+      name: "profile_detail",
 
       component: ProfileDetail,
     },

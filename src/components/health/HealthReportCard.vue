@@ -12,8 +12,8 @@ import {
   calcEffortAvg,
 } from "@/utils/exerciseReportUtils";
 
-const tab = ref("one");
 const exerciseStore = useExerciseStore();
+const tab = ref("one");
 
 const todayStr = getDateString();
 const yesterdayStr = getYesterdayDateString();
@@ -41,6 +41,7 @@ const feedbackMessage = computed(() =>
     todayEffort: todayEffortAvg.value,
     yesterdayEffort: yesterdayEffortAvg.value,
     todayKcal: todayKcal.value,
+    yesterdayKcal: yesterdayKcal.value,
     isFirst: todayLogs.value.length > 0 && yesterdayLogs.value.length === 0,
     isComeback: yesterdayLogs.value.length === 0,
   })
