@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive } from "vue";
-import effortLevels from "@/api/health/effortLevels.json";
+import effortLevels from "@/assets/health/effortLevels.json";
 import { saveElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRouter } from "vue-router";
@@ -43,23 +43,18 @@ const submit = async () => {
     effortLevel: state.form.effortLevel,
   };
 
-  let path = "/health";
   const res = await saveElog(jsonBody);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
   alert("운동기록 저장 완료!");
-  router.push({ path });
+  router.push("/health");
 };
 
 const cancel = () => {
   if (!confirm("취소하고 돌아가시겠습니까?")) return;
-  let path = "/health";
-  if (state.form.exerciselogId > 0) {
-    path = `${state.form.exerciselogId}`;
-  }
-  router.push({ path });
+  router.push("/health");
 };
 </script>
 
@@ -152,10 +147,8 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn @click="submit">{{
-        state.form.exerciselogId > 0 ? "수정" : "추가"
-      }}</v-btn>
-      <v-btn @click="cancel">취소</v-btn>
+      <v-btn class="save" @click.prevent="submit">저장</v-btn>
+      <v-btn @click.prevent="cancel">취소</v-btn>
     </v-row>
   </v-container>
 </template>
@@ -173,11 +166,11 @@ const cancel = () => {
   .title {
     display: flex;
     justify-content: center;
-  }
-  h4 {
-    display: inline-block;
-    border-bottom: 5px solid black;
-    padding-bottom: 5px;
+    h4 {
+      display: inline-block;
+      border-bottom: 5px solid black;
+      padding-bottom: 5px;
+    }
   }
 
   .subtitle {
@@ -210,6 +203,15 @@ const cancel = () => {
     display: flex;
     justify-content: center;
     gap: 10px;
+    .v-btn {
+      height: 30px;
+      border-radius: 20px;
+      background-color: #838383;
+      color: #fff;
+    }
+    .save {
+      background-color: #3bbeff;
+    }
   }
 }
 </style>

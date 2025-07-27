@@ -1,7 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { useExerciseStore } from "@/stores/exerciseStore";
-import effortLevels from "@/api/health/effortLevels.json";
+import effortLevels from "@/assets/health/effortLevels.json";
 import { getFeedbackMessage } from "@/utils/getFeedbackMessage";
 import {
   getDateString,

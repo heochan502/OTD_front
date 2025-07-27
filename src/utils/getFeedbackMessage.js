@@ -1,4 +1,4 @@
-import feedbackMessages from "@/api/health/feedbackMessageForExercise.json";
+import feedbackMessages from "@/assets/health/feedbackMessageForExercise.json";
 
 export function getFeedbackMessage({
   todayDuration,
