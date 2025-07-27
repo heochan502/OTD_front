@@ -22,6 +22,15 @@ const  mealadd = (day)=>{
   dayStore.dayDefine = day;
   router.push({name : 'MealAdd'});
 };
+
+const calculation = ()=>{
+
+    const sum = dayStore.reduce((sum, value)=>sum + value,0);
+
+}
+
+
+
 onMounted(() => {
   console.log('totalKcal:', totalKcal.value);
   console.log('maxKcal:', maxKcal.value);
@@ -74,19 +83,19 @@ onMounted(() => {
         <div class="dailymeal">
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd(0)"
+            @click="mealadd('아침')"
           >
             <span>아침</span> <span>✚</span>
           </button>
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd(1)"
+            @click="mealadd('점심')"
           >
             <span>점심</span> <span>✚</span>
           </button>
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd(2)"
+            @click="mealadd('저녁')"
           >
             <span>저녁</span> <span>✚</span>
           </button>
