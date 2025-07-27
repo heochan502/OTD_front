@@ -2,9 +2,13 @@
 import '@/components/memo/diaryDetail.css';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useDiaryDetail } from './useDiaryDetail';
+import { useDiaryDetail } from './useDiaryDetail.js';
 import DiaryService from '@/services/memo/DiaryHttpService.js';
+import { formatDateTime } from '@/utils/MemoAndDiaryApi';
+import '@/components/memo/DiaryDetail.css';
+import { useAccountStore } from '@/stores/counter';
 
+const accountStore = useAccountStore();
 const route = useRoute();
 const router = useRouter();
 const routeId = computed(() => route.params.id);
@@ -109,29 +113,32 @@ const deleteDiary = async () => {
   }
 };
 
-const enableEdit = () => {
-  setMode('edit');
-};
+const enableEdit = () => setMode('edit');
 
 onMounted(async () => {
-  if (!routeId.value) {
-    setMode('create');
-    clearForm();
-  } else {
-    setMode('view');
-    await fetchDiary(routeId.value);
+  if (!accountStore().isLoggedIn) {
+    alert('로그인 후 이용해주세요.');
+    return router.push('/account/login');
   }
 
-  fetchDiaryList();
-});
-
-watch(routeId, async (id) => {
-  if (!id) {
+  if (!routeId) {
     setMode('create');
     clearForm();
   } else {
     setMode('view');
-    await fetchDiary(id);
+    await fetchDiary(routeId);
+  }
+
+  await fetchDiaryList();
+});
+
+watch(() => route.params.id, async (newId) => {
+  if (!newId) {
+    setMode('create');
+    clearForm();
+  } else {
+    setMode('view');
+    await fetchDiary(newId);
   }
 });
 </script>
@@ -208,7 +215,7 @@ watch(routeId, async (id) => {
         >
           <strong>{{ item.title }}</strong>
           <span>{{ item.content.slice(0, 50) }}...</span>
-          <small>{{ item.date }}</small>
+          <small>{{ formatDateTime(item.date) }}</small>
         </li>
       </ul>
       <div class="pagination">
@@ -219,5 +226,3 @@ watch(routeId, async (id) => {
     </div>
   </div>
 </template>
-
-<style scoped></style>

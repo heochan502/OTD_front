@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue';
-import DiaryService from '@/services/memo/DiaryHttpService.js';
+import DiaryService from '@/services/memo/DiaryHttpService';
 
 export function useDiaryDetail() {
   const diary = ref({
@@ -13,8 +13,7 @@ export function useDiaryDetail() {
 
   const previewImages = ref([]);
   const fileInputRef = ref(null);
-
-  const mode = ref('view'); // 'create' | 'view' | 'edit'
+  const mode = ref('view');
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isViewMode = computed(() => mode.value === 'view');

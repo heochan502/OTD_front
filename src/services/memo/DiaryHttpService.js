@@ -1,12 +1,6 @@
-import axios from 'axios';
+import api from "@/utils/MemoAndDiaryApi"; // 공통 Axios 인스턴스
 
-// 기본 API 주소 설정 (환경 변수 없으면 localhost 사용)
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/OTD',
-  withCredentials: true, // 세션 쿠키 포함
-});
-
-class DiaryService {
+class DiaryHttpService {
   async create(formData) {
     const res = await api.post('/diary', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -37,4 +31,4 @@ class DiaryService {
   }
 }
 
-export default new DiaryService();
+export default new DiaryHttpService();
