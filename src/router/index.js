@@ -12,6 +12,7 @@ import CommunityView from "@/views/community/CommunityView.vue";
 
 import MealForm from "@/views/meal/MealForm.vue";
 import MealAdd from "@/components/meal/MealAdd.vue";
+import MealStatistic from "@/components/meal/MealStatistic.vue";
 
 import HealthMain from "@/views/health/HealthMain.vue";
 import ElogDetail from "@/views/health/ElogDetail.vue";
@@ -41,13 +42,13 @@ const router = createRouter({
       path: "/community",
       name: "community",
       component: CommunityView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/reminder",
       name: "reminder",
       component: ReminderHome,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/reminder/form",
@@ -59,12 +60,12 @@ const router = createRouter({
       name: "reminderlist",
       component: ReminderList,
     },
-  
+
     {
       path: "/meal",
       name: "MealForm",
       component: MealForm,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/meal/add",
@@ -72,10 +73,15 @@ const router = createRouter({
       component: MealAdd,
     },
     {
+      path: "/meal/MealStatistic",
+      name: "MealStatistic",
+      component: MealStatistic,
+    },
+    {
       path: "/health",
       name: "healthMain",
       component: HealthMain,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/elog/:exerciselogId",
@@ -117,33 +123,33 @@ const router = createRouter({
       path: "/profile",
       name: "profile",
       component: Profile,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/location",
       name: "location",
       component: Location,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/memo",
       name: "memo",
       component: Memo,
       props: true,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
-      path: '/diary',
-      name: 'diary',
+      path: "/diary",
+      name: "diary",
       component: Diary,
       props: true,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
-      path: '/detail',
-      name: 'profile_detail',
+      path: "/detail",
+      name: "profile_detail",
       component: ProfileDetail,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
   ],
 });
