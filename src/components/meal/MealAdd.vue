@@ -328,7 +328,7 @@ onMounted(() => {
           </template>
 
           <template v-slot:item="{ item, props }">
-            <v-list-item v-bind="props" v-if="props.title" @click="">
+            <v-list-item v-bind="props" v-if="props.title">
               <!-- <span> {{ item }}</span> -->
               <v-list-item-title>
                 {{ item.value.foodName }}
@@ -346,7 +346,7 @@ onMounted(() => {
 
     <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 ">
 
-      <template v-slot:default="{ item, index }">
+      <template v-slot:default="{ item }">
         <div class="d-flex flex-column align-center  ">
           <v-card class=" mb-4  rounded-lx" style="width: 600px" variant="tonal">
             <v-card-title class="pl-5 pt-1">
