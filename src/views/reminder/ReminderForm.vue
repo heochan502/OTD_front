@@ -183,8 +183,8 @@ const submit = async () => {
       <span>
         <img src="/src/image/cancel.png" alt="취소" class="cancel" />
       </span>
-      <div :class="{ disabled: isRepeatMode }">
-        <span :class="{ on: isDateMode }" class="off">날짜 지정</span>
+      <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
+        <span :class="{ on: isDateMode }" class="off box">날짜 지정</span>
         <span class="date">{{ formattedDate }}</span>
         <img
           src="/src/image/button.png"
@@ -200,19 +200,22 @@ const submit = async () => {
           ></calendar>
         </div>
       </div>
-        <span :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }">
-          <img
-            :src="
-              state.reminder.alarm
-                ? '/src/image/alarm_on.png'
-                : '/src/image/alarm_off.png'
-            "
-            alt="알람 상태"
-            class="alarm-img"
-            @click="state.reminder.alarm = !state.reminder.alarm"
-          />알람 설정</span
-        >
-      <div :class="{ disabled: isDateMode }">
+      <span
+        :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }"
+        class="alarm-box"
+      >
+        <img
+          :src="
+            state.reminder.alarm
+              ? '/src/image/alarm_on.png'
+              : '/src/image/alarm_off.png'
+          "
+          alt="알람 상태"
+          class="alarm-img"
+          @click="state.reminder.alarm = !state.reminder.alarm"
+        />알람 설정</span
+      >
+      <span :class="{ disabled: isDateMode }">
         <span :class="{ on: isRepeatMode }" class="off">요일 반복</span>
         <img
           v-for="(dow, index) in dowImage"
@@ -222,7 +225,7 @@ const submit = async () => {
           @click="imageToggle(index)"
           class="toggle-img"
         />
-      </div>
+      </span>
       <div>
         <input
           type="text"
@@ -239,7 +242,7 @@ const submit = async () => {
           v-model="state.reminder.content"
         ></textarea>
       </div>
-      <button @click="submit">
+      <button @click="submit" class="button">
         {{ state.reminder.id > 0 ? '수정하기' : '추가하기' }}
       </button>
     </div>
@@ -263,8 +266,10 @@ const submit = async () => {
   .form-card {
     position: relative;
     border-radius: 10px;
-    padding: 30px;
+    padding: 40px 30px 30px 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 500px;
 
     .cancel {
       width: 24px;
@@ -274,28 +279,35 @@ const submit = async () => {
       right: 10px;
       cursor: pointer;
     }
+    .calendar-popup {
+      position: relative;
+      .box{
+        
+      }
+      .date,
+      .calendar-button {
+        display: inline-block;
+        vertical-align: middle;
+      }
 
-    .date,
-    .calendar-button {
-      display: inline-block;
-      vertical-align: middle;
-    }
+      .date {
+        margin-left: 10px;
+        font-size: 18px;
+        color: #666;
+      }
 
-    .date {
-      margin-left: 10px;
-      font-size: 18px;
-      color: #666;
-    }
+      .calendar-button {
+        width: 20px;
+        margin-left: 8px;
+        transform: rotate(90deg);
+        cursor: pointer;
+      }
 
-    .calendar-button {
-      width: 20px;
-      margin-left: 8px;
-      transform: rotate(90deg);
-      cursor: pointer;
-    }
-
-    .calendar {
-      margin-top: 10px;
+      .calendar {
+        position: absolute;
+        z-index: 99999999999;
+        margin-top: 10px;
+      }
     }
 
     .alarm-img {
@@ -336,7 +348,7 @@ const submit = async () => {
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 10px;
 
       &:hover {
         background-color: #1aaeff;
@@ -363,7 +375,7 @@ const submit = async () => {
   color: #fff;
 }
 .on {
-  background-color: #bfeaff;
+  background-color: #3bbeff;
   color: #fff;
 }
 </style>
