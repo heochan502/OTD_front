@@ -76,7 +76,7 @@ const cancel = () => {
             <v-row>
               <v-text-field
                 v-model="state.logs.systolic_bp"
-                label="최저 혈압"
+                label="수축기 혈압"
                 variant="solo"
                 class="pa-2"
                 density="compact"
@@ -84,7 +84,7 @@ const cancel = () => {
               ></v-text-field>
               <v-text-field
                 v-model="state.logs.diastolic_bp"
-                label="최고 혈압"
+                label="이완기 혈압"
                 variant="solo"
                 class="pa-2"
                 density="compact"
