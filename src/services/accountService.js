@@ -1,5 +1,7 @@
 import axios from 'axios';
+
 axios.defaults.withCredentials = true;
+
 axios.defaults.baseURL = '/api/OTD';
 
 export const join = (params) => {
@@ -11,11 +13,30 @@ export const login = (params) => {
 };
 
 export const check = () => {
-    return axios.get('/user/check').catch(e => e.response);
-}
+  return axios.get('/user/check').catch((e) => e.response);
+};
 export const logout = () => {
-    return axios.post('/user/logout').catch(e => e.response);
-}
+  return axios.post('/user/logout').catch((e) => e.response);
+};
+
 export const getProfile = () => {
-    return axios.get('/user').catch(e => e.response);
-  };
+  return axios.get('/user/profile').catch((e) => e.response);
+}
+export const updateProfile = (params) => {
+  return axios.put('/user/profile/detail', params, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).catch((e) => e.response);
+}
+export const checkMemberId = (memberId) => {
+  return axios.get(`/user/check/id/${memberId}`).catch((e) => e.response);
+};
+
+export const checkEmail = (email) => {
+  return axios.get(`/user/check/email/${email}`).catch((e) => e.response);
+};
+
+export const checkNickname = (nickname) => {
+  return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
+};

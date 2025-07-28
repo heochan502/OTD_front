@@ -1,8 +1,10 @@
 <script setup>
 import HealthReportCard from "@/components/health/HealthReportCard.vue";
 import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
-import ExercuseLogList from "@/components/health/ExercuseLogList.vue";
+import ExercuseLogList from "@/components/health/ExerciseLogList.vue";
 import HealthLogList from "@/components/health/HealthLogList.vue";
+
+import { onMounted } from "vue";
 </script>
 
 <template>

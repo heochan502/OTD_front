@@ -1,36 +1,80 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, reactive } from "vue";
 import effortLevels from "@/api/health/effortLevels.json";
+import { saveElog, updateElog } from "@/services/health/elogService";
+import { useExerciseStore } from "@/stores/exerciseStore";
+import { useRouter } from "vue-router";
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+const router = useRouter();
+const exerciseStore = useExerciseStore();
+
+const state = reactive({
+  form: {
+    exerciselogId: 0,
+    exerciseId: null,
+    exerciseDatetime: "",
+    exerciseKcal: 0,
+    exerciseDuration: 0,
+    effortLevel: 1,
+  },
+});
+
+// const formatDate = (dateStr) => {
+//   const date = new Date(dateStr);
+//   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+// };
+
+const passData = history.state.data;
+onMounted(() => {
+  exerciseStore.fetchExercises();
+  if (passData) {
+    state.form = JSON.parse(passData);
+  }
+});
+
+// click event
+// 기록 저장/수정
+const submit = async () => {
+  const convertDatetimeFormat = (datetimeStr) => {
+    return datetimeStr.replace("T", " ");
+  };
+
+  const jsonBody = {
+    exerciseId: state.form.exerciseId,
+    exerciseDatetime: convertDatetimeFormat(state.form.exerciseDatetime),
+    exerciseKcal: state.form.exerciseKcal,
+    exerciseDuration: state.form.exerciseDuration,
+    effortLevel: state.form.effortLevel,
+  };
+
+  let res = null;
+  let path = "/health";
+
+  if (passData) {
+    jsonBody.exerciselogId = state.form.exerciselogId;
+    console.log("보내는 데이터", jsonBody);
+
+    res = await updateElog(jsonBody);
+    path = `${state.form.exerciselogId}`;
+  } else {
+    res = await saveElog(jsonBody);
+  }
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("완료!");
+  router.push({ path });
 };
 
-const exerciselog = ref({
-  exerciseDatetime: "",
-  exercise: "",
-  exerciseKcal: 0,
-  exerciseDuration: 0,
-  effortLevel: 1,
-});
-const exercise = [
-  {
-    id: 1,
-    exercise: "수영",
-    met: 10,
-  },
-  {
-    id: 2,
-    exercise: "수영",
-    met: 10,
-  },
-  {
-    id: 3,
-    exercise: "수영",
-    met: 10,
-  },
-];
+const cancel = () => {
+  if (!confirm("취소하고 돌아가시겠습니까?")) return;
+  let path = "/health";
+  if (state.form.exerciselogId > 0) {
+    path = `${state.form.exerciselogId}`;
+  }
+  router.push({ path });
+};
 </script>
 
 <template>
@@ -41,12 +85,17 @@ const exercise = [
     <v-row class="content">
       <v-col cols="6">
         <div class="subtitle">운동일자</div>
-        <input type="datetime-local" v-model="exerciselog.exerciseDatetime" />
+        <input
+          type="datetime-local"
+          id="exerciselogDatetime"
+          v-model="state.form.exerciseDatetime"
+        />
         <div class="duration">
           <div class="subtitle">운동시간(분)</div>
           <v-number-input
             control-variant="split"
-            v-model="exerciselog.exerciseDuration"
+            v-model="state.form.exerciseDuration"
+            :min="0"
             width="200px"
             density="compact"
           ></v-number-input>
@@ -55,7 +104,8 @@ const exercise = [
           <div class="subtitle">활동에너지</div>
           <v-number-input
             control-variant="split"
-            v-model="exerciselog.exerciseKcal"
+            v-model="state.form.exerciseKcal"
+            :min="0"
             width="200px"
             density="compact"
           ></v-number-input>
@@ -63,21 +113,39 @@ const exercise = [
       </v-col>
       <v-col cols="6">
         <!-- 운동 종목 데이터 통신 필요 -->
-        <div class="subtitle">운동</div>
-        <v-select
-          v-model="exerciselog.exercise"
-          :items="exercise.map((e) => e.exercise)"
-          variant="outlined"
-          density="compact"
-        ></v-select>
+        <v-row>
+          <div class="subtitle">운동</div>
+        </v-row>
+        <v-row>
+          <v-select
+            v-model="state.form.exerciseId"
+            :items="
+              exerciseStore.list.map((e) => ({
+                title: e.exerciseName,
+                value: e.exerciseId,
+              }))
+            "
+            variant="solo"
+            density="compact"
+            placeholder="운동을 선택하세요"
+            clearable
+            width="274px"
+          ></v-select>
+
+          <!-- <v-icon
+            icon="mdi-close-thick"
+            class="cursor-pointer"
+            @click="clear"
+          ></v-icon> -->
+        </v-row>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
           <div class="text-h3 font-weight-light">
-            {{ exerciselog.effortLevel }}
+            {{ state.form.effortLevel }}
           </div>
         </div>
         <v-slider
-          v-model="exerciselog.effortLevel"
+          v-model="state.form.effortLevel"
           thumb-label="always"
           color="#3bbeff"
           track-color="E0E0E0"
@@ -90,16 +158,18 @@ const exercise = [
           </template>
         </v-slider>
         <div class="desbox">
-          <p>{{ effortLevels[exerciselog.effortLevel - 1].label }}</p>
+          <p>{{ effortLevels[state.form.effortLevel - 1].label }}</p>
           <p class="description">
-            {{ effortLevels[exerciselog.effortLevel - 1].description }}
+            {{ effortLevels[state.form.effortLevel - 1].description }}
           </p>
         </div>
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn>추가</v-btn>
-      <v-btn>취소</v-btn>
+      <v-btn @click="submit">{{
+        state.form.exerciselogId > 0 ? "수정" : "추가"
+      }}</v-btn>
+      <v-btn @click="cancel">취소</v-btn>
     </v-row>
   </v-container>
 </template>

@@ -9,7 +9,6 @@ defineProps({
   rightString: String,
   customsize: String,
 });
-
 // onMounted(() => {
 //     console.log('totalKcal2:', value.value);
 //     console.log('maxKcal2:', maxKcal.value);
@@ -36,83 +35,87 @@ defineProps({
 </template>
 
 <style scoped>
-.tansu {
-  font-size: 25px;
-  margin-top: 5px;
-  color: #ff6b6b;
-  width: 200px;
-}
-.tansu.progress {
-  appearance: none;
-  border-radius: 15px;
-  height: 25px;
-}
-.tansu.progress::-webkit-progress-bar {
-  background: #ffffff;
-  border-radius: 15px;
-  box-shadow: inset 3px 3px 10px #ffffff;
-}
-.tansu.progress::-webkit-progress-value {
-  border-radius: 15px;
-  background: #ffffff;
-  background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
-  background: linear-gradient(to right, #ff8787, #ff6b6b);
-}
 
-.protein {
-  font-size: 25px;
-  margin-top: 5px;
-  color: #4dabf7;
-  width: 200px;
-}
-.protein.progress {
-  appearance: none;
-  border-radius: 15px;
-  height: 25px;
-}
 
-.progress::-webkit-progress-bar {
-  background: #fafafa;
-  border-radius: 15px;
-  box-shadow: inset 3px 3px 10px #ffffff;
+.tansu {    
+    font-size: 16px;
+    margin-top: 5px;
+    color: #ff6b6b ;
+    width: 200px;
 }
-.progress::-webkit-progress-value {
-  border-radius: 15px;
-  background: #ffffff;
-  background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
-  background: linear-gradient(to right, #74c0fc, #4dabf7);
-}
+    .progress {
+    appearance: none;
+    border-radius: 15px;
+    height: 25px;
+    }
+       .progress::-webkit-progress-bar {            
+        background: #ffffff;
+        border-radius: 15px;        
+        box-shadow: inset 3px 3px 10px #ffffff;
+    }
+    .progress::-webkit-progress-value {
+        border-radius: 15px;
+        background: #ffffff;
+        background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
+        background: linear-gradient(to right, #ff8787, #ff6b6b);
+    }
 
-.jibang {
-  font-size: 25px;
-  color: #ffd43b;
-  margin-top: 5px;
-  width: 200px;
+.protein {    
+    font-size: 16px;
+    margin-top: 5px;
+    color: #4dabf7;
+    width: 200px;
 }
-.jibang.progress {
-  appearance: none;
-  border-radius: 15px;
-  height: 25px;
-}
+    .progress {
+    appearance: none;
+    border-radius: 15px;
+    height: 25px;
+    }
+    
+    
+    .progress::-webkit-progress-bar {
+        background: #fafafa;
+        border-radius: 15px;
+        box-shadow: inset 3px 3px 10px #ffffff;
+    }
+    .progress::-webkit-progress-value {
+        border-radius: 15px;
+        background: #ffffff;
+        background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
+        background: linear-gradient(to right, #74c0fc, #4dabf7);
+    }
 
-.progress::-webkit-progress-bar {
-  background: #ffffff;
-  border-radius: 15px;
-  box-shadow: inset 3px 3px 10px #ffffff;
+.jibang {    
+    font-size: 16px;
+    color: #ffd43b;
+    margin-top: 5px;
+    width: 200px;
 }
-.progress::-webkit-progress-value {
-  border-radius: 15px;
-  background: #ffffff;
-  background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
-  background: linear-gradient(to right, #ffe066, #ffd43b);
-}
+    .progress {
+    appearance: none;
+    border-radius: 15px;
+    height: 25px;
+    }
+    
+    
+    .progress::-webkit-progress-bar {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: inset 3px 3px 10px #ffffff;
+    }
+    .progress::-webkit-progress-value {
+        border-radius: 15px;
+        background: #ffffff;
+        background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
+        background: linear-gradient(to right, #ffe066, #ffd43b);
+    }
 
-.totalcal {
-  margin-left: 10px;
-  inline-size: 650px;
-  font-size: 30px;
-  top: 0px;
-  font-weight: 500;
+.totalcal {    
+    margin-left: 10px;
+    inline-size: 650px;
+    font-size: 20px;  
+    top: 0px;
+    font-weight: 500;
 }
 .bar-header {
   padding: 0px 0px 0px 10px;

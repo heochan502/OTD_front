@@ -23,15 +23,15 @@ const option = {
       return `${data.axisValue}요일 <br />${data.marker} ${data.data} kcal`;
     },
   },
-  legend:{
-    show:false,
-    top : 'top',
-    left:'center',
+  legend: {
+    show: false,
+    top: 'top',
+    left: 'center',
     textStyle: {
-    color: '#ffffff',      // 텍스트 색상
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
+      color: '#ffffff', // 텍스트 색상
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
   },
   // 범례 설정
   xAxis: {
@@ -39,16 +39,16 @@ const option = {
     data: xData,
     axisLabel: {
       color: '#000000', // 텍스트 색상
-      fontSize: 14,     // 글자 크기
+      fontSize: 14, // 글자 크기
       fontWeight: 'bold',
     },
     axisLine: {
       lineStyle: {
-        color: 'none',  // 축 색상
+        color: 'none', // 축 색상
         width: 1,
         show: false,
-      }
-    }
+      },
+    },
   },
   yAxis: {
     min: 0,
@@ -58,15 +58,14 @@ const option = {
       color: '#ffffff',
       fontSize: 14,
       fontWeight: 'bold',
-      formatter: '{value} kcal' // y축 값 옆에 단위 추가
+      formatter: '{value} kcal', // y축 값 옆에 단위 추가
     },
     splitLine: {
       lineStyle: {
         color: '#cccccc', // 눈금선 색상
-        type: 'dashed'    // 점선으로 표시
-      }
-    }
-    
+        type: 'dashed', // 점선으로 표시
+      },
+    },
   },
   // 차트 스타일 설정
   series: [
@@ -80,7 +79,7 @@ const option = {
       barWidth: '50%',
       itemStyle: {
         borderRadius: [30, 30, 0, 0],
-        color: '#D9D9D9' , 
+        color: '#D9D9D9',
         animation: true, // 기본 애니메이션
         animationDuration: 5000, // 초기 진입 애니메이션 시간
         // animationDurationUpdate: 5000, //  데이터 업데이트 시 애니메이션 시간
@@ -96,7 +95,7 @@ const option = {
     top: 10,
     style: {
       text: 'Kcal',
-      fontSize: '25px Noto Sans KR sans-serif' ,
+      fontSize: '25px Noto Sans KR sans-serif',
       fill: '#ffffff',
     },
   },
@@ -114,25 +113,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="weekly-calorie">
-    <div
-      ref="chartRef"
-      class="main-container"
-      style="height: 500px; width: 100%"
-    />
+  <div class="weekly-calorie  ">
+    <div ref="chartRef" class="main-container  " style="height: 500px; width: 100%"></div>
   </div>
 </template>
 
 <style scoped>
 .weekly-calorie {
-  width: 100%;
+  width: 80%;
   height: 100%;
-  position: static;
 }
 .main-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  position: relative;
+  width: 80%;
 }
 </style>
