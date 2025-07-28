@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import Calendar from '@/components/reminder/Calendar.vue';
 import { save } from '@/services/reminder/reminderService';
+import { modify } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 
 const router = useRouter();
@@ -11,6 +12,7 @@ const reminderStore = useReminderStore();
 
 const state = reactive({
   reminder: {
+    id: 0,
     title: '',
     content: '',
     date: '',
@@ -31,11 +33,13 @@ const selectedDone = (day) => {
   const y = day.getFullYear();
   const m = String(day.getMonth() + 1).padStart(2, '0');
   const d = String(day.getDate()).padStart(2, '0');
-  state.date = `${y}.${m}.${d}`; // 넘길 데이터 저장
+  state.reminder.date = `${y}-${m}-${d}`; // 넘길 데이터 저장
 
-  state.repeat = false; // 요일 반복 비활성화
-  state.repeatDow = [];
-  dowImage.value.forEach((item) => (item.isOn = false));
+  if (state.reminder.repeat) {
+    state.reminder.repeat = false; // 요일 반복 비활성화
+    state.reminder.repeatDow = [];
+    dowImage.value.forEach((item) => (item.isOn = false));
+  }
 };
 
 const openCalendar = () => {
@@ -49,10 +53,11 @@ const openCalendar = () => {
 
 // 화면에 나타낼 날짜 포맷 변경
 const formattedDate = computed(() => {
-  const y = selectedDate.value.getFullYear();
-  const m = String(selectedDate.value.getMonth() + 1).padStart(2, '0');
-  const d = String(selectedDate.value.getDate()).padStart(2, '0');
-  return `${y}. ${m}. ${d}`;
+  const selected = new Date(selectedDate.value);
+  const y = selected.getFullYear();
+  const m = String(selected.getMonth() + 1).padStart(2, '0');
+  const d = String(selected.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 });
 
 // 이미지 토글, 요일 선택시 배열 추가/변경 로직
@@ -68,17 +73,13 @@ const dowImage = ref([
 const imageToggle = (index) => {
   dowImage.value[index].isOn = !dowImage.value[index].isOn;
 
-  if (dowImage.value[index].isOn) {
-    if (!state.reminder.repeatDow.includes(index)) {
-      // 배열에 해당 인덱스값이 없으면 추가
-      state.reminder.repeatDow.push(index);
-    } else {
-      state.reminder.repeatDow = state.reminder.repeatDow.filter(
-        (i) => i != index
-      ); // 배열에 해당 인덱스값이 있으면 filter로 제거
-    }
-  }
-  state.reminder.repeat = dowImage.value.some((item) => item.isOn); // 배열 값들 중 하나라도 true면 state.repeat true 리턴
+  const activeIndex = dowImage.value
+    .map((item, i) => (item.isOn ? i : null))
+    .filter((item) => item !== null);
+
+  state.reminder.repeatDow = activeIndex;
+  state.reminder.repeat = activeIndex.length > 0;
+
   if (state.reminder.repeat) {
     state.reminder.date = '';
   }
@@ -88,18 +89,30 @@ const imageToggle = (index) => {
 const isDateMode = computed(() => state.reminder.date !== '');
 const isRepeatMode = computed(() => state.reminder.repeat);
 
-//
-const reminderId = route.query.id;
-
+// 쿼리스트링으로 id가 있으면 해당 리마인더 내용 띄우기
+const reminderId = Number(route.query.id);
+// 쿼리스트링은 문자열 즉, id랑 타입 안맞음
 onMounted(() => {
   if (reminderId) {
-    state.reminder = reminderStore.state.fullReminder.find(
-      (item = item.id === reminderId)
+    const modifyReminder = reminderStore.state.fullReminder.find(
+      (item) => item.id === reminderId
     );
 
+    if (modifyReminder) {
+      Object.assign(state.reminder, {
+        id: modifyReminder.id,
+        title: modifyReminder.title,
+        content: modifyReminder.content,
+        date: modifyReminder.date,
+        alarm: modifyReminder.alarm,
+        repeat: modifyReminder.repeat,
+        repeatDow: [...(modifyReminder.repeatDow || [])],
+      });
+    }
+
     if (state.reminder.date) {
-      const [y, m, d] = state.reminder.date.split('.'); //.map((s) => s.trim());
-      selectedDate.value = new Date(`${y}.${m}.${d}`);
+      const [y, m, d] = state.reminder.date.split('-');
+      selectedDate.value = new Date(`${y}-${m}-${d}`);
     } else if (state.reminder.repeat) {
       dowImage.value.forEach((item, index) => {
         item.isOn = state.reminder.repeatDow.includes(index);
@@ -107,6 +120,7 @@ onMounted(() => {
     }
   }
 });
+
 // 서버 통신 로직
 const submit = async () => {
   if (!isDateMode.value && !isRepeatMode.value) {
@@ -134,25 +148,29 @@ const submit = async () => {
     alarm: state.reminder.alarm,
   };
   console.log('jsonBody', jsonBody);
-  if (state.reminder.id) {
+  let res = null;
+  if (state.reminder.id > 0) {
     jsonBody.id = state.reminder.id;
+    console.log('modify', jsonBody);
     res = await modify(jsonBody);
     if (res === undefined || res.status !== 200) {
-    alert('오류발생');
-    return;
+      alert('오류발생');
+      return;
     }
-    alert('일정을 추가했어요!');
-    if(reminderStore.state.dayReminder){
-      router.push('/reminder/list')}
+    alert('일정을 수정했어요!');
+    router.push('/reminder/list');
   } else {
     res = await save(jsonBody);
+    console.log('res!!', res.data);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;
     }
     alert('일정을 추가했어요!');
+    reminderStore.setReload(true);
+    console.log('pinia', reminderStore.reload);
+    router.push('/reminder');
   }
-  router.push('/reminder');
 };
 </script>
 
@@ -206,13 +224,16 @@ const submit = async () => {
         />
       </div>
       <div>
+        <label for="title">제목</label>
         <input
           type="text"
+          id="title"
           placeholder="어떤 일정이 있으신가요?"
           v-model="state.reminder.title"
         />
       </div>
       <div>
+        <label for="content">내용</label>
         <textarea
           name="내용"
           id="content"
@@ -221,7 +242,7 @@ const submit = async () => {
         ></textarea>
       </div>
       <button @click="submit">
-        {{ state.reminder.id > 0 ? '수정하기' : '저장하기' }}
+        {{ state.reminder.id > 0 ? '수정  하기' : '추가하기' }}
       </button>
     </div>
   </div>
@@ -235,38 +256,6 @@ const submit = async () => {
 .alarm {
   width: 60px;
 }
-// label {
-//   cursor: pointer;
-//   text-indent: -9999px;
-//   width: 100px;
-//   height: 50px;
-//   background-color: #dff7fa;
-//   border-radius: 25px;
-//   display: inline-block;
-//   position: relative;
-//   transition: 0.4s;
-// }
-// label::after {
-//   content: '';
-//   position: absolute;
-//   left: 5px;
-//   top: 4px;
-//   width: 42px;
-//   height: 42px;
-//   border-radius: 50%;
-//   background: #a5cace;
-//   transition: 0.4s;
-// }
-// #toggle-slider:checked + label {
-//   background: #96e7ef;
-// }
-// #toggle-slider:checked + label::after {
-//   left: 54px;
-//   background: #1d6369;
-// }
-// #toggle-slider {
-//   display: none;
-// }
 .toggle-img {
   width: 60px;
   margin: 10px;

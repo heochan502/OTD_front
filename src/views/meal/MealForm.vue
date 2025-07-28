@@ -1,30 +1,68 @@
 <script setup>
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted,computed } from 'vue';
 import {useRouter} from "vue-router";
-import { useDayDefine } from "@/stores/mealStore";
+import { useDayDefine, useCalorieCalcul } from "@/stores/mealStore";
 
 const dayStore = useDayDefine();
-
+const ondayMealData = useCalorieCalcul();
 
 const value = ref(10);
 const moreMeal = ref(500);
+const maxKcal = ref(25000);
+
 const totalKcal = ref(300);
-const maxKcal = ref(2500);
 const tansu = ref(1000); // 탄수화물 비율
 const protein = ref(40); // 단백질 비율
 const jibang = ref(400); // 지방 비율
+
+const itemInfo = ref(
+      {
+        mealDay:'',
+        totalKcal: '',
+        jibang: '',
+        tansu: '',
+        protein: '',
+      }
+    );
 
 const router = useRouter();
 
 const  mealadd = (day)=>{
   dayStore.dayDefine = day;
   router.push({name : 'MealAdd'});
+  // itemInfo
 };
-onMounted(() => {
+
+// 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
+const calorieData = computed(() => {
+  return ondayMealData.itemInfo[0] || {
+    allDayCalorie: 0,
+    mealDay: '',
+    totalFat: 0,
+    totalCarbohydrate: 0,
+    totalProtein: 0,
+  };
+});
+
+
+
+onMounted(async() => {
   console.log('totalKcal:', totalKcal.value);
-  console.log('maxKcal:', maxKcal.value);
+  console.log('maxKcal:', maxKcal.value);  
+   await ondayMealData.mealFormData();
+  // itemInfo.value = {   
+  //   totalKcal: ondayMealData.allDayCalorie,
+  //   jibang :ondayMealData.totalFat,
+  //   tansu :ondayMealData.totalCarbohydrate,
+  //   protein : ondayMealData.totalProtein,
+  //   mealDay : ondayMealData.mealDay
+  // };
+
+  console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
+  // itemInfo.value= ondayMealData.itemInfo.value;
+
 });
 </script>
 
@@ -35,8 +73,8 @@ onMounted(() => {
         <div class="progress-container w-full">
           <ProgressBar
             class="totalcal"
-            :value="totalKcal"
-            :leftString="`${totalKcal}/${maxKcal}kcal`"
+            :value= 'calorieData.allDayCalorie'
+            :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
             :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`"
             :max="maxKcal"
             customsize="totalcal"
@@ -44,27 +82,27 @@ onMounted(() => {
           <div class="inprogressbar">
             <ProgressBar
               class="tansu"
-              :value="tansu"
+              :value="calorieData.totalCarbohydrate"
               :leftString="`탄수화물`"
-              :rightString="`${((tansu / (maxKcal * 0.6)) * 100).toFixed(1)}%`"
-              :max="maxKcal * 0.6"
+              :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
+              :max="(maxKcal * 0.6)/4"
               customsize="tansu"
             />
             <ProgressBar
               class="protein"
-              :value="protein"
+              :value="calorieData.totalProtein"
               :leftString="`단백질`"
-              :rightString="`${protein}%`"
+              :rightString="`${(calorieData.totalProtein/ ((maxKcal * 0.15)/4) * 100).toFixed(1)}%`"
               customsize="protein"
-              :max="maxKcal * 0.15"
+              :max="(maxKcal * 0.15)/4"
             />
             <ProgressBar
               class="jibang"
-              :value="jibang"
+              :value="calorieData.totalFat"
               :leftString="`지방`"
-              :rightString="`${jibang}%`"
+              :rightString="`${(calorieData.totalFat/ ((maxKcal * 0.25) / 9) * 100).toFixed(1)}%`"
               customsize="jibang"
-              :max="maxKcal * 0.25"
+              :max="(maxKcal * 0.25)/9"
             />
           </div>
         </div>
@@ -74,19 +112,19 @@ onMounted(() => {
         <div class="dailymeal">
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd(0)"
+            @click="mealadd('아침')"
           >
             <span>아침</span> <span>✚</span>
           </button>
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd(1)"
+            @click="mealadd('점심')"
           >
             <span>점심</span> <span>✚</span>
           </button>
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd(2)"
+            @click="mealadd('저녁')"
           >
             <span>저녁</span> <span>✚</span>
           </button>
