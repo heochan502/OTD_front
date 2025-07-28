@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive } from "vue";
-import effortLevels from "@/api/health/effortLevels.json";
+import effortLevels from "@/assets/health/effortLevels.json";
 import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRoute, useRouter } from "vue-router";
@@ -45,12 +45,9 @@ onMounted(async () => {
 });
 
 // @click
-const moveToEdit = () => {
+const moveToMain = () => {
   router.push({
-    path: "/elog/edit",
-    state: {
-      data: JSON.stringify(state.elog),
-    },
+    path: "/health",
   });
 };
 
@@ -74,8 +71,7 @@ const deleteLog = async () => {
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
       <div class="btns">
-        <v-btn class="btn_modify" @click="moveToEdit">수정</v-btn>
-        <v-btn class="btn_delete" @click="deleteLog">삭제</v-btn>
+        <v-btn class="btn_home" @click="moveToMain">홈</v-btn>
       </div>
     </v-row>
     <v-row class="align-center">
@@ -113,6 +109,9 @@ const deleteLog = async () => {
         </v-row>
       </v-col>
     </v-row>
+    <div class="btns">
+      <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
+    </div>
   </v-container>
 </template>
 
@@ -167,16 +166,20 @@ const deleteLog = async () => {
 .btns {
   display: flex;
   gap: 5px;
-}
-.v-btn {
-  height: 30px;
-  border-radius: 20px;
-  color: #fff;
-}
-.btn_modify {
-  background-color: #3bbeff;
-}
-.btn_delete {
-  background-color: #838383;
+  justify-content: center;
+  align-items: center;
+
+  .v-btn {
+    height: 30px;
+    border-radius: 20px;
+    color: #fff;
+  }
+  .btn_home {
+    background-color: #3bbeff;
+  }
+  .btn_delete {
+    margin-top: 50px;
+    background-color: #838383;
+  }
 }
 </style>
