@@ -2,7 +2,7 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-axios.defaults.baseURL = '/api/otd';
+axios.defaults.baseURL = '/api/OTD';
 
 export const join = (params) => {
   return axios.post('/user/signup', params).catch((e) => e.response);
@@ -23,7 +23,11 @@ export const getProfile = () => {
   return axios.get('/user/profile').catch((e) => e.response);
 }
 export const updateProfile = (params) => {
-  return axios.post('/user/profile/detail',params).catch((e) => e.response);
+  return axios.put('/user/profile/detail', params, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).catch((e) => e.response);
 }
 export const checkMemberId = (memberId) => {
   return axios.get(`/user/check/id/${memberId}`).catch((e) => e.response);
@@ -35,4 +39,10 @@ export const checkEmail = (email) => {
 
 export const checkNickname = (nickname) => {
   return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
+};
+
+export const deleteMember = (memberNoLogin) => {
+  return axios.delete('/user',{
+    params: { memberNoLogin }
+  }).catch((e) => e.response);
 };

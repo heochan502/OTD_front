@@ -1,6 +1,4 @@
-<script setup>
-import Weather from '@/views/weather/weather.vue';
-</script>
+<script setup></script>
 
 <template>
   <main class="content">
@@ -19,7 +17,7 @@ import Weather from '@/views/weather/weather.vue';
   min-height: 100vh;
   flex: 1;
   padding: 30px 32px;
-  background-color: #f5f5f5;
+  background-color: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -29,10 +27,8 @@ import Weather from '@/views/weather/weather.vue';
   min-width: 100vh;
   min-height: 100vh;
   width: 100%;
-  max-width: 1200px;
-  height: 400px;
-  background-color: #ccc;
+  max-width: 1100px;
+  height: 1400px;
   border-radius: 8px;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 </style>

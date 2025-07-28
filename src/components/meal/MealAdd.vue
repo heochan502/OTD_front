@@ -1,11 +1,9 @@
 <script setup>
-import { reactive, ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { reactive, ref,  onMounted } from 'vue';
 import { debounce, toNumber } from 'lodash';
 import { getFoodNames, getFoodCalorie, inputMealData, getMealData ,modifyMealdata } from '@/services/meal/mealService';
-import { useCalorieCalcul } from '@/stores/mealStore';
 import { useRouter } from 'vue-router';
 import { useDayDefine, useAlldayMeal } from "@/stores/mealStore";
-import { modify } from '@/services/reminder/reminderService';
 
 const dayStore = useDayDefine();
 
@@ -178,24 +176,30 @@ const setItem = ()=>{
 
 const saveMeal = async()=>
 { 
-  saveText = ref('저장하기');
+  // console.log("set전 inputData데이터", inputData.dayMealCategory);
+  // console.log("set전 itemList데이터", itemList.value);
+
   setItem();
  
 
   // console.log("기존 데이터", itemList.value);
-  console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log("아이디 데이터", inputData.dayMealCategory);
   // console.log("날짜 데이터", dayStore.dayDefine);
   // console.log (itemList.value);
   
   const res = await inputMealData(inputData.dayMealCategory);
-  if (res.status !== 200) {
-    console.log("입력 ", res);
+  if (inputData.dayMealCategory.foodDbId.length > 0) {
+    saveText.value = '수정하기';
   }
+  if (res.status !== 200) {
+    console.log("입력 ", res);   
+  }
+  
 };
 
 
 
-  //수정 
+  //수정 하는곳 
 
 const updateMeal = async () => {
 
@@ -205,9 +209,16 @@ const updateMeal = async () => {
   //현재 시간 기점이라 생각해야함
   // inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
 
-  console.log(" 수정데이터들 : ", inputData.dayMealCategory);
+  // console.log(" 수정데이터들 : ", inputData.dayMealCategory);
+
   const res = await modifyMealdata(inputData.dayMealCategory);
 
+  if (itemList.value.length >0) {
+    saveText.value = '수정하기';
+  }
+  else {
+    saveText.value = '저장하기';
+  }
   console.log("값:::" , res);
 };
 
@@ -248,8 +259,8 @@ else
     mealTime : item.itemTitle
   }));
 
-  console.log(" data들 : ", itemList.value);
-  console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log(" data들 : ", itemList.value);
+  // console.log("아이디 데이터", inputData.dayMealCategory);
   // 데이터 넣는곳 
   // itemList.value.push({
   //   foodDbId: foodInfo.foodDbId,
@@ -317,7 +328,7 @@ onMounted(() => {
           </template>
 
           <template v-slot:item="{ item, props }">
-            <v-list-item v-bind="props" v-if="props.title" @click="">
+            <v-list-item v-bind="props" v-if="props.title">
               <!-- <span> {{ item }}</span> -->
               <v-list-item-title>
                 {{ item.value.foodName }}
@@ -335,7 +346,7 @@ onMounted(() => {
 
     <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 ">
 
-      <template v-slot:default="{ item, index }">
+      <template v-slot:default="{ item }">
         <div class="d-flex flex-column align-center  ">
           <v-card class=" mb-4  rounded-lx" style="width: 600px" variant="tonal">
             <v-card-title class="pl-5 pt-1">

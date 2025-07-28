@@ -1,6 +1,7 @@
 import { reactive, ref } from 'vue';
 import { defineStore } from 'pinia';
 
+
 export const useAccountStore = defineStore('counter', () => {
   const state = reactive({
     checked: false,
@@ -18,4 +19,5 @@ export const useAccountStore = defineStore('counter', () => {
   const setLoggedInId = (val) => (loggedInId.value = val);
 
   return { state, loggedInId, setChecked, setLoggedIn, setLoggedInId };
+},{    persist: true,
 });

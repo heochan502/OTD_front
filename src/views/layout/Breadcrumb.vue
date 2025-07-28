@@ -37,32 +37,58 @@ const logoutAccount = async () => {
 
       <!-- 가운데 메뉴 -->
       <nav class="nav">
-        <router-link to="/">홈</router-link>
-        <router-link to="/reminder" href="#">리마인더</router-link>
-        <router-link to="/routine" href="#">루틴</router-link>
-        <router-link to="/meal" href="#">식단</router-link>
-        <router-link to="/health" href="#">건강</router-link>
-        <router-link to="/memo-and-diary">일기</router-link>
-        <a href="#">위치</a>
-        <router-link to="/community" href="#">커뮤니티</router-link>
+        <router-link to="/" class="nav-menu" active-class="active"
+          >홈</router-link
+        >
+        <router-link
+          to="/reminder"
+          href="#"
+          class="nav-menu"
+          active-class="active"
+          >리마인더</router-link
+        >
+        <router-link to="/meal" href="#" class="nav-menu" active-class="active"
+          >식단</router-link
+        >
+        <router-link
+          to="/health"
+          href="#"
+          class="nav-menu"
+          active-class="active"
+          >건강</router-link
+        >
+        <router-link to="/memo-And-Diary" href="#" class="nav-menu" active-class="active"
+          >일기</router-link
+        >
+        <router-link
+          to="/community"
+          href="#"
+          class="nav-menu"
+          active-class="active"
+          >커뮤니티</router-link
+        >
       </nav>
 
       <!-- 오른쪽 로그인 -->
-      <div class="auth">
-        <template v-if="counter.state.loggedIn">
-          <a @click="logoutAccount">로그아웃</a>
-          <router-link to="/profile">회원정보</router-link>
-        </template>
-        <template v-else>
-          <router-link to="/login" href="#">로그인</router-link>
-          <router-link to="/signup" href="#">회원가입</router-link>
-        </template>
+      <div class="member">
+        <div class="auth">
+          <template v-if="counter.state.loggedIn">
+            <a class="auth" @click="logoutAccount">로그아웃</a>
+            <router-link to="/profile" class="auth">회원정보</router-link>
+          </template>
+          <template v-else>
+            <router-link to="/login" href="#" class="auth">로그인</router-link>
+            <router-link to="/signup" href="#" class="auth"
+              >회원가입</router-link
+            >
+          </template>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .breadcrumb {
   width: 100%;
   background-color: white;
@@ -75,52 +101,70 @@ const logoutAccount = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 25px;
+  font-size: 30px;
 }
 
 .logo {
-  padding: 0 110px 0 0;
+  padding: 0 70px 0 0;
   display: flex;
   flex-direction: column;
   line-height: 1.1;
 }
 
 .logo-one {
-  /* font-size: 20px; */
+  // font-size: 20px;
   font-weight: bold;
-  color: #555;
+  color: #838383;
 }
 
 .logo-today {
-  /* font-size: 20px; */
+  // font-size: 20px;
   font-weight: bold;
   color: #4fc3f7;
   margin-left: 4px;
 }
 
 .logo-sub {
-  font-size: 13px;
+  font-size: 12px;
   color: #999;
   margin-top: -2px;
+  margin-left: 86px;
 }
 
 .nav {
-  padding: 0 60px 0 120px;
+  padding: 0 70px;
   display: flex;
   gap: 20px;
-  font-size: 16px;
-  font-weight: 1200;
+  font-size: 18px;
   color: #222;
+  .nav-menu {
+    color: black;
+    padding: 10px;
+    font-weight: bold;
+    &:hover {
+      background-color: white;
+      font-weight: bold;
+      color: #4fc3f7;
+    }
+  }
 }
 
 .nav .active {
   font-weight: bold;
+  color: #4fc3f7;
 }
 
+.member {
+  padding: 0 0 0 70px;
+}
 .auth {
   display: flex;
   gap: 12px;
-  font-size: 14px;
-  color: #00bd7e;
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  &:hover {
+    background-color: white;
+  }
 }
 </style>
