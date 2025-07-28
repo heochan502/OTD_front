@@ -20,16 +20,22 @@ const memberNickName = async () => {
 const popMessage = computed(() => {
   const pop = weather.value.pop;
   const per = '오늘은 비올 확률이' + weather.value.pop + ' % !!';
-  if (pop < 10) {
-    return ;
-  } else if (pop < 30) {
-    return '오늘 날씨 좋네요! 즐거운 하루 보내세요.';
-  } else if (pop < 50) {
+  const sky = weather.value.sky;
+  if ((pop < 10 && sky === '맑음') || (pop < 10 && sky === '구름 많음')) {
+    return '오늘의 날씨는 ' + sky + '이네요! 즐거운 하루 보내세요.';
+  } else if (
+    (pop < 30 && sky === '맑음') ||
+    (pop < 30 && sky === '구름 많음')
+  ) {
+    return per + '걱정 되신다면 우산을 챙기길 추천해요!';
+  } else if (pop < 50 || sky === '흐림') {
     return per + '비가 올 수도 있으니 휴대하기 편한 우산 챙기길 추천해요!';
-  } else if (pop < 95) {
+  } else if (pop < 90) {
     return per + '우산 챙기셨나요? 우산 챙겨가세요!';
-  } else {
+  } else if (pop > 90 || sky === '비') {
     return per + '우산을 꼭 챙기고 빗길 조심하세요!';
+  } else {
+    return per + '오늘 하루도 화이팅!';
   }
 });
 
