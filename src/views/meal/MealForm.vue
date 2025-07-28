@@ -3,6 +3,11 @@ import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted } from 'vue';
 import {useRouter} from "vue-router";
+import { useDayDefine } from "@/stores/mealStore";
+
+const dayStore = useDayDefine();
+
+
 const value = ref(10);
 const moreMeal = ref(500);
 const totalKcal = ref(300);
@@ -13,9 +18,19 @@ const jibang = ref(400); // 지방 비율
 
 const router = useRouter();
 
-const  mealadd = ()=>{
+const  mealadd = (day)=>{
+  dayStore.dayDefine = day;
   router.push({name : 'MealAdd'});
 };
+
+const calculation = ()=>{
+
+    const sum = dayStore.reduce((sum, value)=>sum + value,0);
+
+}
+
+
+
 onMounted(() => {
   console.log('totalKcal:', totalKcal.value);
   console.log('maxKcal:', maxKcal.value);
@@ -68,19 +83,19 @@ onMounted(() => {
         <div class="dailymeal">
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="totalKcal += 10"
+            @click="mealadd('아침')"
           >
             <span>아침</span> <span>✚</span>
           </button>
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="totalKcal += 20"
+            @click="mealadd('점심')"
           >
             <span>점심</span> <span>✚</span>
           </button>
           <button
             class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd"
+            @click="mealadd('저녁')"
           >
             <span>저녁</span> <span>✚</span>
           </button>

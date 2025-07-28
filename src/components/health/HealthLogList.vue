@@ -4,14 +4,14 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const logs = reactive([
-  {
-    healthlog_id: 1,
-    date: "2025-07-08",
-  },
-  {
-    healthlog_id: 2,
-    date: "2025-07-16",
-  },
+  // {
+  //   healthlog_id: 1,
+  //   date: "2025-07-08",
+  // },
+  // {
+  //   healthlog_id: 2,
+  //   date: "2025-07-16",
+  // },
 ]);
 
 const formatDate = (dateStr) => {
@@ -32,6 +32,7 @@ const add = () => {
     </div>
   </div>
   <ul>
+    <li v-if="logs < 1" class="title">건강 기록을 추가하세요</li>
     <li
       v-for="item in logs"
       :key="item.healthlog_id"
@@ -83,21 +84,20 @@ ul {
     border-radius: 40px;
     background-color: #3bbeff;
     cursor: pointer;
-
-    .title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      text-align: right;
-
-      color: #fff;
-    }
   }
+}
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+
+  color: #fff;
 }
 </style>

@@ -1,8 +1,55 @@
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useExerciseStore } from "@/stores/exerciseStore";
 import effortLevels from "@/api/health/effortLevels.json";
+import { getFeedbackMessage } from "@/utils/getFeedbackMessage";
+import {
+  getDateString,
+  getYesterdayDateString,
+  filterLogsByDate,
+  calcKcal,
+  calcDuration,
+  calcEffortAvg,
+} from "@/utils/exerciseReportUtils";
 
 const tab = ref("one");
+const exerciseStore = useExerciseStore();
+
+const todayStr = getDateString();
+const yesterdayStr = getYesterdayDateString();
+
+const todayLogs = computed(() =>
+  filterLogsByDate(exerciseStore.logs, todayStr)
+);
+const yesterdayLogs = computed(() =>
+  filterLogsByDate(exerciseStore.logs, yesterdayStr)
+);
+
+const todayKcal = computed(() => calcKcal(todayLogs.value));
+const yesterdayKcal = computed(() => calcKcal(yesterdayLogs.value));
+
+const todayDuration = computed(() => calcDuration(todayLogs.value));
+const yesterdayDuration = computed(() => calcDuration(yesterdayLogs.value));
+
+const todayEffortAvg = computed(() => calcEffortAvg(todayLogs.value));
+const yesterdayEffortAvg = computed(() => calcEffortAvg(yesterdayLogs.value));
+
+const feedbackMessage = computed(() =>
+  getFeedbackMessage({
+    todayDuration: todayDuration.value,
+    yesterdayDuration: yesterdayDuration.value,
+    todayEffort: todayEffortAvg.value,
+    yesterdayEffort: yesterdayEffortAvg.value,
+    todayKcal: todayKcal.value,
+    isFirst: todayLogs.value.length > 0 && yesterdayLogs.value.length === 0,
+    isComeback: yesterdayLogs.value.length === 0,
+  })
+);
+
+const effortIndex = computed(() => {
+  const idx = todayEffortAvg.value - 1;
+  return idx >= 0 ? idx : 0;
+});
 </script>
 
 <template>
@@ -24,18 +71,22 @@ const tab = ref("one");
           <v-col class="content_left">
             <div>
               <div class="title">활동에너지</div>
-              <div class="report_value">{{ 900 }}kcal</div>
+              <div class="report_value">{{ todayKcal }} kcal</div>
             </div>
             <div>
               <div class="title">운동시간</div>
-              <div class="report_value">{{ 120 }}분</div>
+              <div class="report_value">{{ todayDuration }}분</div>
             </div>
           </v-col>
           <v-col class="content_right">
             <div class="title">운동강도</div>
-            <div class="emoji">{{ effortLevels[8].emoji }}</div>
-            <div class="effort_label">{{ effortLevels[8].label }}</div>
-            <div>어제보다 활동량이 더 많아요!</div>
+            <div class="emoji">
+              {{ effortLevels[effortIndex].emoji }}
+            </div>
+            <div class="effort_label">
+              {{ effortLevels[effortIndex].label }}
+            </div>
+            <div>{{ feedbackMessage }}</div>
           </v-col>
         </v-tabs-window-item>
         <v-tabs-window-item value="two"> 건강리포트 내용 </v-tabs-window-item>
