@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-export const useCalorieCalcul = defineStore('calculCal', () => {
+export const useCalorieCalcul = defineStore('mealInfo', () => {
     const itemInfo = ref([
       {
         totalCalorie: 0,
