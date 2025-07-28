@@ -1,6 +1,6 @@
 <script setup>
-import { reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { reactive, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { getByMonth } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 import Calendar from '@/components/reminder/Calendar.vue';
@@ -32,6 +32,18 @@ onMounted(async () => {
   getReminderList({ year: todayYear, month: todayMonth });
   setTodayReminder();
 });
+
+watch(
+  () => reminderStore.reload,
+  (data) => {
+    console.log('reminderStore.state.reload', reminderStore.reload);
+    if (data) {
+      getReminderList({ year: todayYear, month: todayMonth });
+      setTodayReminder();
+      reminderStore.setReload(false);
+    }
+  }
+);
 
 // 한달치 리마인더 목록(요일반복 포함) 조회
 const getReminderList = async (date) => {
