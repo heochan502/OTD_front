@@ -142,7 +142,7 @@ onMounted(async () => {
   padding: 0.6rem 1rem;
   margin: 1rem auto;
   max-width: 90%;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   border: 1px solid #ccc;
   border-radius: 12px;
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.05);
@@ -166,9 +166,12 @@ onMounted(async () => {
   border: none;
 }
 .menu-list {
-  color: black;
+  color: #ccc;
   padding: 0 1rem 0.1rem;
   border-radius: 16px;
+  &:hover {
+    background-color: white;
+  }
 }
 
 .weather-card {
@@ -180,6 +183,7 @@ onMounted(async () => {
   color: white;
   max-width: 100%;
   height: 11rem;
+  box-shadow: 1px 1px 4px #838383;
   box-sizing: border-box;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 

@@ -7,7 +7,9 @@ import {
   saveLocation,
   removeLocation,
 } from '@/services/weather/locationService';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const keyword = ref('');
 const selectedLocation = ref(null);
 const state = reactive({
@@ -35,10 +37,16 @@ const saveLocal = (searchText) => {
   );
 };
 
-const selectWeatherLocation = async (localId) => {
+const selectWeatherLocation = async (localId, locationName) => {
   const res = await selectLocation(localId);
   if (res && res.status === 200) {
-    alert('해당 지역이 홈화면에 표시됩니다.');
+    if (
+      confirm(
+        `${locationName}이(가) 선택 되었습니다. \n홈 화면으로 이동하시겠습니까?`
+      )
+    ) {
+      router.push('/');
+    }
   }
 };
 
@@ -112,7 +120,12 @@ onMounted(() => {
         <div class="d-flex gap-2">
           <button
             class="btn btn-outline-primary btn-sm"
-            @click="selectWeatherLocation(item.localId)"
+            @click="
+              selectWeatherLocation(
+                item.localId,
+                `${item.city} ${item.county} ${item.town}`
+              )
+            "
           >
             홈화면에 표시
           </button>
@@ -131,6 +144,9 @@ onMounted(() => {
 <style lang="scss" scoped>
 .list {
   color: black;
+}
+.location-name {
+  font-size: 25px;
 }
 .location-wrapper {
   max-width: 700px;
