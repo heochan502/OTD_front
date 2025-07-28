@@ -133,14 +133,8 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-<<<<<<< HEAD
-      path: "/detail",
-      name: "profile_detail",
-
-=======
       path: '/detail',
       name: 'profile_detail',
->>>>>>> origin/main
       component: ProfileDetail,
       meta: { requiresAuth: true }
     },
