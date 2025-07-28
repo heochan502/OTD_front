@@ -242,7 +242,7 @@ const submit = async () => {
         ></textarea>
       </div>
       <button @click="submit">
-        {{ state.reminder.id > 0 ? '수정  하기' : '추가하기' }}
+        {{ state.reminder.id > 0 ? '수정하기' : '추가하기' }}
       </button>
     </div>
   </div>
