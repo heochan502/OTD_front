@@ -23,6 +23,8 @@ const submit = async () => {
     case 404:
       alert('아이디/비밀번호를 확인해 주세요!');
       break;
+    case 500:
+      alert('아이디/비밀번호를 확인해 주세요')
   }
 };
 </script>
