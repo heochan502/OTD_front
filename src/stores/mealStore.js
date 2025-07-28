@@ -3,11 +3,14 @@ import { ref } from 'vue';
 
 export const useCalorieCalcul = defineStore('calculCal', () => {
     const itemInfo = ref([
-    {
-        foodDbId: '',
-        getFoodName: '',
-        calorie: ''
-    }
+      {
+        totalCalorie: 0,
+        allDayCalorie: '',
+        totalFat: '',
+        totalCarbohydrate: '',
+        totalProtein: '',
+        mealTime:'',
+      },
     ]);
 
     const inputFoodInfo = (foodInfo) => {

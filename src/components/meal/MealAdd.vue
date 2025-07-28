@@ -3,7 +3,7 @@ import { reactive, ref,  onMounted } from 'vue';
 import { debounce, toNumber } from 'lodash';
 import { getFoodNames, getFoodCalorie, inputMealData, getMealData ,modifyMealdata } from '@/services/meal/mealService';
 import { useRouter } from 'vue-router';
-import { useDayDefine, useAlldayMeal } from "@/stores/mealStore";
+import { useDayDefine, useAlldayMeal, useCalorieCalcul } from "@/stores/mealStore";
 
 const dayStore = useDayDefine();
 
@@ -45,7 +45,7 @@ const searchFoodName = async (type) => {
 
   const res = await getFoodNames(dataToSend);
 
-  console.log(" 이름 : ", res);
+  // console.log(" 이름 : ", res);
 // 데이터 넣는곳 
   if (type === 'name' && Array.isArray(res)) {
     // null이 아닐떄만 아래 실행 
@@ -132,7 +132,7 @@ const onItemClick = (item) => {
   // console.log('드롭다운에서 클릭된 시점 아이템:', items);
   const foodInfo = item[0];
 
-  console.log('드롭다운에서 클릭된 항목:', foodInfo);
+  // console.log('드롭다운에서 클릭된 항목:', foodInfo);
   if (!itemList.value.some(item => item.foodDbId === foodInfo.foodDbId)) {
     itemList.value.push({
       foodDbId: foodInfo.foodDbId,
@@ -142,7 +142,7 @@ const onItemClick = (item) => {
       totalCalorie :0
     });
   }
-  console.log('배열에 넣는데:', itemList.value);
+  // console.log('배열에 넣는데:', itemList.value);
 };
 
 // 배열 데이터 삭제 
@@ -243,23 +243,23 @@ else
 {
     saveText.value = '저장하기';
 }
-
   // 가공해서 itemList에 넣기
   itemList.value = lisData.map((item) => ({
     foodDbId: item.foodDbId,
     foodName: item.foodName,
     calorie: item.calorie,
     amount: item.amount,
+
     totalCalorie: 0,
     allDayCalorie: item.allDayCalorie,
     mealBrLuDi: item.mealBrLuDi, 
     totalFat :item.totalFat,
     totalCarbohydrate :item.totalCarbohydrate,
     totalProtein : item.totalProtein,
-    mealTime : item.itemTitle
+    mealDay : item.mealDay
   }));
 
-  // console.log(" data들 : ", itemList.value);
+  console.log(" data들 : ", itemList.value);
   // console.log("아이디 데이터", inputData.dayMealCategory);
   // 데이터 넣는곳 
   // itemList.value.push({
@@ -304,7 +304,7 @@ onMounted(() => {
     </div>
     <v-row dense class="justify-center">
       <v-col cols="12" md="5">
-        <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model.trim="searchFood.foodCategory"
+        <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model="searchFood.foodCategory"
           :items="items.foodCategory" item-text="foodCategory" @update:model-value="onCategoryInput"
           label="음식카테고리 입력하세요" variant="solo-inverted" placeholder="음식카테고리"
           @keyup.enter="() => searchFoodName('category')">
@@ -344,7 +344,7 @@ onMounted(() => {
     </v-row>
 
 
-    <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 ">
+    <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 " :height="400">
 
       <template v-slot:default="{ item, index }">
         <div class="d-flex flex-column align-center  ">
