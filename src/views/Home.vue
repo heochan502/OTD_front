@@ -54,16 +54,20 @@ onMounted(async () => {
       <span class="list-date">
         {{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
       >
-      <ul v-if="state.todayReminder.length > 0" class="list">
-        <li
-          v-for="item in state.todayReminder"
-          :key="item.id"
-          class="list-card"
-        >
-          <span class="reminder-title">• {{ item.title }}</span>
-        </li>
+      <ul class="list">
+        <template v-if="state.todayReminder.length > 0">
+          <li
+            v-for="item in state.todayReminder"
+            :key="item.id"
+            class="list-card"
+          >
+            <span class="reminder-title">• {{ item.title }}</span>
+          </li>
+        </template>
+        <template v-else>
+          <span class="empty-comment">"오늘은 한가한 하루네요!"</span>
+        </template>
       </ul>
-      <span v-else class="empty-comment">"오늘은 한가한 하루네요!"</span>
     </div>
   </router-link>
   <div>
@@ -106,6 +110,7 @@ onMounted(async () => {
   border-radius: 0 16px 16px 16px;
   padding: 1rem;
   width: 50%;
+  min-height: 30%;
 }
 
 .list {
@@ -130,15 +135,11 @@ onMounted(async () => {
   }
 }
 .empty-comment {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: inline-block;
+  width: 100%;
+  text-align: center;
   color: #575757;
   font-weight: bold;
   font-size: 20px;
-  // margin: 0 auto;
-  white-space: nowrap;
+  margin: 0.5rem 0;
 }
 </style>
