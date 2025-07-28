@@ -1,14 +1,14 @@
 <script setup>
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted ,watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { getProfile } from '@/services/accountService';
+import { getProfile, deleteMember } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
 
 const router = useRouter();
 const counter = useAccountStore();
 
 const state = reactive({
-  form: {
+  form: {  
     memberNoLogin: 0,
     memberId: '',
     email: '',
@@ -29,6 +29,24 @@ const formatBirthDate = (birthDate) => {
 const handleImageError = (e) => {
   state.form.profileImage = '';
 };
+
+const remove = async (memberNoLogin) => {
+  if (!confirm('정말 회원 탈퇴하시겠습니까?')) return;
+
+  try {
+    const res = await deleteMember(memberNoLogin); // accountService에 deleteMember API 필요
+    if (res.status === 200) {
+      alert('회원 탈퇴가 완료되었습니다.');
+      router.push('/login');
+    } else {
+      alert('회원 탈퇴에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('회원탈퇴 에러:', error);
+    alert('오류가 발생했습니다.');
+  }
+};
+
 
 onMounted(async () => {
   if (!counter.state.loggedIn) {
@@ -52,6 +70,15 @@ onMounted(async () => {
     state.loading = false;
   }
 });
+
+watch(
+  () => counter.state.loggedIn,
+  (isLoggedIn) => {
+    if (!isLoggedIn) {
+      router.push('/login');
+    }
+  }
+);
 </script>
 
 <template>
@@ -62,15 +89,13 @@ onMounted(async () => {
       </div>
 
       <div class="content-container">
-        <!-- 로딩 상태 -->
         <div v-if="state.loading" class="loading-wrapper">
           <div class="loading-spinner"></div>
           <p>정보를 불러오는 중...</p>
         </div>
         
-        <!-- 프로필 정보 -->
+
         <div v-else class="profile-content">
-          <!-- 프로필 사진 섹션 -->
           <div class="profile-photo-section">
             <div class="photo-wrapper">
               <div v-if="state.form.profileImage" class="profile-img-container">
@@ -91,7 +116,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- 정보 카드들 -->
           <div class="info-cards">
             <div class="info-card">
               <div class="card-header">
@@ -121,21 +145,14 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-
-          <!-- 버튼 그룹 -->
           <div class="button-group">
-                <button 
-              @click="router.go(-1)" 
-              class="btn btn-secondary"
-            >
-              뒤로가기
-            </button>
             <router-link 
               to="/detail" 
               class="btn btn-primary"
             >
               정보 수정
             </router-link>
+            <span class="btn btn-primary2" @click.prevent="remove(state.form.memberNoLogin)">회원탈퇴</span>
           </div>
         </div>
       </div>
@@ -156,16 +173,16 @@ onMounted(async () => {
 }
 
 .container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .header {
-  color: #555555;;
+  color: #1e293b;;
   padding: 40px 30px;
 
   text-align: center;
@@ -173,7 +190,7 @@ onMounted(async () => {
 
 .header h1 {
   font-size: 1.75rem;
-  margin: 0 0 -50px 0;
+  margin: 22px 0 -50px 0;
   font-weight: 600;
   letter-spacing: -0.025em;
 }
@@ -189,7 +206,6 @@ onMounted(async () => {
   padding: 40px;
 }
 
-/* 로딩 상태 */
 .loading-wrapper {
   text-align: center;
   padding: 60px 20px;
@@ -230,9 +246,6 @@ onMounted(async () => {
   gap: 30px;
   margin-bottom: 40px;
   padding: 30px;
-  background: #f8fafb;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
 }
 
 .photo-wrapper {
@@ -341,7 +354,6 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-/* 버튼 그룹 */
 .button-group {
   display: flex;
   gap: 12px;
@@ -368,13 +380,21 @@ onMounted(async () => {
   background: #5BA7F7;
   color: white;
 }
+.btn-primary2 {
+  background: #6c757d;;
+  color: white;
+}
 
 .btn-primary:hover {
   background: #4A9EF5;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
 }
-
+.btn-primary2:hover {
+  background: #535A61;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
+}
 .btn-secondary {
   background: #6c757d;
   color: white;
@@ -385,85 +405,4 @@ onMounted(async () => {
   transform: translateY(-1px);
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .page-wrapper {
-    padding: 10px;
-  }
-  
-  .container {
-    border-radius: 12px;
-  }
-  
-  .content-container {
-    padding: 24px;
-  }
-  
-  .header {
-    padding: 32px 24px;
-  }
-  
-  .profile-photo-section {
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
-    padding: 24px;
-  }
-  
-  .info-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 16px 24px;
-  }
-  
-  .info-item .value {
-    font-size: 0.9rem;
-  }
-  
-  .button-group {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .btn {
-    width: 100%;
-  }
-
-  .card-header,
-  .info-item {
-    padding: 16px 24px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header {
-    padding: 24px 20px;
-  }
-  
-  .header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .header p {
-    font-size: 0.9rem;
-  }
-  
-  .content-container {
-    padding: 20px;
-  }
-  
-  .profile-img {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .user-info h2 {
-    font-size: 1.2rem;
-  }
-  
-  .user-info p {
-    font-size: 0.9rem;
-  }
-}
 </style>

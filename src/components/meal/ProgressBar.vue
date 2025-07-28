@@ -42,6 +42,7 @@ defineProps({
     margin-top: 5px;
     color: #ff6b6b ;
     width: 200px;
+}
     .progress {
     appearance: none;
     border-radius: 15px;
@@ -58,12 +59,13 @@ defineProps({
         background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
         background: linear-gradient(to right, #ff8787, #ff6b6b);
     }
-}
+
 .protein {    
     font-size: 16px;
     margin-top: 5px;
     color: #4dabf7;
     width: 200px;
+}
     .progress {
     appearance: none;
     border-radius: 15px;
@@ -82,12 +84,13 @@ defineProps({
         background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
         background: linear-gradient(to right, #74c0fc, #4dabf7);
     }
-}
+
 .jibang {    
     font-size: 16px;
     color: #ffd43b;
     margin-top: 5px;
     width: 200px;
+}
     .progress {
     appearance: none;
     border-radius: 15px;
@@ -106,7 +109,7 @@ defineProps({
         background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
         background: linear-gradient(to right, #ffe066, #ffd43b);
     }
-}
+
 .totalcal {    
     margin-left: 10px;
     inline-size: 650px;
