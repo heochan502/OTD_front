@@ -130,7 +130,7 @@ const routerDate = (date) => {
 
 <template>
   <div class="reminder">
-    <div>
+    <div class="left">
       <Calendar
         @reminder-date="getReminderList"
         @click-date="routerDate"
@@ -138,23 +138,58 @@ const routerDate = (date) => {
         use-page="home"
       ></Calendar>
     </div>
-    <div><router-link to="/reminder/form">일정 추가하기</router-link></div>
-    <router-link to="/reminder/list" class="list" @click="setTodayReminder">
-      <div>
-        <span class="list_title">오늘의 일정</span>
-        <br />
-        <span class="list_date"
-          >{{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+    <div class="right">
+      <div class="add">
+        <router-link to="/reminder/form" class="outline"
+          >일정 추가하기</router-link
         >
-        <ul v-if="state.todayReminder.length > 0">
-          <li v-for="item in state.todayReminder" :key="item.id">
-            <span>{{ item.title }}</span>
-          </li>
-        </ul>
-        <span v-else>오늘은 한가한 하루네요!</span>
       </div>
-    </router-link>
+      <router-link
+        to="/reminder/list"
+        class="list outline"
+        @click="setTodayReminder"
+      >
+        <div>
+          <span class="list_title">오늘의 일정</span>
+          <br />
+          <span class="list_date"
+            >{{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+          >
+          <ul v-if="state.todayReminder.length > 0">
+            <li v-for="item in state.todayReminder" :key="item.id">
+              <span>{{ item.title }}</span>
+            </li>
+          </ul>
+          <span v-else>오늘은 한가한 하루네요!</span>
+        </div>
+      </router-link>
+    </div>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.reminder {
+  display: flex;
+  gap: 50px;
+
+  .right {
+    .add {
+      background-color: #3bbeff;
+      a {
+        color: #fff;
+        outline: none;
+        background-color: #3bbeff;
+      }
+    }
+    .add:hover {
+    }
+  }
+}
+.outline {
+  text-decoration: none;
+  color: inherit;
+}
+.outline:hover {
+  background-color: none;
+}
+</style>
