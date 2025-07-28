@@ -1,54 +1,61 @@
 <script setup>
-import { reactive, ref, watch, computed } from 'vue';
+import { reactive, ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { debounce, toNumber } from 'lodash';
-import { getFoodNames, getFoodCalorie } from '@/services/meal/mealService';
+import { getFoodNames, getFoodCalorie, inputMealData, getMealData ,modifyMealdata } from '@/services/meal/mealService';
 import { useCalorieCalcul } from '@/stores/mealStore';
+import { useRouter } from 'vue-router';
+import { useDayDefine, useAlldayMeal } from "@/stores/mealStore";
+import { modify } from '@/services/reminder/reminderService';
 
+const dayStore = useDayDefine();
+
+const router = useRouter();
 
 const meal = () => {
-  router.push({ name: 'Meal' });
+  router.push({ name: 'MealForm' });
 };
+ 
 
+// 음식이름 드랍박스용
 const nameBox = ref(null);
+// 카테고리용 드랍박스용
 const categoryBox = ref(null);
-const calculStore = useCalorieCalcul();
-
+//데이터 입력 받고 정리 하는곳
 const itemList = ref([]);
 
+//검색 전용
 const searchFood = reactive({
   foodName: '',
   foodCategory: '',
 });
 
+//검색후 데이터
+// const items = useDayDefine();
 const items = reactive({
   foodList: [],
   foodCategory: [],
-})
-const cal = '10'
-const searchFoodName = async (type) => {
+});
 
+const searchFoodName = async (type) => {
   // console.log("이게왜", searchFood);
-  searchFood.foodName = searchFood.foodName === null ? ' ' : searchFood.foodName;
+  searchFood.foodName = searchFood.foodName === null ? '' : searchFood.foodName;
   // 드롭박스 클릭하고 난 뒤에 foodName이 객체화 되어서 이거 자체가 객체인지 판별하고 데이터 조작 하는 부분
   const dataToSend = {
     foodName: typeof searchFood.foodName === 'object' ? searchFood.foodName.foodName : searchFood.foodName,
     foodCategory: searchFood.foodCategory,
   };
 
-
   const res = await getFoodNames(dataToSend);
 
-  // console.log(" 이름 : ", res);
-
-  // 아래는 객체 형태로 받아와서 받아온걸 배열 형태로 수정하는것 (중복 제거 추가 )
-
-
+  console.log(" 이름 : ", res);
+// 데이터 넣는곳 
   if (type === 'name' && Array.isArray(res)) {
     // null이 아닐떄만 아래 실행 
     if (searchFood.foodName) {
       // console.log('널확인 ', searchFood.foodName);
-     
+
       items.foodList = res.map(item => ({
+        foodDbId: item.foodDbId,
         foodName: item.foodName,
         calorie: item.calorie
       }));
@@ -63,19 +70,15 @@ const searchFoodName = async (type) => {
   }
 };
 
-const calculFoodCalorie = async () => {
-
-  console.log("칼로리쪽 : ", searchFood);
-  calculStore.inputFoodInfo(await getFoodCalorie(searchFood));
-  console.log("칼로리 스토어 전체 :", calculStore.itemInfo);
-  console.log("배열 하나 : ", calculStore.getItemInfoByIndex(0));
-}
 
 // 무조건 박스 표출하기위한 forceopendropdown 
 const onNameInput = async () => {
   changeText('name');
   forceOpenDropdown('name');
 };
+
+
+
 // 다시 카테고리 눌렀을때 name 쪽 비워서 검색에 무리없게 만들기
 const onCategoryInput = async () => {
   changeText('category');
@@ -84,9 +87,10 @@ const onCategoryInput = async () => {
   await forceOpenDropdown('category');
 };
 
+
 const forceOpenDropdown = (type) => {
   setTimeout(() => {
-    if (type === 'name' ) {
+    if (type === 'name') {
       nameBox.value.isMenuActive = true;
     }
     if (type === 'category') {
@@ -95,10 +99,6 @@ const forceOpenDropdown = (type) => {
   }, 50);
 };
 
-// 음식 리스트가 비어있으면 가짜 항목 추가
-// const displayFoodList = computed(() => {
-//   return items.foodList.length > 0 ? items.foodList : [{ foodName: '음식 없음', calorie: '' }]
-// })
 
 // 아래는 입력창에 글을 쓰거나 뭘하면 바로바로 받아 들이긴하지만 
 // 시간 텀을 줘서 그 시간 동안 변하는 것에 대한 것을 무시하게 하는 것
@@ -110,31 +110,186 @@ const changeText = debounce((type) => {
 }, 50);
 
 // 아래 value 나 append뒤에 적힌건 함수화해서 값넘겨서 값보고 그떄별로 다르게 표시되는거
-const onItemClick = (item) => {
-  // console.log('드롭다운에서 클릭된 항목:', item); 
-  // console.log('드롭다운에서 클릭된 시점 아이템:', items);
-  const rawItems = item.raw;
-  itemList.value.push({ ...rawItems});
-  // console.log('배열에 넣는데:', itemList.value);
 
-  // return item;
-  // 추가 로직
+
+
+// 현재 시간 
+const currentTime = ref('');
+const updateTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const ampm = String(now.getHours() - 12 <= 0 ? '오전' : '오후');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  currentTime.value = `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
+
+
+// 목록 추가
+const onItemClick = (item) => {
+  // console.log('드롭다운에서 클릭된 시점 아이템:', items);
+  const foodInfo = item[0];
+
+  console.log('드롭다운에서 클릭된 항목:', foodInfo);
+  if (!itemList.value.some(item => item.foodDbId === foodInfo.foodDbId)) {
+    itemList.value.push({
+      foodDbId: foodInfo.foodDbId,
+      foodName: foodInfo.foodName,
+      calorie: foodInfo.calorie,
+      amount: 0,
+      totalCalorie :0
+    });
+  }
+  console.log('배열에 넣는데:', itemList.value);
+};
+
+// 배열 데이터 삭제 
 const removeItem = (index) => {
   itemList.value.splice(index, 1);
 };
+//칼로리 계산
+const calcCalories = (item) => {
+  const gram = item.amount || 0;
+  item.totalCalorie = Math.round(((item.calorie / 100) * gram));
+  return item.totalCalorie;
+};
+
+//meal 저장
+
+const inputData = useAlldayMeal();
+
+
+
+
+const setItem = ()=>{
+  inputData.dayMealCategory.foodDbId = itemList.value.map((info) => info.foodDbId);
+  inputData.dayMealCategory.amount = itemList.value.map((info) => info.amount);
+  inputData.dayMealCategory.totalCalorie = itemList.value.reduce((sum, item) => {
+    return sum + item.totalCalorie;
+  }, 0).toFixed(0);
+  inputData.dayMealCategory.mealBrLuDi = dayStore.dayDefine;
+  //현재 시간 기점이라 생각해야함
+  inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
+}
+
+const saveMeal = async()=>
+{ 
+  saveText = ref('저장하기');
+  setItem();
+ 
+
+  // console.log("기존 데이터", itemList.value);
+  console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log("날짜 데이터", dayStore.dayDefine);
+  // console.log (itemList.value);
+  
+  const res = await inputMealData(inputData.dayMealCategory);
+  if (res.status !== 200) {
+    console.log("입력 ", res);
+  }
+};
+
+
+
+  //수정 
+
+const updateMeal = async () => {
+
+
+  setItem();
+  // inputData.dayMealCategory.mealBrLuDi = dayStore.dayDefine;
+  //현재 시간 기점이라 생각해야함
+  // inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
+
+  console.log(" 수정데이터들 : ", inputData.dayMealCategory);
+  const res = await modifyMealdata(inputData.dayMealCategory);
+
+  console.log("값:::" , res);
+};
+
+
+
+const saveText = ref('저장하기');
+// 화면 뿌리기
+
+const getMeal = async () => {
+  const getlist = {
+    mealBrLuDi : dayStore.dayDefine, 
+    mealDay : currentTime.value.slice(3, 13),
+  }
+
+  const lisData = await getMealData(getlist);
+
+  if (Array.isArray(lisData) && lisData.length > 0)
+{
+  saveText.value = '수정하기';
+}
+else
+{
+    saveText.value = '저장하기';
+}
+
+  // 가공해서 itemList에 넣기
+  itemList.value = lisData.map((item) => ({
+    foodDbId: item.foodDbId,
+    foodName: item.foodName,
+    calorie: item.calorie,
+    amount: item.amount,
+    totalCalorie: 0,
+    allDayCalorie: item.allDayCalorie,
+    mealBrLuDi: item.mealBrLuDi, 
+    totalFat :item.totalFat,
+    totalCarbohydrate :item.totalCarbohydrate,
+    totalProtein : item.totalProtein,
+    mealTime : item.itemTitle
+  }));
+
+  console.log(" data들 : ", itemList.value);
+  console.log("아이디 데이터", inputData.dayMealCategory);
+  // 데이터 넣는곳 
+  // itemList.value.push({
+  //   foodDbId: foodInfo.foodDbId,
+  //   foodName: foodInfo.foodName,
+  //   calorie: foodInfo.calorie,
+  //   amount: 0,
+  //   totalCalorie: 0,
+  //   allDayCalorie: 0,
+  //   mealBrLuDi: dayStore.dayDefine
+  // }); 
+};
+
+
+// 화면 불러올떄
+onMounted(() => {
+  updateTime(); // 컴포넌트가 마운트될 때 초기 시간 설정
+  // console.log("시간 ", currentTime);
+  setInterval(updateTime, 1000); // 1초마다 시간 업데이트
+
+  getMeal();
+
+});
+
+
+
+
 </script>
 
 <template>
   <div class="d-flex flex-column  mb-6 ">
 
-    <div>
-      <span class="  text-grey-darken-1 mb-1 text-h3 font-weight-bold ">
-        아침 메뉴
+    <div class=" text-grey-darken-1 mb-1 font-weight-bold flex-row ">
+      <span class="   text-h3 font-weight-bold ">
+        {{ dayStore.dayDefine }} 메뉴
       </span>
       <!-- 아래는 배열객체의 값의 총합 -->
-      <span> 오늘 드신 칼로리 총합 {{itemList.reduce((sum, item) => sum +  item.calorie, 0) }} kcal</span>
+      <span class="   text-body-1 font-weight-bold  "> 오늘 냠냠 칼로리 총합
+        {{itemList.reduce((sum, item) =>
+        sum + item.totalCalorie, 0)}} kcal</span>
+      <span class="ml-10  "> {{ currentTime }} </span>
     </div>
     <v-row dense class="justify-center">
       <v-col cols="12" md="5">
@@ -150,10 +305,10 @@ const removeItem = (index) => {
 
       </v-col>
       <v-col cols="12" md="6">
-        <v-combobox class="mt-1 w-100" ref="nameBox" v-model.trim="searchFood.foodName" :items="items.foodList"
+        <v-combobox class="mt-1 w-100" ref="nameBox" v-model="searchFood.foodName" :items="items.foodList"
           item-title="foodName" item-value="foodName" label="음식명을 입력하세요" variant="solo-inverted" placeholder="음식명"
-          append-icon="mdi-plus" @update:model-value="onNameInput" @click:append="onNameInput"
-          @keyup.enter="onNameInput ">
+          append-icon="mdi-plus" @update:model-value="onNameInput" @click:append="onItemClick(items.foodList)"
+          @keyup.enter="() => searchFoodName('name')">
 
 
           <template #append-inner>
@@ -162,13 +317,13 @@ const removeItem = (index) => {
           </template>
 
           <template v-slot:item="{ item, props }">
-            <v-list-item v-bind="props" v-if="props.title" @click="onItemClick(item)">
+            <v-list-item v-bind="props" v-if="props.title">
               <!-- <span> {{ item }}</span> -->
               <v-list-item-title>
                 {{ item.value.foodName }}
               </v-list-item-title>
               <v-list-item-subtitle class="text-grey text-body-2 ml-auto d-flex justify-content-between">
-                <span>기준 무게 100g </span> <span>{{ item.raw.calorie || '0' }} kcal</span>
+                <span>기준 무게 100g/ml </span> <span>{{ item.raw.calorie || '0' }} kcal</span>
               </v-list-item-subtitle>
             </v-list-item>
           </template>
@@ -178,41 +333,87 @@ const removeItem = (index) => {
     </v-row>
 
 
+    <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 ">
 
-
-    <v-data-iterator :items="itemList" class="mt-1  pa-3 mb-4 ">
-      <template v-slot:default="{ items }">
-        <div v-if="items.length === 0">
-          <v-alert type="info">추가된 음식이 없습니다.</v-alert>
-        </div>
-        <div v-else class="d-flex flex-column align-center ">
-          <template v-for="(item, i) in items" :key="i">
-            <v-card class="pa-3 mb-4" style="width: 700px">
-              <v-card-title class="d-flex justify-space-between align-center">
-                <div class="d-flex justify-space-between align-center w-100">
-                  <span class="text-body-4 font-weight-bold">{{ item.raw.foodName.replaceAll('"', '') }}</span>
-                  <span class="text-body-4 font-weight-bold">칼로리: {{ item.raw.calorie }} kcal</span>
+      <template v-slot:default="{ item }">
+        <div class="d-flex flex-column align-center  ">
+          <v-card class=" mb-4  rounded-lx" style="width: 600px" variant="tonal">
+            <v-card-title class="pl-5 pt-1">
+              <div class="d-flex justify-space-between w-100 align-start">
+                <!--  왼쪽: 음식 이름 + 기준 칼로리 -->
+                <div class="d-flex flex-column pt-1">
+                  <span class="text-body-4 font-weight-bold" color="black">{{ item.foodName.length > 20 ?
+                    item.foodName.slice(0, 20) + '…' : item.foodName }}</span>
+                  <span class="pt-1 text-body-2 text-darkgrey">100g 기준: {{ item.calorie }} kcal</span>
                 </div>
-                <v-btn icon class="ml-5" color="blue" @click="removeItem(i)">
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </v-card-title>
-              <v-card-subtitle>
-                100g 기준 칼로리: {{ item.raw.calorie }} kcal
-              </v-card-subtitle>
-            </v-card>
-          </template>
+
+                <!--  오른쪽: 양 입력 & 계산된 칼로리 -->
+                <div class="d-flex flex-row align-end mt-2 ml-auto" style="width: 250px">
+                  <div>
+                    <v-text-field v-model.number="item.amount" label="먹은 양 (g/ml)" type="number" variant="underlined"
+                      class="mb-1 mt-0 text-black " hide-details style="width: 80px;" />
+                    <span class="text-body-4 font-weight-bold ">
+                      총 칼로리: {{ calcCalories(item) }} kcal
+                    </span>
+                  </div>
+                  <div>
+                    <v-card-actions>
+                      <v-btn icon color="blue" @click="removeItem(i)">
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </v-card-actions>
+                  </div>
+                </div>
+
+              </div>
+            </v-card-title>
+
+
+          </v-card>
         </div>
       </template>
-    </v-data-iterator>
+      <!-- </v-virtual-scroll> -->
+      <!-- </div> -->
+      <!-- </div> -->
+      <!-- </template> -->
+    </v-virtual-scroll>
+    <div v-if="itemList.length === 0">
+      <v-alert variant="tonal" type="info">추가된 음식이 없습니다.</v-alert>
+    </div>
   </div>
-  <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="meal">
-    <span>식단 홈으로</span> <span>✚</span>
-  </button>
 
+
+
+  <v-btn class="mealsaday text-center " @click="meal">식단 홈으로</v-btn>
+
+  <v-btn class="mealsaday text-center " @click="saveText === '저장하기' ? saveMeal() : updateMeal()">{{ saveText }}</v-btn>
+
+  <!-- <v-btn class="mealsaday text-center " @click="modifyMeal">수정</v-btn> -->
 
 
 </template>
 
-    <style scoped>
-  </style>
+<style scoped>
+.scroll-container {
+  height: 600px;
+  /* 원하는 높이 */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+
+.mealsaday {
+  width: 150px;
+  height: 70px;
+  background-color: #3bbeff;
+  color: white;
+  border: none;
+  font-weight: 1000;
+  font-size: 15px;
+  font-family: 'Noto Sans KR', sans-serif;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 50px;
+}
+</style>
