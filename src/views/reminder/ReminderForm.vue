@@ -239,8 +239,8 @@ const submit = async () => {
           v-model="state.reminder.content"
         ></textarea>
       </div>
-      <button @click="submit" class="button">
-        {{ state.reminder.id > 0 ? '수정  하기' : '추가하기' }}
+      <button @click="submit">
+        {{ state.reminder.id > 0 ? '수정하기' : '추가하기' }}
       </button>
     </div>
   </div>
