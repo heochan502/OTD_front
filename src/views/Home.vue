@@ -44,38 +44,55 @@ onMounted(async () => {
 
 <template>
   <Weather />
-  <router-link class="link" to="/reminder">
-    <div class="header flex justify-between items-center w-full px-4 pt-2">
-      <span class="list-title px-4 py-1 text-white font-semibold text-sm"
-        >오늘의 일정</span
-      >
-    </div>
-    <div class="reminder">
-      <span class="list-date">
-        {{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
-      >
-      <ul class="list">
-        <template v-if="state.todayReminder.length > 0">
-          <li
-            v-for="item in state.todayReminder"
-            :key="item.id"
-            class="list-card"
+  <div class="home-layout">
+    <div class="reminder-wrapper">
+      <router-link class="link" to="/reminder">
+        <div class="header flex justify-between items-center w-full px-4 pt-2">
+          <span class="list-title px-4 py-1 text-white font-semibold text-sm"
+            >오늘의 일정</span
           >
-            <span class="reminder-title">• {{ item.title }}</span>
-          </li>
-        </template>
-        <template v-else>
-          <span class="empty-comment">"오늘은 한가한 하루네요!"</span>
-        </template>
-      </ul>
+        </div>
+        <div class="reminder">
+          <span class="list-date">
+            {{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+          >
+          <ul class="list">
+            <template v-if="state.todayReminder.length > 0">
+              <li
+                v-for="item in state.todayReminder"
+                :key="item.id"
+                class="list-card"
+              >
+                <span class="reminder-title">• {{ item.title }}</span>
+              </li>
+            </template>
+            <template v-else>
+              <li class="empty-wrapper">
+                <span class="empty-comment">"오늘은 한가한 하루네요!"</span>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </router-link>
     </div>
-  </router-link>
-  <div>
-    <ReportCard />
+
+    <div class="report-wrapper">
+      <ReportCard />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.home-layout {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.reminder-wrapper,
+.report-wrapper {
+  width: 50%;
+}
+
 .header {
   display: flex;
   border-radius: 16px 16px 0 0;
@@ -109,31 +126,38 @@ onMounted(async () => {
   margin: 0 1rem;
   border-radius: 0 16px 16px 16px;
   padding: 1rem;
-  width: 50%;
-  min-height: 30%;
-}
+  min-height: 400px;
 
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 1rem;
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem;
 
-  .list-card {
-    width: 100%;
-    height: 35px;
-    background-color: #fff;
-    margin-bottom: 8px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
+    .list-card {
+      width: 100%;
+      height: 35px;
+      background-color: #fff;
+      margin-bottom: 8px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
 
-    .reminder-title {
-      color: #575757;
-      margin-left: 15px;
-      font-weight: bold;
+      .reminder-title {
+        color: #575757;
+        margin-left: 15px;
+        font-weight: bold;
+      }
     }
   }
 }
+.empty-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 280px;
+  width: 100%;
+}
+
 .empty-comment {
   width: 100%;
   text-align: center;
