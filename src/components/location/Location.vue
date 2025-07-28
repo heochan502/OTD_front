@@ -1,14 +1,16 @@
 <script setup>
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, watch, onMounted } from 'vue';
 import {
   getLocalName,
   getLocalList,
   selectLocation,
   saveLocation,
   removeLocation,
-} from "@/services/weather/locationService";
+} from '@/services/weather/locationService';
+import { useRouter } from 'vue-router';
 
-const keyword = ref("");
+const router = useRouter();
+const keyword = ref('');
 const selectedLocation = ref(null);
 const state = reactive({
   items: [], // 지역 검색 결과 리스트
@@ -18,7 +20,7 @@ const state = reactive({
 
 const searchLocation = async () => {
   if (!keyword.value.trim()) {
-    alert("지역명을 입력하세요");
+    alert('지역명을 입력하세요');
     return;
   }
   const res = await getLocalName(keyword.value);
@@ -35,29 +37,35 @@ const saveLocal = (searchText) => {
   );
 };
 
-const selectWeatherLocation = async (localId) => {
+const selectWeatherLocation = async (localId, locationName) => {
   const res = await selectLocation(localId);
   if (res && res.status === 200) {
-    alert("해당 지역이 홈화면에 표시됩니다.");
+    if (
+      confirm(
+        `${locationName}이(가) 선택 되었습니다. \n홈 화면으로 이동하시겠습니까?`
+      )
+    ) {
+      router.push('/');
+    }
   }
 };
 
 const saveSearchedLocation = async () => {
   if (!selectedLocation.value || !selectedLocation.value.localId) {
-    alert("지역 정보가 일치하지 않습니다");
+    alert('지역 정보가 일치하지 않습니다');
     console.log(selectedLocation.value);
     return;
   }
   await saveLocation(selectedLocation.value.localId);
-  alert("지역이 저장되었습니다");
+  alert('지역이 저장되었습니다');
   await LocalList();
 };
 
 const removeLocal = async (localId) => {
-  if (confirm("선택한 지역을 삭제하시겠습니까?")) {
+  if (confirm('선택한 지역을 삭제하시겠습니까?')) {
     const res = await removeLocation(localId);
     if (res.status === 200) {
-      alert("삭제되었습니다.");
+      alert('삭제되었습니다.');
       await LocalList();
     }
   }
@@ -66,11 +74,11 @@ const removeLocal = async (localId) => {
 const LocalList = async () => {
   const res = await getLocalList();
   state.list = res.data;
-  console.log("locallist", state.list);
+  console.log('locallist', state.list);
 };
 
 watch(keyword, async (val) => {
-  if (!val || typeof val !== "string" || !val.trim()) return {};
+  if (!val || typeof val !== 'string' || !val.trim()) return {};
   await searchLocation();
 });
 
@@ -103,7 +111,7 @@ onMounted(() => {
     <ul class="list-group list-group-flush">
       <li
         class="list-group-item d-flex align-items-center justify-content-between"
-        v-for="(item, index) in state.list"
+        v-for="item in state.list"
         :key="index"
       >
         <span class="location-name">
@@ -112,7 +120,12 @@ onMounted(() => {
         <div class="d-flex gap-2">
           <button
             class="btn btn-outline-primary btn-sm"
-            @click="selectWeatherLocation(item.localId)"
+            @click="
+              selectWeatherLocation(
+                item.localId,
+                `${item.city} ${item.county} ${item.town}`
+              )
+            "
           >
             홈화면에 표시
           </button>
@@ -131,6 +144,9 @@ onMounted(() => {
 <style lang="scss" scoped>
 .list {
   color: black;
+}
+.location-name {
+  font-size: 25px;
 }
 .location-wrapper {
   max-width: 700px;
