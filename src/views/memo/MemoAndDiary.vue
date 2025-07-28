@@ -5,6 +5,7 @@
       <button @click="goToMemo">📝 메모 등록</button>
       <button @click="goToDiary">📔 다이어리 등록</button>
     </div>
+    <router-view />
   </div>
 </template>
 
@@ -14,11 +15,11 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const goToMemo = () => {
-  router.push('/memo/list');
+router.push({ name: 'MemoDetail' });
 };
 
 const goToDiary = () => {
-  router.push('/diary/create');
+router.push({ name: 'DiaryDetail' });
 };
 </script>
 

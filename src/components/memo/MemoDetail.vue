@@ -60,7 +60,7 @@ const changePage = (num) => {
 };
 
 const goToMemoDetail = (id) => {
-  if (route.params.id !== id) router.push(`/memo/${id}`);
+  if (route.params.id !== id) router.push(`/memoAndDiary/memo/${id}`);
 };
 
 const saveMemo = async () => {
@@ -70,19 +70,42 @@ const saveMemo = async () => {
   }
 
   try {
+    const files = Array.from(fileInputRef.value?.files || []);
+
     if (isEditMode.value) {
-      await MemoHttpService.modify({ id: memo.value.id, ...memo.value });
+      const formData = new FormData();
+      formData.append(
+        'memoData',
+        new Blob([
+          JSON.stringify({
+            id: memo.value.id,
+            memoName: memo.value.memoName,
+            memoContent: memo.value.memoContent,
+            memoImage: memo.value.imageFileName,
+          }),
+        ], { type: 'application/json' })
+      );
+      files.forEach((f) => formData.append('memoImageFiles', f));
+      await MemoHttpService.modify(formData);
     } else {
       const formData = new FormData();
-      formData.append('memoName', memo.value.memoName);
-      formData.append('memoContent', memo.value.memoContent);
-      const files = Array.from(fileInputRef.value?.files || []);
+      formData.append(
+        'memoData',
+        new Blob([
+          JSON.stringify({
+            memoName: memo.value.memoName,
+            memoContent: memo.value.memoContent,
+          }),
+        ], { type: 'application/json' })
+      );
       files.forEach((f) => formData.append('memoImageFiles', f));
       await MemoHttpService.create(formData);
     }
 
     alert('저장 완료');
-    router.push('/memo');
+    state.currentPage = 1;
+    await fetchMemoList();
+    router.push('/memoAndDiary/memo');
   } catch {
     alert('저장 실패');
   }
@@ -94,7 +117,9 @@ const deleteMemo = async () => {
   try {
     await MemoHttpService.deleteById(memo.value.id);
     alert('삭제 완료');
-    router.push('/memo');
+    state.currentPage = 1;
+    await fetchMemoList();
+    router.push('/memoAndDiary/memo');
   } catch {
     alert('삭제 실패');
   }
@@ -116,27 +141,33 @@ onMounted(async () => {
   } else {
     setMode('view');
     await fetchMemo(routeId.value);
+    await fetchMemoList();
   }
 });
 </script>
 
 <template>
-  <div class="memo-detail-container">
-    <h2>{{ isCreateMode ? '메모 작성' : isEditMode ? '메모 수정' : '메모 보기' }}</h2>
+  <div class="memo-wrapper">
+    <div class="memo-detail">
+      <h2>메모</h2>
 
-    <div class="input-section">
-      <label>제목</label>
-      <input v-model="memo.memoName" :readonly="isViewMode" />
-    </div>
-
-    <div class="input-section">
-      <label>내용</label>
-      <textarea v-model="memo.memoContent" rows="10" :readonly="isViewMode" />
-    </div>
-
-    <div class="input-section">
-      <label>이미지 업로드 (최대 5장)</label>
+      <label for="memoName">제목</label>
       <input
+        id="memoName"
+        type="text"
+        v-model="memo.memoName"
+      />
+
+      <label for="memoContent">내용</label>
+      <textarea
+        id="memoContent"
+        v-model="memo.memoContent"
+        rows="10"
+      />
+
+      <label for="imageUpload">이미지 업로드 (최대 5장)</label>
+      <input
+        id="imageUpload"
         type="file"
         ref="fileInputRef"
         accept=".jpg, .jpeg, .png, .gif"
@@ -144,6 +175,7 @@ onMounted(async () => {
         @change="handleImageChange"
         :disabled="isViewMode"
       />
+
       <div class="preview-list">
         <div
           v-for="(img, index) in previewImages"
@@ -159,50 +191,58 @@ onMounted(async () => {
             X
           </button>
         </div>
-        <p v-if="hasNoImages">등록된 이미지가 없습니다.</p>
-        <p v-else-if="typeof imageCount === 'number' && imageCount >= 5">
+        <p v-if="hasNoImages" class="empty-message">등록된 이미지가 없습니다.</p>
+        <p
+          v-else-if="typeof imageCount === 'number' && imageCount >= 5"
+          class="empty-message"
+        >
           이미지는 최대 5장까지 등록할 수 있습니다.
         </p>
       </div>
-    </div>
 
-    <div class="button-group">
-      <button v-if="isCreateMode" @click="saveMemo">등록</button>
-      <button v-if="isEditMode" @click="saveMemo">수정 완료</button>
-      <button v-if="isViewMode" @click="enableEdit">수정</button>
-      <button v-if="isViewMode" @click="deleteMemo" class="btn-danger">
-        삭제
-      </button>
-      <button @click="router.push('/memo')">뒤로</button>
-    </div>
-
-    <hr style="margin: 40px 0; border-top: 1px solid #ccc;" />
-    <h3>메모 목록</h3>
-
-    <div class="memo-list-section">
-      <div v-if="state.memoList.length === 0" class="empty-message">
-        등록된 메모가 없습니다.
+      <div class="button-group">
+        <button v-if="isCreateMode" @click="saveMemo">등록</button>
+        <button v-if="isEditMode" @click="saveMemo">수정 완료</button>
+        <button v-if="isViewMode" @click="enableEdit">수정</button>
+        <button v-if="isViewMode" @click="deleteMemo" class="btn-danger">
+          삭제
+        </button>
+        <button @click="router.push('/memoAndDiary/memo')">뒤로</button>
       </div>
-      <ul v-else class="memo-items">
-        <li
-          v-for="item in state.memoList"
-          :key="item.id"
-          class="memo-item"
-          @click="goToMemoDetail(item.id)"
-        >
-          <strong>{{ item.memoName }}</strong>
-          <span>{{ item.memoContent.slice(0, 50) }}...</span>
-          <small>{{ formatDateTime(item.createdAt) }}</small>
-        </li>
-      </ul>
-      <div class="pagination">
-        <button @click="changePage(state.currentPage - 1)" :disabled="state.currentPage <= 1">
-          이전
-        </button>
-        <span>{{ state.currentPage }} / {{ totalPages }}</span>
-        <button @click="changePage(state.currentPage + 1)" :disabled="state.currentPage >= totalPages">
-          다음
-        </button>
+
+      <div class="memo-list" v-if="!isCreateMode">
+        <h3>전체 메모 목록</h3>
+        <div v-if="state.memoList.length === 0" class="empty-message">
+          등록된 메모가 없습니다.
+        </div>
+        <ul class="memo-items" v-else>
+          <li
+            v-for="item in state.memoList"
+            :key="item.id"
+            class="memo-item"
+            @click="goToMemoDetail(item.id)"
+          >
+            <div class="memo-title">{{ item.memoName }}</div>
+            <div class="memo-content">{{ item.memoContent }}</div>
+            <div class="memo-date">{{ formatDateTime(item.createdAt) }}</div>
+          </li>
+        </ul>
+
+        <div class="pagination">
+          <button
+            @click="changePage(state.currentPage - 1)"
+            :disabled="state.currentPage <= 1"
+          >
+            이전
+          </button>
+          <span>{{ state.currentPage }} / {{ totalPages }}</span>
+          <button
+            @click="changePage(state.currentPage + 1)"
+            :disabled="state.currentPage >= totalPages"
+          >
+            다음
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -27,6 +27,8 @@ import ElogEdit from "@/views/health/ElogEdit.vue";
 import MemoDetail from "@/components/memo/MemoDetail.vue";
 import DiaryDetail from "@/components/memo/DiaryDetail.vue";
 import MemoAndDiary from "@/views/memo/MemoAndDiary.vue";
+import MemoList from "@/components/memo/MemoList.vue";
+import DiaryList from "@/components/memo/DiaryList.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -125,16 +127,15 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: "/memo/",
-      name: "memo",
-      component: Memo,
-      props: true,
-    },
-    {
-      path: "/diary",
-      name: "diary",
-      component: Diary,
-      props: true,
+      path: "/memoAndDiary",
+      name: "MemoAndDiary",
+      component: MemoAndDiary,
+      children: [
+      { path: "memo", name: "MemoDetail", component: MemoDetail, props: true },
+      { path: "diary", name: "DiaryDetail", component: DiaryDetail, props: true, },
+      { path: "memolist", name: "MemoList", component: MemoList, props: true, },
+      { path: "diarylist", name: "DiaryList", component: DiaryList, props: true, },        
+    ],
     },
     {
       path: '/detail',

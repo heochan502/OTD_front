@@ -1,5 +1,15 @@
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAccountStore } from '@/stores/counter.js';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
+
+export const MOOD_OPTIONS = [
+  { value: '', label: '선택' },
+  { value: 'happy', label: '😊 행복' },
+  { value: 'sad', label: '😢 슬픔' },
+  { value: 'angry', label: '😠 화남' },
+  { value: 'neutral', label: '😐 보통' },
+];
 
 export function useDiaryDetail() {
   const diary = ref({
@@ -11,13 +21,19 @@ export function useDiaryDetail() {
     mood: '',
   });
 
-  const previewImages = ref([]);
   const fileInputRef = ref(null);
-  const mode = ref('view'); // 'create', 'view', 'edit'
+  const previewImages = ref([]);
+  const mode = ref('view');
 
   const isCreateMode = computed(() => mode.value === 'create');
-  const isViewMode = computed(() => mode.value === 'view');
   const isEditMode = computed(() => mode.value === 'edit');
+  const isViewMode = computed(() => mode.value === 'view');
+  const imageCount = computed(() => previewImages.value.length);
+  const hasNoImages = computed(() => isViewMode.value && imageCount.value === 0);
+
+  const router = useRouter();
+  const route = useRoute();
+  const accountStore = useAccountStore();
 
   const setMode = (newMode) => (mode.value = newMode);
 
@@ -30,46 +46,139 @@ export function useDiaryDetail() {
       imageFileName: null,
       mood: '',
     };
+    previewImages.value.forEach((url) => {
+      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+    });
     previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = null;
+    if (fileInputRef.value) fileInputRef.value.value = '';
   };
 
   const fetchDiary = async (id) => {
-    const result = await DiaryHttpService.findById(id);
-    diary.value = result;
-
-    previewImages.value = [];
-    if (result.imageFileName) {
-      previewImages.value.push(`/pic/${result.imageFileName}`);
+    try {
+      const { resultData } = await DiaryHttpService.findById(id);
+      if (!resultData) {
+        alert('해당 일기를 불러올 수 없습니다.');
+        return router.push('/memoAndDiary/diary');
+      }
+      diary.value = resultData;
+      previewImages.value = resultData.imageFileName
+        ? [`/pic/${resultData.imageFileName}`]
+        : [];
+    } catch (e) {
+      alert('일기 조회 중 오류 발생');
+      console.error(e);
+      router.push('/memoAndDiary/diary');
     }
   };
 
-  const handleImageChange = (e) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 업로드 가능합니다.');
-      fileInputRef.value.value = null;
+    const extAllowed = ['jpg', 'jpeg', 'png', 'gif'];
+    const maxSize = 5 * 1024 * 1024;
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (!extAllowed.includes(ext)) {
+      alert('허용되지 않는 파일 형식입니다.');
+      return;
+    }
+    if (file.size > maxSize) {
+      alert('파일 크기가 5MB를 초과합니다.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      previewImages.value = [event.target.result];
-    };
-    reader.readAsDataURL(file);
+    previewImages.value.forEach((url) => {
+      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+    });
+    previewImages.value = [URL.createObjectURL(file)];
   };
 
   const removeImage = () => {
+    if (previewImages.value[0]?.startsWith('blob:')) {
+      URL.revokeObjectURL(previewImages.value[0]);
+    }
     previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = null;
+    if (fileInputRef.value) fileInputRef.value.value = '';
     diary.value.imageFileName = null;
   };
 
-  const hasNoImages = computed(() => previewImages.value.length === 0);
-  const imageCount = computed(() => previewImages.value.length);
+  const createDiary = async () => {
+    try {
+      const formData = new FormData();
+      formData.append(
+        'diaryData',
+        new Blob([JSON.stringify(diary.value)], { type: 'application/json' })
+      );
+
+      const file = fileInputRef.value?.files?.[0];
+      if (file) formData.append('diaryImageFiles', file);
+
+      const result = await DiaryHttpService.create(formData);
+      alert('일기가 등록되었습니다.');
+      router.push(`/memoAndDiary/diary/${result.id}`);
+    } catch (e) {
+      alert('일기 등록 실패');
+      console.error(e);
+    }
+  };
+
+  const updateDiary = async () => {
+    try {
+      const formData = new FormData();
+      formData.append(
+        'diaryData',
+        new Blob([JSON.stringify(diary.value)], { type: 'application/json' })
+      );
+
+      const file = fileInputRef.value?.files?.[0];
+      if (file) formData.append('diaryImageFiles', file);
+
+      await DiaryHttpService.modify(formData);
+      alert('수정 완료');
+      setMode('view');
+      await fetchDiary(diary.value.id);
+    } catch (e) {
+      alert('수정 실패');
+      console.error(e);
+    }
+  };
+
+  const deleteDiary = async () => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await DiaryHttpService.deleteById(diary.value.id);
+      alert('삭제 완료');
+      router.push('/memoAndDiary/diary');
+    } catch (e) {
+      alert('삭제 실패');
+      console.error(e);
+    }
+  };
+
+  const cancelEdit = async () => {
+    if (diary.value.id) {
+      setMode('view');
+      await fetchDiary(diary.value.id);
+    } else {
+      router.push('/memoAndDiary/diary');
+    }
+  };
+
+  onMounted(async () => {
+    if (!accountStore.state.loggedIn) {
+      alert('로그인 후 이용해주세요.');
+      return router.push('/account/login');
+    }
+
+    const id = route.params.id;
+    if (id && id !== 'create') {
+      setMode('view');
+      await fetchDiary(id);
+    } else {
+      setMode('create');
+    }
+  });
 
   return {
     diary,
@@ -77,8 +186,8 @@ export function useDiaryDetail() {
     fileInputRef,
     mode,
     isCreateMode,
-    isViewMode,
     isEditMode,
+    isViewMode,
     setMode,
     clearForm,
     fetchDiary,
@@ -86,5 +195,10 @@ export function useDiaryDetail() {
     removeImage,
     hasNoImages,
     imageCount,
+    createDiary,
+    updateDiary,
+    deleteDiary,
+    cancelEdit,
+    MOOD_OPTIONS,
   };
 }

@@ -9,14 +9,9 @@ export default [
     component: MemoAndDiary,
   },
   {
-    path: '/memo/list',
-    name: 'MemoList',
-    component: MemoList,
-  },
-  {
-    path: '/memo/add',
+    path: '/memo/create',
     name: 'MemoAdd',
-    component: MemoDetail,
+    component: MemoList,
   },
   {
     path: '/memo/:id',

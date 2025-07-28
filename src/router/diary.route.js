@@ -1,11 +1,11 @@
-import DiaryCreate from '@/components/diary/DiaryCreate.vue';
 import DiaryDetail from '@/components/diary/DiaryDetail.vue';
 
 export default [
   {
-    path: '/diary/add',
-    name: 'DiaryAdd',
-    component: DiaryCreate,
+    path: '/diary/create',
+    name: 'DiaryCreate',
+    component: DiaryDetail,
+    props: true,
   },
   {
     path: '/diary/:id',

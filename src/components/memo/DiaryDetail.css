@@ -1,3 +1,25 @@
+:root {
+  --color-primary: #50C3F7;
+  --color-skyblue: #87ceeb;
+  --color-skyblue-hover: #87ceeb;
+  --color-text-dark: #000;
+  --color-text-light: #555;
+  --color-gray-e0: #e0e0e0;
+  --color-gray-ccc: #ccc;
+  --color-gray-a0: #a0a0a0;
+  --color-gray-eee: #eee;
+  --color-red-danger: #dc3545;
+  --color-red-danger-hover: #c82333;
+  --memo-clicked-bg: #f0f8ff;
+  --memo-hover-bg: #f5f5f5;
+  --spacing-sm: 5px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --border-radius-base: 8px;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+}
+
 .diary-wrapper {
   width: 100%;
   margin: 0;
@@ -13,40 +35,41 @@
 
 .diary-detail {
   max-width: 800px;
-  margin: 40px auto;
-  padding: 30px 40px;
+  margin: var(--spacing-lg) auto;
+  padding: var(--spacing-lg);
   background-color: #f9f9f9;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px var(--shadow-light);
+  color: var(--color-text-dark);
 }
 
 .diary-detail h2 {
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-md);
   color: var(--color-text-dark);
 }
 
 .diary-detail label {
   display: block;
-  margin-top: 24px;
+  margin-top: var(--spacing-lg);
   font-weight: bold;
-  font-size: 20px;
+  font-size: 1.2rem;
   color: var(--color-text-dark);
 }
 
-/* ✅ 제목과 내용 input/textarea 너비 통일 & 오른쪽 끝까지 확장 */
 .diary-detail input[type="text"],
 .diary-detail textarea {
   width: 100%;
-  font-size: 18px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-top: 8px;
-  margin-bottom: 24px;
+  font-size: 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-gray-ccc);
+  border-radius: var(--border-radius-base);
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
   box-sizing: border-box;
+  color: var(--color-text-dark);
 }
 
 .diary-detail textarea {
@@ -55,23 +78,25 @@
 }
 
 .diary-detail input[type="file"] {
-  margin-top: 10px;
-  color: var(--color-text-dark)
+  margin-top: var(--spacing-sm);
+  color: var(--color-text-dark);
 }
 
+/* === 이미지 미리보기 === */
 .preview-list {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 10px;
-  gap: 10px;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
 }
 
 .preview-item {
   position: relative;
   width: 120px;
   height: 120px;
-  background-color: #eee;
-  border-radius: 8px;
+  background-color: var(--color-gray-eee);
+  border: 1px solid var(--color-gray-eee);
+  border-radius: var(--border-radius-base);
   overflow: hidden;
 }
 
@@ -79,45 +104,47 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: var(--border-radius-base);
 }
 
 .remove-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   width: 24px;
   height: 24px;
-  background-color: rgba(255, 0, 0, 0.7);
+  background-color: var(--color-red-danger);
   color: white;
   border: none;
   border-radius: 50%;
   font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .remove-btn:hover {
-  background-color: red;
+  background-color: var(--color-red-danger-hover);
 }
 
+/* === 버튼 그룹 === */
 .diary-detail .button-group {
   display: flex;
   justify-content: center;
-  align-items: center;
-  text-align: center;
-  margin-top: 20px;
-  gap: 10px;
   flex-wrap: wrap;
-  color: var(--color-text-dark);
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
 }
 
 .diary-detail button {
   padding: 10px 20px;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius-base);
   cursor: pointer;
   border: none;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
   color: var(--color-text-dark);
 }
 
@@ -125,10 +152,11 @@
   opacity: 0.9;
 }
 
+/* === 리스트 === */
 .diary-detail .diary-list {
-  margin-top: 40px;
-  border-top: 1px dashed #ccc;
-  padding-top: 20px;
+  margin-top: var(--spacing-lg);
+  border-top: 1px dashed var(--color-gray-e0);
+  padding-top: var(--spacing-md);
 }
 
 .diary-detail .diary-list ul {
@@ -140,22 +168,23 @@
   margin-bottom: 10px;
 }
 
+/* === 페이지네이션 === */
 .pagination {
-  margin-top: 20px;
+  margin-top: var(--spacing-md);
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
 
 .pagination button {
   padding: 6px 12px;
   font-size: 0.95rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-primary);
   background-color: var(--color-primary);
-  color: #000;
-  border-radius: 6px;
+  color: black;
+  border-radius: var(--spacing-sm);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .pagination button:disabled {
@@ -164,9 +193,25 @@
   cursor: not-allowed;
 }
 
+.pagination button:hover:not(:disabled) {
+  background-color: var(--color-skyblue-hover);
+}
+
 h3 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: var(--color-text-dark);
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-dark);
+}
+
+/* === 공통 빈 메시지 === */
+.empty-message {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-dark);
+  text-align: center;
+  background-color: #f9f9f9;
+  padding: 1rem;
+  margin-top: var(--spacing-lg);
+  border-radius: var(--border-radius-base);
 }
