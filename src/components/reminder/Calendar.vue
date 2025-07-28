@@ -169,7 +169,7 @@ const todayColor = (day) => {
 </script>
 <template>
   <div class="calendar">
-    <h2 class="calendar_title">
+    <h3 class="calendar_title">
       <a href="#" @click.prevent="prevMonth"
         ><img src="/src/image/button.png" alt="이전 달 보기" class="rotate"
       /></a>
@@ -179,7 +179,7 @@ const todayColor = (day) => {
       <a href="#" @click.prevent="nextMonth"
         ><img src="/src/image/button.png" alt="다음 달 보기"
       /></a>
-    </h2>
+    </h3>
     <table class="table">
       <thead>
         <tr>
@@ -216,11 +216,12 @@ const todayColor = (day) => {
 <style lang="scss" scoped>
 .calendar {
   border-radius: 20px;
-  margin-top: 50px;
-  margin-left: 50px;
-  width: 600px;
-  padding: 30px;
+  border: #dedede solid 1px;
+  margin-top: 70px;
+  width: 630px;
   background-color: #fff;
+  padding: 35px 45px 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
   .calendar_title {
     display: flex;
@@ -249,6 +250,7 @@ const todayColor = (day) => {
       cursor: pointer;
       text-align: center;
       vertical-align: middle;
+      height: 70px;
       .date {
         display: flex;
         align-items: center;
@@ -257,9 +259,10 @@ const todayColor = (day) => {
         height: 50px;
         font-weight: bold;
         border-radius: 100%;
+        margin: auto;
       }
       .reminder_color {
-        background-color: rgb(205, 236, 250);
+        background-color: #bfeaff;
       }
     }
     .today_color {
