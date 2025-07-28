@@ -167,6 +167,8 @@ const submit = async () => {
       return;
     }
     alert('일정을 추가했어요!');
+    reminderStore.setReload(true);
+    console.log('pinia', reminderStore.reload);
     router.push('/reminder');
   }
 };

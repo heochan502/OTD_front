@@ -23,9 +23,10 @@ onMounted(async () => {
     }
   }
 
-  const formattedToday = `${year}-${String(month).padStart(2, '0')}-${String(
-    today.getDate()
-  ).padStart(2, '0')}`;
+  const formattedToday = `${todayYear}-${String(todayMonth).padStart(
+    2,
+    '0'
+  )}-${String(todayDate).padStart(2, '0')}`;
   const dow = today.getDay();
 
   state.todayReminder = reminderStore.state.fullReminder.filter((item) => {
