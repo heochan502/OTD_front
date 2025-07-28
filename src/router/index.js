@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import ReminderHome from "@/views/reminder/ReminderHome.vue";
-import RoutineHome from "@/components/routine/RoutineHome.vue";
 import ReminderForm from "@/views/reminder/ReminderForm.vue";
 import ReminderList from "@/views/reminder/ReminderList.vue";
 
@@ -56,13 +55,8 @@ const router = createRouter({
       component: ReminderList,
     },
     {
-      path: "/routine",
-      name: "routine",
-      component: RoutineHome,
-    },
-    {
-      path: "/meal",
-      name: "MealForm",
+      path: '/meal',
+      name: 'MealForm',
       component: MealForm,
     },
     {
@@ -122,14 +116,14 @@ const router = createRouter({
       component: Location,
     },
     {
-      path: "/memo/",
-      name: "memo",
+      path: '/memo/',
+      name: 'memo',
       component: Memo,
       props: true,
     },
     {
-      path: "/diary",
-      name: "diary",
+      path: '/diary',
+      name: 'diary',
       component: Diary,
       props: true,
     },
