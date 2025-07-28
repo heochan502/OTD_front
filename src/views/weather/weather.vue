@@ -97,10 +97,10 @@ onMounted(async () => {
   <div class="weather-alert" v-if="weather">
     <strong>{{ nickName }}님~</strong>{{ popMessage }}
   </div>
-  <div class="flex justify-between items-center w-full px-4 pt-2">
-    <button class="live px-4 py-1 text-white font-semibold text-sm">
+  <div class="header flex justify-between items-center w-full px-4 pt-2">
+    <span class="live px-4 py-1 text-white font-semibold text-sm">
       실시간 날씨 정보
-    </button>
+    </span>
     <button @click="toggleMenu" class="menu px-2 py-1 text-sm font-bold">
       ☰ 날씨 메뉴
     </button>
@@ -155,9 +155,14 @@ onMounted(async () => {
     margin-right: 0.3rem;
   }
 }
-.live {
-  background-color: #3bbeff;
-  border-radius: 16px 16px 0 0;
+.header {
+  display: flex;
+
+  .live {
+    background-color: #3bbeff;
+    border-radius: 16px 16px 0 0;
+    gap: 0;
+  }
 }
 
 .menu {
