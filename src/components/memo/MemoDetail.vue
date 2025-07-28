@@ -1,14 +1,12 @@
 <script setup>
 import '@/components/memo/memoDetail.css';
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useAccountStore } from '@/stores/counter';
 import { useMemoDetail } from './useMemoDetail';
-import MemoService from '@/services/memo/MemoHttpService';
+import MemoHttpService from '@/services/memo/MemoHttpService.js';
 import { formatDateTime } from '@/utils/MemoAndDiaryApi';
-import '@/components/memo/MemoDetail.css';
+import api from '@/utils/MemoAndDiaryApi';
 
-const account = accountStore();
 const route = useRoute();
 const router = useRouter();
 const routeId = computed(() => route.params.id);
@@ -28,31 +26,33 @@ const {
   removeImage,
 } = useMemoDetail();
 
-const memoList = ref([]);
-const currentPage = ref(1);
-const pageSize = ref(5);
-const totalMemos = ref(0);
+const state = reactive({
+  memoList: [],
+  currentPage: 1,
+  pageSize: 5,
+  totalMemos: 0,
+});
 
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil(totalMemos.value / pageSize.value))
+  Math.max(1, Math.ceil(state.totalMemos / state.pageSize))
 );
 
 const fetchMemoList = async () => {
   try {
-    const res = await MemoService.findAll({
-      currentPage: currentPage.value,
-      pageSize: pageSize.value,
+    const result = await MemoHttpService.findAll({
+      currentPage: state.currentPage,
+      pageSize: state.pageSize
     });
-    memoList.value = res.data.memoList || [];
-    totalMemos.value = res.data.totalCount || 0;
-  } catch (e) {
+    state.memoList = result.memoList;
+    state.totalMemos = result.totalCount;
+  } catch (err) {
     alert('메모 목록 로딩 실패');
   }
 };
 
 const changePage = (num) => {
   if (num >= 1 && num <= totalPages.value) {
-    currentPage.value = num;
+    state.currentPage = num;
     fetchMemoList();
   }
 };
@@ -62,35 +62,24 @@ const goToMemoDetail = (id) => {
 };
 
 const saveMemo = async () => {
-  if (!memo.value.memoName?.trim()) {
-    alert('제목을 입력하세요');
-    return;
-  }
-  if (!memo.value.memoContent?.trim()) {
-    alert('내용을 입력하세요');
+  if (!memo.value.memoName?.trim() || !memo.value.memoContent?.trim()) {
+    alert('제목과 내용을 모두 입력하세요.');
     return;
   }
 
   try {
     if (isEditMode.value) {
-      await MemoService.modify({ id: memo.value.id, ...memo.value });
+      await MemoHttpService.modify({ id: memo.value.id, ...memo.value });
     } else {
       const formData = new FormData();
       formData.append('memoName', memo.value.memoName);
       formData.append('memoContent', memo.value.memoContent);
-
       const files = Array.from(fileInputRef.value?.files || []);
-      if (files.length > 5) {
-        alert('이미지는 최대 5장까지 업로드 가능합니다.');
-        return;
-      }
-
-      files.forEach(file => formData.append('memoImageFiles', file));
-      await MemoService.create(formData);
+      files.forEach(f => formData.append('memoImageFiles', f));
+      await MemoHttpService.create(formData);
     }
 
     alert('저장 완료');
-    await fetchMemoList();
     router.push('/memo');
   } catch (e) {
     alert('저장 실패');
@@ -101,44 +90,30 @@ const deleteMemo = async () => {
   if (!confirm('정말 삭제하시겠습니까?')) return;
 
   try {
-    await MemoService.deleteById(memo.value.id);
+    await MemoHttpService.deleteById(memo.value.id);
     alert('삭제 완료');
-    memoList.value = memoList.value.filter(item => item.id !== memo.value.id);
-    await fetchMemoList();
     router.push('/memo');
-  } catch (e) {
+  } catch {
     alert('삭제 실패');
   }
 };
 
-const enableEdit = () => {
-  setMode('edit');
-};
+const enableEdit = () => setMode('edit');
 
 onMounted(async () => {
-  if (!accountStore().isLoggedIn) {
-    alert('로그인 후 이용해주세요.');
-    return router.push('/account/login');
+  try {
+    await api.get('/account/check');
+  } catch {
+    return;
   }
 
-  if (!routeId) {
+  if (!routeId.value || routeId.value === 'create') {
     setMode('create');
     clearForm();
+    await fetchMemoList();
   } else {
     setMode('view');
-    await fetchMemo(routeId);
-  }
-
-  await fetchMemoList();
-});
-
-watch(() => route.params.id, async (newId) => {
-  if (!newId) {
-    setMode('create');
-    clearForm();
-  } else {
-    setMode('view');
-    await fetchMemo(newId);
+    await fetchMemo(routeId.value);
   }
 });
 </script>

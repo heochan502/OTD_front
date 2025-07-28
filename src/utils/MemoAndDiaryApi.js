@@ -1,26 +1,17 @@
 import axios from 'axios';
 
+// 백엔드 서버의 실제 도메인 주소 명시
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/OTD',
-  withCredentials: true, // 세션 쿠키 포함
+  withCredentials: true, // ✅ 세션 쿠키 포함
 });
 
-// ❌ 세션 기반이므로 토큰 헤더는 제거 (아래 주석 처리 가능)
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("accessToken");
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
-
-// ✅ 인증 에러 시 로그인 페이지로 이동
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.error("401 인증 오류 → 로그인 페이지로 이동");
-      window.location.href = "/account/login"; // 경로는 프로젝트에 맞게 조정
+      console.warn('401 인증 오류 → 로그인 페이지로 이동');
+      window.location.href = '/account/login'; // 프로젝트 경로에 맞게 조정
     }
     return Promise.reject(error);
   }

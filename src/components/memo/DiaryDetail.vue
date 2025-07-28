@@ -1,14 +1,12 @@
 <script setup>
 import '@/components/memo/diaryDetail.css';
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useDiaryDetail } from './useDiaryDetail.js';
 import DiaryService from '@/services/memo/DiaryHttpService.js';
-import { formatDateTime } from '@/utils/MemoAndDiaryApi';
-import '@/components/memo/DiaryDetail.css';
-import { useAccountStore } from '@/stores/counter';
+import { formatDateTime } from '@/utils/MemoAndDiaryApi'; // ✅ 파일명 대소문자 주의
+import api from '@/utils/MemoAndDiaryApi'; // ✅ casing 맞춤
 
-const accountStore = useAccountStore();
 const route = useRoute();
 const router = useRouter();
 const routeId = computed(() => route.params.id);
@@ -28,31 +26,33 @@ const {
   removeImage,
 } = useDiaryDetail();
 
-const diaryList = ref([]);
-const currentPage = ref(1);
-const pageSize = ref(5);
-const totalDiaries = ref(0);
+const state = reactive({
+  diaryList: [],
+  currentPage: 1,
+  pageSize: 5,
+  totalDiaries: 0,
+});
 
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil(totalDiaries.value / pageSize.value))
+  Math.max(1, Math.ceil(state.totalDiaries / state.pageSize))
 );
 
 const fetchDiaryList = async () => {
   try {
-    const res = await DiaryService.findAll({
-      currentPage: currentPage.value,
-      pageSize: pageSize.value,
+    const result = await DiaryHttpService.findAll({
+      currentPage: state.currentPage,
+      pageSize: state.pageSize
     });
-    diaryList.value = res.data.diaryList || [];
-    totalDiaries.value = res.data.totalCount || 0;
-  } catch (e) {
+    state.diaryList = result.diaryList;
+    state.totalDiaries = result.totalCount;
+  } catch (err) {
     alert('일기 목록 로딩 실패');
   }
 };
 
 const changePage = (num) => {
   if (num >= 1 && num <= totalPages.value) {
-    currentPage.value = num;
+    state.currentPage = num;
     fetchDiaryList();
   }
 };
@@ -62,39 +62,27 @@ const goToDiaryDetail = (id) => {
 };
 
 const saveDiary = async () => {
-  if (!diary.value.title?.trim()) {
-    alert("제목을 입력하세요");
-    return;
-  }
-  if (!diary.value.content?.trim()) {
-    alert("내용을 입력하세요");
+  if (!diary.value.diaryName?.trim() || !diary.value.diaryContent?.trim()) {
+    alert('제목과 내용을 입력하세요.');
     return;
   }
 
   try {
     if (isEditMode.value) {
-      await DiaryService.modify({ id: diary.value.id, ...diary.value });
+      await DiaryHttpService.modify({ id: diary.value.id, ...diary.value });
     } else {
       const formData = new FormData();
-      formData.append('title', diary.value.title);
-      formData.append('content', diary.value.content);
-      formData.append('mood', diary.value.mood);
-      formData.append('date', diary.value.date);
-
+      formData.append('diaryName', diary.value.diaryName);
+      formData.append('diaryContent', diary.value.diaryContent);
+      formData.append('mood', diary.value.mood || '');
       const files = Array.from(fileInputRef.value?.files || []);
-      if (files.length > 5) {
-        alert("이미지는 최대 5장까지 업로드 가능합니다.");
-        return;
-      }
-
-      files.forEach(file => formData.append('images', file));
-      await DiaryService.create(formData);
+      files.forEach(f => formData.append('diaryImageFiles', f));
+      await DiaryHttpService.create(formData);
     }
 
     alert('저장 완료');
-    await fetchDiaryList();
-    router.push('/memo');
-  } catch (e) {
+    router.push('/diary');
+  } catch {
     alert('저장 실패');
   }
 };
@@ -103,12 +91,10 @@ const deleteDiary = async () => {
   if (!confirm('정말 삭제하시겠습니까?')) return;
 
   try {
-    await DiaryService.deleteById(diary.value.id);
+    await DiaryHttpService.deleteById(diary.value.id);
     alert('삭제 완료');
-    diaryList.value = diaryList.value.filter(item => item.id !== diary.value.id);
-    await fetchDiaryList();
-    router.push('/memo');
-  } catch (e) {
+    router.push('/diary');
+  } catch {
     alert('삭제 실패');
   }
 };
@@ -116,29 +102,19 @@ const deleteDiary = async () => {
 const enableEdit = () => setMode('edit');
 
 onMounted(async () => {
-  if (!accountStore().isLoggedIn) {
-    alert('로그인 후 이용해주세요.');
-    return router.push('/account/login');
+  try {
+    await api.get('/account/check');
+  } catch {
+    return;
   }
 
-  if (!routeId) {
+  if (!routeId.value || routeId.value === 'create') {
     setMode('create');
     clearForm();
+    await fetchDiaryList();
   } else {
     setMode('view');
-    await fetchDiary(routeId);
-  }
-
-  await fetchDiaryList();
-});
-
-watch(() => route.params.id, async (newId) => {
-  if (!newId) {
-    setMode('create');
-    clearForm();
-  } else {
-    setMode('view');
-    await fetchDiary(newId);
+    await fetchDiary(routeId.value);
   }
 });
 </script>
@@ -149,27 +125,27 @@ watch(() => route.params.id, async (newId) => {
 
     <div class="input-section">
       <label>제목</label>
-      <input v-model="diary.title" :readonly="isViewMode" />
-    </div>
-
-    <div class="input-section">
-      <label>내용</label>
-      <textarea v-model="diary.content" rows="10" :readonly="isViewMode"></textarea>
+      <input v-model="diary.diaryName" :readonly="isViewMode" />
     </div>
 
     <div class="input-section">
       <label>기분</label>
       <select v-model="diary.mood" :disabled="isViewMode">
-        <option value="happy">😊 행복</option>
-        <option value="sad">😢 슬픔</option>
-        <option value="angry">😠 화남</option>
-        <option value="neutral">😐 평범</option>
+        <option value="">선택</option>
+        <option value="좋음">좋음</option>
+        <option value="보통">보통</option>
+        <option value="나쁨">나쁨</option>
       </select>
     </div>
 
     <div class="input-section">
-      <label>작성 날짜</label>
-      <input type="date" v-model="diary.date" :disabled="isViewMode" />
+      <label>작성일</label>
+      <input type="date" v-model="diary.createdAt" :disabled="isViewMode" />
+    </div>
+
+    <div class="input-section">
+      <label>내용</label>
+      <textarea v-model="diary.diaryContent" rows="10" :readonly="isViewMode"></textarea>
     </div>
 
     <div class="input-section">
@@ -196,7 +172,7 @@ watch(() => route.params.id, async (newId) => {
       <button v-if="isEditMode" @click="saveDiary">수정 완료</button>
       <button v-if="isViewMode" @click="enableEdit">수정</button>
       <button v-if="isViewMode" @click="deleteDiary" class="btn-danger">삭제</button>
-      <button @click="router.push('/memo')">뒤로</button>
+      <button @click="router.push('/diary')">뒤로</button>
     </div>
 
     <hr style="margin: 40px 0; border-top: 1px solid #ccc;" />
@@ -213,9 +189,9 @@ watch(() => route.params.id, async (newId) => {
           class="diary-item"
           @click="goToDiaryDetail(item.id)"
         >
-          <strong>{{ item.title }}</strong>
-          <span>{{ item.content.slice(0, 50) }}...</span>
-          <small>{{ formatDateTime(item.date) }}</small>
+          <strong>{{ item.diaryName }}</strong>
+          <span>{{ item.diaryContent.slice(0, 50) }}...</span>
+          <small>{{ formatDateTime(item.createdAt) }}</small>
         </li>
       </ul>
       <div class="pagination">
@@ -226,3 +202,5 @@ watch(() => route.params.id, async (newId) => {
     </div>
   </div>
 </template>
+
+<style scoped></style>

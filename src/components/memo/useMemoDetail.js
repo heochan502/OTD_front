@@ -1,8 +1,13 @@
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAccountStore } from '@/stores/counter.js';
 import MemoHttpService from '@/services/memo/MemoHttpService';
 
 export function useMemoDetail() {
+  const accountStore = useAccountStore();
+  const router = useRouter();
+  const route = useRoute();
+
   const memo = ref({
     id: null,
     memoName: '',
@@ -13,16 +18,13 @@ export function useMemoDetail() {
 
   const previewImages = ref([]);
   const fileInputRef = ref(null);
-  const router = useRouter();
   const mode = ref('view');
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isViewMode = computed(() => mode.value === 'view');
   const isEditMode = computed(() => mode.value === 'edit');
 
-  const setMode = (newMode) => {
-    mode.value = newMode;
-  };
+  const setMode = (newMode) => (mode.value = newMode);
 
   const clearForm = () => {
     memo.value = {
@@ -32,7 +34,7 @@ export function useMemoDetail() {
       createdAt: null,
       imageFileName: null,
     };
-    previewImages.value.forEach((url) => url.startsWith('blob:') && URL.revokeObjectURL(url));
+    previewImages.value.forEach(url => url.startsWith('blob:') && URL.revokeObjectURL(url));
     previewImages.value = [];
     if (fileInputRef.value) fileInputRef.value.value = '';
   };
@@ -46,11 +48,9 @@ export function useMemoDetail() {
       }
 
       memo.value = resultData;
-      if (resultData.imageFileName) {
-        previewImages.value = [`/pic/${resultData.imageFileName}`];
-      } else {
-        previewImages.value = [];
-      }
+      previewImages.value = resultData.imageFileName
+        ? [`/pic/${resultData.imageFileName}`]
+        : [];
     } catch (e) {
       console.error('메모 조회 실패', e);
       router.push('/memo');
@@ -70,8 +70,7 @@ export function useMemoDetail() {
     if (file.size > maxSize) return alert('파일 크기가 5MB를 초과합니다.');
 
     previewImages.value.forEach(url => url.startsWith('blob:') && URL.revokeObjectURL(url));
-    const previewUrl = URL.createObjectURL(file);
-    previewImages.value = [previewUrl];
+    previewImages.value = [URL.createObjectURL(file)];
   };
 
   const removeImage = () => {
@@ -81,6 +80,21 @@ export function useMemoDetail() {
     previewImages.value = [];
     if (fileInputRef.value) fileInputRef.value.value = '';
   };
+
+  onMounted(async () => {
+    if (!accountStore.state.loggedIn) {
+      alert('로그인 후 이용해주세요.');
+      return router.push('/account/login');
+    }
+
+    const id = route.params.id;
+    if (id && id !== 'create') {
+      setMode('view');
+      await fetchMemo(id);
+    } else {
+      setMode('create');
+    }
+  });
 
   return {
     memo,

@@ -1,4 +1,4 @@
-import api from "@/utils/MemoAndDiaryApi"; // 공통 Axios 인스턴스
+import api from '@/utils/MemoAndDiaryApi';
 
 class MemoHttpService {
   async create(memoData, imageFiles = []) {
@@ -13,32 +13,31 @@ class MemoHttpService {
       formData.append('memoImageFiles', file);
     });
 
-    const res = await api.post("/memo", formData, {
+    const res = await api.post('/memo', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return res.data;
+    return res.data.resultData;
   }
 
   async findAll(params) {
-    const res = await api.get("/memo", {
-      params: { page: 1, size: 5, ...params },
-    });
-    return res.data;
+    const res = await axios.get('/api/OTD/memo', { params });
+    return res.data.resultData;
   }
+
 
   async findById(id) {
     const res = await api.get(`/memo/${id}`);
-    return res.data;
+    return res.data.resultData;
   }
 
   async modify(jsonBody) {
-    const res = await api.put("/memo", jsonBody);
-    return res.data;
+    const res = await api.put('/memo', jsonBody);
+    return res.data.resultData;
   }
 
   async deleteById(id) {
     const res = await api.delete(`/memo?id=${id}`);
-    return res.data;
+    return res.data.resultData;
   }
 }
 
