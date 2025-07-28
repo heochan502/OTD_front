@@ -4,14 +4,14 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const logs = reactive([
-  // {
-  //   healthlog_id: 1,
-  //   date: "2025-07-08",
-  // },
-  // {
-  //   healthlog_id: 2,
-  //   date: "2025-07-16",
-  // },
+  {
+    healthlog_id: 1,
+    date: "2025-07-08",
+  },
+  {
+    healthlog_id: 2,
+    date: "2025-07-16",
+  },
 ]);
 
 const formatDate = (dateStr) => {
@@ -19,8 +19,12 @@ const formatDate = (dateStr) => {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
+// @click
 const add = () => {
   router.push("/hlog/add");
+};
+const detail = (healthlogId) => {
+  router.push(`/hlog/${healthlogId}`);
 };
 </script>
 

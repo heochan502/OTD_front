@@ -169,20 +169,22 @@ const todayColor = (day) => {
 </script>
 <template>
   <div class="calendar">
-    <h2 class="calendar_title">
+    <h3 class="calendar_title">
       <a href="#" @click.prevent="prevMonth"
-        ><img src="/src/image/button.png" alt="이전 달 보기"
+        ><img src="/src/image/button.png" alt="이전 달 보기" class="rotate"
       /></a>
-      {{ currentYear }}년 {{ currentMonth }}월
+      <b>{{ currentYear }}</b
+      >년 <b>{{ currentMonth }}</b
+      >월
       <a href="#" @click.prevent="nextMonth"
         ><img src="/src/image/button.png" alt="다음 달 보기"
       /></a>
-    </h2>
+    </h3>
     <table class="table">
       <thead>
         <tr>
           <td v-for="dayOfWeek in dayOfWeek" :key="dayOfWeek">
-            {{ dayOfWeek }}
+            <b>{{ dayOfWeek }}</b>
           </td>
         </tr>
       </thead>
@@ -193,13 +195,17 @@ const todayColor = (day) => {
             :key="index"
             :class="{
               today_color: todayColor(dayOfMonth.date),
-              reminder_color: dayOfMonth.hasReminder,
               sunday_color: index === 0,
             }"
             class="day"
             @click="pickDate(dayOfMonth.date)"
           >
-            {{ dayOfMonth.date }}
+            <span
+              class="date"
+              :class="{ reminder_color: dayOfMonth.hasReminder }"
+            >
+              {{ dayOfMonth.date }}</span
+            >
           </td>
         </tr>
       </tbody>
@@ -209,27 +215,61 @@ const todayColor = (day) => {
 
 <style lang="scss" scoped>
 .calendar {
-  width: 500px;
+  border-radius: 20px;
+  border: #dedede solid 1px;
+  margin-top: 70px;
+  width: 630px;
+  background-color: #fff;
+  padding: 35px 45px 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
   .calendar_title {
-    a > img {
-      width: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    gap: 5px;
+    a {
+      display: flex;
+      align-items: center;
+      img {
+        width: 25px;
+      }
+      img.rotate {
+        transform: rotate(180deg);
+      }
+    }
+    a:hover {
+      background-color: #fff;
     }
   }
   .table {
+    font-size: 25px;
     td {
-      text-align: center;
-      vertical-align: middle;
       border-bottom: none;
       cursor: pointer;
+      text-align: center;
+      vertical-align: middle;
+      height: 70px;
+      .date {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        font-weight: bold;
+        border-radius: 100%;
+        margin: auto;
+      }
+      .reminder_color {
+        background-color: #bfeaff;
+      }
     }
     .today_color {
       color: steelblue;
     }
     .sunday_color {
       color: tomato;
-    }
-    .reminder_color {
-      background-color: rgb(205, 236, 250);
     }
     td {
       height: 70px;
