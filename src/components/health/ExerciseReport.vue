@@ -13,7 +13,6 @@ import {
 } from "@/utils/exerciseReportUtils";
 
 const exerciseStore = useExerciseStore();
-const tab = ref("one");
 
 // YYYY-MM-DD
 const todayStr = getDateString();
@@ -57,59 +56,33 @@ const effortIndex = computed(() => {
 </script>
 
 <template>
-  <v-card class="card" width="400" height="300">
-    <v-tabs
-      v-model="tab"
-      bg-color="#9DDEFF"
-      color="#fff"
-      grow
-      style="border-radius: 25px 25px 0 0"
-      slider-color="#3bbeff"
-    >
-      <v-tab value="one">운동 리포트</v-tab>
-      <v-tab value="two">건강 리포트</v-tab>
-    </v-tabs>
-    <v-card-text height="300">
-      <v-tabs-window v-model="tab">
-        <v-tabs-window-item value="one" class="exercise_report">
-          <v-col class="content_left">
-            <div>
-              <div class="title">활동에너지</div>
-              <div class="report_value">{{ todayKcal }} kcal</div>
-            </div>
-            <div>
-              <div class="title">운동시간</div>
-              <div class="report_value">{{ todayDuration }}분</div>
-            </div>
-          </v-col>
-          <v-col class="content_right">
-            <div v-if="todayEffortAvg > 0">
-              <div class="title">운동강도</div>
-              <div class="emoji">
-                {{ effortLevels[effortIndex].emoji }}
-              </div>
-              <div class="effort_label">
-                {{ effortLevels[effortIndex].label }}
-              </div>
-            </div>
-            <div>{{ feedbackMessage }}</div>
-          </v-col>
-        </v-tabs-window-item>
-        <v-tabs-window-item value="two"> 건강리포트 내용 </v-tabs-window-item>
-      </v-tabs-window>
-    </v-card-text>
-  </v-card>
+  <v-tabs-window-item value="one" class="exercise_report">
+    <v-col class="content_left">
+      <div>
+        <div class="title">활동에너지</div>
+        <div class="report_value">{{ todayKcal }} kcal</div>
+      </div>
+      <div>
+        <div class="title">운동시간</div>
+        <div class="report_value">{{ todayDuration }}분</div>
+      </div>
+    </v-col>
+    <v-col class="content_right">
+      <div v-if="todayEffortAvg > 0">
+        <div class="title">운동강도</div>
+        <div class="emoji">
+          {{ effortLevels[effortIndex].emoji }}
+        </div>
+        <div class="effort_label">
+          {{ effortLevels[effortIndex].label }}
+        </div>
+      </div>
+      <div>{{ feedbackMessage }}</div>
+    </v-col>
+  </v-tabs-window-item>
 </template>
 
 <style lang="scss" scoped>
-.v-tab {
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-}
-.v-tab.v-tab--selected {
-  background-color: #3bbeff;
-}
 .exercise_report {
   display: flex;
   padding: 20px 20px 0;
@@ -147,6 +120,7 @@ const effortIndex = computed(() => {
     }
   }
 }
+
 .title {
   font-size: 16px;
 }

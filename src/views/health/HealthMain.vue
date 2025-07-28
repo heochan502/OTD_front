@@ -1,5 +1,5 @@
 <script setup>
-import HealthReportCard from "@/components/health/HealthReportCard.vue";
+import ReportCard from "@/components/health/ReportCard.vue";
 import HealthLogCalendar from "@/components/health/HealthLogCalendar.vue";
 import ExercuseLogList from "@/components/health/ExerciseLogList.vue";
 import HealthLogList from "@/components/health/HealthLogList.vue";
@@ -14,7 +14,7 @@ import { onMounted } from "vue";
     <v-row class="top" justify="center" align="center">
       <!-- 리포트영역 -->
       <v-col cols="auto">
-        <HealthReportCard />
+        <ReportCard />
       </v-col>
       <!-- 달력 -->
       <v-col cols="auto">
