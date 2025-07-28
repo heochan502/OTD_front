@@ -55,8 +55,8 @@ const router = createRouter({
       component: ReminderList,
     },
     {
-      path: '/meal',
-      name: 'MealForm',
+      path: "/meal",
+      name: "MealForm",
       component: MealForm,
     },
     {
