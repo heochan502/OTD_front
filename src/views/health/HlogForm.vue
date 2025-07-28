@@ -1,19 +1,21 @@
 <script setup>
 import { reactive } from "vue";
 import { useRouter } from "vue-router";
+import sleepQualitys from "@/assets/health/sleepQualitys.json";
+import moodLevels from "@/assets/health/moodLevels.json";
 
 const router = useRouter();
 
 const state = reactive({
   logs: {
-    weight: 0,
-    height: 0,
-    systolic_bp: 0,
-    diastolic_bp: 0,
-    sugar_level: 0,
-    mood_lebel: 0,
-    sleep_quality: 0,
-    healthlog_datetime: "",
+    weight: null,
+    height: null,
+    systolic_bp: null,
+    diastolic_bp: null,
+    sugar_level: null,
+    mood_lebel: null,
+    sleep_quality: null,
+    healthlog_datetime: null,
   },
 });
 
@@ -36,69 +38,96 @@ const cancel = () => {
 
 <template>
   <v-container class="container" fluid>
-    <v-sheet class="mx-auto" width="600">
+    <v-sheet class="mx-auto" width="1000">
       <v-form>
         <v-row class="title">
           <h4>건강 기록하기</h4>
         </v-row>
-        <v-row>
-          <v-text-field
-            v-model="state.logs.weight"
-            :rules="rules"
-            label="체중"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-text-field>
-          <v-text-field
-            v-model="state.logs.height"
-            :rules="rules"
-            label="신장"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-text-field>
-        </v-row>
-        <v-row>
-          <v-text-field
-            v-model="state.logs.systolic_bp"
-            label="최저 혈압"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-text-field>
-          <v-text-field
-            v-model="state.logs.diastolic_bp"
-            label="최고 혈압"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-text-field>
-          <v-text-field
-            v-model="state.logs.sugar_level"
-            label="혈당"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-text-field>
-        </v-row>
-        <v-row>
-          <v-combobox
-            v-model="state.logs.mood_lebel"
-            label="마음상태"
-            :items="[1, 2, 3]"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-combobox>
-          <v-combobox
-            v-model="state.logs.sleep_quality"
-            label="수면기록"
-            :items="[1, 2, 3]"
-            variant="solo"
-            class="pa-2"
-            clearable
-          ></v-combobox>
+        <v-row class="hlogForm">
+          <v-col class="left">
+            <v-date-picker
+              v-model="state.logs.healthlog_datetime"
+              width="300px"
+              divided
+              landscape
+            ></v-date-picker>
+          </v-col>
+          <v-col class="right" cols="8">
+            <v-row>
+              <v-text-field
+                v-model="state.logs.weight"
+                :rules="rules"
+                label="체중(kg)"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.logs.height"
+                :rules="rules"
+                label="신장"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field
+                v-model="state.logs.systolic_bp"
+                label="최저 혈압"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.logs.diastolic_bp"
+                label="최고 혈압"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.logs.sugar_level"
+                label="혈당"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+            </v-row>
+            <v-row>
+              <v-combobox
+                v-model="state.logs.mood_lebel"
+                label="감정상태"
+                :items="
+                  moodLevels.map((e) => ({
+                    title: e.label,
+                    value: e.level,
+                  }))
+                "
+                variant="solo"
+                class="pa-2"
+                clearable
+              ></v-combobox>
+              <v-combobox
+                v-model="state.logs.sleep_quality"
+                label="수면기록"
+                :items="
+                  sleepQualitys.map((e) => ({
+                    title: e.label,
+                    value: e.level,
+                  }))
+                "
+                variant="solo"
+                class="pa-2"
+                clearable
+              ></v-combobox>
+            </v-row>
+          </v-col>
         </v-row>
         <v-row class="btns">
           <v-btn class="save" @click="submit">저장</v-btn>
@@ -127,6 +156,21 @@ const cancel = () => {
       border-bottom: 5px solid black;
       padding-bottom: 5px;
     }
+  }
+
+  .hlogForm {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .v-date-picker {
+    $date-picker-header-height: 30px;
+  }
+
+  .right {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
   }
 
   .btns {
