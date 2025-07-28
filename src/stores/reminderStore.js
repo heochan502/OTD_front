@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 export const useReminderStore = defineStore(
   'reminder',
@@ -11,6 +11,8 @@ export const useReminderStore = defineStore(
       currentMonth: new Date().getMonth() + 1,
       selectedDate: '',
     });
+
+    const reload = ref(false);
 
     const setDayReminder = (data) => {
       state.dayReminder = data;
@@ -28,8 +30,12 @@ export const useReminderStore = defineStore(
       state.currentMonth = data;
     };
 
-    const setSelectedDate = (date) => {
-      state.selectedDate = date;
+    const setSelectedDate = (data) => {
+      state.selectedDate = data;
+    };
+
+    const setReload = (data) => {
+      reload.value = data;
     };
 
     return {
@@ -39,6 +45,8 @@ export const useReminderStore = defineStore(
       setCurrentYear,
       setCurrentMonth,
       setSelectedDate,
+      setReload,
+      reload,
     };
   },
   {
