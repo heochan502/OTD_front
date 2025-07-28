@@ -5,7 +5,7 @@ import { useBaseDate, useDayDefine } from '@/stores/mealStore';
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
 
-const selectedDate = ref('2025-06-15'); // 초기화 및 선택하는 날짜 들어감 
+const selectedDate = ref(nowDay.nowDay); // 초기화 및 선택하는 날짜 들어감 
 const weekDates = ref([]);
 
 function getWeekDates(dateString) {
@@ -20,11 +20,11 @@ function getWeekDates(dateString) {
 
     for (let i = 0; i < 7; i++) {
         // 주 시작 일 과 끝일만 넣기
-       if(i===0 || i===6){
+    //    if(i===0 || i===6){
         const currentDate = new Date(startDate);
         currentDate.setDate(startDate.getDate() + i);
         result.push(currentDate.toISOString().slice(0, 10));
-       }
+    //    }
     }
     return result;
 }
@@ -34,7 +34,7 @@ watch(
     (newDate) => {
         weekDates.value = getWeekDates(newDate);
         weekDay.getWeekDate.startDate = weekDates.value[0];
-        weekDay.getWeekDate.endDate = weekDates.value[1]
+        weekDay.getWeekDate.endDate = weekDates.value[6]
         // console.log("주시작 : ", weekDay.getWeekDate.startDate, nowDay.nowDay );
     },
     { immediate: true }
@@ -45,7 +45,7 @@ watch(
 </script>
 
 <template>
-    <!-- <div>
+    <div>
         <v-text-field v-model="selectedDate" label="날짜 선택" type="date" class="mb-4"></v-text-field>
 
         <v-list>
@@ -53,7 +53,7 @@ watch(
                 <v-list-item-title>{{ date }}</v-list-item-title>
             </v-list-item>
         </v-list>
-    </div> -->
+    </div>
 </template>
 
 

@@ -54,8 +54,9 @@ onMounted(async() => {
       <div class="left">
         <div class="progress-container w-full">
           <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-            :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`" :rightString="`${maxKcal - calorieData.allDayCalorie}kcal 더 먹을 수 있어요!`"
-            :max="maxKcal" customsize="totalcal" />
+            :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
+            :rightString="`${maxKcal - calorieData.allDayCalorie}kcal 더 먹을 수 있어요!`" :max="maxKcal"
+            customsize="totalcal" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
               :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
@@ -87,12 +88,13 @@ onMounted(async() => {
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
       <span class="sub-title text-subtitle-1">이번주에 평균 {{ value }}kcal 먹었어요</span>
-    </div>
-    <div class="bottom d-flex justify-center mb-6">
       <WeeklyCalorie />
     </div>
+    <div class="bottom d-flex justify-center mb-6">
+
+    </div>
   </div>
- 
+
   <!-- </div> -->
 </template>
 
