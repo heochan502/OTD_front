@@ -1,8 +1,9 @@
 <script setup>
-import Weather from '@/views/weather/weather.vue';
-import { getByMonth } from '@/services/reminder/reminderService';
-import { onMounted, reactive } from 'vue';
-import { useReminderStore } from '@/stores/reminderStore';
+import Weather from "@/views/weather/weather.vue";
+import { getByMonth } from "@/services/reminder/reminderService";
+import { onMounted, reactive } from "vue";
+import { useReminderStore } from "@/stores/reminderStore";
+import ReportCard from "@/components/health/ReportCard.vue";
 
 const reminderStore = useReminderStore();
 
@@ -25,8 +26,8 @@ onMounted(async () => {
 
   const formattedToday = `${todayYear}-${String(todayMonth).padStart(
     2,
-    '0'
-  )}-${String(todayDate).padStart(2, '0')}`;
+    "0"
+  )}-${String(todayDate).padStart(2, "0")}`;
   const dow = today.getDay();
 
   state.todayReminder = reminderStore.state.fullReminder.filter((item) => {
@@ -65,6 +66,9 @@ onMounted(async () => {
       <span v-else class="empty-comment">"오늘은 한가한 하루네요!"</span>
     </div>
   </router-link>
+  <div>
+    <ReportCard />
+  </div>
 </template>
 
 <style lang="scss" scoped>
