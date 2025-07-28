@@ -146,13 +146,13 @@ watch(
             </div>
           </div>
           <div class="button-group">
+            <span class="btn btn-primary2" @click.prevent="remove(state.form.memberNoLogin)">회원탈퇴</span>
             <router-link 
               to="/detail" 
               class="btn btn-primary"
             >
               정보 수정
             </router-link>
-            <span class="btn btn-primary2" @click.prevent="remove(state.form.memberNoLogin)">회원탈퇴</span>
           </div>
         </div>
       </div>
@@ -381,9 +381,11 @@ watch(
   color: white;
 }
 .btn-primary2 {
-  background: #6c757d;;
-  color: white;
+  background: white;
+  color: #6b7280;
+  border: 2px solid #e5e7eb;
 }
+
 
 .btn-primary:hover {
   background: #4A9EF5;
@@ -391,10 +393,10 @@ watch(
   box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
 }
 .btn-primary2:hover {
-  background: #535A61;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
+  background: #f9fafb;
+  border-color: #d1d5db;
 }
+
 .btn-secondary {
   background: #6c757d;
   color: white;
