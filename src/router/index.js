@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAccountStore } from '@/stores/counter';
 
 import ReminderHome from "@/views/reminder/ReminderHome.vue";
-import RoutineHome from "@/components/routine/RoutineHome.vue";
 import ReminderForm from "@/views/reminder/ReminderForm.vue";
 import ReminderList from "@/views/reminder/ReminderList.vue";
 
@@ -60,12 +59,7 @@ const router = createRouter({
       name: "reminderlist",
       component: ReminderList,
     },
-    {
-      path: "/routine",
-      name: "routine",
-      component: RoutineHome,
-      meta: { requiresAuth: true }
-    },
+  
     {
       path: "/meal",
       name: "MealForm",
@@ -139,8 +133,8 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: "/diary",
-      name: "diary",
+      path: '/diary',
+      name: 'diary',
       component: Diary,
       props: true,
       meta: { requiresAuth: true }
