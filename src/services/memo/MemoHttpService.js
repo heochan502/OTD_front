@@ -1,36 +1,36 @@
 import axios from 'axios';
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = '/api/OTD';  // 기본 API 경로
+axios.defaults.baseURL = '/api/OTD/memoAndDiary';  // 기본 경로 통일
 
-class DiaryHttpService {
+class MemoHttpService {
   async findAll(params) {
-    const res = await axios.get('/memoAndDiary/diary', { params });
+    const res = await axios.get('/memo', { params });
     return res.data.resultData;
   }
 
   async findById(id) {
-    const res = await axios.get(`/memoAndDiary/diary/${id}`);
+    const res = await axios.get(`/memo/${id}`);
     return res.data;
   }
 
   async create(formData) {
-    const res = await axios.post('/memoAndDiary/diary', formData, {
+    const res = await axios.post('/memo', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data.resultData;
   }
 
   async modify(formData) {
-    const res = await axios.put('/memoAndDiary/diary', formData, {
+    const res = await axios.put('/memo', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data.resultData;
   }
 
   async deleteById(id) {
-    const res = await axios.delete(`/memoAndDiary/diary?id=${id}`);
+    const res = await axios.delete(`/memo?id=${id}`);
     return res.data.resultData;
   }
 }
 
-export default new DiaryHttpService();
+export default new MemoHttpService();

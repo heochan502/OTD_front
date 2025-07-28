@@ -1,64 +1,52 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import DiaryHttpService from '@/services/memo/DiaryHttpService';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import MemoHttpService from '@/services/memo/MemoHttpService';
+import { formatDateTime } from '@/utils/MemoAndDiaryApi';
 
-const diaries = ref([]);
-const currentPage = ref(1);
-const pageSize = 5;
-const totalDiaries = ref(0);
+const memoList = ref([]);
+const router = useRouter();
 
-const totalPages = computed(() => Math.ceil(totalDiaries.value / pageSize));
-
-const fetchDiaries = async (page = 1) => {
+const fetchMemoList = async () => {
   try {
-    const params = { currentPage: page, pageSize };
-    const result = await DiaryHttpService.findAll(params);
-    diaries.value = result.diaryList || [];
-    totalDiaries.value = result.totalCount || 0;
-    currentPage.value = page;
-  } catch (err) {
-    alert('다이어리 리스트를 불러오는데 실패했습니다.');
+    const result = await MemoHttpService.findAll({
+      currentPage: 1,  // 페이지 번호 (필요에 따라 추가)
+      pageSize: 10,    // 페이지 크기 (필요에 따라 추가)
+    });
+    memoList.value = result.memoList;
+  } catch (e) {
+    alert('메모 목록 로딩 실패');
+    console.error(e);
   }
 };
 
-const changePage = (page) => {
-  if (page < 1 || page > totalPages.value) return;
-  fetchDiaries(page);
+const goToMemoDetail = (id) => {
+  router.push(`/memoAndDiary/memo/${id}`); // 해당 메모 상세 페이지로 이동
 };
 
-const goToDetail = (id) => {
-  // 라우터를 이용해 다이어리 상세 페이지로 이동
-  window.location.href = `/memoAndDiary/diary/${id}`; // 혹은 router.push() 사용 가능
-};
-
-const formatDateTime = (dateString) => {
-  if (!dateString) return '';
-  const dt = new Date(dateString);
-  return dt.toLocaleString();
-};
-
-onMounted(() => {
-  fetchDiaries();
+onMounted(async () => {
+  await fetchMemoList();  // 메모 목록을 가져옴
 });
 </script>
 
 <template>
-  <div class="diary-list">
-    <h2>다이어리 리스트</h2>
-    <ul>
-      <li v-for="diary in diaries" :key="diary.id" @click="goToDetail(diary.id)">
-        <h3>{{ diary.diaryName }}</h3>
-        <p>{{ diary.diaryContent }}</p>
-        <img v-if="diary.diaryImageFileName" :src="`/pic/${diary.diaryImageFileName}`" alt="diary image" width="100" />
-        <small>{{ formatDateTime(diary.createdAt) }}</small>
+  <div class="memo-list-wrapper">
+    <h2>메모 목록</h2>
+    <div v-if="memoList.length === 0" class="empty-message">
+      등록된 메모가 없습니다.
+    </div>
+    <ul v-else>
+      <li
+        v-for="item in memoList"
+        :key="item.id"
+        class="memo-item"
+        @click="goToMemoDetail(item.id)"
+      >
+        <div class="memo-title">{{ item.memoName }}</div>
+        <div class="memo-content">{{ item.memoContent }}</div>
+        <div class="memo-date">{{ formatDateTime(item.createdAt) }}</div>
       </li>
     </ul>
-
-    <div class="pagination">
-      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">이전</button>
-      <span>{{ currentPage }} / {{ totalPages }}</span>
-      <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
-    </div>
   </div>
 </template>
 

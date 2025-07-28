@@ -1,5 +1,5 @@
 import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';  // useRoute 추가
 import { useAccountStore } from '@/stores/counter.js';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 
@@ -21,21 +21,20 @@ export function useDiaryDetail() {
     mood: '',
   });
 
-  const fileInputRef = ref(null);
   const previewImages = ref([]);
+  const fileInputRef = ref(null);
   const mode = ref('view');
-
-  const isCreateMode = computed(() => mode.value === 'create');
-  const isEditMode = computed(() => mode.value === 'edit');
-  const isViewMode = computed(() => mode.value === 'view');
-  const imageCount = computed(() => previewImages.value.length);
-  const hasNoImages = computed(() => isViewMode.value && imageCount.value === 0);
-
+  const route = useRoute();  // route 정의 추가
   const router = useRouter();
-  const route = useRoute();
   const accountStore = useAccountStore();
 
-  const setMode = (newMode) => (mode.value = newMode);
+  const isCreateMode = computed(() => mode.value === 'create');
+  const isViewMode = computed(() => mode.value === 'view');
+  const isEditMode = computed(() => mode.value === 'edit');
+  const imageCount = computed(() => previewImages.value.length ?? 0);
+  const hasNoImages = computed(() => isViewMode.value && imageCount.value === 0);
+
+  const setMode = (m) => (mode.value = m);
 
   const clearForm = () => {
     diary.value = {
@@ -65,8 +64,8 @@ export function useDiaryDetail() {
         ? [`/pic/${resultData.imageFileName}`]
         : [];
     } catch (e) {
+      console.error('일기 조회 실패:', e);
       alert('일기 조회 중 오류 발생');
-      console.error(e);
       router.push('/memoAndDiary/diary');
     }
   };
@@ -92,6 +91,9 @@ export function useDiaryDetail() {
       if (url.startsWith('blob:')) URL.revokeObjectURL(url);
     });
     previewImages.value = [URL.createObjectURL(file)];
+
+    const formData = new FormData();
+    formData.append('diaryImageFiles', file); // 이미지 파일을 FormData에 추가
   };
 
   const removeImage = () => {
@@ -166,11 +168,6 @@ export function useDiaryDetail() {
   };
 
   onMounted(async () => {
-    if (!accountStore.state.loggedIn) {
-      alert('로그인 후 이용해주세요.');
-      return router.push('/account/login');
-    }
-
     const id = route.params.id;
     if (id && id !== 'create') {
       setMode('view');
@@ -186,19 +183,19 @@ export function useDiaryDetail() {
     fileInputRef,
     mode,
     isCreateMode,
-    isEditMode,
     isViewMode,
+    isEditMode,
     setMode,
     clearForm,
     fetchDiary,
     handleImageChange,
     removeImage,
-    hasNoImages,
-    imageCount,
     createDiary,
     updateDiary,
     deleteDiary,
     cancelEdit,
+    hasNoImages,
+    imageCount,
     MOOD_OPTIONS,
   };
 }

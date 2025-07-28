@@ -20,20 +20,23 @@
   --shadow-medium: rgba(0, 0, 0, 0.3);
 }
 
-.diary-wrapper {
+.diary-wrapper,
+.memo-wrapper {
   width: 100%;
   margin: 0;
   padding: 0;
 }
 
-.diary-form {
+.diary-form,
+.memo-form {
   width: 100%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
 }
 
-.diary-detail {
+.diary-detail,
+.memo-detail {
   max-width: 800px;
   margin: var(--spacing-lg) auto;
   padding: var(--spacing-lg);
@@ -43,7 +46,8 @@
   color: var(--color-text-dark);
 }
 
-.diary-detail h2 {
+.diary-detail h2,
+.memo-detail h2 {
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
@@ -51,7 +55,8 @@
   color: var(--color-text-dark);
 }
 
-.diary-detail label {
+.diary-detail label,
+.memo-detail label {
   display: block;
   margin-top: var(--spacing-lg);
   font-weight: bold;
@@ -60,7 +65,9 @@
 }
 
 .diary-detail input[type="text"],
-.diary-detail textarea {
+.memo-detail input[type="text"],
+.diary-detail textarea,
+.memo-detail textarea {
   width: 100%;
   font-size: 1rem;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -70,14 +77,17 @@
   margin-bottom: var(--spacing-md);
   box-sizing: border-box;
   color: var(--color-text-dark);
+  /* 텍스트 영역 높이를 동일하게 통일 */
+  min-height: 120px;
 }
 
-.diary-detail textarea {
-  min-height: 120px;
+.diary-detail textarea,
+.memo-detail textarea {
   resize: vertical;
 }
 
-.diary-detail input[type="file"] {
+.diary-detail input[type="file"],
+.memo-detail input[type="file"] {
   margin-top: var(--spacing-sm);
   color: var(--color-text-dark);
 }
@@ -130,7 +140,8 @@
 }
 
 /* === 버튼 그룹 === */
-.diary-detail .button-group {
+.diary-detail .button-group,
+.memo-detail .button-group {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -138,7 +149,8 @@
   margin-top: var(--spacing-md);
 }
 
-.diary-detail button {
+.diary-detail button,
+.memo-detail button {
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: var(--border-radius-base);
@@ -148,24 +160,9 @@
   color: var(--color-text-dark);
 }
 
-.diary-detail button:hover {
+.diary-detail button:hover,
+.memo-detail button:hover {
   opacity: 0.9;
-}
-
-/* === 리스트 === */
-.diary-detail .diary-list {
-  margin-top: var(--spacing-lg);
-  border-top: 1px dashed var(--color-gray-e0);
-  padding-top: var(--spacing-md);
-}
-
-.diary-detail .diary-list ul {
-  list-style: none;
-  padding: 0;
-}
-
-.diary-detail .diary-list li {
-  margin-bottom: 10px;
 }
 
 /* === 페이지네이션 === */
