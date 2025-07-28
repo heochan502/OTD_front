@@ -42,7 +42,7 @@ const logoutAccount = async () => {
         <router-link to="/routine" href="#">루틴</router-link>
         <router-link to="/meal" href="#">식단</router-link>
         <router-link to="/health" href="#">건강</router-link>
-        <router-link to="/memo" href="#">일기</router-link>
+        <router-link to="/memo-and-diary">일기</router-link>
         <a href="#">위치</a>
         <router-link to="/community" href="#">커뮤니티</router-link>
       </nav>

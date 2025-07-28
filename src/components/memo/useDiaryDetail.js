@@ -1,26 +1,19 @@
-import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useAccountStore } from '@/stores/counter.js';
+import { ref, computed } from 'vue';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 
 export function useDiaryDetail() {
-  const accountStore = useAccountStore();
-  const router = useRouter();
-  const route = useRoute();
-
   const diary = ref({
     id: null,
     diaryName: '',
     diaryContent: '',
     createdAt: null,
-    diaryImage: null,
+    imageFileName: null,
     mood: '',
-    diaryDate: '',
   });
 
   const previewImages = ref([]);
   const fileInputRef = ref(null);
-  const mode = ref('view');
+  const mode = ref('view'); // 'create', 'view', 'edit'
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isViewMode = computed(() => mode.value === 'view');
@@ -34,71 +27,49 @@ export function useDiaryDetail() {
       diaryName: '',
       diaryContent: '',
       createdAt: null,
-      diaryImage: null,
+      imageFileName: null,
       mood: '',
-      diaryDate: '',
     };
-    previewImages.value.forEach(url => url.startsWith('blob:') && URL.revokeObjectURL(url));
     previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = '';
+    if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
   const fetchDiary = async (id) => {
-    try {
-      const { resultData } = await DiaryHttpService.findById(id);
-      if (!resultData) {
-        console.warn('일기 없음');
-        return router.push('/diary');
-      }
+    const result = await DiaryHttpService.findById(id);
+    diary.value = result;
 
-      diary.value = resultData;
-      previewImages.value = resultData.diaryImage
-        ? [`/pic/${resultData.diaryImage}`]
-        : [];
-    } catch (e) {
-      console.error('일기 조회 실패', e);
-      router.push('/diary');
+    previewImages.value = [];
+    if (result.imageFileName) {
+      previewImages.value.push(`/pic/${result.imageFileName}`);
     }
   };
 
-  const handleImageChange = (event) => {
-    const files = Array.from(event.target.files);
+  const handleImageChange = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
     const file = files[0];
-    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.');
+      fileInputRef.value.value = null;
+      return;
+    }
 
-    const extAllowed = ['jpg', 'jpeg', 'png', 'gif'];
-    const maxSize = 5 * 1024 * 1024;
-    const ext = file.name.split('.').pop().toLowerCase();
-
-    if (!extAllowed.includes(ext)) return alert('허용되지 않는 파일 형식입니다.');
-    if (file.size > maxSize) return alert('파일 크기가 5MB를 초과합니다.');
-
-    previewImages.value.forEach(url => url.startsWith('blob:') && URL.revokeObjectURL(url));
-    previewImages.value = [URL.createObjectURL(file)];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      previewImages.value = [event.target.result];
+    };
+    reader.readAsDataURL(file);
   };
 
   const removeImage = () => {
-    if (previewImages.value[0]?.startsWith('blob:')) {
-      URL.revokeObjectURL(previewImages.value[0]);
-    }
     previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = '';
+    if (fileInputRef.value) fileInputRef.value.value = null;
+    diary.value.imageFileName = null;
   };
 
-  onMounted(async () => {
-    if (!accountStore.state.loggedIn) {
-      alert('로그인 후 이용해주세요.');
-      return router.push('/account/login');
-    }
-
-    const id = route.params.id;
-    if (id && id !== 'create') {
-      setMode('view');
-      await fetchDiary(id);
-    } else {
-      setMode('create');
-    }
-  });
+  const hasNoImages = computed(() => previewImages.value.length === 0);
+  const imageCount = computed(() => previewImages.value.length);
 
   return {
     diary,
@@ -113,5 +84,7 @@ export function useDiaryDetail() {
     fetchDiary,
     handleImageChange,
     removeImage,
+    hasNoImages,
+    imageCount,
   };
 }

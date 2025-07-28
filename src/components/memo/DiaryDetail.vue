@@ -1,206 +1,151 @@
 <script setup>
-import '@/components/memo/diaryDetail.css';
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useDiaryDetail } from './useDiaryDetail.js';
-import DiaryService from '@/services/memo/DiaryHttpService.js';
-import { formatDateTime } from '@/utils/MemoAndDiaryApi'; // ✅ 파일명 대소문자 주의
-import api from '@/utils/MemoAndDiaryApi'; // ✅ casing 맞춤
+import DiaryHttpService from '@/services/memo/DiaryHttpService';
 
 const route = useRoute();
 const router = useRouter();
-const routeId = computed(() => route.params.id);
 
-const {
-  diary,
-  previewImages,
-  fileInputRef,
-  mode,
-  isCreateMode,
-  isViewMode,
-  isEditMode,
-  setMode,
-  clearForm,
-  fetchDiary,
-  handleImageChange,
-  removeImage,
-} = useDiaryDetail();
-
-const state = reactive({
-  diaryList: [],
-  currentPage: 1,
-  pageSize: 5,
-  totalDiaries: 0,
+const diary = ref({
+  id: null,
+  title: '',
+  content: '',
+  imageFileName: null,
 });
 
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(state.totalDiaries / state.pageSize))
-);
+const diaryList = ref([]);
+const previewImage = ref('');
+const mode = ref('create');
 
-const fetchDiaryList = async () => {
-  try {
-    const result = await DiaryHttpService.findAll({
-      currentPage: state.currentPage,
-      pageSize: state.pageSize
-    });
-    state.diaryList = result.diaryList;
-    state.totalDiaries = result.totalCount;
-  } catch (err) {
-    alert('일기 목록 로딩 실패');
-  }
-};
+const isCreateMode = computed(() => mode.value === 'create');
+const isEditMode = computed(() => mode.value === 'edit');
 
-const changePage = (num) => {
-  if (num >= 1 && num <= totalPages.value) {
-    state.currentPage = num;
-    fetchDiaryList();
-  }
-};
-
-const goToDiaryDetail = (id) => {
-  if (route.params.id !== id) router.push(`/diary/${id}`);
-};
-
-const saveDiary = async () => {
-  if (!diary.value.diaryName?.trim() || !diary.value.diaryContent?.trim()) {
-    alert('제목과 내용을 입력하세요.');
-    return;
-  }
-
-  try {
-    if (isEditMode.value) {
-      await DiaryHttpService.modify({ id: diary.value.id, ...diary.value });
-    } else {
-      const formData = new FormData();
-      formData.append('diaryName', diary.value.diaryName);
-      formData.append('diaryContent', diary.value.diaryContent);
-      formData.append('mood', diary.value.mood || '');
-      const files = Array.from(fileInputRef.value?.files || []);
-      files.forEach(f => formData.append('diaryImageFiles', f));
-      await DiaryHttpService.create(formData);
+// 초기 진입 처리
+onMounted(async () => {
+  const id = route.params.id;
+  if (id) {
+    mode.value = 'edit';
+    const res = await DiaryHttpService.findById(id);
+    diary.value = res;
+    if (res.imageFileName) {
+      previewImage.value = `/pic/${res.imageFileName}`;
     }
-
-    alert('저장 완료');
-    router.push('/diary');
-  } catch {
-    alert('저장 실패');
+  } else {
+    mode.value = 'create';
   }
+
+  if (!isCreateMode.value) {
+    diaryList.value = await DiaryHttpService.findAll({ page: 1, pageSize: 10 });
+  }
+});
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    previewImage.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+const removeImage = () => {
+  previewImage.value = '';
+};
+
+const createDiary = async () => {
+  const formData = new FormData();
+
+  // 백엔드 DiaryPostReq 필드명과 일치해야 함
+  formData.append(
+    'diaryData',
+    new Blob(
+      [JSON.stringify({
+        diaryName: diary.value.diaryName,     // ✅ 정확한 키 확인
+        diaryContent: diary.value.diaryContent
+      })],
+      { type: 'application/json' }
+    )
+  );
+
+  const fileInput = document.querySelector('input[type="file"]');
+  if (fileInput?.files[0]) {
+    formData.append('diaryImageFiles', fileInput.files[0]); // ✅ 한 번만 append
+  }
+
+  try {
+    await DiaryHttpService.create(formData);
+    alert('등록 완료');
+    router.push('/diary');
+  } catch (error) {
+    console.error('등록 실패:', error);
+    alert('등록 중 오류가 발생했습니다.');
+  }
+};
+
+const updateDiary = async () => {
+  await DiaryHttpService.modify(diary.value);
+  alert('수정 완료');
 };
 
 const deleteDiary = async () => {
-  if (!confirm('정말 삭제하시겠습니까?')) return;
-
-  try {
+  if (confirm('정말 삭제하시겠습니까?')) {
     await DiaryHttpService.deleteById(diary.value.id);
     alert('삭제 완료');
     router.push('/diary');
-  } catch {
-    alert('삭제 실패');
   }
 };
 
-const enableEdit = () => setMode('edit');
-
-onMounted(async () => {
-  try {
-    await api.get('/account/check');
-  } catch {
-    return;
-  }
-
-  if (!routeId.value || routeId.value === 'create') {
-    setMode('create');
-    clearForm();
-    await fetchDiaryList();
-  } else {
-    setMode('view');
-    await fetchDiary(routeId.value);
-  }
-});
+const cancelEdit = () => {
+  router.push('/diary');
+};
 </script>
 
+
 <template>
-  <div class="diary-detail-container">
-    <h2>{{ isCreateMode ? '일기 작성' : isEditMode ? '일기 수정' : '일기 보기' }}</h2>
+  <div class="diary-wrapper">
+    <div class="diary-detail">
+      <h2>일기</h2>
 
-    <div class="input-section">
-      <label>제목</label>
-      <input v-model="diary.diaryName" :readonly="isViewMode" />
-    </div>
+      <label for="title">제목</label>
+      <input id="title" type="text" v-model="diary.title" />
 
-    <div class="input-section">
-      <label>기분</label>
-      <select v-model="diary.mood" :disabled="isViewMode">
-        <option value="">선택</option>
-        <option value="좋음">좋음</option>
-        <option value="보통">보통</option>
-        <option value="나쁨">나쁨</option>
-      </select>
-    </div>
+      <label for="content">내용</label>
+      <textarea id="content" v-model="diary.content" />
 
-    <div class="input-section">
-      <label>작성일</label>
-      <input type="date" v-model="diary.createdAt" :disabled="isViewMode" />
-    </div>
+      <label for="image">이미지</label>
+      <input type="file" @change="handleFileChange" />
 
-    <div class="input-section">
-      <label>내용</label>
-      <textarea v-model="diary.diaryContent" rows="10" :readonly="isViewMode"></textarea>
-    </div>
-
-    <div class="input-section">
-      <label>이미지 업로드 (최대 5장)</label>
-      <input
-        type="file"
-        ref="fileInputRef"
-        accept=".jpg, .jpeg, .png, .gif"
-        multiple
-        @change="handleImageChange"
-        :disabled="isViewMode"
-      />
-      <div class="preview-list">
-        <div v-for="(img, index) in previewImages" :key="index" class="preview-item">
-          <img :src="img" />
-          <button v-if="!isViewMode" @click="removeImage(index)" class="remove-btn">X</button>
+      <div class="preview-list" v-if="previewImage">
+        <div class="preview-item">
+          <img :src="previewImage" />
+          <button class="remove-btn" @click="removeImage">X</button>
         </div>
-        <p v-if="isViewMode && previewImages.length === 0">등록된 이미지가 없습니다.</p>
       </div>
-    </div>
 
-    <div class="button-group">
-      <button v-if="isCreateMode" @click="saveDiary">등록</button>
-      <button v-if="isEditMode" @click="saveDiary">수정 완료</button>
-      <button v-if="isViewMode" @click="enableEdit">수정</button>
-      <button v-if="isViewMode" @click="deleteDiary" class="btn-danger">삭제</button>
-      <button @click="router.push('/diary')">뒤로</button>
-    </div>
+      <div class="button-group">
+        <!-- 등록 버튼 (create 모드) -->
+        <button v-if="isCreateMode" @click="createDiary">등록</button>
 
-    <hr style="margin: 40px 0; border-top: 1px solid #ccc;" />
-    <h3>일기 목록</h3>
-
-    <div class="diary-list-section">
-      <div v-if="diaryList.length === 0" class="empty-message">
-        등록된 일기가 없습니다.
+        <!-- 수정/삭제/취소 버튼 (edit 모드) -->
+        <template v-if="isEditMode">
+          <button @click="updateDiary">수정 완료</button>
+          <button @click="deleteDiary">삭제</button>
+          <button @click="cancelEdit">취소</button>
+        </template>
       </div>
-      <ul v-else class="diary-items">
-        <li
-          v-for="item in diaryList"
-          :key="item.id"
-          class="diary-item"
-          @click="goToDiaryDetail(item.id)"
-        >
-          <strong>{{ item.diaryName }}</strong>
-          <span>{{ item.diaryContent.slice(0, 50) }}...</span>
-          <small>{{ formatDateTime(item.createdAt) }}</small>
-        </li>
-      </ul>
-      <div class="pagination">
-        <button @click="changePage(currentPage - 1)" :disabled="currentPage <= 1">이전</button>
-        <span>{{ currentPage }} / {{ totalPages }}</span>
-        <button @click="changePage(currentPage + 1)" :disabled="currentPage >= totalPages">다음</button>
+
+      <!-- 리스트는 view/edit 모드에서만 표시 -->
+      <div class="diary-list" v-if="!isCreateMode">
+        <h3 class="h3">전체 일기 목록</h3>
+        <ul>
+          <li v-for="item in diaryList" :key="item.id">
+            {{ item.title }}
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style src="./diaryDetail.css" />

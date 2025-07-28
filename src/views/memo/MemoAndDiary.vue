@@ -18,12 +18,13 @@ const goToMemo = () => {
 };
 
 const goToDiary = () => {
-  router.push('/diary/add');
+  router.push('/diary/create');
 };
 </script>
 
 <style scoped>
 .memo-menu {
+  color: black;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,17 +33,22 @@ const goToDiary = () => {
 }
 .button-wrapper {
   display: flex;
-  gap: 24px;
-  margin-top: 30px;
+  gap: 40px;
+  margin-top: 50px;
 }
 button {
-  padding: 16px 32px;
-  font-size: 18px;
-  border-radius: 12px;
+  width: 240px;
+  height: 80px;
+  padding: 20px 32px;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 16px;
   border: none;
   background-color: #f0f0f0;
   cursor: pointer;
   transition: 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 }
 button:hover {
   background-color: #d9d9d9;

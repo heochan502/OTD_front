@@ -1,36 +1,36 @@
-import api from '@/utils/MemoAndDiaryApi';
+import axios from 'axios';
+axios.defaults.withCredentials = true;
 
 class DiaryHttpService {
-  async create(formData) {
-    const res = await api.post('/diary', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return res.data.resultData;
-  }
-
-  async findAll(params = {}) {
-    const res = await api.get('/diary', {
+  async findAll(params) {
+    const res = await axios.get('/diary', {
       params: {
-        page: 1,
-        size: 5,
-        ...params, // currentPage, pageSize 같은 외부 전달값 반영
-      },
+        currentPage: 1,
+        pageSize: 10,
+      }
     });
     return res.data.resultData;
   }
 
   async findById(id) {
-    const res = await api.get(`/diary/${id}`);
+    const res = await axios.get(`/diary/${id}`);
     return res.data.resultData;
   }
 
-  async modify(jsonBody) {
-    const res = await api.put('/diary', jsonBody);
+  async create(formData) {
+    const res = await axios.post('/diary', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data.resultData;
+  }
+
+  async modify(diaryData) {
+    const res = await axios.put('/diary', diaryData);
     return res.data.resultData;
   }
 
   async deleteById(id) {
-    const res = await api.delete(`/diary/${id}`);
+    const res = await axios.delete(`/diary?id=${id}`);
     return res.data.resultData;
   }
 }

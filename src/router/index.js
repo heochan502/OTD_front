@@ -24,9 +24,9 @@ import Location from "@/components/location/Location.vue";
 import ProfileDetail from "@/views/ProfileDetail.vue";
 import ElogEdit from "@/views/health/ElogEdit.vue";
 
-import MemoAndDiary from "@/views/memo/MemoAndDiary.vue"; // 폴더가 다를 경우
 import MemoDetail from "@/components/memo/MemoDetail.vue";
 import DiaryDetail from "@/components/memo/DiaryDetail.vue";
+import MemoAndDiary from "@/views/memo/MemoAndDiary.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -123,8 +123,8 @@ const router = createRouter({
       component: Location,
     },
       {
-    path: "/memo",
-    name: "MemoMenu",
+    path: "/memo-and-diary",
+    name: "MemoAndDiary",
     component: MemoAndDiary,
   },
   {

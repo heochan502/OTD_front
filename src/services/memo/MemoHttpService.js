@@ -20,7 +20,12 @@ class MemoHttpService {
   }
 
   async findAll(params) {
-    const res = await axios.get('/api/OTD/memo', { params });
+    const res = await axios.get('/memo', { 
+      params: {
+        currentPage: 1,
+        pageSize: 10,
+      }
+  });
     return res.data.resultData;
   }
 
