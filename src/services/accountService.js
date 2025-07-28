@@ -40,3 +40,9 @@ export const checkEmail = (email) => {
 export const checkNickname = (nickname) => {
   return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
 };
+
+export const deleteMember = (memberNoLogin) => {
+  return axios.delete('/user',{
+    params: { memberNoLogin }
+  }).catch((e) => e.response);
+};

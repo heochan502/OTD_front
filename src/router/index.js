@@ -142,8 +142,8 @@ const router = createRouter({
     {
       path: '/detail',
       name: 'profile_detail',
-
       component: ProfileDetail,
+      meta: { requiresAuth: true }
     },
   ],
 });

@@ -365,6 +365,15 @@ onMounted(async () => {
     state.loading = false;
   }
 });
+
+watch(
+  () => counter.state.loggedIn,
+  (isLoggedIn) => {
+    if (!isLoggedIn) {
+      router.push('/login');
+    }
+  }
+);
 </script>
 
 <template>

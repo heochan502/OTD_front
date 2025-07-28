@@ -1,14 +1,14 @@
 <script setup>
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted ,watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { getProfile } from '@/services/accountService';
+import { getProfile, deleteMember } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
 
 const router = useRouter();
 const counter = useAccountStore();
 
 const state = reactive({
-  form: {
+  form: {  
     memberNoLogin: 0,
     memberId: '',
     email: '',
@@ -29,6 +29,24 @@ const formatBirthDate = (birthDate) => {
 const handleImageError = (e) => {
   state.form.profileImage = '';
 };
+
+const remove = async (memberNoLogin) => {
+  if (!confirm('정말 회원 탈퇴하시겠습니까?')) return;
+
+  try {
+    const res = await deleteMember(memberNoLogin); // accountService에 deleteMember API 필요
+    if (res.status === 200) {
+      alert('회원 탈퇴가 완료되었습니다.');
+      router.push('/login');
+    } else {
+      alert('회원 탈퇴에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('회원탈퇴 에러:', error);
+    alert('오류가 발생했습니다.');
+  }
+};
+
 
 onMounted(async () => {
   if (!counter.state.loggedIn) {
@@ -52,6 +70,15 @@ onMounted(async () => {
     state.loading = false;
   }
 });
+
+watch(
+  () => counter.state.loggedIn,
+  (isLoggedIn) => {
+    if (!isLoggedIn) {
+      router.push('/login');
+    }
+  }
+);
 </script>
 
 <template>
@@ -125,6 +152,7 @@ onMounted(async () => {
             >
               정보 수정
             </router-link>
+            <span class="btn btn-primary2" @click.prevent="remove(state.form.memberNoLogin)">회원탈퇴</span>
           </div>
         </div>
       </div>
@@ -352,13 +380,21 @@ onMounted(async () => {
   background: #5BA7F7;
   color: white;
 }
+.btn-primary2 {
+  background: #6c757d;;
+  color: white;
+}
 
 .btn-primary:hover {
   background: #4A9EF5;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
 }
-
+.btn-primary2:hover {
+  background: #535A61;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
+}
 .btn-secondary {
   background: #6c757d;
   color: white;
