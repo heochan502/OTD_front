@@ -88,8 +88,12 @@ export const useBaseDate = defineStore("useBaseDate",()=>{
     startDate:'',
     endDate:''
   })
-
-
-
   return { getWeekDate };
-})
+});
+
+export const useWeeklyStore = defineStore('weekly', ()=>{
+  const weeklyRawData = ref([]);
+  return {
+    weeklyRawData,
+  };
+});
