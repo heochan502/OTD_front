@@ -5,7 +5,7 @@ import { usecommunityStore } from '@/stores/communityStore';
 const store = usecommunityStore();
 
 onMounted(() => {
-  store.loadPosts(); // 🔥 API 데이터 호출
+  store.loadPosts(); // API 데이터 호출
   console.log('store.posts:', store.posts); // 여기서 확인
 });
 
@@ -19,6 +19,23 @@ const filteredPosts = computed(() => {
       (post.memberNick || '').toLowerCase().includes(query)
   );
 });
+
+// 페이징
+const nextPage = () => {
+  store.page++;
+  store.loadPosts();
+};
+
+const prevPage = () => {
+  if (store.page > 1) {
+    store.page--;
+    store.loadPosts();
+  }
+};
+
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleString('ko-KR');
+}
 </script>
 
 <template>
@@ -71,13 +88,14 @@ const filteredPosts = computed(() => {
             <div>
               <div class="text-caption text-grey-darken-1">
                 {{ post.memberNick }} ·
-                {{ new Date(post.createdAt).toLocaleString() }}
+                {{ formatDate(post.createdAt) }}
               </div>
               <div class="text-body-1 font-weight-medium">
-                {{ post.title }}
+                {{ post?.title }}
               </div>
               <div class="text-caption text-grey mt-1">
-                ❤️ {{ post.like }} · 💬 {{ post.commentCount }}
+                ❤️ {{ post.like }} · 💬 {{ post.commentCount }}· 👁️
+                {{ post.viewCount }}
               </div>
             </div>
           </v-row>
