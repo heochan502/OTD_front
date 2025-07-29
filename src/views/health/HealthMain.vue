@@ -46,9 +46,5 @@ import { onMounted } from "vue";
     display: flex;
     justify-content: center;
   }
-
-  .top {
-    margin-bottom: 50px;
-  }
 }
 </style>

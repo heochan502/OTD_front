@@ -3,13 +3,15 @@ import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted,computed } from 'vue';
 import {useRouter} from "vue-router";
-import { useDayDefine, useCalorieCalcul } from "@/stores/mealStore";
+import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
+
+
 
 const dayStore = useDayDefine();
 const ondayMealData = useCalorieCalcul();
+const weeklyData = useWeeklyStore();
+const baseDate = useBaseDate();
 
-const value = ref(10);
-const moreMeal = ref(500);
 const maxKcal = ref(2500);
 
 const router = useRouter();
@@ -22,7 +24,7 @@ const  mealadd = (day)=>{
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
 const calorieData = computed(() => {
-  const info = ondayMealData.itemInfo.value;
+  const info = ondayMealData.itemInfo;
   if (Array.isArray(info) && info.length > 0) {
     return info[0];
   }
@@ -34,18 +36,23 @@ const calorieData = computed(() => {
     totalProtein: 0,
   };
 });
-
+const total = ref(0);
+const avg =ref(0);
 onMounted(async() => {
   // console.log('totalKcal:', totalKcal.value);
   // console.log('maxKcal:', maxKcal.value);  
    await ondayMealData.mealFormData();
-  console.log(ondayMealData); // 이게 ref인지 reactive인지도 확인
-  console.log(ondayMealData.itemInfo);
-
+  console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
+  total.value = weeklyData.weeklyRawData.reduce((sum, day) => sum + day.totalCalorie, 0);
+    avg.value = total.value / weeklyData.weeklyRawData.length;
+  console.log("정보 데이터 :", avg.value);
+  console.log("인포 :", weeklyData.weeklyRawData);
+  
   // console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
   // itemInfo.value= ondayMealData.itemInfo.value;
 
 });
+
 </script>
 
 <template>
@@ -87,10 +94,13 @@ onMounted(async() => {
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1">이번주에 평균 {{ value }}kcal 먹었어요</span>
-      <WeeklyCalorie />
+      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ avg.toFixed(0) }}kcal 먹었어요</span>
+      
+      <div class=" d-flex  justify-content-end ">
+      <WeeklyCalorie class="" />
     </div>
-    <div class="bottom d-flex justify-center mb-6">
+    </div>
+    <div class="bottom ">
 
     </div>
   </div>

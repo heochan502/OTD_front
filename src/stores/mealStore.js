@@ -64,6 +64,9 @@ export const useDayDefine = defineStore("useDayDefine",()=>
       initCurrentTime(); // 자동 초기화 실행
 
       return { dayDefine, updateTime, currentTime, nowDay };
+    },
+    {
+      persist: true  // 🔥 이 한 줄로 localStorage 자동 저장/복원됨
     }
 );
 
@@ -85,8 +88,12 @@ export const useBaseDate = defineStore("useBaseDate",()=>{
     startDate:'',
     endDate:''
   })
-
-
-
   return { getWeekDate };
-})
+});
+
+export const useWeeklyStore = defineStore('weekly', ()=>{
+  const weeklyRawData = ref([]);
+  return {
+    weeklyRawData,
+  };
+});
