@@ -235,7 +235,7 @@ const getMeal = async () => {
     mealBrLuDi : dayStore.dayDefine, 
     mealDay : dayStore.currentTime.slice(3, 13),
   }
-
+  // console.log(" data들 : ",  getlist);
   const lisData = await getMealData(getlist);
 
   if (Array.isArray(lisData) && lisData.length > 0)
