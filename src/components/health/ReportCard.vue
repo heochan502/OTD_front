@@ -1,13 +1,40 @@
 <script setup>
-import { ref } from 'vue';
-import ExerciseReport from './ExerciseReport.vue';
-import HealthReport from './HealthReport.vue';
+import ExerciseReport from "./ExerciseReport.vue";
+import HealthReport from "./HealthReport.vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
-const tab = ref('two');
+const tabs = ["one", "two"];
+const tab = ref("one");
+
+let intervalId;
+const isPaused = ref(false);
+
+function startCycle() {
+  stopCycle();
+  intervalId = setInterval(() => {
+    if (!isPaused.value) {
+      const currentIndex = tabs.indexOf(tab.value);
+      tab.value = tabs[(currentIndex + 1) % tabs.length];
+    }
+  }, 3000);
+}
+function stopCycle() {
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+}
+onMounted(startCycle);
+onUnmounted(stopCycle);
+
 </script>
 
 <template>
-  <v-card class="card">
+  <v-card
+    class="card"
+    @mouseenter="isPaused = true"
+    @mouseleave="isPaused = false"
+  >
     <v-tabs
       v-model="tab"
       bg-color="#9DDEFF"

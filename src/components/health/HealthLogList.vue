@@ -37,21 +37,23 @@ const detail = (healthlogId) => {
       <i class="bi bi-plus-circle btn-plus" @click="add"></i>
     </div>
   </div>
-  <ul>
-    <li v-if="state.logs.length < 1" class="title">건강 기록을 추가하세요</li>
-    <li
-      v-for="item in state.logs"
-      :key="item.healthlogId"
-      @click="detail(item.healthlogId)"
-    >
-      <div class="title">
-        {{ formatDate(item.healthlogDatetime) }}
-      </div>
-      <div class="content">
-        <div>건강보기</div>
-      </div>
-    </li>
-  </ul>
+  <div class="list-wrap">
+    <ul>
+      <li v-if="state.logs.length < 1" class="title">건강 기록을 추가하세요</li>
+      <li
+        v-for="item in state.logs"
+        :key="item.healthlogId"
+        @click="detail(item.healthlogId)"
+      >
+        <div class="title">
+          {{ formatDate(item.healthlogDatetime) }}
+        </div>
+        <div class="content">
+          <div>건강보기</div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -70,7 +72,10 @@ const detail = (healthlogId) => {
     cursor: pointer;
   }
 }
-
+.list-wrap {
+  height: 300px;
+  overflow: auto;
+}
 ul {
   display: flex;
   flex-direction: column;
@@ -85,7 +90,7 @@ ul {
 
     width: 400px;
     height: 80px;
-    margin: 10px 0;
+    margin: 9px 0;
     padding: 5px 40px;
     border-radius: 40px;
     background-color: #3bbeff;

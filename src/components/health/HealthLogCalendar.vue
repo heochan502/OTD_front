@@ -1,14 +1,23 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
+import { useHealthStore } from "@/stores/healthStore";
+import { useExerciseStore } from "@/stores/exerciseStore";
 
-const healthLogDate = ref(["2025-07-08", "2025-07-09"]);
+const healthStore = useHealthStore();
+const exerciseStore = useExerciseStore();
 
-const exerciseLogDate = ref(["2025-07-08", "2025-07-16"]);
+const healthLogDate = ref([]);
+const exerciseLogDate = ref([]);
 
 const calendarAttributes = ref([]);
 
 function formatDate(date) {
-  return date.toISOString().split("T")[0];
+  if (!date) return "";
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 const selectedDate = ref(new Date());
@@ -19,6 +28,19 @@ function formatYearMonth(date) {
   const month = date.getMonth() + 1;
   return `${year}년 ${month}월`;
 }
+
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
+  await exerciseStore.fetchExerciselogs();
+
+  healthLogDate.value = healthStore.logs.map((item) =>
+    formatDate(item.healthlogDatetime)
+  );
+
+  exerciseLogDate.value = exerciseStore.logs.map((item) =>
+    formatDate(item.exerciseDatetime)
+  );
+});
 </script>
 
 <template>
@@ -82,6 +104,10 @@ function formatYearMonth(date) {
   width: 25px;
   height: 25px;
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
 .dot-wrapper {

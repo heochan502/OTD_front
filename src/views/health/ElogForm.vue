@@ -10,7 +10,6 @@ const exerciseStore = useExerciseStore();
 
 const state = reactive({
   form: {
-    exerciselogId: 0,
     exerciseId: null,
     exerciseDatetime: "",
     exerciseKcal: 0,
@@ -44,13 +43,12 @@ const submit = async () => {
   };
 
   const res = await saveElog(jsonBody);
-  const id = state.form.exerciselogId;
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
   alert("운동기록 저장 완료!");
-  router.push(`/health/${id}`);
+  router.push("/health");
 };
 
 const cancel = () => {
