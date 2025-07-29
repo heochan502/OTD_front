@@ -363,7 +363,7 @@ const submit = async () => {
   color: #fff;
 }
 .on {
-  background-color: #bfeaff;
+  background-color: #3bbeff;
   color: #fff;
 }
 </style>

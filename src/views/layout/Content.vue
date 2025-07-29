@@ -25,10 +25,9 @@
 
 .box {
   min-width: 100vh;
-  min-height: 100vh;
+  min-height: 90vh;
   width: 100%;
   max-width: 1100px;
-  height: 1400px;
   border-radius: 8px;
 }
 </style>
