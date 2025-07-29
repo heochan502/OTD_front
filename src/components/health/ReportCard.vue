@@ -1,9 +1,9 @@
 <script setup>
-import { ref } from "vue";
-import ExerciseReport from "./ExerciseReport.vue";
-import HealthReport from "./HealthReport.vue";
+import { ref } from 'vue';
+import ExerciseReport from './ExerciseReport.vue';
+import HealthReport from './HealthReport.vue';
 
-const tab = ref("one");
+const tab = ref('two');
 </script>
 
 <template>
@@ -32,6 +32,7 @@ const tab = ref("one");
 .card {
   width: 400px;
   height: 300px;
+  border-radius: 25px 25px 0 0;
 }
 .v-tab {
   font-size: 18px;
