@@ -216,7 +216,7 @@ const submit = async () => {
         />알람 설정</span
       >
       <span :class="{ disabled: isDateMode }">
-        <span :class="{ on: isRepeatMode }" class="off">요일 반복</span>
+        <span :class="{ on: isRepeatMode }" class="off toggle-box">요일 반복</span>
         <img
           v-for="(dow, index) in dowImage"
           :key="index"
@@ -281,9 +281,7 @@ const submit = async () => {
     }
     .calendar-popup {
       position: relative;
-      .box{
-        
-      }
+
       .date,
       .calendar-button {
         display: inline-block;
@@ -309,12 +307,19 @@ const submit = async () => {
         margin-top: 10px;
       }
     }
+    .alarm-box {
+      margin-right: 110px;
+    }
 
     .alarm-img {
-      width: 20px;
+      width: 18px;
+      height: 18px;
       margin-right: 5px;
     }
 
+    .toggle-box {
+      margin-right: 0;
+    }
     .toggle-img {
       width: 40px;
       height: 40px;
