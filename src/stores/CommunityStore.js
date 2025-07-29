@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { fetchPosts } from '@/services/community/communityService'; // ✅ 추가
+import {
+  fetchPosts,
+  fetchPostById,
+} from '@/services/community/communityService';
 
 export const usecommunityStore = defineStore('community', () => {
   const posts = ref([]);
@@ -9,13 +12,21 @@ export const usecommunityStore = defineStore('community', () => {
   const selectedPost = ref(null);
   const viewMode = ref('list'); // 'list' | 'detail' | 'edit' | 'write'
   const hasLiked = ref(false);
+  const page = ref(1);
+  const totalCount = ref(0);
 
   // 게시글 목록 조회
-  const loadPosts = async () => {
+  const loadPosts = async (page = 1) => {
     try {
-      const res = await fetchPosts();
-      console.log('res:', res); // ← 확인 완료
-      posts.value = res.data.content || res.data; // 구조에 따라 조정
+      const res = await fetchPosts(page, 10);
+
+      const allPosts = res.data.posts || res.data.content || [];
+
+      posts.value = allPosts.filter(
+        (post) => post.isDeleted === false || post.isDeleted === 0
+      );
+
+      totalCount.value = res.data.totalCount || res.data.total || 0;
     } catch (err) {
       console.error('게시글 목록 조회 실패', err);
     }
@@ -43,20 +54,24 @@ export const usecommunityStore = defineStore('community', () => {
     selectedPost.value = post;
   };
 
-  const clearPost = () => {
+  const clearSelectedPost = () => {
     selectedPost.value = null;
   };
 
   const goList = () => {
-    clearPost();
+    clearSelectedPost();
     viewMode.value = 'list';
   };
 
-  const goDetail = (post) => {
-    if (post) {
-      selectPost(post); // 리스트에서 클릭 시
+  const goDetail = async (post) => {
+    if (!post?.postId) return;
+    try {
+      const res = await fetchPostById(post.postId);
+      selectedPost.value = res.data;
+      viewMode.value = 'detail';
+    } catch (err) {
+      console.error('상세 조회 실패:', err);
     }
-    viewMode.value = 'detail';
   };
 
   const goEdit = () => {
@@ -64,7 +79,7 @@ export const usecommunityStore = defineStore('community', () => {
   };
 
   const goWrite = () => {
-    clearPost();
+    clearSelectedPost();
     viewMode.value = 'write';
   };
 
@@ -83,14 +98,14 @@ export const usecommunityStore = defineStore('community', () => {
     filteredPosts,
     sortedPosts,
     selectPost,
-    clearPost,
+    clearSelectedPost,
     viewMode,
     goList,
     goDetail,
     goEdit,
     goWrite,
     loadPosts,
-
     replacePost,
+    totalCount,
   };
 });

@@ -1,12 +1,17 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
 
 const store = usecommunityStore();
 
+const itemsPerPage = 10;
+const currentPage = ref(1);
+
 onMounted(() => {
-  store.loadPosts(); // 🔥 API 데이터 호출
-  console.log('store.posts:', store.posts); // 여기서 확인
+
+  store.loadPosts();
+  console.log('store.posts:', store.posts);
+
 });
 
 const filteredPosts = computed(() => {
@@ -19,6 +24,41 @@ const filteredPosts = computed(() => {
       (post.memberNick || '').toLowerCase().includes(query)
   );
 });
+
+
+// 페이징 계산
+const pageCount = computed(() =>
+  Math.ceil(filteredPosts.value.length / itemsPerPage)
+);
+
+const currentPagePosts = computed(() => store.sortedPosts); // 이미 현재 페이지 10개
+
+const onPageChange = (page) => {
+  currentPage.value = page;
+  store.loadPosts(page); //페이지 바뀔 때마다 새 게시글 요청
+};
+
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  if (isNaN(date)) return '날짜 오류';
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+const handlePostClick = (post) => {
+  console.log('클릭된 post:', post);
+  if (!post?.postId || post.postId <= 0) {
+    console.warn('유효하지 않은 postId:', post.postId);
+    return;
+  }
+  store.goDetail(post);
+};
+
 </script>
 
 <template>
@@ -55,13 +95,13 @@ const filteredPosts = computed(() => {
       </v-btn-toggle>
 
       <v-card
-        v-for="post in filteredPosts"
+        v-for="post in currentPagePosts"
         :key="post.postId"
         class="mb-3 px-3 py-4 hover-effect"
         elevation="0"
         rounded="xl"
         style="border: 1px solid #e0e0e0"
-        @click="store.goDetail(post)"
+        @click="handlePostClick(post)"
       >
         <v-row justify="space-between" no-gutters>
           <v-row align="start" no-gutters class="flex-grow-1">
@@ -71,18 +111,29 @@ const filteredPosts = computed(() => {
             <div>
               <div class="text-caption text-grey-darken-1">
                 {{ post.memberNick }} ·
-                {{ new Date(post.createdAt).toLocaleString() }}
+                {{ formatDate(post.createdAt) }}
               </div>
               <div class="text-body-1 font-weight-medium">
-                {{ post.title }}
+                {{ post?.title }}
               </div>
               <div class="text-caption text-grey mt-1">
-                ❤️ {{ post.like }} · 💬 {{ post.commentCount }}
+                ❤️ {{ post.like }} · 💬 {{ post.commentCount }}· 👁️
+                {{ post.viewCount }}
               </div>
             </div>
           </v-row>
         </v-row>
       </v-card>
+      <!-- 페이지네이션 -->
+      <v-row justify="center" class="mt-6">
+        <v-pagination
+          v-model="currentPage"
+          :length="Math.ceil(totalCount / 10)"
+          rounded
+          color="primary"
+          @update:model-value="onPageChange"
+        />
+      </v-row>
     </div>
   </v-container>
 </template>

@@ -6,9 +6,9 @@ axios.defaults.baseURL = '/api/OTD/';
 const COMMUNITY_BASE = 'community/';
 
 // 게시글 목록 조회
-export const fetchPosts = (page = 1, size = 20) => {
+export const fetchPosts = (page = 1, size = 10, searchText = '') => {
   return axios.get(`${COMMUNITY_BASE}list`, {
-    params: { page, size },
+    params: { page, size, searchText },
   });
 };
 
