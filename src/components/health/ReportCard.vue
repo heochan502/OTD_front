@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import ExerciseReport from './ExerciseReport.vue';
 import HealthReport from './HealthReport.vue';
 
-const tab = ref('one');
+const tab = ref('two');
 </script>
 
 <template>

@@ -183,8 +183,8 @@ const submit = async () => {
       <span>
         <img src="/src/image/cancel.png" alt="취소" class="cancel" />
       </span>
-      <div :class="{ disabled: isRepeatMode }">
-        <span :class="{ on: isDateMode }" class="off">날짜 지정</span>
+      <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
+        <span :class="{ on: isDateMode }" class="off date-box">날짜 지정</span>
         <span class="date">{{ formattedDate }}</span>
         <img
           src="/src/image/button.png"
@@ -200,29 +200,36 @@ const submit = async () => {
           ></calendar>
         </div>
       </div>
-        <span :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }">
-          <img
-            :src="
-              state.reminder.alarm
-                ? '/src/image/alarm_on.png'
-                : '/src/image/alarm_off.png'
-            "
-            alt="알람 상태"
-            class="alarm-img"
-            @click="state.reminder.alarm = !state.reminder.alarm"
-          />알람 설정</span
-        >
-      <div :class="{ disabled: isDateMode }">
-        <span :class="{ on: isRepeatMode }" class="off">요일 반복</span>
+      <span
+        :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }"
+        class="alarm-box"
+      >
         <img
-          v-for="(dow, index) in dowImage"
-          :key="index"
-          :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
-          :alt="dow.name"
-          @click="imageToggle(index)"
-          class="toggle-img"
-        />
-      </div>
+          :src="
+            state.reminder.alarm
+              ? '/src/image/alarm_on.png'
+              : '/src/image/alarm_off.png'
+          "
+          alt="알람 상태"
+          class="alarm-img"
+          @click="state.reminder.alarm = !state.reminder.alarm"
+        />알람 설정</span
+      >
+      <span :class="{ disabled: isDateMode }">
+        <span :class="{ on: isRepeatMode }" class="off toggle-box"
+          >요일 반복</span
+        >
+        <div class="img">
+          <img
+            v-for="(dow, index) in dowImage"
+            :key="index"
+            :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
+            :alt="dow.name"
+            @click="imageToggle(index)"
+            class="toggle-img"
+          />
+        </div>
+      </span>
       <div>
         <input
           type="text"
@@ -239,7 +246,7 @@ const submit = async () => {
           v-model="state.reminder.content"
         ></textarea>
       </div>
-      <button @click="submit">
+      <button @click="submit" class="button">
         {{ state.reminder.id > 0 ? '수정하기' : '추가하기' }}
       </button>
     </div>
@@ -256,15 +263,17 @@ const submit = async () => {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
-    color: #333;
-    margin-bottom: 30px;
+    color: #5D5D5D;
+    margin-bottom: 25px;
   }
 
   .form-card {
     position: relative;
     border-radius: 10px;
-    padding: 30px;
+    padding: 40px 30px 30px 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 500px;
 
     .cancel {
       width: 24px;
@@ -274,33 +283,49 @@ const submit = async () => {
       right: 10px;
       cursor: pointer;
     }
-
-    .date,
-    .calendar-button {
-      display: inline-block;
-      vertical-align: middle;
+    .date-box {
+      margin-right: 173px;
     }
+    .calendar-popup {
+      position: relative;
 
-    .date {
-      margin-left: 10px;
-      font-size: 18px;
-      color: #666;
+      .date,
+      .calendar-button {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .date {
+        font-size: 18px;
+        color: #5D5D5D;
+        font-weight: bold;
+      }
+
+      .calendar-button {
+        width: 20px;
+        margin-left: 8px;
+        transform: rotate(90deg);
+        cursor: pointer;
+      }
+
+      .calendar {
+        position: absolute;
+        z-index: 99999999999;
+        margin-top: 10px;
+      }
     }
-
-    .calendar-button {
-      width: 20px;
-      margin-left: 8px;
-      transform: rotate(90deg);
-      cursor: pointer;
-    }
-
-    .calendar {
-      margin-top: 10px;
+    .alarm-box {
+      margin-right: 166px;
     }
 
     .alarm-img {
-      width: 20px;
+      width: 18px;
+      height: 18px;
       margin-right: 5px;
+    }
+
+    .toggle-box {
+      margin-right: 0;
     }
 
     .toggle-img {
@@ -311,10 +336,17 @@ const submit = async () => {
       cursor: pointer;
     }
 
+    .img img:nth-child(1) {
+      margin-left: 0;
+    }
+    .img img:nth-child(7) {
+      margin-right: 0;
+    }
+
     .title,
     .content {
       width: 100%;
-      border: 1px solid #ccc;
+      border: 2px solid #ccc;
       border-radius: 8px;
       padding: 10px;
       font-size: 16px;
@@ -336,7 +368,7 @@ const submit = async () => {
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 10px;
 
       &:hover {
         background-color: #1aaeff;
@@ -363,7 +395,7 @@ const submit = async () => {
   color: #fff;
 }
 .on {
-  background-color: #bfeaff;
+  background-color: #3bbeff;
   color: #fff;
 }
 </style>

@@ -1,18 +1,20 @@
 <script setup>
-import { reactive } from "vue";
+import { onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { useHealthStore } from "@/stores/healthStore";
 
 const router = useRouter();
-const logs = reactive([
-  {
-    healthlog_id: 1,
-    date: "2025-07-08",
-  },
-  {
-    healthlog_id: 2,
-    date: "2025-07-16",
-  },
-]);
+const healthStore = useHealthStore();
+
+const state = reactive({
+  logs: [],
+});
+
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
+  state.logs = healthStore.logs;
+  console.log(state.logs);
+});
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -36,14 +38,14 @@ const detail = (healthlogId) => {
     </div>
   </div>
   <ul>
-    <li v-if="logs < 1" class="title">건강 기록을 추가하세요</li>
+    <li v-if="state.logs.length < 1" class="title">건강 기록을 추가하세요</li>
     <li
-      v-for="item in logs"
-      :key="item.healthlog_id"
-      @click="detail(item.healthlog_id)"
+      v-for="item in state.logs"
+      :key="item.healthlogId"
+      @click="detail(item.healthlogId)"
     >
       <div class="title">
-        {{ formatDate(item.date) }}
+        {{ formatDate(item.healthlogDatetime) }}
       </div>
       <div class="content">
         <div>건강보기</div>

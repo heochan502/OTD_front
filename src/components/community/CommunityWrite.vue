@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
 import { useAccountStore } from '@/stores/counter';
 import axios from 'axios';
+import { createPost } from '@/services/community/communityService';
 
 const store = usecommunityStore();
 const account = useAccountStore();
@@ -20,13 +21,11 @@ const submitPost = async () => {
   const formData = new FormData();
   formData.append('title', title.value);
   formData.append('content', content.value);
-  formData.append('memberNoLogin', account.loggedInId); // ✅ 로그인 유저 번호
+  formData.append('memberNoLogin', account.loggedInId); // 로그인 유저 번호
 
   try {
-    const res = await axios.post('/community/create', formData);
+    const res = await createPost(formData); // 서비스 함수 사용
     console.log('글 등록 성공', res.data);
-
-    // 등록 후 목록에 추가 (임시)
     store.goList();
   } catch (err) {
     console.error('글 등록 실패', err);
