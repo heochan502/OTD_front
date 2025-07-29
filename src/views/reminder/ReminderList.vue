@@ -159,7 +159,6 @@ const modify = (id) => {
   align-items: center;
   gap: 12px;
   margin-bottom: 10px;
-
   .edit {
     display: flex;
     flex-direction: column;
