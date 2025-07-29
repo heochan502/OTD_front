@@ -1,6 +1,7 @@
 <script setup>
 import { usecommunityStore } from '@/stores/communityStore';
 import { useAccountStore } from '@/stores/counter';
+import axios from 'axios';
 import { ref, computed, onMounted } from 'vue';
 import {
   deletePost,
