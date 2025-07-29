@@ -2,7 +2,7 @@
 import { usecommunityStore } from '@/stores/communityStore';
 import { useAccountStore } from '@/stores/counter';
 import axios from 'axios';
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import {
   deletePost,
   toggleLike,
@@ -45,6 +45,13 @@ const fetchMents = async () => {
     console.error('댓글 조회 실패:', err);
   }
 };
+
+// onMounted(() => {
+//   // 브라우저 렌더링 전에 실행되도록 nextTick을 사용
+//   nextTick(() => {
+//     window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); // behavior: 'auto'로 즉시 이동
+//   });
+// });
 
 watch(
   () => post.value,
