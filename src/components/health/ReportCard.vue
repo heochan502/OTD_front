@@ -26,6 +26,7 @@ function stopCycle() {
 }
 onMounted(startCycle);
 onUnmounted(stopCycle);
+
 </script>
 
 <template>

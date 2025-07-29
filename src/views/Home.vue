@@ -1,9 +1,9 @@
 <script setup>
-import Weather from "@/views/weather/weather.vue";
-import { getByMonth } from "@/services/reminder/reminderService";
-import { onMounted, reactive } from "vue";
-import { useReminderStore } from "@/stores/reminderStore";
-import ReportCard from "@/components/health/ReportCard.vue";
+import Weather from '@/views/weather/weather.vue';
+import { getByMonth } from '@/services/reminder/reminderService';
+import { onMounted, reactive } from 'vue';
+import { useReminderStore } from '@/stores/reminderStore';
+import ReportCard from '@/components/health/ReportCard.vue';
 
 const reminderStore = useReminderStore();
 
@@ -26,8 +26,8 @@ onMounted(async () => {
 
   const formattedToday = `${todayYear}-${String(todayMonth).padStart(
     2,
-    "0"
-  )}-${String(todayDate).padStart(2, "0")}`;
+    '0'
+  )}-${String(todayDate).padStart(2, '0')}`;
   const dow = today.getDay();
 
   state.todayReminder = reminderStore.state.fullReminder.filter((item) => {
@@ -76,7 +76,7 @@ onMounted(async () => {
       </router-link>
     </div>
 
-    <div class="report-wrapper mt-5">
+    <div class="report-wrapper mt-9">
       <ReportCard />
     </div>
   </div>
@@ -93,14 +93,54 @@ onMounted(async () => {
   width: 50%;
 }
 
+.report-wrapper {
+  :deep(.v-card) {
+    background-color: transparent !important;
+    border-radius: 25px 25px 0 0 !important;
+    width: 96%;
+    height: inherit;
+  }
+
+  :deep(.v-card-text) {
+    background-color: #fff;
+    padding: 1rem !important;
+    max-height: 400px !important;
+    min-height: 400px !important;
+  }
+  :deep(.v-tab) {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    text-transform: none !important;
+  }
+  :deep(.exercise_report) {
+    min-height: 300px;
+  }
+  :deep(.health_report) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    min-height: 350px;
+    margin: 0 auto !important;
+    padding-top: 1rem;
+  }
+}
+
 .header {
   display: flex;
-  border-radius: 16px 16px 0 0;
   color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
 
   .list-title {
+    width: 180px;
+    height: 3rem;
     background-color: #3bbeff;
-    border-radius: 16px 16px 0 0;
+    line-height: 45px;
+    text-align: center;
+    border-radius: 25px 25px 0 0;
     gap: 0;
   }
 }
@@ -124,10 +164,15 @@ onMounted(async () => {
 .reminder {
   background-color: #bfeaff;
   margin: 0 1rem;
-  border-radius: 0 16px 16px 16px;
+  border-radius: 0 16px 0 0;
   padding: 1rem;
   min-height: 400px;
-
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.4);
+  &::-webkit-scrollbar {
+    display: none;
+  }
   .list {
     list-style: none;
     padding: 0;

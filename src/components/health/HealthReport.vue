@@ -43,7 +43,7 @@ const maxBmi = 40;
           interval="5000"
           class="report-carousel"
         >
-          <v-carousel-item v-for="(item, i) in subtitle" :key="i">
+          <v-carousel-item class="sheet" v-for="(item, i) in subtitle" :key="i">
             <v-sheet :color="colors[i]" height="100%">
               <div class="d-flex fill-height justify-center pa-3">
                 <div class="text-h6">{{ item }}</div>

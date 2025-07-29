@@ -121,11 +121,14 @@ const modify = (id) => {
                     class="img alarm"
                   />
                   <img
-                    v-if="reminder.content"
+                    :class="{
+                      'button-hide':
+                        reminder.content === '' || reminder.content === null,
+                    }"
                     src="/src/image/button.png"
                     alt="상세보기"
                     @click="viewDetail(reminder.id)"
-                    class="img detail cursor-pointer"
+                    class="img detail"
                   />
                 </div>
               </div>
@@ -159,7 +162,6 @@ const modify = (id) => {
   align-items: center;
   gap: 12px;
   margin-bottom: 10px;
-
   .edit {
     display: flex;
     flex-direction: column;
@@ -173,7 +175,7 @@ const modify = (id) => {
   border-radius: 5rem;
   font-size: 1.2rem;
   font-weight: 500;
-  width: 96%;
+  width: 93%;
   padding: 18px;
 }
 .contents {
@@ -241,12 +243,13 @@ const modify = (id) => {
 
 .detail {
   transform: rotate(90deg);
+  cursor: pointer;
 }
 
 .reminder-add {
   display: flex;
   flex-direction: row-reverse;
-  max-width: 96%;
+  max-width: 93%;
 
   .add {
     width: 135px;
@@ -265,5 +268,9 @@ const modify = (id) => {
 .content-text {
   color: #575757;
   margin-left: 30px;
+}
+
+.button-hide {
+  visibility: hidden;
 }
 </style>
