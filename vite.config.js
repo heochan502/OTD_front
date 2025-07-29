@@ -16,7 +16,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'C:/2025_swstudy/OTD_back/jin/src/main/resources/memo/uploads',
+    outDir: 'C:/Download',
     emptyOutDir: true,
   },
   plugins: [

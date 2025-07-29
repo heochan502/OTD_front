@@ -57,8 +57,8 @@ const logoutAccount = async () => {
           active-class="active"
           >건강</router-link
         >
-        <router-link to="/memo" href="#" class="nav-menu" active-class="active"
-          >일기</router-link
+        <router-link to="/memoAndDiary" href="#" class="nav-menu" active-class="active"
+          >기록</router-link
         >
         <router-link
           to="/community"
