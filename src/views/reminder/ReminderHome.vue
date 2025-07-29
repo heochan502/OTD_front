@@ -1,15 +1,15 @@
 <script setup>
-import { reactive, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { getByMonth } from '@/services/reminder/reminderService';
-import { useReminderStore } from '@/stores/reminderStore';
-import Calendar from '@/components/reminder/Calendar.vue';
+import { reactive, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
+import { getByMonth } from "@/services/reminder/reminderService";
+import { useReminderStore } from "@/stores/reminderStore";
+import Calendar from "@/components/reminder/Calendar.vue";
 
 const reminderStore = useReminderStore();
 
 const router = useRouter();
 
-const formatNumber = (n) => String(n).padStart(2, '0');
+const formatNumber = (n) => String(n).padStart(2, "0");
 const formatDate = (date) => {
   const y = date.getFullYear();
   const m = formatNumber(date.getMonth() + 1);
@@ -46,7 +46,7 @@ watch(
 const getReminderList = async (date) => {
   const res = await getByMonth(date.year, date.month);
   if (res === undefined || res.status !== 200) {
-    alert('오류발생');
+    alert("오류발생");
     return;
   }
   reminderStore.setFullReminder(res.data);
@@ -115,9 +115,9 @@ const routerDate = (date) => {
 
   if (dayReminder.length > 0) {
     reminderStore.setSelectedDate(formattedDate);
-    router.push('/reminder/list');
+    router.push("/reminder/list");
   } else {
-    router.push('reminder/form');
+    router.push("reminder/form");
   }
 };
 </script>
