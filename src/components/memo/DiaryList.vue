@@ -3,17 +3,21 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 import { formatDateTime } from '@/utils/MemoAndDiaryApi';
+import { useAccountStore } from '@/stores/counter';
 
 const diaryList = ref([]);
 const router = useRouter();
+const accountStore = useAccountStore();
 
 const fetchDiaryList = async () => {
   try {
-    const result = await DiaryHttpService.findAll({
-      currentPage: 1,  // 페이지 번호 (필요에 따라 추가)
-      pageSize: 10,    // 페이지 크기 (필요에 따라 추가)
-    });
-    diaryList.value = result.diaryList;
+    const params = {
+      memberNoLogin: accountStore.state.memberNoLogin,
+      currentPage: 1,
+      pageSize: 10,
+      offset: 0,
+    };
+    diaryList.value = await DiaryHttpService.findAll(params);
   } catch (e) {
     alert('다이어리 목록 로딩 실패');
     console.error(e);
@@ -21,12 +25,10 @@ const fetchDiaryList = async () => {
 };
 
 const goToDiaryDetail = (id) => {
-  router.push(`/memoAndDiary/diary/${id}`); // 해당 다이어리 상세 페이지로 이동
+  router.push(`/memoAndDiary/diary/${id}`);
 };
 
-onMounted(async () => {
-  await fetchDiaryList();  // 다이어리 목록을 가져옴
-});
+onMounted(fetchDiaryList);
 </script>
 
 <template>
@@ -69,4 +71,7 @@ onMounted(async () => {
   color: #888;
   text-align: center;
 }
+.diary {
+  color: black !important;
+  }
 </style>

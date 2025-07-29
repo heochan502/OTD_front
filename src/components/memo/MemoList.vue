@@ -77,6 +77,10 @@ onMounted(async () => {
   gap: 1rem;
   margin-top: 1rem;
 }
+.diary-title, .diary-content, .diary-date {
+  color: black !important;
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;

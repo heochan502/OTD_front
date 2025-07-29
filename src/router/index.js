@@ -3,16 +3,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 
 
-<<<<<<< HEAD
-import CommunityView from "@/views/community/CommunityView.vue";
-=======
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
 import ReminderForm from '@/views/reminder/ReminderForm.vue';
 import ReminderList from '@/views/reminder/ReminderList.vue';
 
-import Memo from '@/components/memo/MemoDetail.vue';
-import Diary from '@/components/memo/DiaryDetail.vue';
->>>>>>> 0bde3dd98c07cc5327002dbcfd5fe25b5b6b72e8
+import MemoList from '@/components/memo/MemoList.vue';
+import DiaryList from '@/components/memo/DiaryList.vue';
+import MemoDetail from '@/components/memo/MemoDetail.vue';
+import DiaryDetail from '@/components/memo/DiaryDetail.vue';
+import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 
 import CommunityView from '@/views/community/CommunityView.vue';
 
@@ -27,21 +26,12 @@ import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
 
-<<<<<<< HEAD
-import MemoAndDiary from "@/views/memo/MemoAndDiary.vue";
-import MemoDetail from "@/components/memo/MemoDetail.vue";
-import DiaryDetail from "@/components/memo/DiaryDetail.vue";
-import MemoList from "@/components/memo/MemoList.vue";
-import DiaryList from "@/components/memo/DiaryList.vue";
-=======
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
 
 import Location from '@/components/location/Location.vue';
 import ProfileDetail from '@/views/ProfileDetail.vue';
-
->>>>>>> 0bde3dd98c07cc5327002dbcfd5fe25b5b6b72e8
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,42 +63,6 @@ const router = createRouter({
       name: 'reminderlist',
       component: ReminderList,
     },
-<<<<<<< HEAD
-    {
-      path: "/meal",
-      name: "MealForm",
-      component: MealForm,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/meal/add",
-      name: "MealAdd",
-      component: MealAdd,
-    },
-    {
-      path: "/health",
-      name: "healthMain",
-      component: HealthMain,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/elog/:exerciselogId",
-      name: "ElogDetail",
-      component: ElogDetail,
-    },
-    {
-      path: "/elog/form",
-      name: "ElogForm",
-      component: ElogForm,
-    },
-    {
-      path: "/elog/edit",
-      name: "ElogEdit",
-      component: ElogEdit,
-    },
-=======
-
->>>>>>> 0bde3dd98c07cc5327002dbcfd5fe25b5b6b72e8
     {
       path: '/meal',
       name: 'MealForm',
@@ -174,36 +128,25 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-<<<<<<< HEAD
-      path: "/memoAndDiary",
-      name: "MemoAndDiary",
+      path: '/memoAndDiary',
+      name: 'memoAndDiary',
       component: MemoAndDiary,
+      props: true,
+      meta: { requiresAuth: true},
     },
     {
-      path: "/memoAndDiary/memo",
-      name: "MemoDetail",
+      path: '/memoAndDiary/memo',
+      name: 'memo',
       component: MemoDetail,
       props: true,
+      meta: { requiresAuth: true },
     },
     {
       path: "/memoAndDiary/diary",
-      name: "DiaryDetail",
+      name: "diary",
       component: DiaryDetail,
       props: true,
-=======
-      path: '/memo',
-      name: 'memo',
-      component: Memo,
-      props: true,
       meta: { requiresAuth: true },
-    },
-    {
-      path: "/diary",
-      name: "diary",
-      component: Diary,
-      props: true,
-      meta: { requiresAuth: true },
->>>>>>> 0bde3dd98c07cc5327002dbcfd5fe25b5b6b72e8
     },
     {
       path: "/memoAndDiary/memolist",
@@ -221,10 +164,7 @@ const router = createRouter({
       path: "/detail",
       name: "profile_detail",
       component: ProfileDetail,
-<<<<<<< HEAD
-=======
       meta: { requiresAuth: true },
->>>>>>> 0bde3dd98c07cc5327002dbcfd5fe25b5b6b72e8
     },
   ],
 });

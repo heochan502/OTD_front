@@ -1,5 +1,5 @@
-import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';  // useRoute를 추가
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import MemoHttpService from '@/services/memo/MemoHttpService';
 import { useAccountStore } from '@/stores/counter.js';
 
@@ -11,12 +11,14 @@ export function useMemoDetail() {
     createdAt: null,
     imageFileName: null,
   });
-  const accountStore = useAccountStore();
+
   const previewImages = ref([]);
   const fileInputRef = ref(null);
   const mode = ref('view');
-  const route = useRoute();  // useRoute를 추가하여 route 정의
+
   const router = useRouter();
+  const route = useRoute();
+  const accountStore = useAccountStore();
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isViewMode = computed(() => mode.value === 'view');
@@ -43,18 +45,16 @@ export function useMemoDetail() {
 
   const fetchMemo = async (id) => {
     try {
-      const { resultData } = await MemoHttpService.findById(id);
+      const resultData = await MemoHttpService.findById(id);
       if (!resultData) {
-        console.error('해당 메모를 찾을 수 없습니다.');
         alert('해당 메모를 찾을 수 없습니다.');
-        return router.push('/memoAndDiary/memo'); // 메모 목록으로 이동
+        return router.push('/memoAndDiary/memo');
       }
       memo.value = resultData;
       previewImages.value = resultData.imageFileName
         ? [`/pic/${resultData.imageFileName}`]
         : [];
     } catch (e) {
-      console.error('메모 조회 실패:', e);
       alert('메모 조회 중 오류 발생');
       router.push('/memoAndDiary/memo');
     }
@@ -81,9 +81,6 @@ export function useMemoDetail() {
       if (url.startsWith('blob:')) URL.revokeObjectURL(url);
     });
     previewImages.value = [URL.createObjectURL(file)];
-
-    const formData = new FormData();
-    formData.append('memoImageFiles', file);
   };
 
   const removeImage = () => {
@@ -98,11 +95,7 @@ export function useMemoDetail() {
   const createMemo = async () => {
     try {
       const formData = new FormData();
-      formData.append(
-        'memoData',
-        new Blob([JSON.stringify(memo.value)], { type: 'application/json' })
-      );
-
+      formData.append('memoData', new Blob([JSON.stringify(memo.value)], { type: 'application/json' }));
       const file = fileInputRef.value?.files?.[0];
       if (file) formData.append('memoImageFiles', file);
 
@@ -118,11 +111,7 @@ export function useMemoDetail() {
   const updateMemo = async () => {
     try {
       const formData = new FormData();
-      formData.append(
-        'memoData',
-        new Blob([JSON.stringify(memo.value)], { type: 'application/json' })
-      );
-
+      formData.append('memoData', new Blob([JSON.stringify(memo.value)], { type: 'application/json' }));
       const file = fileInputRef.value?.files?.[0];
       if (file) formData.append('memoImageFiles', file);
 
@@ -158,6 +147,7 @@ export function useMemoDetail() {
   };
 
   onMounted(async () => {
+    await nextTick();
     const id = route.params.id;
     if (id && id !== 'create') {
       setMode('view');
@@ -165,6 +155,12 @@ export function useMemoDetail() {
     } else {
       setMode('create');
     }
+  });
+
+  onBeforeUnmount(() => {
+    previewImages.value.forEach((url) => {
+      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+    });
   });
 
   return {

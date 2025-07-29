@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import MemoHttpService from '@/services/memo/MemoHttpService';
 import { useRouter } from 'vue-router';
+import MemoHttpService from '@/services/memo/MemoHttpService';
 
 const router = useRouter();
 
@@ -13,7 +13,6 @@ const memo = ref({
 
 const previewImage = ref(null);
 
-// 이미지 업로드 및 프리뷰 처리
 const handleImageChange = (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -22,7 +21,6 @@ const handleImageChange = (e) => {
   }
 };
 
-// 저장 함수
 const saveMemo = async () => {
   if (!memo.value.memoName || !memo.value.memoContent) {
     alert('제목과 내용을 모두 입력해주세요!');
@@ -60,23 +58,26 @@ const saveMemo = async () => {
   <div class="memo-detail">
     <h2>메모 등록</h2>
 
+    <!-- 제목 -->
     <label for="memoName">제목</label>
-    <input v-model="memo.memoName" id="memoName" type="text" class="text-input" />
+    <input v-model="memo.memoName" id="memoName" placeholder="제목 입력" />
 
+    <!-- 내용 -->
     <label for="memoContent">내용</label>
-    <textarea v-model="memo.memoContent" id="memoContent" class="textarea"></textarea>
+    <textarea v-model="memo.memoContent" id="memoContent" placeholder="내용 입력" />
 
-    <label for="fileInput">이미지 업로드</label>
-    <input type="file" id="fileInput" @change="handleImageChange" />
-
-    <div v-if="previewImage" class="preview-list">
-      <div class="preview-item">
-        <img :src="previewImage" alt="프리뷰" />
+    <!-- 이미지 업로드 -->
+    <div class="image-section">
+      <label>이미지</label>
+      <input type="file" accept="image/*" @change="handleImageChange" />
+      <div v-if="previewImage">
+        <img :src="previewImage" alt="미리보기" class="preview-img" />
       </div>
     </div>
 
+    <!-- 버튼 -->
     <div class="button-group">
-      <button @click="saveMemo">저장</button>
+      <button @click="saveMemo">등록</button>
     </div>
   </div>
 </template>

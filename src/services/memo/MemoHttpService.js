@@ -1,13 +1,12 @@
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = '/api/OTD/memoAndDiary';
 
 class MemoHttpService {
   // 메모 목록 조회
   async findAll(params) {
     try {
-      const res = await axios.get('/memo', { params });
+      const res = await axios.get('/memoAndDiary/memo', { params });
       return res.data.resultData;
     } catch (err) {
       console.error('메모 목록 조회 실패:', err);
@@ -18,7 +17,7 @@ class MemoHttpService {
   // 단일 메모 조회
   async findById(id) {
     try {
-      const res = await axios.get(`/memo/${id}`);
+      const res = await axios.get(`/memoAndDiary/memo/${id}`);
       return res.data.resultData;
     } catch (err) {
       console.error('메모 조회 실패:', err);
@@ -29,7 +28,7 @@ class MemoHttpService {
   // 메모 생성
   async create(formData) {
   try {
-    const res = await axios.post('/memo', formData, {
+    const res = await axios.post('/memoAndDiary/memo', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data.resultData;
@@ -49,7 +48,7 @@ class MemoHttpService {
   // 메모 수정
   async modify(formData) {
     try {
-      const res = await axios.put('/memo', formData, {
+      const res = await axios.put('/memoAndDiary/memo', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return res.data.resultData;
@@ -62,7 +61,7 @@ class MemoHttpService {
   // 메모 삭제
   async deleteById(id) {
     try {
-      const res = await axios.delete(`/memo?id=${id}`);
+      const res = await axios.delete(`/memoAndDiary/memo?id=${id}`);
       return res.data.resultData;
     } catch (err) {
       console.error('메모 삭제 실패:', err);
