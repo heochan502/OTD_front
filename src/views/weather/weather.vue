@@ -8,13 +8,11 @@ const nickName = ref('');
 
 const LocalWeather = async () => {
   const res = await getWeather();
-  console.log(res.data);
   weather.value = res.data;
 };
 // 한줄 알림
 const memberNickName = async () => {
   const res = await getNickName();
-  console.log(res.data.memberNick);
   nickName.value = res.data.memberNick;
 };
 const popMessage = computed(() => {
@@ -111,14 +109,13 @@ onMounted(async () => {
   <div>
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">
       <div v-if="weather" class="weather-content">
-        <!-- left -->
         <div class="weather-left">
           <div class="weather-location">
             {{ weather.localName }}
           </div>
           <div class="condition">{{ weather.sky }}</div>
         </div>
-        <!-- right -->
+
         <div class="weather-right">
           <div class="warp">
             <div class="weather-icon">{{ skyEmoji }}</div>

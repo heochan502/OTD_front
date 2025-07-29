@@ -35,7 +35,6 @@ onMounted(async () => {
 watch(
   () => reminderStore.reload,
   (data) => {
-    console.log('reminderStore.state.reload', reminderStore.reload);
     if (data) {
       getReminderList({ year: todayYear, month: todayMonth });
       reminderStore.setReload(false);
@@ -46,21 +45,17 @@ watch(
 // 한달치 리마인더 목록(요일반복 포함) 조회
 const getReminderList = async (date) => {
   const res = await getByMonth(date.year, date.month);
-  console.log('res.date', res.data);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
   }
   reminderStore.setFullReminder(res.data);
-  console.log('date1111', res.data);
 
   const fixedDateList = res.data
     .filter((item) => item.date)
     .map((item) => item.date);
-  console.log('fixedDateList', fixedDateList);
 
   const repeatDateList = getRepeatDate(res.data, date.year, date.month);
-  console.log('repeatDateList', repeatDateList);
 
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
