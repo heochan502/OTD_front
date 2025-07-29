@@ -1,42 +1,20 @@
 :root {
   --color-primary: #50C3F7;
-  --color-skyblue: #87ceeb;
-  --color-skyblue-hover: #87ceeb;
   --color-text-dark: #000;
-  --color-text-light: #555;
-  --color-gray-e0: #e0e0e0;
   --color-gray-ccc: #ccc;
-  --color-gray-a0: #a0a0a0;
   --color-gray-eee: #eee;
   --color-red-danger: #dc3545;
   --color-red-danger-hover: #c82333;
-  --memo-clicked-bg: #f0f8ff;
-  --memo-hover-bg: #f5f5f5;
   --spacing-sm: 5px;
-  --spacing-md: 15px;
+  --spacing-md: 24px;
   --spacing-lg: 20px;
   --border-radius-base: 8px;
   --shadow-light: rgba(0, 0, 0, 0.08);
-  --shadow-medium: rgba(0, 0, 0, 0.3);
 }
 
-.diary-wrapper,
-.memo-wrapper {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.diary-form,
-.memo-form {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.diary-detail,
-.memo-detail {
+/* === 공통 wrapper === */
+.memo-detail,
+.diary-detail {
   max-width: 800px;
   margin: var(--spacing-lg) auto;
   padding: var(--spacing-lg);
@@ -46,50 +24,55 @@
   color: var(--color-text-dark);
 }
 
-.diary-detail h2,
-.memo-detail h2 {
+/* === 제목 === */
+.memo-detail h2,
+.diary-detail h2 {
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
   margin-bottom: var(--spacing-md);
-  color: var(--color-text-dark);
 }
 
-.diary-detail label,
-.memo-detail label {
+/* === 라벨 === */
+.memo-detail label,
+.diary-detail label {
   display: block;
   margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
   font-weight: bold;
   font-size: 1.2rem;
-  color: var(--color-text-dark);
 }
 
-.diary-detail input[type="text"],
-.memo-detail input[type="text"],
-.diary-detail textarea,
-.memo-detail textarea {
-  width: 100%;
-  font-size: 1rem;
+/* === 인풋 필드 (제목, 기분 등) === */
+.text-input {
+  width: 720px;
+  height: 50px;
+  font-size: 1.1rem;
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-gray-ccc);
   border-radius: var(--border-radius-base);
   margin-top: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
   box-sizing: border-box;
-  color: var(--color-text-dark);
-  /* 텍스트 영역 높이를 동일하게 통일 */
-  min-height: 120px;
 }
 
-.diary-detail textarea,
-.memo-detail textarea {
-  resize: vertical;
-}
-
-.diary-detail input[type="file"],
-.memo-detail input[type="file"] {
+/* === 텍스트에어리어 (내용 입력) === */
+.textarea {
+  width: 720px;
+  height: 350px;
+  font-size: 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-gray-ccc);
+  border-radius: var(--border-radius-base);
   margin-top: var(--spacing-sm);
-  color: var(--color-text-dark);
+  margin-bottom: var(--spacing-md);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* === 파일 업로드 === */
+input[type="file"] {
+  margin-top: var(--spacing-sm);
 }
 
 /* === 이미지 미리보기 === */
@@ -105,7 +88,6 @@
   width: 120px;
   height: 120px;
   background-color: var(--color-gray-eee);
-  border: 1px solid var(--color-gray-eee);
   border-radius: var(--border-radius-base);
   overflow: hidden;
 }
@@ -140,8 +122,7 @@
 }
 
 /* === 버튼 그룹 === */
-.diary-detail .button-group,
-.memo-detail .button-group {
+.button-group {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -149,66 +130,17 @@
   margin-top: var(--spacing-md);
 }
 
-.diary-detail button,
-.memo-detail button {
+.button-group button {
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: var(--border-radius-base);
   cursor: pointer;
   border: none;
-  transition: background-color 0.2s ease;
-  color: var(--color-text-dark);
-}
-
-.diary-detail button:hover,
-.memo-detail button:hover {
-  opacity: 0.9;
-}
-
-/* === 페이지네이션 === */
-.pagination {
-  margin-top: var(--spacing-md);
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-md);
-}
-
-.pagination button {
-  padding: 6px 12px;
-  font-size: 0.95rem;
-  border: 1px solid var(--color-primary);
   background-color: var(--color-primary);
-  color: black;
-  border-radius: var(--spacing-sm);
-  cursor: pointer;
+  color: white;
   transition: background-color 0.2s ease;
 }
 
-.pagination button:disabled {
-  background-color: var(--color-gray-e0);
-  color: var(--color-gray-a0);
-  cursor: not-allowed;
-}
-
-.pagination button:hover:not(:disabled) {
-  background-color: var(--color-skyblue-hover);
-}
-
-h3 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: var(--spacing-md);
-  color: var(--color-text-dark);
-}
-
-/* === 공통 빈 메시지 === */
-.empty-message {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-text-dark);
-  text-align: center;
-  background-color: #f9f9f9;
-  padding: 1rem;
-  margin-top: var(--spacing-lg);
-  border-radius: var(--border-radius-base);
+.button-group button:hover {
+  opacity: 0.9;
 }

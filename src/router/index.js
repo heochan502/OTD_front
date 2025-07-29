@@ -24,9 +24,9 @@ import Location from "@/components/location/Location.vue";
 import ProfileDetail from "@/views/ProfileDetail.vue";
 import ElogEdit from "@/views/health/ElogEdit.vue";
 
+import MemoAndDiary from "@/views/memo/MemoAndDiary.vue";
 import MemoDetail from "@/components/memo/MemoDetail.vue";
 import DiaryDetail from "@/components/memo/DiaryDetail.vue";
-import MemoAndDiary from "@/views/memo/MemoAndDiary.vue";
 import MemoList from "@/components/memo/MemoList.vue";
 import DiaryList from "@/components/memo/DiaryList.vue";
 
@@ -42,13 +42,13 @@ const router = createRouter({
       path: "/community",
       name: "community",
       component: CommunityView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/reminder",
       name: "reminder",
       component: ReminderHome,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/reminder/form",
@@ -60,12 +60,11 @@ const router = createRouter({
       name: "reminderlist",
       component: ReminderList,
     },
-  
     {
       path: "/meal",
       name: "MealForm",
       component: MealForm,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/meal/add",
@@ -76,7 +75,7 @@ const router = createRouter({
       path: "/health",
       name: "healthMain",
       component: HealthMain,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/elog/:exerciselogId",
@@ -93,7 +92,6 @@ const router = createRouter({
       name: "ElogEdit",
       component: ElogEdit,
     },
-
     {
       path: "/hlog/:healthlogId",
       name: "HlogDetail",
@@ -118,42 +116,56 @@ const router = createRouter({
       path: "/profile",
       name: "profile",
       component: Profile,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/location",
       name: "location",
       component: Location,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: "/memoAndDiary",
       name: "MemoAndDiary",
       component: MemoAndDiary,
-      children: [
-      { path: "memo", name: "MemoDetail", component: MemoDetail, props: true },
-      { path: "diary", name: "DiaryDetail", component: DiaryDetail, props: true, },
-      { path: "memolist", name: "MemoList", component: MemoList, props: true, },
-      { path: "diarylist", name: "DiaryList", component: DiaryList, props: true, },        
-    ],
     },
     {
-      path: '/detail',
-      name: 'profile_detail',
-
+      path: "/memoAndDiary/memo",
+      name: "MemoDetail",
+      component: MemoDetail,
+      props: true,
+    },
+    {
+      path: "/memoAndDiary/diary",
+      name: "DiaryDetail",
+      component: DiaryDetail,
+      props: true,
+    },
+    {
+      path: "/memoAndDiary/memolist",
+      name: "MemoList",
+      component: MemoList,
+      props: true,
+    },
+    {
+      path: "/memoAndDiary/diarylist",
+      name: "DiaryList",
+      component: DiaryList,
+      props: true,
+    },
+    {
+      path: "/detail",
+      name: "profile_detail",
       component: ProfileDetail,
     },
   ],
 });
 
-
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
-
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return '/login';
+    return "/login";
   }
-
 });
 
 export default router;

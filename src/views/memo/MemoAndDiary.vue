@@ -1,3 +1,16 @@
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const goToMemo = () => {
+  router.push('/memoAndDiary/memo');
+};
+const goToDiary = () => {
+  router.push('/memoAndDiary/diary');
+};
+</script>
+
 <template>
   <div class="memo-menu">
     <h2>기록을 시작해볼까요?</h2>
@@ -8,20 +21,6 @@
     <router-view />
   </div>
 </template>
-
-<script setup>
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const goToMemo = () => {
-router.push({ name: 'MemoDetail' });
-};
-
-const goToDiary = () => {
-router.push({ name: 'DiaryDetail' });
-};
-</script>
 
 <style scoped>
 .memo-menu {

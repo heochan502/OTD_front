@@ -11,7 +11,7 @@ export function useMemoDetail() {
     createdAt: null,
     imageFileName: null,
   });
-
+  const accountStore = useAccountStore();
   const previewImages = ref([]);
   const fileInputRef = ref(null);
   const mode = ref('view');
