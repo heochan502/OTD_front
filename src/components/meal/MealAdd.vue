@@ -235,7 +235,7 @@ const getMeal = async () => {
     mealBrLuDi : dayStore.dayDefine, 
     mealDay : dayStore.currentTime.slice(3, 13),
   }
-
+  // console.log(" data들 : ",  getlist);
   const lisData = await getMealData(getlist);
 
   if (Array.isArray(lisData) && lisData.length > 0)
@@ -320,7 +320,7 @@ onMounted(() => {
       <v-col cols="12" md="6">
         <v-combobox class="mt-1 w-100" ref="nameBox" v-model="searchFood.foodName" :items="items.foodList"
           item-title="foodName" item-value="foodName" label="음식명을 입력하세요" variant="solo-inverted" placeholder="음식명"
-          append-icon="mdi-plus" @update:model-value="onNameInput" @click:append="onItemClick(items.foodList)"
+          color="info" append-icon="mdi-plus" @update:model-value="onNameInput" @click:append="onItemClick(items.foodList)"
           @keyup.enter="() => searchFoodName('name')">
 
 
@@ -336,7 +336,7 @@ onMounted(() => {
                 {{ item.value.foodName }}
               </v-list-item-title>
               <v-list-item-subtitle class="text-grey text-body-2 ml-auto d-flex justify-content-between">
-                <span>기준 무게 100g/ml </span> <span>{{ item.raw.calorie || '0' }} kcal</span>
+                <span>기준 용량 100g/ml </span> <span>{{ item.raw.calorie || '0' }} kcal</span>
               </v-list-item-subtitle>
             </v-list-item>
           </template>
@@ -385,10 +385,6 @@ onMounted(() => {
           </v-card>
         </div>
       </template>
-      <!-- </v-virtual-scroll> -->
-      <!-- </div> -->
-      <!-- </div> -->
-      <!-- </template> -->
     </v-virtual-scroll>
     <div v-if="itemList.length === 0">
       <v-alert variant="tonal" type="info">추가된 음식이 없습니다.</v-alert>
