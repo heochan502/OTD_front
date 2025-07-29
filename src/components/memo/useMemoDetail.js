@@ -1,7 +1,6 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import MemoHttpService from '@/services/memo/MemoHttpService';
-import { useAccountStore } from '@/stores/counter.js';
 
 export function useMemoDetail() {
   const memo = ref({
@@ -18,7 +17,6 @@ export function useMemoDetail() {
 
   const router = useRouter();
   const route = useRoute();
-  const accountStore = useAccountStore();
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isViewMode = computed(() => mode.value === 'view');
@@ -48,7 +46,7 @@ export function useMemoDetail() {
       const resultData = await MemoHttpService.findById(id);
       if (!resultData) {
         alert('해당 메모를 찾을 수 없습니다.');
-        return router.push('/memoAndDiary/memo');
+        return router.push('/memo/list');
       }
       memo.value = resultData;
       previewImages.value = resultData.imageFileName
@@ -56,7 +54,7 @@ export function useMemoDetail() {
         : [];
     } catch (e) {
       alert('메모 조회 중 오류 발생');
-      router.push('/memoAndDiary/memo');
+      router.push('/memo/list');
     }
   };
 
@@ -99,9 +97,9 @@ export function useMemoDetail() {
       const file = fileInputRef.value?.files?.[0];
       if (file) formData.append('memoImageFiles', file);
 
-      const result = await MemoHttpService.create(formData);
+      await MemoHttpService.create(formData);
       alert('메모가 등록되었습니다.');
-      router.push(`/memoAndDiary/memo/${result.id}`);
+      router.push('/memo/list');
     } catch (e) {
       alert('메모 등록 실패');
       console.error(e);
@@ -130,7 +128,7 @@ export function useMemoDetail() {
     try {
       await MemoHttpService.deleteById(memo.value.id);
       alert('삭제 완료');
-      router.push('/memoAndDiary/memo');
+      router.push('/memo/list');
     } catch (e) {
       alert('삭제 실패');
       console.error(e);
@@ -142,18 +140,18 @@ export function useMemoDetail() {
       setMode('view');
       await fetchMemo(memo.value.id);
     } else {
-      router.push('/memoAndDiary/memo');
+      router.push('/memo/list');
     }
   };
 
   onMounted(async () => {
     await nextTick();
     const id = route.params.id;
-    if (id && id !== 'create') {
+    if (route.path === '/memo/add') {
+      setMode('create');
+    } else if (id) {
       setMode('view');
       await fetchMemo(id);
-    } else {
-      setMode('create');
     }
   });
 

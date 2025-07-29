@@ -96,7 +96,7 @@ export function useDiaryDetail() {
       const result = await DiaryHttpService.create(formData);
       alert('일기가 등록되었습니다.');
       clearPreviewImages();
-      router.push('/memoAndDiary/diarylist');
+      router.push('/memoAndDiary/diary/list');
     } catch (err) {
       alert('등록 실패');
       console.error(err);
@@ -139,7 +139,7 @@ export function useDiaryDetail() {
     try {
       await DiaryHttpService.deleteById(diary.value.id);
       alert('삭제 완료');
-      router.push('/memoAndDiary/diarylist');
+      router.push('/memoAndDiary/diary/list');
     } catch (err) {
       alert('삭제 실패');
       console.error(err);
@@ -151,16 +151,16 @@ export function useDiaryDetail() {
       setMode('view');
       await fetchDiary(diary.value.id);
     } else {
-      router.push('/memoAndDiary/diarylist');
+      router.push('/memoAndDiary/diary/list');
     }
   };
 
   const fetchDiary = async (id) => {
     try {
-      const result = await DiaryHttpService.findById(id); // ✅ 수정된 부분
+      const result = await DiaryHttpService.findById(id);
       if (!result) {
         alert('해당 일기를 불러올 수 없습니다.');
-        return router.push('/memoAndDiary/diary');
+        return router.push('/memoAndDiary/diary/list');
       }
       diary.value = result;
       previewImages.value = result.imageFileName
@@ -169,7 +169,7 @@ export function useDiaryDetail() {
     } catch (err) {
       alert('일기 조회 중 오류 발생');
       console.error(err);
-      router.push('/memoAndDiary/diary');
+      router.push('/memoAndDiary/diary/list');
     }
   };
 

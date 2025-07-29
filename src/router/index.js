@@ -1,15 +1,13 @@
-
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
-
 
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
 import ReminderForm from '@/views/reminder/ReminderForm.vue';
 import ReminderList from '@/views/reminder/ReminderList.vue';
 
 import MemoList from '@/components/memo/MemoList.vue';
-import DiaryList from '@/components/memo/DiaryList.vue';
 import MemoDetail from '@/components/memo/MemoDetail.vue';
+import DiaryList from '@/components/memo/DiaryList.vue';
 import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 
@@ -25,13 +23,12 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
-
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
+import ProfileDetail from '@/views/ProfileDetail.vue';
 
 import Location from '@/components/location/Location.vue';
-import ProfileDetail from '@/views/ProfileDetail.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -122,6 +119,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/detail',
+      name: 'profile_detail',
+      component: ProfileDetail,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/location',
       name: 'location',
       component: Location,
@@ -132,39 +135,39 @@ const router = createRouter({
       name: 'memoAndDiary',
       component: MemoAndDiary,
       props: true,
-      meta: { requiresAuth: true},
-    },
-    {
-      path: '/memoAndDiary/memo',
-      name: 'memo',
-      component: MemoDetail,
-      props: true,
       meta: { requiresAuth: true },
-    },
-    {
-      path: "/memoAndDiary/diary",
-      name: "diary",
-      component: DiaryDetail,
-      props: true,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/memoAndDiary/memolist",
-      name: "MemoList",
-      component: MemoList,
-      props: true,
-    },
-    {
-      path: "/memoAndDiary/diarylist",
-      name: "DiaryList",
-      component: DiaryList,
-      props: true,
-    },
-    {
-      path: "/detail",
-      name: "profile_detail",
-      component: ProfileDetail,
-      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'memo/list',
+          name: 'MemoList',
+          component: MemoList,
+        },
+        {
+          path: 'memo/add',
+          name: 'MemoCreate',
+          component: MemoDetail,
+        },
+        {
+          path: 'memo/:id',
+          name: 'MemoDetail',
+          component: MemoDetail,
+        },
+        {
+          path: 'diary/list',
+          name: 'DiaryList',
+          component: DiaryList,
+        },
+        {
+          path: 'diary/add',
+          name: 'DiaryCreate',
+          component: DiaryDetail,
+        },
+        {
+          path: 'diary/:id',
+          name: 'DiaryDetail',
+          component: DiaryDetail,
+        },
+      ],
     },
   ],
 });
@@ -172,7 +175,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return "/login";
+    return '/login';
   }
 });
 

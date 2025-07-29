@@ -18,10 +18,11 @@ const formatDateTime = (dateString) => {
 }
 
 const goToMemo = () => {
-  router.push('/memoAndDiary/memo');
+  router.push('/memoAndDiary/memo/list');
 };
+
 const goToDiary = () => {
-  router.push('/memoAndDiary/diary');
+  router.push('/memoAndDiary/diary/add');
 };
 </script>
 

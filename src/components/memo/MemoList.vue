@@ -10,8 +10,8 @@ const router = useRouter();
 const fetchMemoList = async () => {
   try {
     const result = await MemoHttpService.findAll({
-      currentPage: 1,  // 페이지 번호 (필요에 따라 추가)
-      pageSize: 10,    // 페이지 크기 (필요에 따라 추가)
+      currentPage: 1,
+      pageSize: 10,
     });
     memoList.value = result.memoList;
   } catch (e) {
@@ -21,20 +21,26 @@ const fetchMemoList = async () => {
 };
 
 const goToMemoDetail = (id) => {
-  router.push(`/memoAndDiary/memo/${id}`); // 해당 메모 상세 페이지로 이동
+  router.push(`/memo/${id}`);
 };
 
-onMounted(async () => {
-  await fetchMemoList();  // 메모 목록을 가져옴
-});
+const goToAddMemo = () => {
+  router.push('/memo/add');
+};
+
+onMounted(fetchMemoList);
 </script>
 
 <template>
   <div class="memo-list-wrapper">
     <h2>메모 목록</h2>
+
+    <button @click="goToAddMemo" class="add-memo-button">+ 메모 등록</button>
+
     <div v-if="memoList.length === 0" class="empty-message">
       등록된 메모가 없습니다.
     </div>
+
     <ul v-else>
       <li
         v-for="item in memoList"
@@ -45,44 +51,53 @@ onMounted(async () => {
         <div class="memo-title">{{ item.memoName }}</div>
         <div class="memo-content">{{ item.memoContent }}</div>
         <div class="memo-date">{{ formatDateTime(item.createdAt) }}</div>
+        <img
+          v-if="item.imageFileName"
+          :src="`/pic/${item.imageFileName}`"
+          alt="메모 이미지"
+          class="memo-thumbnail"
+        />
       </li>
     </ul>
   </div>
 </template>
 
 <style scoped>
-.diary-list {
+.memo-list-wrapper {
   max-width: 600px;
   margin: 0 auto;
 }
-.diary-list ul {
-  list-style: none;
-  padding: 0;
-}
-.diary-list li {
-  cursor: pointer;
+.add-memo-button {
   margin-bottom: 1rem;
+  padding: 8px 16px;
+  background-color: #50c3f7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.memo-item {
+  cursor: pointer;
+  margin-bottom: 1.5rem;
   padding: 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
+  background-color: #fafafa;
 }
-.diary-list img {
-  display: block;
+.memo-title,
+.memo-content,
+.memo-date {
+  color: black;
+  margin-bottom: 0.3rem;
+}
+.memo-thumbnail {
   margin-top: 0.5rem;
+  max-width: 100%;
+  border-radius: 6px;
 }
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.diary-title, .diary-content, .diary-date {
-  color: black !important;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.empty-message {
+  color: #777;
+  text-align: center;
+  margin-top: 2rem;
 }
 </style>

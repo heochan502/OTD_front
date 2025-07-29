@@ -1,68 +1,44 @@
 <script setup>
-import { ref } from 'vue';
-import MemoHttpService from '@/services/memo/MemoHttpService';
-import { useRouter } from 'vue-router';
+import { useMemoDetail } from '@/components/memo/useMemoDetail';
 import '@/components/memo/MemoAndDiaryDetail.css';
 
-const router = useRouter();
+const {
+  memo,
+  previewImages,
+  fileInputRef,
+  isCreateMode,
+  isViewMode,
+  isEditMode,
+  setMode,
+  handleImageChange,
+  removeImage,
+  createMemo,
+  updateMemo,
+  deleteMemo,
+  cancelEdit,
+} = useMemoDetail();
 
-const memo = ref({
-  memoName: '',
-  memoContent: '',
-  memoImageFiles: null,
-});
-
-const previewImages = ref([]);
-
-const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    memo.value.memoImageFiles = file;
-    previewImages.value = [URL.createObjectURL(file)];
-  }
-};
-
-const saveMemo = async () => {
+// 저장 처리 (등록 or 수정)
+const saveMemo = () => {
   if (!memo.value.memoName || !memo.value.memoContent) {
     alert('제목과 내용을 모두 입력해주세요!');
     return;
   }
-
-  const formData = new FormData();
-  formData.append(
-    'memoData',
-    new Blob(
-      [JSON.stringify({
-        memoName: memo.value.memoName,
-        memoContent: memo.value.memoContent,
-      })],
-      { type: 'application/json' }
-    )
-  );
-
-  if (memo.value.memoImageFiles) {
-    formData.append('memoImageFiles', memo.value.memoImageFiles);
-  }
-
-  try {
-    await MemoHttpService.create(formData);
-    alert('메모가 저장되었습니다!');
-    router.push('/memoAndDiary/memolist');
-  } catch (error) {
-    console.error('메모 저장 실패:', error);
-    alert('메모 저장 실패');
-  }
+  isEditMode.value ? updateMemo() : createMemo();
 };
 </script>
 
 <template>
   <div class="memo-detail">
-    <h2>메모 등록</h2>
+    <h2 v-if="isCreateMode">메모 등록</h2>
+    <h2 v-else-if="isViewMode">메모 보기</h2>
+    <h2 v-else-if="isEditMode">메모 수정</h2>
 
     <label for="memoName">제목</label>
     <input
       id="memoName"
       v-model="memo.memoName"
+      :disabled="isViewMode"
       type="text"
       placeholder="제목 입력"
       class="text-input"
@@ -72,6 +48,7 @@ const saveMemo = async () => {
     <textarea
       id="memoContent"
       v-model="memo.memoContent"
+      :disabled="isViewMode"
       placeholder="내용 입력"
       class="textarea"
     ></textarea>
@@ -81,19 +58,31 @@ const saveMemo = async () => {
       id="imageUpload"
       type="file"
       accept="image/*"
+      ref="fileInputRef"
       @change="handleImageChange"
+      :disabled="isViewMode"
     />
 
     <div v-if="previewImages.length > 0" class="preview-list">
       <div class="preview-item" v-for="(url, idx) in previewImages" :key="idx">
         <img :src="url" alt="미리보기 이미지" />
-        <button class="remove-btn" @click="previewImages.splice(idx, 1)">삭제</button>
+        <button v-if="!isViewMode" class="remove-btn" @click="removeImage(idx)">삭제</button>
       </div>
     </div>
     <div v-else class="no-image">이미지가 없습니다.</div>
 
     <div class="button-group">
-      <button @click="saveMemo">등록</button>
+      <button v-if="isCreateMode" @click="saveMemo">등록</button>
+      <button v-if="isEditMode" @click="saveMemo">수정 완료</button>
+
+      <template v-if="isCreateMode || isEditMode">
+        <button @click="cancelEdit">취소</button>
+      </template>
+
+      <template v-if="isViewMode">
+        <button @click="setMode('edit')">수정</button>
+        <button @click="deleteMemo">삭제</button>
+      </template>
     </div>
   </div>
 </template>
