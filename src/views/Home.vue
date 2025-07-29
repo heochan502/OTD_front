@@ -76,7 +76,7 @@ onMounted(async () => {
       </router-link>
     </div>
 
-    <div class="report-wrapper mt-9 shadow-none">
+    <div class="report-wrapper mt-5">
       <ReportCard />
     </div>
   </div>
