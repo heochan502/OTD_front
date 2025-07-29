@@ -1,5 +1,6 @@
 <script setup>
 import Layout from "./views/layout/Layout.vue";
+
 import { useRoute, useRouter } from "vue-router";
 import { ref, watch, onMounted } from "vue";
 import { useAccountStore } from "./stores/counter";
@@ -50,6 +51,10 @@ watch(() => route.path,() => {
     </div>
     <Layout v-else />
   </div>
+  <div class="footer">
+
+  </div>
+  
 </template>
 
 <style>
