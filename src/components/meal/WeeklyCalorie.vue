@@ -155,8 +155,8 @@ watch(weekDay.getWeekDate, (newVal) => {
 });
 
 const testFunc = async (param) => {
-	console.log("파람::" , param);
-  // await nextTick();
+	// console.log("파람::" , param);
+   await nextTick();
   await getStatistic(weekDay.getWeekDate);
    myChart = echarts.init(chartRef.value);
    myChart.setOption(option);
