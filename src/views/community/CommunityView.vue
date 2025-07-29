@@ -1,11 +1,10 @@
 <script setup>
-import { computed } from 'vue';
+import { onMounted, watch, nextTick } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
 import CommunityList from '@/components/community/CommunityList.vue';
 import CommunityDetail from '@/components/community/CommunityDetail.vue';
 import CommunityEdit from '@/components/community/CommunityEdit.vue';
 import CommunityWrite from '@/components/community/CommunityWrite.vue';
-import { onMounted, watch } from 'vue';
 
 const store = usecommunityStore();
 
@@ -15,10 +14,9 @@ onMounted(() => {
 
 watch(
   () => store.viewMode,
-  (newVal) => {
-    if (newVal === 'detail') {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    }
+  async () => {
+    await nextTick(); // DOM 렌더링 후 스크롤 이동
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }
 );
 </script>

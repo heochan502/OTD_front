@@ -116,7 +116,7 @@ const effortIndex = computed(() => {
       border-radius: 20px;
       padding: 2px 10px;
       margin: 7px 0 5px;
-      width: fit-content;
+      // width: fit-content;
     }
   }
 }

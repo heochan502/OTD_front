@@ -8,13 +8,11 @@ const nickName = ref('');
 
 const LocalWeather = async () => {
   const res = await getWeather();
-  console.log(res.data);
   weather.value = res.data;
 };
 // 한줄 알림
 const memberNickName = async () => {
   const res = await getNickName();
-  console.log(res.data.memberNick);
   nickName.value = res.data.memberNick;
 };
 const popMessage = computed(() => {
@@ -35,7 +33,7 @@ const popMessage = computed(() => {
   } else if (pop > 90 || sky === '비') {
     return per + '우산을 꼭 챙기고 빗길 조심하세요!';
   } else {
-    return per + '오늘 하루도 화이팅!';
+    return '오늘 하루도 화이팅!';
   }
 });
 
@@ -49,7 +47,6 @@ const skyEmojiList = {
   비: '🌧️',
   눈: '❄️',
   비눈: '🌨️',
-  default: '🌈',
 };
 
 const skyEmoji = computed(() => {
@@ -95,7 +92,10 @@ onMounted(async () => {
 
 <template>
   <div class="weather-alert" v-if="weather">
-    <strong>{{ nickName }}님~</strong>{{ popMessage }}
+    <strong>{{
+      nickName === '' || nickName === undefined ? '' : nickName + '님~'
+    }}</strong
+    >{{ popMessage }}
   </div>
   <div class="header flex justify-between items-center w-full px-4 pt-2">
     <span class="live px-4 py-1 text-white font-semibold text-sm">
@@ -111,23 +111,34 @@ onMounted(async () => {
   <div>
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">
       <div v-if="weather" class="weather-content">
-        <!-- left -->
         <div class="weather-left">
           <div class="weather-location">
             {{ weather.localName }}
           </div>
           <div class="condition">{{ weather.sky }}</div>
         </div>
-        <!-- right -->
+
         <div class="weather-right">
           <div class="warp">
             <div class="weather-icon">{{ skyEmoji }}</div>
-            <div class="temperature">{{ weather.tem }}℃</div>
+            <div class="temperature">
+              {{
+                weather.tem === undefined
+                  ? '😏🙄😂😭😥😨😱날씨를 불러오지 못하였습니다😱😨😥😭😂🙄😏'
+                  : weather.tem + '℃'
+              }}
+            </div>
           </div>
           <div class="max_min_temperature">
-            {{ '최저 ' + weather.tmn + '° / 최고 ' + weather.tmx }}°
+            {{
+              weather.tmn === undefined
+                ? ''
+                : '최저 ' + weather.tmn + '° / 최고 ' + weather.tmx + '°'
+            }}
           </div>
-          <div class="humidity">습도 {{ weather.reh }}%</div>
+          <div class="humidity">
+            {{ weather.reh === undefined ? '' : '습도' + weather.reh + '%' }}
+          </div>
         </div>
       </div>
     </div>
@@ -141,11 +152,11 @@ onMounted(async () => {
   align-items: center;
   padding: 0.6rem 1rem;
   margin: 1rem auto;
-  max-width: 90%;
+  max-width: 97%;
   font-size: 1.2rem;
   border: 1px solid #ccc;
   border-radius: 12px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   color: #333;
   line-height: 1.4;

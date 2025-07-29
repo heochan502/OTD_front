@@ -25,7 +25,8 @@ const  mealadd = (day)=>{
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
-  if (Array.isArray(info) && info.length > 0) {
+  // null, undefined, 배열 길이 체크
+  if (Array.isArray(info) && info.length > 0 && info[0]?.allDayCalorie !== undefined) {
     return info[0];
   }
   return {
@@ -42,11 +43,12 @@ onMounted(async() => {
   // console.log('totalKcal:', totalKcal.value);
   // console.log('maxKcal:', maxKcal.value);  
    await ondayMealData.mealFormData();
-  console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
+   
+   console.log("정보 데이터 :",calorieData.value);
+  // console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
   total.value = weeklyData.weeklyRawData.reduce((sum, day) => sum + day.totalCalorie, 0);
-    avg.value = total.value / weeklyData.weeklyRawData.length;
-  console.log("정보 데이터 :", avg.value);
-  console.log("인포 :", weeklyData.weeklyRawData);
+  avg.value = total.value / weeklyData.weeklyRawData.length;
+  // console.log("인포 :", weeklyData.weeklyRawData);
   
   // console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
   // itemInfo.value= ondayMealData.itemInfo.value;
@@ -60,8 +62,8 @@ onMounted(async() => {
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-          <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-            :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
+            <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
+              :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
             :rightString="`${maxKcal - calorieData.allDayCalorie}kcal 더 먹을 수 있어요!`" :max="maxKcal"
             customsize="totalcal" />
           <div class="inprogressbar">
@@ -80,13 +82,13 @@ onMounted(async() => {
 
       <div class="right">
         <div class="dailymeal">
-          <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="mealadd('아침')">
+          <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('아침')">
             <span>아침</span> <span>✚</span>
           </button>
-          <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="mealadd('점심')">
+          <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('점심')">
             <span>점심</span> <span>✚</span>
           </button>
-          <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="mealadd('저녁')">
+          <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('저녁')">
             <span>저녁</span> <span>✚</span>
           </button>
         </div>
