@@ -16,17 +16,11 @@ export const findById = (id) => {
 };
 
 export const deleteById = (id) => {
-  return axios.get(`reminder/${id}`).catch((e) => e.response);
+  return axios.delete(`reminder/${id}`).catch((e) => e.response);
 };
 
 export const getByMonth = (year, month) => {
   return axios
     .get('reminder', { params: { year, month } })
-    .catch((e) => e.response);
-};
-
-export const getByDay = (year, month, day) => {
-  return axios
-    .get('remider/today', { params: { year, month, day } })
     .catch((e) => e.response);
 };

@@ -1,7 +1,8 @@
 <script setup>
 import Layout from "./views/layout/Layout.vue";
+
 import { useRoute, useRouter } from "vue-router";
-import { watch, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useAccountStore } from "./stores/counter";
 import { check } from "./services/accountService";
 
@@ -9,6 +10,7 @@ const route = useRoute();
 const router = useRouter();
 const counter = useAccountStore();
 
+const isInitializing = ref(true);
 
 const checkAccount = async () => {
   console.log("로그인 체크");
@@ -20,7 +22,6 @@ const checkAccount = async () => {
   } else {
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
-    //커뮤니티 유저 id 저장
     counter.setLoggedInId(res.data);
     return res.data > 0;
   }
@@ -28,10 +29,9 @@ const checkAccount = async () => {
 
 onMounted(async () => {
   const isLoggedIn = await checkAccount();
+  isInitializing.value = false; 
   if (!isLoggedIn) {
-    router.push("/login");
-  } else {
-    router.push("/");
+    router.replace("/login");
   }
 });
 
@@ -51,6 +51,10 @@ watch(() => route.path,() => {
     </div>
     <Layout v-else />
   </div>
+  <div class="footer">
+
+  </div>
+  
 </template>
 
 <style>
@@ -79,12 +83,8 @@ watch(() => route.path,() => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .loading-container p {

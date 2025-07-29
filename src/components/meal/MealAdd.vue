@@ -1,11 +1,9 @@
 <script setup>
-import { reactive, ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { reactive, ref,  onMounted } from 'vue';
 import { debounce, toNumber } from 'lodash';
 import { getFoodNames, getFoodCalorie, inputMealData, getMealData ,modifyMealdata } from '@/services/meal/mealService';
-import { useCalorieCalcul } from '@/stores/mealStore';
 import { useRouter } from 'vue-router';
-import { useDayDefine, useAlldayMeal } from "@/stores/mealStore";
-import { modify } from '@/services/reminder/reminderService';
+import { useDayDefine, useAlldayMeal, useCalorieCalcul } from "@/stores/mealStore";
 
 const dayStore = useDayDefine();
 
@@ -47,7 +45,7 @@ const searchFoodName = async (type) => {
 
   const res = await getFoodNames(dataToSend);
 
-  console.log(" 이름 : ", res);
+  // console.log(" 이름 : ", res);
 // 데이터 넣는곳 
   if (type === 'name' && Array.isArray(res)) {
     // null이 아닐떄만 아래 실행 
@@ -114,18 +112,18 @@ const changeText = debounce((type) => {
 
 
 // 현재 시간 
-const currentTime = ref('');
-const updateTime = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const ampm = String(now.getHours() - 12 <= 0 ? '오전' : '오후');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  currentTime.value = `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-};
+// const currentTime = ref('');
+// const updateTime = () => {
+//   const now = new Date();
+//   const year = now.getFullYear();
+//   const month = String(now.getMonth() + 1).padStart(2, '0');
+//   const day = String(now.getDate()).padStart(2, '0');
+//   const ampm = String(now.getHours() - 12 <= 0 ? '오전' : '오후');
+//   const hours = String(now.getHours()).padStart(2, '0');
+//   const minutes = String(now.getMinutes()).padStart(2, '0');
+//   const seconds = String(now.getSeconds()).padStart(2, '0');
+//   currentTime.value = `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+// };
 
 
 
@@ -134,7 +132,7 @@ const onItemClick = (item) => {
   // console.log('드롭다운에서 클릭된 시점 아이템:', items);
   const foodInfo = item[0];
 
-  console.log('드롭다운에서 클릭된 항목:', foodInfo);
+  // console.log('드롭다운에서 클릭된 항목:', foodInfo);
   if (!itemList.value.some(item => item.foodDbId === foodInfo.foodDbId)) {
     itemList.value.push({
       foodDbId: foodInfo.foodDbId,
@@ -144,7 +142,7 @@ const onItemClick = (item) => {
       totalCalorie :0
     });
   }
-  console.log('배열에 넣는데:', itemList.value);
+  // console.log('배열에 넣는데:', itemList.value);
 };
 
 // 배열 데이터 삭제 
@@ -173,41 +171,53 @@ const setItem = ()=>{
   }, 0).toFixed(0);
   inputData.dayMealCategory.mealBrLuDi = dayStore.dayDefine;
   //현재 시간 기점이라 생각해야함
-  inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
+  inputData.dayMealCategory.mealDay = dayStore.currentTime.slice(3, 13);
 }
 
 const saveMeal = async()=>
 { 
-  saveText = ref('저장하기');
+  // console.log("set전 inputData데이터", inputData.dayMealCategory);
+  // console.log("set전 itemList데이터", itemList.value);
+
   setItem();
  
 
   // console.log("기존 데이터", itemList.value);
-  console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log("아이디 데이터", inputData.dayMealCategory);
   // console.log("날짜 데이터", dayStore.dayDefine);
   // console.log (itemList.value);
   
   const res = await inputMealData(inputData.dayMealCategory);
-  if (res.status !== 200) {
-    console.log("입력 ", res);
+  if (inputData.dayMealCategory.foodDbId.length > 0) {
+    saveText.value = '수정하기';
   }
+  if (res.status !== 200) {
+    console.log("입력 ", res);   
+  }
+  
 };
 
 
 
-  //수정 
+  //수정 하는곳 
 
 const updateMeal = async () => {
-
 
   setItem();
   // inputData.dayMealCategory.mealBrLuDi = dayStore.dayDefine;
   //현재 시간 기점이라 생각해야함
   // inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
 
-  console.log(" 수정데이터들 : ", inputData.dayMealCategory);
+  // console.log(" 수정데이터들/ : ", inputData.dayMealCategory);
+
   const res = await modifyMealdata(inputData.dayMealCategory);
 
+  if (itemList.value.length >0) {
+    saveText.value = '수정하기';
+  }
+  else {
+    saveText.value = '저장하기';
+  }
   console.log("값:::" , res);
 };
 
@@ -216,10 +226,12 @@ const updateMeal = async () => {
 const saveText = ref('저장하기');
 // 화면 뿌리기
 
+const getData = useAlldayMeal();
+
 const getMeal = async () => {
   const getlist = {
     mealBrLuDi : dayStore.dayDefine, 
-    mealDay : currentTime.value.slice(3, 13),
+    mealDay : dayStore.currentTime.slice(3, 13),
   }
 
   const lisData = await getMealData(getlist);
@@ -232,24 +244,24 @@ else
 {
     saveText.value = '저장하기';
 }
-
   // 가공해서 itemList에 넣기
   itemList.value = lisData.map((item) => ({
     foodDbId: item.foodDbId,
     foodName: item.foodName,
     calorie: item.calorie,
     amount: item.amount,
+
     totalCalorie: 0,
     allDayCalorie: item.allDayCalorie,
     mealBrLuDi: item.mealBrLuDi, 
     totalFat :item.totalFat,
     totalCarbohydrate :item.totalCarbohydrate,
     totalProtein : item.totalProtein,
-    mealTime : item.itemTitle
+    mealDay : item.mealDay
   }));
 
   console.log(" data들 : ", itemList.value);
-  console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log("아이디 데이터", inputData.dayMealCategory);
   // 데이터 넣는곳 
   // itemList.value.push({
   //   foodDbId: foodInfo.foodDbId,
@@ -265,9 +277,9 @@ else
 
 // 화면 불러올떄
 onMounted(() => {
-  updateTime(); // 컴포넌트가 마운트될 때 초기 시간 설정
+  dayStore.updateTime(); // 컴포넌트가 마운트될 때 초기 시간 설정
   // console.log("시간 ", currentTime);
-  setInterval(updateTime, 1000); // 1초마다 시간 업데이트
+  setInterval(dayStore.updateTime, 1000); // 1초마다 시간 업데이트
 
   getMeal();
 
@@ -289,11 +301,11 @@ onMounted(() => {
       <span class="   text-body-1 font-weight-bold  "> 오늘 냠냠 칼로리 총합
         {{itemList.reduce((sum, item) =>
         sum + item.totalCalorie, 0)}} kcal</span>
-      <span class="ml-10  "> {{ currentTime }} </span>
+      <span class="ml-10  "> {{ dayStore.currentTime }} </span>
     </div>
     <v-row dense class="justify-center">
       <v-col cols="12" md="5">
-        <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model.trim="searchFood.foodCategory"
+        <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model="searchFood.foodCategory"
           :items="items.foodCategory" item-text="foodCategory" @update:model-value="onCategoryInput"
           label="음식카테고리 입력하세요" variant="solo-inverted" placeholder="음식카테고리"
           @keyup.enter="() => searchFoodName('category')">
@@ -317,7 +329,7 @@ onMounted(() => {
           </template>
 
           <template v-slot:item="{ item, props }">
-            <v-list-item v-bind="props" v-if="props.title" @click="">
+            <v-list-item v-bind="props" v-if="props.title">
               <!-- <span> {{ item }}</span> -->
               <v-list-item-title>
                 {{ item.value.foodName }}
@@ -333,9 +345,9 @@ onMounted(() => {
     </v-row>
 
 
-    <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 ">
+    <v-virtual-scroll :items="itemList" class="mt-1  pa-3 mb-2 " :height="400">
 
-      <template v-slot:default="{ item, index }">
+      <template v-slot:default="{ item }">
         <div class="d-flex flex-column align-center  ">
           <v-card class=" mb-4  rounded-lx" style="width: 600px" variant="tonal">
             <v-card-title class="pl-5 pt-1">

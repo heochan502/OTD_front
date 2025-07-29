@@ -1,6 +1,7 @@
 <script setup>
 import Breadcrumb from './Breadcrumb.vue';
 import Content from './Content.vue';
+import Footer from '../Footer.vue';
 </script>
 
 <template>
@@ -13,6 +14,9 @@ import Content from './Content.vue';
     <div class="contentlayout">
       <Content />
     </div>
+    <div class="footer">
+       <Footer />
+    </div>
   </div>
 </template>
 
@@ -23,10 +27,9 @@ import Content from './Content.vue';
   display: flex;
   flex-direction: column;
   position: sticky;
-  z-index: 1000;    
+  top: 0;
+  z-index: 1000;
   height: auto;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 .contentlayout {
   min-width: 100vw;
