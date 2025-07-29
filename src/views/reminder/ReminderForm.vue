@@ -181,7 +181,9 @@ const submit = async () => {
     </h2>
     <div class="form-card">
       <span>
-        <img src="/src/image/cancel.png" alt="취소" class="cancel" />
+        <router-link :to="state.reminder.id ? '/reminder/list' : '/reminder'">
+          <img src="/src/image/cancel.png" alt="취소" class="cancel" />
+        </router-link>
       </span>
       <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
         <span :class="{ on: isDateMode }" class="off date-box">날짜 지정</span>
@@ -263,18 +265,23 @@ const submit = async () => {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
-    color: #5D5D5D;
+    color: #5d5d5d;
     margin-bottom: 25px;
   }
 
   .form-card {
     position: relative;
     border-radius: 10px;
-    padding: 40px 30px 30px 30px;
+    padding: 20px 30px 30px 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     height: 500px;
 
+    a {
+      &:hover {
+        background-color: #fff;
+      }
+    }
     .cancel {
       width: 24px;
       height: 24px;
@@ -297,7 +304,7 @@ const submit = async () => {
 
       .date {
         font-size: 18px;
-        color: #5D5D5D;
+        color: #5d5d5d;
         font-weight: bold;
       }
 

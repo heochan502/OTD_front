@@ -6,7 +6,7 @@ const healthlog = reactive({
   height: 170,
 });
 
-const colors = ["#8F50FD", "#FDAC50", "#FD5050", "#FD508F"];
+const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
 const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
 
 const bmi = computed(() => {
@@ -40,7 +40,7 @@ const maxBmi = 40;
           hide-delimiter-background
           direction="vertical"
           hide-delimiters
-          interval="7000"
+          interval="5000"
           class="report-carousel"
         >
           <v-carousel-item class="sheet" v-for="(item, i) in subtitle" :key="i">
