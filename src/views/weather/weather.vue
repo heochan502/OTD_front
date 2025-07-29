@@ -160,6 +160,7 @@ onMounted(async () => {
   background-color: #fff;
   color: #333;
   line-height: 1.4;
+  user-select: none;
 
   strong {
     font-weight: bold;
@@ -173,6 +174,7 @@ onMounted(async () => {
     background-color: #3bbeff;
     border-radius: 16px 16px 0 0;
     gap: 0;
+    user-select: none;
   }
 }
 
@@ -182,6 +184,7 @@ onMounted(async () => {
   border: none;
 }
 .menu-list {
+  margin-top: 4px;
   color: #ccc;
   padding: 0 1rem 0.1rem;
   border-radius: 16px;
@@ -202,6 +205,7 @@ onMounted(async () => {
   box-shadow: 1px 1px 4px #838383;
   box-sizing: border-box;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  user-select: none;
 
   .weather-content {
     display: flex;
