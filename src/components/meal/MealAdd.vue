@@ -5,6 +5,8 @@ import { getFoodNames, getFoodCalorie, inputMealData, getMealData ,modifyMealdat
 import { useRouter } from 'vue-router';
 import { useDayDefine, useAlldayMeal, useCalorieCalcul } from "@/stores/mealStore";
 
+
+
 const dayStore = useDayDefine();
 
 const router = useRouter();
@@ -305,10 +307,9 @@ onMounted(() => {
     </div>
     <v-row dense class="justify-center">
       <v-col cols="12" md="5">
-        <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model="searchFood.foodCategory"
-          :items="items.foodCategory" item-text="foodCategory" @update:model-value="onCategoryInput"
-          label="음식카테고리 입력하세요" variant="solo-inverted" placeholder="음식카테고리"
-          @keyup.enter="() => searchFoodName('category')">
+        <v-combobox class="mt-1 w-100 " ref="categoryBox" v-model="searchFood.foodCategory" :items="items.foodCategory"
+          item-text="foodCategory" @update:model-value="onCategoryInput" label="음식카테고리 입력하세요" variant="solo-inverted"
+          placeholder="음식카테고리" @keyup.enter="() => searchFoodName('category')">
           <template #append-inner>
             <v-icon class="mr-2" @click="() => searchFoodName('category')">mdi-magnify</v-icon>
             <!-- <v-icon @click="onHomeClick">mdi-plus</v-icon> -->
@@ -349,27 +350,27 @@ onMounted(() => {
 
       <template v-slot:default="{ item }">
         <div class="d-flex flex-column align-center  ">
-          <v-card class=" mb-4  rounded-lx" style="width: 600px" variant="tonal">
+          <v-card class=" mb-4  rounded-lx rounded-pill" style="width: 600px" variant="tonal">
             <v-card-title class="pl-5 pt-1">
-              <div class="d-flex justify-space-between w-100 align-start">
+              <div class="d-flex justify-space-between w-100 align-start ">
                 <!--  왼쪽: 음식 이름 + 기준 칼로리 -->
                 <div class="d-flex flex-column pt-1">
-                  <span class="text-body-4 font-weight-bold" color="black">{{ item.foodName.length > 20 ?
+                  <span class="text-body-4 font-weight-bold p-2" color="black">{{ item.foodName.length > 20 ?
                     item.foodName.slice(0, 20) + '…' : item.foodName }}</span>
-                  <span class="pt-1 text-body-2 text-darkgrey">100g 기준: {{ item.calorie }} kcal</span>
+                  <span class=" p-2 pt-1 text-body-2 text-darkgrey">100g 기준: {{ item.calorie }} kcal</span>
                 </div>
 
                 <!--  오른쪽: 양 입력 & 계산된 칼로리 -->
-                <div class="d-flex flex-row align-end mt-2 ml-auto" style="width: 250px">
+                <div class="d-flex flex-row align-center mt-2 ml-auto justify-content-between" style="width: 250px">
                   <div>
                     <v-text-field v-model.number="item.amount" label="먹은 양 (g/ml)" type="number" variant="underlined"
-                      class="mb-1 mt-0 text-black " hide-details style="width: 80px;" />
+                      class=" p-2mb-1 mt-0 text-black " hide-details style="width: 80px;" />
                     <span class="text-body-4 font-weight-bold ">
                       총 칼로리: {{ calcCalories(item) }} kcal
                     </span>
                   </div>
                   <div>
-                    <v-card-actions>
+                    <v-card-actions >
                       <v-btn icon color="blue" @click="removeItem(i)">
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
@@ -395,12 +396,14 @@ onMounted(() => {
   </div>
 
 
+  <div class="d-flex flex-row align-end justify-end">
+    <v-btn class="mealsaday text-center " @click="meal">식단 홈으로</v-btn>
 
-  <v-btn class="mealsaday text-center " @click="meal">식단 홈으로</v-btn>
-
-  <v-btn class="mealsaday text-center " @click="saveText === '저장하기' ? saveMeal() : updateMeal()">{{ saveText }}</v-btn>
-
+    <v-btn class="mealsaday text-center ml-5 " @click="saveText === '저장하기' ? saveMeal() : updateMeal()">{{ saveText
+      }}</v-btn>
+  </div>
   <!-- <v-btn class="mealsaday text-center " @click="modifyMeal">수정</v-btn> -->
+
 
 
 </template>
