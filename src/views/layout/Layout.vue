@@ -1,6 +1,7 @@
 <script setup>
 import Breadcrumb from './Breadcrumb.vue';
 import Content from './Content.vue';
+import Footer from '../Footer.vue';
 </script>
 
 <template>
@@ -12,6 +13,9 @@ import Content from './Content.vue';
     </div>
     <div class="contentlayout">
       <Content />
+    </div>
+    <div class="footer">
+       <Footer />
     </div>
   </div>
 </template>

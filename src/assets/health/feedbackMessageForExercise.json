@@ -54,6 +54,24 @@
     "message": "소소한 활동도 충분히 가치 있어요"
   },
   {
+    "id": "moreCaloriesThanYesterday",
+    "type": "kcal",
+    "condition": "today > yesterday",
+    "message": "오늘은 어제보다 더 활기차게 움직였어요! 에너지 넘치는 하루네요."
+  },
+  {
+    "id": "lessCaloriesThanYesterday",
+    "type": "kcal",
+    "condition": "today < yesterday",
+    "message": "오늘은 어제보다 활동 에너지가 조금 낮았어요. 내일은 다시 힘차게!"
+  },
+  {
+    "id": "equalCalories",
+    "type": "kcal",
+    "condition": "today ≈ yesterday",
+    "message": "어제와 비슷한 에너지로 꾸준히 움직였어요. 좋은 리듬이에요!"
+  },
+  {
     "id": "firstWorkout",
     "type": "milestone",
     "condition": "first",
@@ -70,5 +88,11 @@
     "type": "rest",
     "condition": "lowEffort && lowDuration",
     "message": "오늘은 회복하는 날이었어요. 몸도 마음도 쉬어가요."
+  },
+  {
+    "id": "noRecord",
+    "type": "none",
+    "condition": "noData",
+    "message": "오늘은 운동 기록이 없네요. 가벼운 산책이라도 시작해보세요."
   }
 ]

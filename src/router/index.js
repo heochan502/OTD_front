@@ -25,7 +25,6 @@ import Profile from "@/views/Profile.vue";
 
 import Location from "@/components/location/Location.vue";
 import ProfileDetail from "@/views/ProfileDetail.vue";
-import ElogEdit from "@/views/health/ElogEdit.vue";
 
 
 
@@ -87,12 +86,6 @@ const router = createRouter({
       name: "ElogForm",
       component: ElogForm,
     },
-    {
-      path: "/elog/edit",
-      name: "ElogEdit",
-      component: ElogEdit,
-    },
-
     {
       path: "/hlog/:healthlogId",
       name: "HlogDetail",
