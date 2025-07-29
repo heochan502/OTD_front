@@ -270,7 +270,6 @@ const routerDate = (date) => {
         color: #575757;
         font-weight: bold;
         font-size: 20px;
-        // margin: 0 auto;
         white-space: nowrap;
       }
     }
