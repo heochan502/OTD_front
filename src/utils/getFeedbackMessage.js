@@ -19,11 +19,11 @@ export function getFeedbackMessage({
   if (todayEffort < 2 && todayDuration < 10) return find("restDay");
 
   // 활동 에너지 비교 (칼로리 기반)
-  if (todayKcal > 300) return find("highCalories");
-  if (todayKcal < 100) return find("lowCalories");
   if (todayKcal > yesterdayKcal) return find("moreCaloriesThanYesterday");
   if (todayKcal < yesterdayKcal) return find("lessCaloriesThanYesterday");
   if (todayKcal === yesterdayKcal) return find("equalCalories");
+  if (todayKcal > 300) return find("highCalories");
+  if (todayKcal < 100) return find("lowCalories");
 
   // 운동 시간 비교
   if (todayDuration > yesterdayDuration + 10) return find("muchMoreDuration");

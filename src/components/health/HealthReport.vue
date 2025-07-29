@@ -38,9 +38,8 @@ const maxBmi = 40;
           show-arrows="hover"
           cycle
           hide-delimiter-background
-          direction="vertical"
           hide-delimiters
-          interval="5000"
+          interval="3000"
           class="report-carousel"
         >
           <v-carousel-item class="sheet" v-for="(item, i) in subtitle" :key="i">
