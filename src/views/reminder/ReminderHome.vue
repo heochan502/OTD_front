@@ -244,10 +244,10 @@ const routerDate = (date) => {
 
             .list-card {
               width: 100%;
-              height: 35px;
+              height: 45px;
               background-color: #fff;
               margin-bottom: 8px;
-              border-radius: 20px;
+              border-radius: 25px;
               display: flex;
               align-items: center;
 

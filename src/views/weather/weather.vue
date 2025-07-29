@@ -141,11 +141,11 @@ onMounted(async () => {
   align-items: center;
   padding: 0.6rem 1rem;
   margin: 1rem auto;
-  max-width: 90%;
+  max-width: 97%;
   font-size: 1.2rem;
   border: 1px solid #ccc;
   border-radius: 12px;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   color: #333;
   line-height: 1.4;
