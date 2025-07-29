@@ -25,7 +25,6 @@ const getReminderList = async (year, month) => {
     return;
   }
 
-  console.log('listres', res.data);
   reminderStore.setFullReminder(res.data);
 
   state.reminder = res.data.filter((item) => {
@@ -59,9 +58,7 @@ const remove = async (id) => {
   if (!confirm('이 일정을 삭제할까요?')) {
     return;
   }
-  console.log('id', id);
   const res = await deleteById(id);
-  console.log('resremove', res);
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
