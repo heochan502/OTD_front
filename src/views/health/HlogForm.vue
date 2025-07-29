@@ -1,5 +1,220 @@
-<script setup></script>
+<script setup>
+import { reactive } from "vue";
+import { useRouter } from "vue-router";
+import sleepQualitys from "@/assets/health/sleepQualitys.json";
+import moodLevels from "@/assets/health/moodLevels.json";
+import { saveHlog } from "@/services/health/hlogService";
+import dayjs from "dayjs";
 
-<template>건강기록 추가하기 페이지</template>
+const router = useRouter();
 
-<style scoped></style>
+const state = reactive({
+  form: {
+    weight: null,
+    height: null,
+    systolicBp: null,
+    diastolicBp: null,
+    sugarLevel: null,
+    moodLevel: null,
+    sleepQuality: null,
+    healthlogDatetime: "",
+  },
+});
+
+const rules = [
+  (value) => {
+    if (value) return true;
+    return "필수 입력사항입니다.";
+  },
+];
+
+const convertDatetimeFormat = (input) => {
+  return dayjs(input).format("YYYY-MM-DD HH:mm:ss.SSS");
+};
+
+// @click
+const submit = async () => {
+  if (!confirm("건강 기록을 저장하시겠습니까?")) return;
+  const jsonBody = {
+    weight: state.form.weight,
+    height: state.form.height,
+    systolicBp: state.form.systolicBp,
+    diastolicBp: state.form.diastolicBp,
+    sugarLevel: state.form.sugarLevel,
+    moodLevel: state.form.moodLevel,
+    sleepQuality: state.form.sleepQuality,
+    healthlogDatetime: convertDatetimeFormat(state.form.healthlogDatetime),
+  };
+
+  const res = await saveHlog(jsonBody);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("건강기록 저장 완료!");
+  router.push("/health");
+};
+
+const cancel = () => {
+  if (!confirm("취소하고 돌아가시겠습니까?")) return;
+  router.push("/health");
+};
+</script>
+
+<template>
+  <v-container class="container" fluid>
+    <v-sheet class="mx-auto" width="1000">
+      <v-form>
+        <v-row class="title">
+          <h4>건강 기록하기</h4>
+        </v-row>
+        <v-row class="hlogForm">
+          <v-col class="left">
+            <v-date-picker
+              v-model="state.form.healthlogDatetime"
+              width="300px"
+              divided
+              landscape
+            ></v-date-picker>
+          </v-col>
+          <v-col class="right" cols="8">
+            <v-row>
+              <v-text-field
+                v-model="state.form.weight"
+                :rules="rules"
+                label="체중(kg)"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.height"
+                :rules="rules"
+                label="신장"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field
+                v-model="state.form.systolicBp"
+                label="수축기 혈압"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.diastolicBp"
+                label="이완기 혈압"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.sugarLevel"
+                label="혈당"
+                variant="solo"
+                class="pa-2"
+                density="compact"
+                clearable
+              ></v-text-field>
+            </v-row>
+            <v-row>
+              <v-select
+                v-model="state.form.moodLevel"
+                label="감정상태"
+                :items="
+                  moodLevels.map((e) => ({
+                    title: e.label,
+                    value: e.level,
+                  }))
+                "
+                item-title="title"
+                item-value="value"
+                variant="solo"
+                class="pa-2"
+                clearable
+              ></v-select>
+              <v-select
+                v-model="state.form.sleepQuality"
+                label="수면기록"
+                :items="
+                  sleepQualitys.map((e) => ({
+                    title: e.label,
+                    value: e.level,
+                  }))
+                "
+                item-title="title"
+                item-value="value"
+                variant="solo"
+                class="pa-2"
+                clearable
+              ></v-select>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-row class="btns">
+          <v-btn class="save" @click="submit">저장</v-btn>
+          <v-btn @click="cancel">취소</v-btn>
+        </v-row>
+      </v-form>
+    </v-sheet>
+  </v-container>
+</template>
+
+<style lang="scss" scoped>
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: column;
+
+  padding-top: 100px;
+
+  .title {
+    display: flex;
+    justify-content: center;
+    h4 {
+      display: inline-block;
+      border-bottom: 5px solid black;
+      padding-bottom: 5px;
+    }
+  }
+
+  .hlogForm {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .v-date-picker {
+    $date-picker-header-height: 30px;
+  }
+
+  .right {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .btns {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    .v-btn {
+      height: 30px;
+      border-radius: 20px;
+      background-color: #838383;
+      color: #fff;
+    }
+    .save {
+      background-color: #3bbeff;
+    }
+  }
+}
+</style>

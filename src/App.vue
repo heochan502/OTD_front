@@ -1,5 +1,6 @@
 <script setup>
 import Layout from "./views/layout/Layout.vue";
+
 import { useRoute, useRouter } from "vue-router";
 import { ref, watch, onMounted } from "vue";
 import { useAccountStore } from "./stores/counter";
@@ -50,6 +51,10 @@ watch(() => route.path,() => {
     </div>
     <Layout v-else />
   </div>
+  <div class="footer">
+
+  </div>
+  
 </template>
 
 <style>
@@ -78,12 +83,8 @@ watch(() => route.path,() => {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .loading-container p {

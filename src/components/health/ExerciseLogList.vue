@@ -49,24 +49,26 @@ const add = () => {
       <i class="bi bi-plus-circle btn-plus" @click="add"></i>
     </div>
   </div>
-  <ul>
-    <li v-if="state.logs.length < 1" class="title">운동 기록을 추가하세요</li>
-    <li
-      v-for="item in state.logs"
-      :key="item.exerciselogId"
-      @click="detail(item.exerciselogId)"
-    >
-      <div class="title">
-        {{ exerciseStore.list[item.exerciseId - 1]?.exerciseName }}
-      </div>
-      <div class="content">
-        <div>{{ item.exerciseDuration }}분</div>
-        <div>
-          {{ formatDate(item.exerciseDatetime) }}
+  <div class="list-wrap">
+    <ul>
+      <li v-if="state.logs.length < 1" class="title">운동 기록을 추가하세요</li>
+      <li
+        v-for="item in state.logs"
+        :key="item.exerciselogId"
+        @click="detail(item.exerciselogId)"
+      >
+        <div class="title">
+          {{ exerciseStore.list[item.exerciseId - 1]?.exerciseName }}
         </div>
-      </div>
-    </li>
-  </ul>
+        <div class="content">
+          <div>{{ item.exerciseDuration }}분</div>
+          <div>
+            {{ formatDate(item.exerciseDatetime) }}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -87,13 +89,17 @@ const add = () => {
     cursor: pointer;
   }
 }
-
+.list-wrap {
+  height: 300px;
+  overflow: auto;
+}
 ul {
   display: flex;
   flex-direction: column;
   margin: 0;
   padding: 0;
   list-style: none;
+  overflow: auto;
 
   li {
     display: flex;
@@ -102,7 +108,7 @@ ul {
 
     width: 400px;
     height: 80px;
-    margin: 10px 0;
+    margin: 9px 0;
     padding: 5px 40px;
     border-radius: 40px;
     background-color: #3bbeff;

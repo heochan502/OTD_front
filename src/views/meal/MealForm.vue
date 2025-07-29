@@ -1,40 +1,58 @@
 <script setup>
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted,computed } from 'vue';
 import {useRouter} from "vue-router";
-import { useDayDefine } from "@/stores/mealStore";
+import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
+
+
 
 const dayStore = useDayDefine();
+const ondayMealData = useCalorieCalcul();
+const weeklyData = useWeeklyStore();
+const baseDate = useBaseDate();
 
-
-const value = ref(10);
-const moreMeal = ref(500);
-const totalKcal = ref(300);
 const maxKcal = ref(2500);
-const tansu = ref(1000); // 탄수화물 비율
-const protein = ref(40); // 단백질 비율
-const jibang = ref(400); // 지방 비율
 
 const router = useRouter();
 
 const  mealadd = (day)=>{
   dayStore.dayDefine = day;
   router.push({name : 'MealAdd'});
+  // itemInfo
 };
 
-const calculation = ()=>{
-
-    const sum = dayStore.reduce((sum, value)=>sum + value,0);
-
-}
-
-
-
-onMounted(() => {
-  console.log('totalKcal:', totalKcal.value);
-  console.log('maxKcal:', maxKcal.value);
+// 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
+const calorieData = computed(() => {
+  const info = ondayMealData.itemInfo;
+  if (Array.isArray(info) && info.length > 0) {
+    return info[0];
+  }
+  return {
+    allDayCalorie: 0,
+    mealDay: '',
+    totalFat: 0,
+    totalCarbohydrate: 0,
+    totalProtein: 0,
+  };
 });
+const total = ref(0);
+const avg =ref(0);
+onMounted(async() => {
+  // console.log('totalKcal:', totalKcal.value);
+  // console.log('maxKcal:', maxKcal.value);  
+   await ondayMealData.mealFormData();
+  console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
+  total.value = weeklyData.weeklyRawData.reduce((sum, day) => sum + day.totalCalorie, 0);
+    avg.value = total.value / weeklyData.weeklyRawData.length;
+  console.log("정보 데이터 :", avg.value);
+  console.log("인포 :", weeklyData.weeklyRawData);
+  
+  // console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
+  // itemInfo.value= ondayMealData.itemInfo.value;
+
+});
+
 </script>
 
 <template>
@@ -42,61 +60,33 @@ onMounted(() => {
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-          <ProgressBar
-            class="totalcal"
-            :value="totalKcal"
-            :leftString="`${totalKcal}/${maxKcal}kcal`"
-            :rightString="`${moreMeal}kcal 더 먹을 수 있어요!`"
-            :max="maxKcal"
-            customsize="totalcal"
-          />
+          <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
+            :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
+            :rightString="`${maxKcal - calorieData.allDayCalorie}kcal 더 먹을 수 있어요!`" :max="maxKcal"
+            customsize="totalcal" />
           <div class="inprogressbar">
-            <ProgressBar
-              class="tansu"
-              :value="tansu"
-              :leftString="`탄수화물`"
-              :rightString="`${((tansu / (maxKcal * 0.6)) * 100).toFixed(1)}%`"
-              :max="maxKcal * 0.6"
-              customsize="tansu"
-            />
-            <ProgressBar
-              class="protein"
-              :value="protein"
-              :leftString="`단백질`"
-              :rightString="`${protein}%`"
-              customsize="protein"
-              :max="maxKcal * 0.15"
-            />
-            <ProgressBar
-              class="jibang"
-              :value="jibang"
-              :leftString="`지방`"
-              :rightString="`${jibang}%`"
-              customsize="jibang"
-              :max="maxKcal * 0.25"
-            />
+            <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
+              :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
+              :max="(maxKcal * 0.6)/4" customsize="tansu" />
+            <ProgressBar class="protein" :value="calorieData.totalProtein" :leftString="`단백질`"
+              :rightString="`${(calorieData.totalProtein/ ((maxKcal * 0.15)/4) * 100).toFixed(1)}%`"
+              customsize="protein" :max="(maxKcal * 0.15)/4" />
+            <ProgressBar class="jibang" :value="calorieData.totalFat" :leftString="`지방`"
+              :rightString="`${(calorieData.totalFat/ ((maxKcal * 0.25) / 9) * 100).toFixed(1)}%`" customsize="jibang"
+              :max="(maxKcal * 0.25)/9" />
           </div>
         </div>
       </div>
 
       <div class="right">
         <div class="dailymeal">
-          <button
-            class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd('아침')"
-          >
+          <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="mealadd('아침')">
             <span>아침</span> <span>✚</span>
           </button>
-          <button
-            class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd('점심')"
-          >
+          <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="mealadd('점심')">
             <span>점심</span> <span>✚</span>
           </button>
-          <button
-            class="btn btn-primary mealsaday font-weight-black text-body-1"
-            @click="mealadd('저녁')"
-          >
+          <button class="btn btn-primary mealsaday font-weight-black text-body-1" @click="mealadd('저녁')">
             <span>저녁</span> <span>✚</span>
           </button>
         </div>
@@ -104,12 +94,14 @@ onMounted(() => {
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1"
-        >이번주에 평균 {{ value }}kcal 먹었어요</span
-      >
+      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ avg.toFixed(0) }}kcal 먹었어요</span>
+      
+      <div class=" d-flex  justify-content-end ">
+      <WeeklyCalorie class="" />
     </div>
-    <div class="bottom d-flex justify-center mb-6">
-      <WeeklyCalorie />
+    </div>
+    <div class="bottom ">
+
     </div>
   </div>
 

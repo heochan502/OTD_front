@@ -30,7 +30,6 @@ const state = reactive({
 
 onMounted(async () => {
   getReminderList({ year: todayYear, month: todayMonth });
-  setTodayReminder();
 });
 
 watch(
@@ -39,7 +38,6 @@ watch(
     console.log('reminderStore.state.reload', reminderStore.reload);
     if (data) {
       getReminderList({ year: todayYear, month: todayMonth });
-      setTodayReminder();
       reminderStore.setReload(false);
     }
   }
@@ -66,6 +64,7 @@ const getReminderList = async (date) => {
 
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
+  setTodayReminder();
 };
 
 // 요일 반복 리마인더 해당 요일 날짜로 변환 로직
@@ -140,29 +139,32 @@ const routerDate = (date) => {
     </div>
     <div class="right">
       <div class="add">
-        <router-link to="/reminder/form" class="outline"
-          >일정 추가하기</router-link
-        >
+        <router-link to="/reminder/form">일정 추가하기</router-link>
       </div>
-      <router-link
-        to="/reminder/list"
-        class="list outline"
-        @click="setTodayReminder"
-      >
-        <div>
-          <span class="list_title">오늘의 일정</span>
-          <br />
-          <span class="list_date"
-            >{{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+      <div class="preview">
+        <div class="block">
+          <router-link
+            to="/reminder/list"
+            @click="setTodayReminder"
+            class="link"
           >
-          <ul v-if="state.todayReminder.length > 0">
-            <li v-for="item in state.todayReminder" :key="item.id">
-              <span>{{ item.title }}</span>
-            </li>
-          </ul>
-          <span v-else>오늘은 한가한 하루네요!</span>
+            <span class="list-title">오늘의 일정</span>
+            <span class="list-date">
+              {{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+            >
+            <ul v-if="state.todayReminder.length > 0" class="list">
+              <li
+                v-for="item in state.todayReminder"
+                :key="item.id"
+                class="list-card"
+              >
+                <span class="reminder-title">• {{ item.title }}</span>
+              </li>
+            </ul>
+            <span v-else class="empty-comment">"오늘은 한가한 하루네요!"</span>
+          </router-link>
         </div>
-      </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -170,26 +172,107 @@ const routerDate = (date) => {
 <style lang="scss" scoped>
 .reminder {
   display: flex;
-  gap: 50px;
+  gap: 40px;
 
+  .left {
+    margin-left: 30px;
+  }
   .right {
+    margin-top: 69px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
     .add {
+      width: 135px;
+      height: 43px;
       background-color: #3bbeff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 25px;
+      margin-right: 13px;
       a {
         color: #fff;
         outline: none;
+        font-weight: bold;
+        font-size: 17px;
+      }
+      a:hover {
         background-color: #3bbeff;
       }
     }
-    .add:hover {
+    .preview {
+      border-radius: 20px;
+      background-color: #bfeaff;
+      width: 358px;
+      height: 486px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+      .block {
+        margin: 35px;
+        height: 418px;
+        position: relative;
+
+        a {
+          display: block;
+          max-height: 418px;
+          overflow-y: auto;
+          &::-webkit-scrollbar {
+            display: none;
+          }
+          &:hover {
+            background-color: #bfeaff;
+          }
+
+          .list-title {
+            color: #fff;
+            font-weight: bold;
+            font-size: 20px;
+          }
+
+          .list-date {
+            margin: -3px 0 25px 1px;
+            display: block;
+            color: #fff;
+            font-size: 13px;
+          }
+
+          .list {
+            list-style: none;
+            padding: 0;
+
+            .list-card {
+              width: 100%;
+              height: 35px;
+              background-color: #fff;
+              margin-bottom: 8px;
+              border-radius: 20px;
+              display: flex;
+              align-items: center;
+
+              .reminder-title {
+                color: #575757;
+                margin-left: 15px;
+                font-weight: bold;
+              }
+            }
+          }
+        }
+      }
+
+      .empty-comment {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: inline-block;
+        color: #575757;
+        font-weight: bold;
+        font-size: 20px;
+        white-space: nowrap;
+      }
     }
   }
-}
-.outline {
-  text-decoration: none;
-  color: inherit;
-}
-.outline:hover {
-  background-color: none;
 }
 </style>

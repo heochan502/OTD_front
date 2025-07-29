@@ -1,15 +1,35 @@
 <script setup>
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref, nextTick, reactive, watch } from 'vue';
+
+import { useBaseDate,useWeeklyStore ,} from '@/stores/mealStore';
+import { getWeekTotal } from '@/services/meal/mealService'
+import MealStatistic from './MealStatistic.vue';
 
 import * as echarts from 'echarts';
 
+const weeklyStore = useWeeklyStore();
+
+
+const weekDay = useBaseDate();
 
 const xData = ['월', '화', '수', '목', '금', '토', '일'];
-const yData = xData.map(() => parseInt(Math.random() * 2400));
+const yData = [0, 0,  0,  0,  0,  0,  0];
+
+
+const getDayName = (dateString) => {
+  const days = ['월', '화', '수', '목', '금', '토','일'];
+  const date = new Date(dateString);
+  return days[date.getDay()];
+};
+
+
+
 const chartRef = ref(null); // 차트 DOM 요소 참조
 let myChart = null; // ECharts 인스턴스
 
 const option = {
+
+  
   // 차트 옵션 설정
   //마우스 올렸을때 나오는 정보값
   tooltip: {
@@ -20,7 +40,7 @@ const option = {
       // data.marker는 색상 표시
       // data.data는 해당 데이터 값
       // data.axisValue는 x축의 값
-      return `${data.axisValue}요일 <br />${data.marker} ${data.data} kcal`;
+      return `${data.axisValue}요일 <br />${data.marker} ${data.data.toLocaleString()} kcal`;
     },
   },
   legend: {
@@ -51,12 +71,10 @@ const option = {
     },
   },
   yAxis: {
-    min: 0,
-    max: 2400,
     type: 'value',
     axisLabel: {
-      color: '#ffffff',
-      fontSize: 14,
+      color: '#000000',
+      fontSize: 12,
       fontWeight: 'bold',
       formatter: '{value} kcal', // y축 값 옆에 단위 추가
     },
@@ -70,7 +88,7 @@ const option = {
   // 차트 스타일 설정
   series: [
     {
-      name: '요일',
+      name: '요일 ',
       type: 'bar',
       seriesLayoutBy: 'row',
       data: yData,
@@ -100,22 +118,59 @@ const option = {
     },
   },
 };
+const getStatistic = async(weeky)=>{
+  
+  const res = await getWeekTotal(weeky);
+  if (res.status === 200)
+  {
+    weeklyStore.weeklyRawData = res.data; 
+  }
+  console.log("데이터 확인 ", weeklyStore.weeklyRawData );
+
+  weeklyStore.weeklyRawData.forEach(item => {
+    const dayName = getDayName(item.mealDay); // '화', '수', ...
+    const index = xData.indexOf(dayName);      // 요일 인덱스 찾기   
+    if (index !== -1) {
+      yData[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
+    }
+  });
+}
 
 onMounted(async () => {
+  
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
-    myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화
+    myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화    
+    await getStatistic(weekDay.getWeekDate); // 주 시작 과 끝 보내서 데이터 받아오기
     myChart.setOption(option); // 차트 옵션 설정
   } else {
     console.warn('chartRef is null');
   }
+  console.log("주시작 : ", weekDay.getWeekDate);
+  
 });
+
+watch(weekDay.getWeekDate, (newVal) => {
+  testFunc(newVal);
+});
+
+const testFunc = async (param) => {
+	console.log("파람::" , param);
+  // await nextTick();
+  await getStatistic(weekDay.getWeekDate);
+   myChart = echarts.init(chartRef.value);
+   myChart.setOption(option);
+};
+
+
 </script>
 
 <template>
-  <div class="weekly-calorie  ">
+  <div class="weekly-calorie   ">
     <div ref="chartRef" class="main-container  " style="height: 500px; width: 100%"></div>
   </div>
+
+  <MealStatistic />
 </template>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive } from "vue";
-import effortLevels from "@/api/health/effortLevels.json";
-import { saveElog, updateElog } from "@/services/health/elogService";
+import effortLevels from "@/assets/health/effortLevels.json";
+import { saveElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRouter } from "vue-router";
 
@@ -10,7 +10,6 @@ const exerciseStore = useExerciseStore();
 
 const state = reactive({
   form: {
-    exerciselogId: 0,
     exerciseId: null,
     exerciseDatetime: "",
     exerciseKcal: 0,
@@ -24,16 +23,12 @@ const state = reactive({
 //   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 // };
 
-const passData = history.state.data;
 onMounted(() => {
   exerciseStore.fetchExercises();
-  if (passData) {
-    state.form = JSON.parse(passData);
-  }
 });
 
 // click event
-// 기록 저장/수정
+// 기록 저장
 const submit = async () => {
   const convertDatetimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
@@ -47,33 +42,18 @@ const submit = async () => {
     effortLevel: state.form.effortLevel,
   };
 
-  let res = null;
-  let path = "/health";
-
-  if (passData) {
-    jsonBody.exerciselogId = state.form.exerciselogId;
-    console.log("보내는 데이터", jsonBody);
-
-    res = await updateElog(jsonBody);
-    path = `${state.form.exerciselogId}`;
-  } else {
-    res = await saveElog(jsonBody);
-  }
+  const res = await saveElog(jsonBody);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("완료!");
-  router.push({ path });
+  alert("운동기록 저장 완료!");
+  router.push("/health");
 };
 
 const cancel = () => {
   if (!confirm("취소하고 돌아가시겠습니까?")) return;
-  let path = "/health";
-  if (state.form.exerciselogId > 0) {
-    path = `${state.form.exerciselogId}`;
-  }
-  router.push({ path });
+  router.push("/health");
 };
 </script>
 
@@ -166,10 +146,8 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn @click="submit">{{
-        state.form.exerciselogId > 0 ? "수정" : "추가"
-      }}</v-btn>
-      <v-btn @click="cancel">취소</v-btn>
+      <v-btn class="save" @click.prevent="submit">저장</v-btn>
+      <v-btn @click.prevent="cancel">취소</v-btn>
     </v-row>
   </v-container>
 </template>
@@ -187,11 +165,11 @@ const cancel = () => {
   .title {
     display: flex;
     justify-content: center;
-  }
-  h4 {
-    display: inline-block;
-    border-bottom: 5px solid black;
-    padding-bottom: 5px;
+    h4 {
+      display: inline-block;
+      border-bottom: 5px solid black;
+      padding-bottom: 5px;
+    }
   }
 
   .subtitle {
@@ -224,6 +202,15 @@ const cancel = () => {
     display: flex;
     justify-content: center;
     gap: 10px;
+    .v-btn {
+      height: 30px;
+      border-radius: 20px;
+      background-color: #838383;
+      color: #fff;
+    }
+    .save {
+      background-color: #3bbeff;
+    }
   }
 }
 </style>

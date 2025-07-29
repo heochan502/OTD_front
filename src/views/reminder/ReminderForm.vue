@@ -175,20 +175,24 @@ const submit = async () => {
 </script>
 
 <template>
-  <div>
-    <h2>{{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}</h2>
-    <div>
-      <div>
-        <span title="취소"></span>
-      </div>
-      <div :class="{ disabled: isRepeatMode }">
-        <span :class="{ on: isDateMode, off: isRepeatMode }">날짜 지정</span>
-        <span>{{ formattedDate }}</span>
+  <div class="form">
+    <h2 class="form-title">
+      {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
+    </h2>
+    <div class="form-card">
+      <span>
+        <router-link :to="state.reminder.id ? '/reminder/list' : '/reminder'">
+          <img src="/src/image/cancel.png" alt="취소" class="cancel" />
+        </router-link>
+      </span>
+      <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
+        <span :class="{ on: isDateMode }" class="off date-box">날짜 지정</span>
+        <span class="date">{{ formattedDate }}</span>
         <img
           src="/src/image/button.png"
           alt="날짜 선택하기"
           @click="openCalendar"
-          class="pickButton"
+          class="calendar-button"
         />
         <div class="calendar">
           <calendar
@@ -198,80 +202,207 @@ const submit = async () => {
           ></calendar>
         </div>
       </div>
-      <div>
-        <span :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }">
-          <img
-            :src="
-              state.reminder.alarm
-                ? '/src/image/alarm_on.png'
-                : '/src/image/alarm_off.png'
-            "
-            alt="알람 상태"
-            class="alarm"
-            @click="state.reminder.alarm = !state.reminder.alarm"
-          />알람 설정</span
-        >
-      </div>
-      <div :class="{ disabled: isDateMode }">
-        <span :class="{ on: isRepeatMode, off: isDateMode }">요일 반복</span>
+      <span
+        :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }"
+        class="alarm-box"
+      >
         <img
-          v-for="(dow, index) in dowImage"
-          :key="index"
-          :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
-          :alt="dow.name"
-          @click="imageToggle(index)"
-          class="toggle-img"
-        />
-      </div>
+          :src="
+            state.reminder.alarm
+              ? '/src/image/alarm_on.png'
+              : '/src/image/alarm_off.png'
+          "
+          alt="알람 상태"
+          class="alarm-img"
+          @click="state.reminder.alarm = !state.reminder.alarm"
+        />알람 설정</span
+      >
+      <span :class="{ disabled: isDateMode }">
+        <span :class="{ on: isRepeatMode }" class="off toggle-box"
+          >요일 반복</span
+        >
+        <div class="img">
+          <img
+            v-for="(dow, index) in dowImage"
+            :key="index"
+            :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
+            :alt="dow.name"
+            @click="imageToggle(index)"
+            class="toggle-img"
+          />
+        </div>
+      </span>
       <div>
-        <label for="title">제목</label>
         <input
           type="text"
-          id="title"
+          class="title"
           placeholder="어떤 일정이 있으신가요?"
           v-model="state.reminder.title"
         />
       </div>
       <div>
-        <label for="content">내용</label>
         <textarea
           name="내용"
-          id="content"
+          class="content"
           placeholder="내용을 추가해주세요!"
           v-model="state.reminder.content"
         ></textarea>
       </div>
-      <button @click="submit">
-        {{ state.reminder.id > 0 ? '수정  하기' : '추가하기' }}
+      <button @click="submit" class="button">
+        {{ state.reminder.id > 0 ? '수정하기' : '추가하기' }}
       </button>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.pickButton {
-  width: 50px;
-  cursor: pointer;
+.form {
+  width: 400px;
+  margin: 80px auto;
+  background-color: #fff;
+
+  .form-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #5d5d5d;
+    margin-bottom: 25px;
+  }
+
+  .form-card {
+    position: relative;
+    border-radius: 10px;
+    padding: 20px 30px 30px 30px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 500px;
+
+    a {
+      &:hover {
+        background-color: #fff;
+      }
+    }
+    .cancel {
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+    .date-box {
+      margin-right: 173px;
+    }
+    .calendar-popup {
+      position: relative;
+
+      .date,
+      .calendar-button {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .date {
+        font-size: 18px;
+        color: #5d5d5d;
+        font-weight: bold;
+      }
+
+      .calendar-button {
+        width: 20px;
+        margin-left: 8px;
+        transform: rotate(90deg);
+        cursor: pointer;
+      }
+
+      .calendar {
+        position: absolute;
+        z-index: 99999999999;
+        margin-top: 10px;
+      }
+    }
+    .alarm-box {
+      margin-right: 166px;
+    }
+
+    .alarm-img {
+      width: 18px;
+      height: 18px;
+      margin-right: 5px;
+    }
+
+    .toggle-box {
+      margin-right: 0;
+    }
+
+    .toggle-img {
+      width: 40px;
+      height: 40px;
+      margin: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .img img:nth-child(1) {
+      margin-left: 0;
+    }
+    .img img:nth-child(7) {
+      margin-right: 0;
+    }
+
+    .title,
+    .content {
+      width: 100%;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 15px;
+      resize: none;
+    }
+
+    .content {
+      height: 80px;
+    }
+
+    .button {
+      width: 100%;
+      background-color: #3bbeff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+
+      &:hover {
+        background-color: #1aaeff;
+      }
+    }
+  }
 }
-.alarm {
-  width: 60px;
-}
-.toggle-img {
-  width: 60px;
-  margin: 10px;
-  cursor: pointer;
-}
+
 .disabled {
   opacity: 0.5;
 }
-.on {
-  display: inline-block;
-  background-color: #bfeaff;
-  color: #fff;
-  padding: 5px 9px;
-  border-radius: 5px;
-}
+
+.on,
 .off {
-  color: gray;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 5px;
+  padding: 6px 10px;
+  margin: 10px 5px 5px 0;
+}
+
+.off {
+  background-color: #d9d9d9;
+  color: #fff;
+}
+.on {
+  background-color: #3bbeff;
+  color: #fff;
 }
 </style>
