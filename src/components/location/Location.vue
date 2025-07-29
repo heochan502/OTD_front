@@ -1,16 +1,16 @@
 <script setup>
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, watch, onMounted } from 'vue';
 import {
   getLocalName,
   getLocalList,
   selectLocation,
   saveLocation,
   removeLocation,
-} from "@/services/weather/locationService";
-import { useRouter } from "vue-router";
+} from '@/services/weather/locationService';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const keyword = ref("");
+const keyword = ref('');
 const selectedLocation = ref(null);
 const state = reactive({
   items: [], // 지역 검색 결과 리스트
@@ -20,7 +20,7 @@ const state = reactive({
 
 const searchLocation = async () => {
   if (!keyword.value.trim()) {
-    alert("지역명을 입력하세요");
+    alert('지역명을 입력하세요');
     return;
   }
   const res = await getLocalName(keyword.value);
@@ -45,27 +45,26 @@ const selectWeatherLocation = async (localId, locationName) => {
         `${locationName}이(가) 선택 되었습니다. \n홈 화면으로 이동하시겠습니까?`
       )
     ) {
-      router.push("/");
+      router.push('/');
     }
   }
 };
 
 const saveSearchedLocation = async () => {
   if (!selectedLocation.value || !selectedLocation.value.localId) {
-    alert("지역 정보가 일치하지 않습니다");
-    console.log(selectedLocation.value);
+    alert('지역 정보가 일치하지 않습니다');
     return;
   }
   await saveLocation(selectedLocation.value.localId);
-  alert("지역이 저장되었습니다");
+  alert('지역이 저장되었습니다');
   await LocalList();
 };
 
 const removeLocal = async (localId) => {
-  if (confirm("선택한 지역을 삭제하시겠습니까?")) {
+  if (confirm('선택한 지역을 삭제하시겠습니까?')) {
     const res = await removeLocation(localId);
     if (res.status === 200) {
-      alert("삭제되었습니다.");
+      alert('삭제되었습니다.');
       await LocalList();
     }
   }
@@ -74,11 +73,10 @@ const removeLocal = async (localId) => {
 const LocalList = async () => {
   const res = await getLocalList();
   state.list = res.data;
-  console.log("locallist", state.list);
 };
 
 watch(keyword, async (val) => {
-  if (!val || typeof val !== "string" || !val.trim()) return {};
+  if (!val || typeof val !== 'string' || !val.trim()) return {};
   await searchLocation();
 });
 
