@@ -12,6 +12,7 @@ import CommunityView from '@/views/community/CommunityView.vue';
 
 import MealForm from '@/views/meal/MealForm.vue';
 import MealAdd from '@/components/meal/MealAdd.vue';
+import MealStatistic from '@/components/meal/MealStatistic.vue';
 
 import HealthMain from '@/views/health/HealthMain.vue';
 import ElogDetail from '@/views/health/ElogDetail.vue';
@@ -67,6 +68,11 @@ const router = createRouter({
       path: '/meal/add',
       name: 'MealAdd',
       component: MealAdd,
+    },
+    {
+      path: '/meal/MealStatistic',
+      name: 'MealStatistic',
+      component: MealStatistic,
     },
     {
       path: '/health',
