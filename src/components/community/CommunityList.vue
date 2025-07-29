@@ -8,8 +8,10 @@ const itemsPerPage = 10;
 const currentPage = ref(1);
 
 onMounted(() => {
+
   store.loadPosts();
   console.log('store.posts:', store.posts);
+
 });
 
 const filteredPosts = computed(() => {
@@ -22,6 +24,7 @@ const filteredPosts = computed(() => {
       (post.memberNick || '').toLowerCase().includes(query)
   );
 });
+
 
 // 페이징 계산
 const pageCount = computed(() =>
@@ -55,6 +58,7 @@ const handlePostClick = (post) => {
   }
   store.goDetail(post);
 };
+
 </script>
 
 <template>
