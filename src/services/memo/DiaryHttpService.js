@@ -3,7 +3,9 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 
 class DiaryHttpService {
+
   async findAll(params) {
+    console.log("params", params);
   const res = await axios.get('/memoAndDiary/diary', { params });
   console.log('API 응답 데이터:', res.data);
   

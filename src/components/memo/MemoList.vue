@@ -13,7 +13,9 @@ const fetchMemoList = async () => {
       currentPage: 1,  // 페이지 번호 (필요에 따라 추가)
       pageSize: 10,    // 페이지 크기 (필요에 따라 추가)
     });
-    memoList.value = result.memoList;
+    memoList.value = result.memos;
+    console.log("메모리스트 벨류 ", memoList.value);
+    console.log("메모리스트 벨류 ", result);
   } catch (e) {
     alert('메모 목록 로딩 실패');
     console.error(e);
@@ -32,7 +34,7 @@ onMounted(async () => {
 <template>
   <div class="memo-list-wrapper">
     <h2>메모 목록</h2>
-    <div v-if="memoList.length === 0" class="empty-message">
+    <div v-if="memoList.value===null" class="empty-message">
       등록된 메모가 없습니다.
     </div>
     <ul v-else>

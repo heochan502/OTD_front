@@ -11,13 +11,15 @@ const accountStore = useAccountStore();
 
 const fetchDiaryList = async () => {
   try {
+    console.log("accountStore", accountStore.loggedInId);
     const params = {
-      memberNoLogin: accountStore.state.memberNoLogin,
+      memberNoLogin: accountStore.loggedInId,
       currentPage: 1,
       pageSize: 10,
       offset: 0,
     };
     diaryList.value = await DiaryHttpService.findAll(params);
+  
   } catch (e) {
     alert('다이어리 목록 로딩 실패');
     console.error(e);
