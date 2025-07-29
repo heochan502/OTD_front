@@ -3,48 +3,80 @@ import { onMounted, reactive } from "vue";
 import moodLevels from "@/assets/health/moodLevels.json";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
 import HealthCart from "@/components/health/HealthChart.vue";
+import { useHealthStore } from "@/stores/healthStore";
+import { useRoute } from "vue-router";
+import { getHlog, deleteHlog } from "@/services/health/hlogService";
+import router from "@/router";
 
-const healthlog = reactive({
-  healthlog_id: 1,
-  weight: 60,
-  height: 170,
-  systolic_bp: 80,
-  diastolic_bp: 115,
-  sugar_level: 100,
-  mood_level: 5,
-  sleep_quality: 4,
-  healthlog_datetime: "2025-07-28",
+const healthStore = useHealthStore();
+const route = useRoute();
+
+const state = reactive({
+  hlog: {
+    healthlogId: null,
+    weight: null,
+    height: null,
+    systolicBp: null,
+    diastolicBp: null,
+    sugarLevel: null,
+    moodLevel: null,
+    sleepQuality: null,
+    healthlogDatetime: "",
+  },
+});
+
+const healthlogId = route.params.healthlogId;
+
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
+  const res = await getHlog(healthlogId);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  state.hlog = res.data;
 });
 
 const fields = [
-  { key: "mood_level", label: "감정상태" },
-  { key: "sleep_quality", label: "수면기록" },
+  { key: "moodLevel", label: "감정상태" },
+  { key: "sleepQuality", label: "수면기록" },
   { key: "weight", label: "체중", unit: "kg" },
   { key: "height", label: "신장", unit: "cm" },
-  { key: "systolic_bp", label: "수축기 혈압", unit: "mmHg" },
-  { key: "diastolic_bp", label: "이완기 혈압", unit: "mmHg" },
-  { key: "sugar_level", label: "혈당", unit: "mg/dL" },
+  { key: "systolicBp", label: "수축기 혈압", unit: "mmHg" },
+  { key: "diastolicBp", label: "이완기 혈압", unit: "mmHg" },
+  { key: "sugarLevel", label: "혈당", unit: "mg/dL" },
 ];
-
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-onMounted(() => {});
+// @click
+const deleteLog = async () => {
+  if (!confirm("삭제하시겠습니까?")) return;
+  const res = await deleteHlog(healthlogId);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("삭제되었습니다");
+  router.push("/health");
+};
 </script>
 
 <template>
   <v-container>
     <v-row class="top">
-      <div class="datetime">{{ formatDate(healthlog.healthlog_datetime) }}</div>
+      <div class="datetime">{{ formatDate(state.hlog.healthlogDatetime) }}</div>
       <div class="btns">
-        <v-btn class="btn_home">홈</v-btn>
-        <v-btn class="btn_delete">삭제</v-btn>
+        <router-link to="/health">
+          <v-btn class="btn_home">홈</v-btn>
+        </router-link>
+        <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
       </div>
     </v-row>
 
-    <v-item-group selected-class="bg-primary">
+    <v-item-group selected-class="bg-blue">
       <div class="item_group">
         <div v-for="(field, idx) in fields" :key="idx" class="card-wrapper">
           <v-item v-slot="{ selectedClass, toggle }">
@@ -63,11 +95,14 @@ onMounted(() => {});
               </div>
               <div class="text-center content">
                 {{
-                  field.key === "mood_level"
-                    ? moodLevels[healthlog[field.key]]?.label
-                    : field.key === "sleep_quality"
-                    ? sleepQualitys[healthlog[field.key]]?.label
-                    : healthlog[field.key] +
+                  field.key === "moodLevel"
+                    ? moodLevels.find((e) => e.level === state.hlog[field.key])
+                        ?.label
+                    : field.key === "sleepQuality"
+                    ? sleepQualitys.find(
+                        (e) => e.level === state.hlog[field.key]
+                      )?.label
+                    : state.hlog[field.key] +
                       (field.unit ? ` ${field.unit}` : "")
                 }}
               </div>
@@ -100,6 +135,7 @@ onMounted(() => {});
 
   .v-card {
     border-radius: 20px;
+    border: 2px solid #2196f3;
   }
   .subtitle {
     padding-bottom: 10px;
@@ -121,5 +157,13 @@ onMounted(() => {});
   .btn_delete {
     background-color: #838383;
   }
+}
+
+.content {
+  font-weight: 700;
+}
+
+:hover {
+  background-color: #fff;
 }
 </style>

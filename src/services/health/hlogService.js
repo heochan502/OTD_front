@@ -19,8 +19,8 @@ export const getHlog = (healthlogId) => {
 };
 
 // 건강기록 삭제
-export const deleteHlog = (exerciselogId) => {
+export const deleteHlog = (healthlogId) => {
   return axios
-    .delete(`${path}?exerciselog_id=${exerciselogId}`)
+    .delete(`${path}?healthlog_id=${healthlogId}`)
     .catch((e) => e.response);
 };
