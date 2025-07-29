@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { getProfile, deleteMember } from '@/services/accountService';
 import { useAccountStore } from '@/stores/counter';
 
+
 const router = useRouter();
 const counter = useAccountStore();
 
@@ -34,7 +35,7 @@ const remove = async (memberNoLogin) => {
   if (!confirm('정말 회원 탈퇴하시겠습니까?')) return;
 
   try {
-    const res = await deleteMember(memberNoLogin); // accountService에 deleteMember API 필요
+    const res = await deleteMember(memberNoLogin); 
     if (res.status === 200) {
       alert('회원 탈퇴가 완료되었습니다.');
       router.push('/login');
