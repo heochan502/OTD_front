@@ -28,7 +28,6 @@
   min-height: 90vh;
   width: 100%;
   max-width: 1100px;
-  height: 1900px;
   border-radius: 8px;
 }
 </style>

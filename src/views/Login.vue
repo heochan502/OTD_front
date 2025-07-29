@@ -75,10 +75,10 @@ const submit = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f5f7fa;
-  min-height: 100vh;
+  background: #fff;
+  min-height: 30vh;
   font-family: 'Noto Sans KR', sans-serif;
-  padding: 40px 0;
+  padding: 40px 0px;
 }
 .form-container {
   width: 100%;
