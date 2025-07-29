@@ -12,7 +12,6 @@ const props = defineProps({
   usePage: { type: String, default: 'home' },
 });
 const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
-console.log('props', props.reminderDate);
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 

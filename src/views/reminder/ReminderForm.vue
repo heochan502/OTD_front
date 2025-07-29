@@ -147,11 +147,9 @@ const submit = async () => {
     repeatDow: state.reminder.repeatDow,
     alarm: state.reminder.alarm,
   };
-  console.log('jsonBody', jsonBody);
   let res = null;
   if (state.reminder.id > 0) {
     jsonBody.id = state.reminder.id;
-    console.log('modify', jsonBody);
     res = await modify(jsonBody);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
@@ -161,14 +159,12 @@ const submit = async () => {
     router.push('/reminder/list');
   } else {
     res = await save(jsonBody);
-    console.log('res!!', res.data);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;
     }
     alert('일정을 추가했어요!');
     reminderStore.setReload(true);
-    console.log('pinia', reminderStore.reload);
     router.push('/reminder');
   }
 };

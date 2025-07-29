@@ -76,7 +76,7 @@ onMounted(async () => {
       </router-link>
     </div>
 
-    <div class="report-wrapper mt-9">
+    <div class="report-wrapper mt-10">
       <ReportCard />
     </div>
   </div>
@@ -98,7 +98,7 @@ onMounted(async () => {
     background-color: transparent !important;
     border-radius: 25px 25px 0 0 !important;
     width: 96%;
-    height: inherit;
+    min-height: 448px;
   }
 
   :deep(.v-card-text) {
@@ -133,12 +133,13 @@ onMounted(async () => {
   color: #fff;
   font-size: 1rem;
   font-weight: bold;
+  margin-top: 8px;
 
   .list-title {
     width: 180px;
     height: 3rem;
     background-color: #3bbeff;
-    line-height: 45px;
+    line-height: 42px;
     text-align: center;
     border-radius: 25px 25px 0 0;
     gap: 0;
@@ -180,10 +181,10 @@ onMounted(async () => {
 
     .list-card {
       width: 100%;
-      height: 35px;
+      height: 55px;
       background-color: #fff;
       margin-bottom: 8px;
-      border-radius: 20px;
+      border-radius: 30px;
       display: flex;
       align-items: center;
 
