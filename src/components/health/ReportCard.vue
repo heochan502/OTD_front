@@ -1,9 +1,9 @@
 <script setup>
-import { ref } from "vue";
-import ExerciseReport from "./ExerciseReport.vue";
-import HealthReport from "./HealthReport.vue";
+import { ref } from 'vue';
+import ExerciseReport from './ExerciseReport.vue';
+import HealthReport from './HealthReport.vue';
 
-const tab = ref("two");
+const tab = ref('two');
 </script>
 
 <template>
