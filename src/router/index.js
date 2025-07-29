@@ -1,5 +1,7 @@
+
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
+
 
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
 import ReminderForm from '@/views/reminder/ReminderForm.vue';
@@ -20,12 +22,14 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
+
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
 
 import Location from '@/components/location/Location.vue';
 import ProfileDetail from '@/views/ProfileDetail.vue';
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -130,8 +134,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/diary',
-      name: 'diary',
+      path: "/diary",
+      name: "diary",
       component: Diary,
       props: true,
       meta: { requiresAuth: true },
@@ -149,7 +153,7 @@ router.beforeEach((to) => {
   const accountStore = useAccountStore();
 
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return '/login';
+    return "/login";
   }
 });
 
