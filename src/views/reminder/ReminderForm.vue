@@ -184,7 +184,7 @@ const submit = async () => {
         <img src="/src/image/cancel.png" alt="취소" class="cancel" />
       </span>
       <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
-        <span :class="{ on: isDateMode }" class="off box">날짜 지정</span>
+        <span :class="{ on: isDateMode }" class="off date-box">날짜 지정</span>
         <span class="date">{{ formattedDate }}</span>
         <img
           src="/src/image/button.png"
@@ -216,15 +216,19 @@ const submit = async () => {
         />알람 설정</span
       >
       <span :class="{ disabled: isDateMode }">
-        <span :class="{ on: isRepeatMode }" class="off toggle-box">요일 반복</span>
-        <img
-          v-for="(dow, index) in dowImage"
-          :key="index"
-          :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
-          :alt="dow.name"
-          @click="imageToggle(index)"
-          class="toggle-img"
-        />
+        <span :class="{ on: isRepeatMode }" class="off toggle-box"
+          >요일 반복</span
+        >
+        <div class="img">
+          <img
+            v-for="(dow, index) in dowImage"
+            :key="index"
+            :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
+            :alt="dow.name"
+            @click="imageToggle(index)"
+            class="toggle-img"
+          />
+        </div>
       </span>
       <div>
         <input
@@ -259,8 +263,8 @@ const submit = async () => {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
-    color: #333;
-    margin-bottom: 30px;
+    color: #5D5D5D;
+    margin-bottom: 25px;
   }
 
   .form-card {
@@ -279,6 +283,9 @@ const submit = async () => {
       right: 10px;
       cursor: pointer;
     }
+    .date-box {
+      margin-right: 173px;
+    }
     .calendar-popup {
       position: relative;
 
@@ -289,9 +296,9 @@ const submit = async () => {
       }
 
       .date {
-        margin-left: 10px;
         font-size: 18px;
-        color: #666;
+        color: #5D5D5D;
+        font-weight: bold;
       }
 
       .calendar-button {
@@ -308,7 +315,7 @@ const submit = async () => {
       }
     }
     .alarm-box {
-      margin-right: 110px;
+      margin-right: 166px;
     }
 
     .alarm-img {
@@ -320,6 +327,7 @@ const submit = async () => {
     .toggle-box {
       margin-right: 0;
     }
+
     .toggle-img {
       width: 40px;
       height: 40px;
@@ -328,10 +336,17 @@ const submit = async () => {
       cursor: pointer;
     }
 
+    .img img:nth-child(1) {
+      margin-left: 0;
+    }
+    .img img:nth-child(7) {
+      margin-right: 0;
+    }
+
     .title,
     .content {
       width: 100%;
-      border: 1px solid #ccc;
+      border: 2px solid #ccc;
       border-radius: 8px;
       padding: 10px;
       font-size: 16px;
