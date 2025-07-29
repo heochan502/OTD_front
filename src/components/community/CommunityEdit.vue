@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { usecommunityStore } from '@/stores/communityStore';
 import {
   updatePost,
@@ -12,6 +12,13 @@ const post = computed(() => store.selectedPost || {});
 // 수정 중인 값들을 로컬 상태로 복사
 const editedTitle = ref(post.value.title);
 const editedContent = ref(post.value.content);
+
+onMounted(async () => {
+  if (post.value) {
+    likeCount.value = post.value.like;
+    isLiked.value = post.value.likedByCurrentUser;
+  }
+});
 
 watch(post, (newPost) => {
   editedTitle.value = newPost.title;
