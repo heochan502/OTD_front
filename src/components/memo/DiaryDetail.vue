@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import { useDiaryDetail, MOOD_OPTIONS } from '@/components/memo/useDiaryDetail';
 import '@/components/memo/MemoAndDiaryDetail.css';
 
@@ -7,7 +6,6 @@ const {
   diary,
   previewImages,
   fileInputRef,
-  mode,
   isCreateMode,
   isViewMode,
   isEditMode,
@@ -45,7 +43,7 @@ const {
       :disabled="isViewMode"
       placeholder="내용 입력"
       class="textarea"
-    />
+    ></textarea>
 
     <label for="mood">기분</label>
     <select
@@ -76,10 +74,9 @@ const {
     <div v-if="previewImages.length > 0" class="preview-list">
       <div class="preview-item" v-for="(url, idx) in previewImages" :key="idx">
         <img :src="url" alt="프리뷰 이미지" />
-        <button v-if="!isViewMode" @click="removeImage(idx)">삭제</button>
+        <button v-if="!isViewMode" class="remove-btn" @click="removeImage(idx)">삭제</button>
       </div>
     </div>
-
     <div v-else class="no-image">이미지가 없습니다.</div>
 
     <div class="button-group">
