@@ -3,19 +3,21 @@ import { reactive } from "vue";
 import { useRouter } from "vue-router";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
 import moodLevels from "@/assets/health/moodLevels.json";
+import { saveHlog } from "@/services/health/hlogService";
+import dayjs from "dayjs";
 
 const router = useRouter();
 
 const state = reactive({
-  logs: {
+  form: {
     weight: null,
     height: null,
-    systolic_bp: null,
-    diastolic_bp: null,
-    sugar_level: null,
-    mood_lebel: null,
-    sleep_quality: null,
-    healthlog_datetime: null,
+    systolicBp: null,
+    diastolicBp: null,
+    sugarLevel: null,
+    moodLevel: null,
+    sleepQuality: null,
+    healthlogDatetime: "",
   },
 });
 
@@ -26,10 +28,33 @@ const rules = [
   },
 ];
 
-// @click
-const submit = () => {
-  alert("추후 구현 예정");
+const convertDatetimeFormat = (input) => {
+  return dayjs(input).format("YYYY-MM-DD HH:mm:ss.SSS");
 };
+
+// @click
+const submit = async () => {
+  if (!confirm("건강 기록을 저장하시겠습니까?")) return;
+  const jsonBody = {
+    weight: state.form.weight,
+    height: state.form.height,
+    systolicBp: state.form.systolicBp,
+    diastolicBp: state.form.diastolicBp,
+    sugarLevel: state.form.sugarLevel,
+    moodLevel: state.form.moodLevel,
+    sleepQuality: state.form.sleepQuality,
+    healthlogDatetime: convertDatetimeFormat(state.form.healthlogDatetime),
+  };
+
+  const res = await saveHlog(jsonBody);
+  if (res === undefined || res.status !== 200) {
+    alert("에러발생");
+    return;
+  }
+  alert("건강기록 저장 완료!");
+  router.push("/health");
+};
+
 const cancel = () => {
   if (!confirm("취소하고 돌아가시겠습니까?")) return;
   router.push("/health");
@@ -46,7 +71,7 @@ const cancel = () => {
         <v-row class="hlogForm">
           <v-col class="left">
             <v-date-picker
-              v-model="state.logs.healthlog_datetime"
+              v-model="state.form.healthlogDatetime"
               width="300px"
               divided
               landscape
@@ -55,7 +80,7 @@ const cancel = () => {
           <v-col class="right" cols="8">
             <v-row>
               <v-text-field
-                v-model="state.logs.weight"
+                v-model="state.form.weight"
                 :rules="rules"
                 label="체중(kg)"
                 variant="solo"
@@ -64,7 +89,7 @@ const cancel = () => {
                 clearable
               ></v-text-field>
               <v-text-field
-                v-model="state.logs.height"
+                v-model="state.form.height"
                 :rules="rules"
                 label="신장"
                 variant="solo"
@@ -75,7 +100,7 @@ const cancel = () => {
             </v-row>
             <v-row>
               <v-text-field
-                v-model="state.logs.systolic_bp"
+                v-model="state.form.systolicBp"
                 label="수축기 혈압"
                 variant="solo"
                 class="pa-2"
@@ -83,7 +108,7 @@ const cancel = () => {
                 clearable
               ></v-text-field>
               <v-text-field
-                v-model="state.logs.diastolic_bp"
+                v-model="state.form.diastolicBp"
                 label="이완기 혈압"
                 variant="solo"
                 class="pa-2"
@@ -91,7 +116,7 @@ const cancel = () => {
                 clearable
               ></v-text-field>
               <v-text-field
-                v-model="state.logs.sugar_level"
+                v-model="state.form.sugarLevel"
                 label="혈당"
                 variant="solo"
                 class="pa-2"
@@ -100,8 +125,8 @@ const cancel = () => {
               ></v-text-field>
             </v-row>
             <v-row>
-              <v-combobox
-                v-model="state.logs.mood_lebel"
+              <v-select
+                v-model="state.form.moodLevel"
                 label="감정상태"
                 :items="
                   moodLevels.map((e) => ({
@@ -109,12 +134,14 @@ const cancel = () => {
                     value: e.level,
                   }))
                 "
+                item-title="title"
+                item-value="value"
                 variant="solo"
                 class="pa-2"
                 clearable
-              ></v-combobox>
-              <v-combobox
-                v-model="state.logs.sleep_quality"
+              ></v-select>
+              <v-select
+                v-model="state.form.sleepQuality"
                 label="수면기록"
                 :items="
                   sleepQualitys.map((e) => ({
@@ -122,10 +149,12 @@ const cancel = () => {
                     value: e.level,
                   }))
                 "
+                item-title="title"
+                item-value="value"
                 variant="solo"
                 class="pa-2"
                 clearable
-              ></v-combobox>
+              ></v-select>
             </v-row>
           </v-col>
         </v-row>
