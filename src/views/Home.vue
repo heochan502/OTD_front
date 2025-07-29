@@ -76,7 +76,7 @@ onMounted(async () => {
       </router-link>
     </div>
 
-    <div class="report-wrapper mt-5">
+    <div class="report-wrapper mt-9">
       <ReportCard />
     </div>
   </div>
@@ -108,7 +108,7 @@ onMounted(async () => {
     min-height: 400px !important;
   }
   :deep(.v-tab) {
-    font-size: 16px !important;
+    font-size: 1rem !important;
     font-weight: 700 !important;
     color: #fff !important;
     text-transform: none !important;
@@ -131,12 +131,12 @@ onMounted(async () => {
 .header {
   display: flex;
   color: #fff;
-  font-size: 18px;
+  font-size: 1rem;
   font-weight: bold;
 
   .list-title {
-    width: 150px;
-    height: 50px;
+    width: 180px;
+    height: 3rem;
     background-color: #3bbeff;
     line-height: 45px;
     text-align: center;
