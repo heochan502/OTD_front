@@ -73,7 +73,12 @@ const handlePostClick = (post) => {
           />
         </v-col>
         <v-col cols="3" class="text-right ps-2">
-          <v-btn color="primary" rounded height="40" @click="store.goWrite()"
+          <v-btn
+            color="#3bbeff"
+            style="color: white"
+            rounded
+            height="40"
+            @click="store.goWrite()"
             >글쓰기</v-btn
           >
         </v-col>
