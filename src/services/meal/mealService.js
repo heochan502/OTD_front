@@ -41,15 +41,22 @@ export const getMealData = async (getlist) => {
 };
 
 export const getMealTotalOnDay = async (nowDay) => {
-  console.log('오늘 정보', nowDay);
+  // console.log('오늘 정보', nowDay);
 
 
   const res = await axios.get("meal/eatenMeal", {params :{mealDay:nowDay}});
-  console.log("json이겟지? :", res.data);
+  // console.log("json이겟지? :", res.data);
   // const data = res.data;
   return res.data;
 };
 
+
+export const getWeekTotal = async (weeky) => {
+  // console.log("주간", weeky);
+  const res = await axios.get("meal/statsMeal", { params:weeky});
+  // console.log("json이겟지? :", res.data);
+  return res;
+};
 
 
 // 데이터 수정
