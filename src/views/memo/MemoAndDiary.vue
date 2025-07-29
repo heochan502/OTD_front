@@ -29,8 +29,8 @@ const goToDiary = () => {
   <div class="memo-menu">
     <h2>기록을 시작해볼까요?</h2>
     <div class="button-wrapper">
-      <button @click="goToMemo">📝 메모 등록</button>
-      <button @click="goToDiary">📔 다이어리 등록</button>
+      <button @click="goToMemo">📝 메모</button>
+      <button @click="goToDiary">📔 다이어리</button>
     </div>
     <router-view />
   </div>

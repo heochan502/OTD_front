@@ -46,7 +46,7 @@ onMounted(fetchDiaryList);
       >
         <div class="diary-title">{{ item.diaryName }}</div>
         <div class="diary-content">{{ item.diaryContent }}</div>
-        <div class="diary-date">{{ formatDateTime(item.createdAt) }}</div>
+        <div class="diary-date">{{ formatDateTime(item.createdAt ?? item.created_at) }}</div>
       </li>
     </ul>
   </div>
