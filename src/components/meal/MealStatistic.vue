@@ -57,11 +57,11 @@ watch(
       nowDay.nowDay
     );
 
-    // const res = await getWeekTotal(weekDay.getWeekDate);
-    // if (res.status === 200) {
-    //   weeklyStore.weeklyRawData = res.data;
-    //   console.log("통신구역 " );
-    // }
+    const res =  getWeekTotal(weekDay.getWeekDate);
+    if (res.status === 200) {
+      weeklyStore.weeklyRawData = res.data;
+      console.log("통신구역 " );
+    }
 
   },
   { immediate: true }

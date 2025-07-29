@@ -45,16 +45,7 @@ onMounted(async() => {
    await ondayMealData.mealFormData();
    
   console.log("정보 데이터 :", weeklyData.weeklyRawData);
-  // console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
-//   if (weeklyData.weeklyRawData.length !== 0)
-//  { total.value = weeklyData.weeklyRawData.reduce((sum, day) => sum + day.totalCalorie, 0);
-//   avg.value = total.value / weeklyData.weeklyRawData.length;
-//   // console.log("인포 :", weeklyData.weeklyRawData);
-//  }
-//   else
-//   { avg.value=0; }
-  // console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
-  // itemInfo.value= ondayMealData.itemInfo.value;
+  
 
 });
 
