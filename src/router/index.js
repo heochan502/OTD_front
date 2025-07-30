@@ -29,6 +29,7 @@ import HlogForm from '@/views/health/HlogForm.vue';
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
+import Password from '@/views/Password.vue';
 
 import Location from '@/components/location/Location.vue';
 import ProfileDetail from '@/views/ProfileDetail.vue';
@@ -161,11 +162,24 @@ const router = createRouter({
       props: true,
     },
     {
+      path: "/profile",
+      name: "profile",
+      component: Profile,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/detail",
       name: "profile_detail",
       component: ProfileDetail,
       meta: { requiresAuth: true },
+    },    
+    {
+      path: "/password",
+      name: "password",
+      component: Password,
+      meta: { requiresAuth: true },
     },
+  
   ],
 });
 

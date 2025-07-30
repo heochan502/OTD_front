@@ -19,6 +19,7 @@ const logoutAccount = async () => {
     return;
   }
   counter.setLoggedIn(false);
+  router.push('/login');
 };
 </script>
 

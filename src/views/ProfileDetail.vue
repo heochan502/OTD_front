@@ -112,10 +112,10 @@ const validateName = (name) => {
   if (name.trim().length < 2) {
     return { isValid: false, message: '이름은 최소 2글자 이상이어야 합니다.' };
   }
-  if (name.trim().length > 10) {
+  if (name.trim().length > 20) {
     return {
       isValid: false,
-      message: '이름은 최대 10글자까지 입력 가능합니다.',
+      message: '이름은 최대 20글자까지 입력 가능합니다.',
     };
   }
 
