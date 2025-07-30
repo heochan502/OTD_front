@@ -201,6 +201,7 @@ const submit = async () => {
       <span
         :class="{ on: state.reminder.alarm, off: !state.reminder.alarm }"
         class="alarm-box"
+        @click="state.reminder.alarm = !state.reminder.alarm"
       >
         <img
           :src="
@@ -210,7 +211,6 @@ const submit = async () => {
           "
           alt="알람 상태"
           class="alarm-img"
-          @click="state.reminder.alarm = !state.reminder.alarm"
         />알람 설정</span
       >
       <span :class="{ disabled: isDateMode }">
@@ -319,6 +319,7 @@ const submit = async () => {
     }
     .alarm-box {
       margin-right: 166px;
+      cursor: pointer;
     }
 
     .alarm-img {
@@ -355,6 +356,14 @@ const submit = async () => {
       font-size: 16px;
       margin-top: 15px;
       resize: none;
+      cursor: pointer;
+    }
+
+    .title:focus,
+    .content:focus {
+      outline: none;
+      border-color: #2a9df4;
+      box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.15);
     }
 
     .content {
