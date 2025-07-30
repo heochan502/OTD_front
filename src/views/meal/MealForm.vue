@@ -70,7 +70,7 @@ const formatNumber = (num) => num.toLocaleString();
       <div class="left">
         <div class="progress-container w-full">
             <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-              :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
+              :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
             :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
             customsize="totalcal" />
           <div class="inprogressbar">
