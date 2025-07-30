@@ -1,15 +1,15 @@
 <script setup>
-import { reactive, onMounted, watch } from "vue";
-import { useRouter } from "vue-router";
-import { getByMonth } from "@/services/reminder/reminderService";
-import { useReminderStore } from "@/stores/reminderStore";
-import Calendar from "@/components/reminder/Calendar.vue";
+import { reactive, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { getByMonth } from '@/services/reminder/reminderService';
+import { useReminderStore } from '@/stores/reminderStore';
+import Calendar from '@/components/reminder/Calendar.vue';
 
 const reminderStore = useReminderStore();
 
 const router = useRouter();
 
-const formatNumber = (n) => String(n).padStart(2, "0");
+const formatNumber = (n) => String(n).padStart(2, '0');
 const formatDate = (date) => {
   const y = date.getFullYear();
   const m = formatNumber(date.getMonth() + 1);
@@ -46,7 +46,7 @@ watch(
 const getReminderList = async (date) => {
   const res = await getByMonth(date.year, date.month);
   if (res === undefined || res.status !== 200) {
-    alert("오류발생");
+    alert('오류발생');
     return;
   }
   reminderStore.setFullReminder(res.data);
@@ -70,7 +70,6 @@ const getRepeatDate = (fullReminder, year, month) => {
   for (let day = 1; day <= end; day++) {
     const date = new Date(year, month - 1, day);
     const dow = date.getDay();
-
     for (const item of fullReminder) {
       if (item.repeat && item.repeatDow?.includes(dow)) {
         const created = new Date(item.created);
@@ -81,6 +80,7 @@ const getRepeatDate = (fullReminder, year, month) => {
       }
     }
   }
+  // console.log('result', result);
   return result;
 };
 
@@ -115,9 +115,9 @@ const routerDate = (date) => {
 
   if (dayReminder.length > 0) {
     reminderStore.setSelectedDate(formattedDate);
-    router.push("/reminder/list");
+    router.push('/reminder/list');
   } else {
-    router.push("reminder/form");
+    router.push('reminder/form');
   }
 };
 </script>
@@ -139,7 +139,11 @@ const routerDate = (date) => {
       <div class="preview">
         <div class="block">
           <router-link
-            to="/reminder/list"
+            :to="
+              state.todayReminder.length === 0
+                ? '/reminder/form'
+                : '/reminder/list'
+            "
             @click="setTodayReminder"
             class="link"
           >
