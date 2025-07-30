@@ -1,42 +1,42 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = '/memoAndDiary';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
 
 class MemoHttpService {
   async findAll(params) {
-    return this._request('get', '/memo', { params }, '메모 목록 조회');
+    return this._request('get', '/memoAndDiary/memo', { params }, '메모 목록 조회');
   }
 
   async findById(id) {
-    return this._request('get', `/memo/${id}`, null, `메모(ID: ${id}) 조회`);
+    return this._request('get', `/memoAndDiary/memo/${id}`, null, `메모(ID: ${id}) 조회`);
   }
 
   async create(formData) {
-    return this._request('post', '/memo', formData, '메모 등록', {
+    return this._request('post', '/memoAndDiary/memo', formData, '메모 등록', {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   }
 
   async modify(formData) {
-    return this._request('put', '/memo', formData, '메모 수정', {
+    return this._request('put', '/memoAndDiary/memo', formData, '메모 수정', {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   }
 
   async deleteById(id) {
-    return this._request('delete', `/memo?id=${id}`, null, `메모(ID: ${id}) 삭제`);
+    return this._request('delete', `/memoAndDiary/memo`, { params: { id } }, `메모(ID: ${id}) 삭제`);
   }
 
   async _request(method, url, data, context, extraConfig = {}) {
     try {
       let res;
       if (method === 'get' || method === 'delete') {
-        res = await axios[method](url, { ...data, ...extraConfig });
+        res = await axios[method](url, { ...extraConfig, ...(data || {}) });
       } else {
         res = await axios[method](url, data, extraConfig);
       }
-      return res.data.resultData;
+      return res?.data?.resultData ?? {};
     } catch (err) {
       this._handleError(err, context);
       throw err;

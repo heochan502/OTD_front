@@ -12,9 +12,11 @@
   --shadow-light: rgba(0, 0, 0, 0.08);
 }
 
-/* === 공통 wrapper === */
+/* === 공통 wrapper (디테일/리스트 공용) === */
 .memo-detail,
-.diary-detail {
+.diary-detail,
+.memo-list,
+.diary-list {
   max-width: 800px;
   margin: var(--spacing-lg) auto;
   padding: var(--spacing-lg);
@@ -72,7 +74,7 @@
 
 /* === 파일 업로드 === */
 input[type="file"] {
-  width: 720px; /* 제목/내용 입력과 동일 너비 */
+  width: 720px;
   padding: var(--spacing-sm) var(--spacing-md);
   margin-top: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
@@ -83,7 +85,7 @@ input[type="file"] {
 
 /* === 이미지 미리보기 === */
 .preview-list {
-  width: 720px; /* 제목/내용 입력과 동일 너비 */
+  width: 720px;
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-md);
@@ -150,4 +152,61 @@ input[type="file"] {
 
 .button-group button:hover {
   opacity: 0.9;
+}
+
+/* === 리스트 아이템 (공통) === */
+.memo-item,
+.diary-item {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f5f5f5;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 2px 8px var(--shadow-light);
+  cursor: pointer;
+}
+
+/* === 리스트 아이템 간격 === */
+.memo-list > .memo-item + .memo-item,
+.diary-list > .diary-item + .diary-item {
+  margin-top: var(--spacing-md);
+}
+
+/* === 리스트 내부 이미지 미리보기 === */
+.preview-image {
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: cover;
+  margin-top: var(--spacing-sm);
+  border-radius: var(--border-radius-base);
+}
+
+/* === 작성일 표시 === */
+.date {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* === 비어있을 때 메시지 === */
+.empty-message {
+  text-align: center;
+  color: #999;
+  margin-top: 20px;
+}
+
+/* === 📱 모바일 반응형 대응 === */
+@media (max-width: 768px) {
+  .memo-detail,
+  .diary-detail,
+  .memo-list,
+  .diary-list {
+    padding: 16px;
+  }
+
+  .text-input,
+  .textarea,
+  input[type="file"],
+  .preview-list {
+    width: 100%;
+  }
 }

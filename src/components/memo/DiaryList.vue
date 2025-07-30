@@ -1,75 +1,60 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { MOOD_OPTIONS } from '@/components/memo/useDiaryDetail';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
+import { useAccountStore } from '@/stores/counter';
+import '@/components/memo/MemoAndDiaryDetail.css';
 
-const props = defineProps({});
 const emit = defineEmits(['select']);
-
 const diaryList = ref([]);
+const accountStore = useAccountStore();
 
-const fetchDiaries = async () => {
+const fetchDiaryList = async () => {
+  const params = {
+    currentPage: 1,
+    pageSize: 100,
+    memberNoLogin: accountStore.loggedInId,
+  };
+
   try {
-    const res = await DiaryHttpService.findAll({ currentPage: 1, pageSize: 100 });
-    diaryList.value = res.diaryList;
+    const result = await DiaryHttpService.findAll(params);
+    console.log('[diaryList] 서버 응답:', result);
+    diaryList.value = result?.diaryList || [];
   } catch (err) {
-    alert('다이어리 목록 조회 실패');
-    console.error(err);
+    console.error('다이어리 목록 조회 실패:', err);
+    diaryList.value = [];
   }
 };
 
-onMounted(() => {
-  fetchDiaries();
-});
+onMounted(fetchDiaryList);
+defineExpose({ fetchDiaryList });
 
-const getMoodLabel = (value) => {
-  const mood = MOOD_OPTIONS.find((m) => m.value === value);
-  return mood ? mood.label : '기타';
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString();
 };
-
-// ✅ 외부에서 호출할 수 있도록 expose
-defineExpose({
-  fetchDiaries,
-});
 </script>
 
 <template>
-  <div class="diary-list">
+  <div class="memo-list">
     <div
-      v-for="item in diaryList"
-      :key="item.id"
-      class="diary-item"
-      @click="$emit('select', item)"
+      v-for="diary in diaryList"
+      :key="diary.id"
+      class="memo-item"
+      @click="$emit('select', diary)"
     >
-      <h3>{{ item.diaryName }}</h3>
-      <p>{{ item.diaryContent }}</p>
-      <p>기분: {{ getMoodLabel(item.mood) }}</p>
+      <h3>{{ diary.diaryName }}</h3>
+      <p>{{ diary.diaryContent }}</p>
+      <span class="date">{{ formatDate(diary.createdAt) }}</span>
       <img
-        v-if="item.imageFileName"
-        :src="`/pic/${item.imageFileName}`"
+        v-show="diary.imageFileName"
+        :src="`/pic/${diary.imageFileName}`"
         class="preview-image"
         alt="diary"
       />
     </div>
+
+    <div v-show="diaryList.length === 0" class="empty-message">
+      등록된 다이어리가 없습니다.
+    </div>
   </div>
 </template>
-
-<style scoped>
-.diary-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.diary-item {
-  background: #f5f5f5;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-}
-.preview-image {
-  margin-top: 12px;
-  max-width: 200px;
-  border-radius: 8px;
-}
-</style>

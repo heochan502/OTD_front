@@ -1,168 +1,165 @@
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import MemoHttpService from '@/services/memo/MemoHttpService';
+import { useAccountStore } from '@/stores/counter';
 
 export function useMemoDetail(props, emit) {
+  const accountStore = useAccountStore();
+  const router = useRouter();
+  const route = useRoute();
+
   const memo = ref({
     id: null,
     memoName: '',
     memoContent: '',
-    createdAt: null,
     imageFileName: null,
+    createdAt: null,
   });
 
-  const previewImages = ref([]);
   const fileInputRef = ref(null);
+  const previewImages = ref([]);
   const mode = ref('view');
-  const route = useRoute();
-  const router = useRouter();
-  const accountStore = useAccountStore();
 
   const isCreateMode = computed(() => mode.value === 'create');
-  const isViewMode = computed(() => mode.value === 'view');
   const isEditMode = computed(() => mode.value === 'edit');
-  const hasNoImages = computed(() => isViewMode.value && previewImages.value.length === 0);
+  const isViewMode = computed(() => mode.value === 'view');
 
-  const setMode = (newMode) => {
-    mode.value = newMode;
+  const isTitleValid = computed(() => memo.value.memoName.trim().length >= 10);
+  const isContentValid = computed(() => memo.value.memoContent.length >= 10);
+
+  const setMode = (value) => {
+    mode.value = value;
+  };
+
+  const handleImageChange = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      previewImages.value = [reader.result];
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (index) => {
+    previewImages.value.splice(index, 1);
+    if (fileInputRef.value) {
+      fileInputRef.value.value = null;
+    }
   };
 
   const clearPreviewImages = () => {
-    previewImages.value.forEach((url) => {
-      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-    });
     previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = '';
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
-    const ext = file.name.split('.').pop().toLowerCase();
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!allowedExts.includes(ext)) {
-      alert('허용되지 않는 파일 형식입니다.');
-      return;
+    if (fileInputRef.value) {
+      fileInputRef.value.value = null;
     }
-    if (file.size > maxSize) {
-      alert('파일 크기가 5MB를 초과합니다.');
-      return;
-    }
-
-    clearPreviewImages();
-    previewImages.value = [URL.createObjectURL(file)];
-  };
-
-  const removeImage = () => {
-    clearPreviewImages();
-    memo.value.imageFileName = null;
   };
 
   const createMemo = async () => {
     try {
       const formData = new FormData();
-      formData.append('memoData', new Blob([JSON.stringify(memo.value)], { type: 'application/json' }));
-      const file = fileInputRef.value?.files?.[0];
-      if (file) {
-        formData.append('memoImageFiles', file);
+      const memoData = new Blob(
+        [JSON.stringify(memo.value)],
+        { type: 'application/json' }
+      );
+
+      formData.append('memoData', memoData);
+      if (fileInputRef.value?.files[0]) {
+        formData.append('memoImageFiles', fileInputRef.value.files[0]);
       }
 
       await MemoHttpService.create(formData);
-      alert('메모가 등록되었습니다.');
       emit('created');
-      memo.value = { id: null, memoName: '', memoContent: '', createdAt: null, imageFileName: null };
       clearPreviewImages();
-    } catch (e) {
-      alert('등록 실패');
-      console.error('등록 오류:', e);
+    } catch (err) {
+      console.error('메모 등록 실패', err);
     }
   };
 
   const updateMemo = async () => {
     try {
-      const file = fileInputRef.value?.files?.[0];
       const formData = new FormData();
+      const memoData = new Blob(
+        [JSON.stringify(memo.value)],
+        { type: 'application/json' }
+      );
 
-      const memoData = {
-        id: memo.value.id,
-        memoName: memo.value.memoName,
-        memoContent: memo.value.memoContent,
-        imageFileName: memo.value.imageFileName,
-      };
-
-      formData.append('memoData', new Blob([JSON.stringify(memoData)], { type: 'application/json' }));
-      if (file) formData.append('memoImageFiles', file);
+      formData.append('memoData', memoData);
+      if (fileInputRef.value?.files[0]) {
+        formData.append('memoImageFiles', fileInputRef.value.files[0]);
+      }
 
       await MemoHttpService.modify(formData);
-      alert('수정 완료');
-      setMode('view');
-      await fetchMemo(memo.value.id);
       emit('updated');
+      setMode('view');
+      clearPreviewImages();
     } catch (err) {
-      alert('수정 실패');
+      console.error('메모 수정 실패', err);
     }
   };
 
   const deleteMemo = async () => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
     try {
-      await MemoHttpService.deleteById(memo.value.id);
-      alert('삭제 완료');
-      emit('deleted');
-      router.push('/memoAndDiary/memo/list');
+      if (confirm('정말 삭제하시겠습니까?')) {
+        await MemoHttpService.deleteById(memo.value.id);
+        emit('deleted');
+      }
     } catch (err) {
-      alert('삭제 실패');
+      console.error('메모 삭제 실패', err);
     }
   };
 
-  const cancelEdit = async () => {
-    if (memo.value.id) {
-      setMode('view');
-      await fetchMemo(memo.value.id);
-    } else {
-      emit('cancel');
-      router.push('/memoAndDiary/memo/list');
-    }
+  const cancelEdit = () => {
+    emit('cancel');
   };
 
-  const fetchMemo = async (id) => {
+  const fetchCurrentMemo = async (id) => {
     try {
-      const result = await MemoHttpService.findById(id);
-      if (!result) {
-        return router.push('/memoAndDiary/memo/list');
-      }
-      memo.value = result;
-      previewImages.value = result.imageFileName ? [`/pic/${result.imageFileName}`] : [];
+      const data = await MemoHttpService.findById(id);
+      memo.value = data;
+      clearPreviewImages();
     } catch (err) {
-      alert('메모 조회 실패');
-      router.push('/memoAndDiary/memo/list');
+      console.error('메모 조회 실패', err);
     }
   };
-
-  watch(
-    () => props?.memoProp,
-    (newVal) => {
-      if (newVal) {
-        memo.value = { ...newVal };
-        previewImages.value = newVal.imageFileName ? [`/pic/${newVal.imageFileName}`] : [];
-        setMode('view');
-      }
-    },
-    { immediate: true }
-  );
-
-  onMounted(async () => {
-    const id = route.params.id;
-    if (!props?.memoProp && id && id !== 'create') {
-      setMode('view');
-      await fetchMemo(id);
-    } else if (!props?.memoProp) {
-      setMode('create');
+watch(
+  () => props.memoProp,
+  (newMemo) => {
+    if (newMemo) {
+      memo.value = { ...newMemo };
+      setMode('view'); // 선택 시 항상 view 모드로 진입
+      clearPreviewImages();
     }
-  });
+  },
+  { immediate: true }
+);
+
+onMounted(async () => {
+  if (!accountStore.state.loggedIn) {
+    alert('로그인 후 이용해주세요.');
+    return router.push('/account/login');
+  }
+
+  if (route.path.includes('/add')) {
+    setMode('create');
+    return;
+  }
+
+  const id = route.params.id;
+  if (id) {
+    fetchCurrentMemo(id);   
+    mode.value = 'view';
+  } else {
+    mode.value = 'create';
+  }
+});
 
   onBeforeUnmount(() => {
     clearPreviewImages();
@@ -173,9 +170,10 @@ export function useMemoDetail(props, emit) {
     previewImages,
     fileInputRef,
     isCreateMode,
-    isViewMode,
     isEditMode,
-    hasNoImages,
+    isViewMode,
+    isTitleValid,
+    isContentValid,
     setMode,
     handleImageChange,
     removeImage,
@@ -183,5 +181,6 @@ export function useMemoDetail(props, emit) {
     updateMemo,
     deleteMemo,
     cancelEdit,
+    clearPreviewImages,
   };
 }
