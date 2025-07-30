@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { getByMonth } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 import Calendar from '@/components/reminder/Calendar.vue';
@@ -70,7 +70,6 @@ const getRepeatDate = (fullReminder, year, month) => {
   for (let day = 1; day <= end; day++) {
     const date = new Date(year, month - 1, day);
     const dow = date.getDay();
-
     for (const item of fullReminder) {
       if (item.repeat && item.repeatDow?.includes(dow)) {
         const created = new Date(item.created);
@@ -81,6 +80,7 @@ const getRepeatDate = (fullReminder, year, month) => {
       }
     }
   }
+  // console.log('result', result);
   return result;
 };
 
@@ -139,7 +139,11 @@ const routerDate = (date) => {
       <div class="preview">
         <div class="block">
           <router-link
-            to="/reminder/list"
+            :to="
+              state.todayReminder.length === 0
+                ? '/reminder/form'
+                : '/reminder/list'
+            "
             @click="setTodayReminder"
             class="link"
           >

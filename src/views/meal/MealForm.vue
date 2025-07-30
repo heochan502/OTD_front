@@ -1,7 +1,7 @@
 <script setup>
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
-import { ref, reactive, onMounted,computed } from 'vue';
+import { ref, reactive, onMounted,computed ,watch} from 'vue';
 import {useRouter} from "vue-router";
 import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
 
@@ -44,16 +44,23 @@ onMounted(async() => {
   // console.log('maxKcal:', maxKcal.value);  
    await ondayMealData.mealFormData();
    
-   console.log("정보 데이터 :",calorieData.value);
-  // console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
-  total.value = weeklyData.weeklyRawData.reduce((sum, day) => sum + day.totalCalorie, 0);
-  avg.value = total.value / weeklyData.weeklyRawData.length;
-  // console.log("인포 :", weeklyData.weeklyRawData);
+  console.log("정보 데이터 :", weeklyData.weeklyRawData);
   
-  // console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
-  // itemInfo.value= ondayMealData.itemInfo.value;
 
 });
+
+watch(
+  () => weeklyData.weeklyRawData,
+  (newData) => {
+    if (newData.length !== 0) {
+      total.value = newData.reduce((sum, day) => sum + day.totalCalorie, 0);
+      avg.value = total.value / newData.length;
+    } else {
+      avg.value = 0;
+    }
+  },
+  { immediate: true, deep: true }
+);
 
 </script>
 

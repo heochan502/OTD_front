@@ -11,7 +11,7 @@
           <a
             href="https://www.notion.so/1-22db5ca759e880ac8fede229747b9a28"
             class="social-link group"
-          >
+            target="_blank">
             <span class="tooltip">Notion</span>
             <div class="social-icon">
               <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@
 
           <a
             href="https://www.erdcloud.com/d/jH9JtCfpDedmA59MA"
-            class="social-link group"
+            class="social-link group" target="_blank"
           >
             <span class="tooltip">ERD</span>
             <div class="social-icon">
@@ -41,7 +41,7 @@
           <a
             href="https://github.com/heochan502/OTD_front"
             class="social-link group"
-          >
+            target="_blank">
             <span class="tooltip">Front</span>
             <div class="social-icon">
               <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@
           <a
             href="https://github.com/heochan502/OTD_back"
             class="social-link group"
-          >
+            target="_blank">
             <span class="tooltip">Back</span>
             <div class="social-icon">
               <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
