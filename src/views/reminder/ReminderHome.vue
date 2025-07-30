@@ -59,7 +59,7 @@ const getReminderList = async (date) => {
 
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
-  setTodayReminder();
+  setTodayReminder(date);
 };
 
 // 요일 반복 리마인더 해당 요일 날짜로 변환 로직
@@ -85,7 +85,8 @@ const getRepeatDate = (fullReminder, year, month) => {
 };
 
 // 일정 미리보기 영역 클릭시 리스트 페이지로 라우팅 처리 될 때의 피니아 값 주입
-const setTodayReminder = () => {
+const setTodayReminder = (date) => {
+  console.log('date11', date);
   const todayDow = today.getDay();
   const todayReminder = reminderStore.state.fullReminder.filter((item) => {
     return (
@@ -93,7 +94,8 @@ const setTodayReminder = () => {
       (item.repeat && item.repeatDow?.includes(todayDow))
     );
   });
-  state.todayReminder = todayReminder;
+  if (date.month === todayMonth && date.year === todayYear)
+    state.todayReminder = todayReminder;
   reminderStore.setDayReminder(todayReminder);
 };
 
