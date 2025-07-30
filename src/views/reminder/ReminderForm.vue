@@ -178,7 +178,7 @@ const submit = async () => {
     <div class="form-card">
       <span>
         <router-link :to="state.reminder.id ? '/reminder/list' : '/reminder'">
-          <img src="/src/assets/image/cancel.png" alt="취소" class="cancel" />
+          <img src="/image/cancel.png" alt="취소" class="cancel" />
         </router-link>
       </span>
       <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
@@ -186,7 +186,7 @@ const submit = async () => {
         <span @click="openCalendar">
           <span class="date">{{ formattedDate }}</span>
           <img
-            src="/src/assets/image/button.png"
+            src="/image/button.png"
             alt="날짜 선택하기"
             class="calendar-button"
         /></span>
@@ -206,8 +206,8 @@ const submit = async () => {
         <img
           :src="
             state.reminder.alarm
-              ? '/src/assets/image/alarm_on.png'
-              : '/src/assets/image/alarm_off.png'
+              ? '/image/alarm_on.png'
+              : '/image/alarm_off.png'
           "
           alt="알람 상태"
           class="alarm-img"
@@ -221,7 +221,7 @@ const submit = async () => {
           <img
             v-for="(dow, index) in dowImage"
             :key="index"
-            :src="`/src/assets/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
+            :src="`/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
             :alt="dow.name"
             @click="imageToggle(index)"
             class="toggle-img"
