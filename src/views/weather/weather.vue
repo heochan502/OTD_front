@@ -62,19 +62,19 @@ const dayTimes = computed(() => {
 });
 
 const backgroundImg = {
-  '맑음-morning': 'url(src/image/weather/clear_morning.jpg)',
-  '맑음-evening': 'url(src/image/weather/clear_afternoon.jpg)',
-  '맑음-night': 'url(src/image/weather/clear_night.jpg)',
-  '구름 많음-morning': 'url(src/image/weather/littlecloudy_morning.jpg)',
-  '구름 많음-evening': 'url(src/image/weather/littlecloudy.jpg)',
-  '구름 많음-night': 'url(src/image/weather/littlecloudy_night.jpg)',
-  '흐림-morning': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-evening': 'url(src/image/weather/cloudy.jpg)',
-  '흐림-night': 'url(src/image/weather/cloudy_night.jpg)',
-  '비-morning': 'url(src/image/weather/rain.jpg)',
-  '비-evening': 'url(src/image/weather/rain.jpg)',
-  '비-night': 'url(src/image/weather/rain.jpg)',
-  default: 'url(src/image/weather/default.png)',
+  '맑음-morning': 'url(src/assets/image/weather/clear_morning.jpg)',
+  '맑음-evening': 'url(src/assets/image/weather/clear_afternoon.jpg)',
+  '맑음-night': 'url(src/assets/image/weather/clear_night.jpg)',
+  '구름 많음-morning': 'url(src/assets/image/weather/littlecloudy_morning.jpg)',
+  '구름 많음-evening': 'url(src/assets/image/weather/littlecloudy.jpg)',
+  '구름 많음-night': 'url(src/assets/image/weather/littlecloudy_night.jpg)',
+  '흐림-morning': 'url(src/assets/image/weather/cloudy.jpg)',
+  '흐림-evening': 'url(src/assets/image/weather/cloudy.jpg)',
+  '흐림-night': 'url(src/assets/image/weather/cloudy_night.jpg)',
+  '비-morning': 'url(src/assets/image/weather/rain.jpg)',
+  '비-evening': 'url(src/assets/image/weather/rain.jpg)',
+  '비-night': 'url(src/assets/image/weather/rain.jpg)',
+  default: 'url(src/assets/image/weather/default.png)',
 };
 
 const weatherBackground = computed(() => {
@@ -124,7 +124,7 @@ onMounted(async () => {
             <div class="temperature">
               {{
                 weather.tem === undefined
-                  ? '😏🙄😂😭😥😨😱날씨를 불러오지 못하였습니다😱😨😥😭😂🙄😏'
+                  ? '날씨를 불러오지 못하였습니다....'
                   : weather.tem + '℃'
               }}
             </div>
