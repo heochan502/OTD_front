@@ -2,6 +2,11 @@
 import { useDiaryDetail, MOOD_OPTIONS } from '@/components/memo/useDiaryDetail';
 import '@/components/memo/MemoAndDiaryDetail.css';
 
+const props = defineProps({
+  diaryProp: Object,
+});
+const emit = defineEmits(['created', 'updated', 'deleted', 'cancel']);
+
 const {
   diary,
   previewImages,
@@ -16,87 +21,42 @@ const {
   updateDiary,
   deleteDiary,
   cancelEdit,
-  hasNoImages,
-} = useDiaryDetail();
+} = useDiaryDetail(props, emit);
 </script>
 
 <template>
   <div class="diary-detail">
-    <h2 v-if="isCreateMode">다이어리 등록</h2>
-    <h2 v-else-if="isViewMode">다이어리 보기</h2>
-    <h2 v-else-if="isEditMode">다이어리 수정</h2>
+    <h2>다이어리 {{ isCreateMode ? '등록' : isEditMode ? '수정' : '상세 보기' }}</h2>
 
-    <label for="diaryName">제목</label>
-    <input
-      id="diaryName"
-      v-model="diary.diaryName"
-      :disabled="isViewMode"
-      type="text"
-      placeholder="제목 입력"
-      class="text-input"
-    />
+    <!-- 제목 입력 -->
+    <input v-model="diary.diaryName" class="text-input" placeholder="제목을 입력하세요" :readonly="isViewMode" />
 
-    <label for="diaryContent">내용</label>
-    <textarea
-      id="diaryContent"
-      v-model="diary.diaryContent"
-      :disabled="isViewMode"
-      placeholder="내용 입력"
-      class="textarea"
-    ></textarea>
+    <!-- 내용 입력 -->
+    <textarea v-model="diary.diaryContent" class="textarea" placeholder="내용을 입력하세요" :readonly="isViewMode" />
 
-    <label for="mood">기분</label>
-    <select
-      id="mood"
-      v-model="diary.mood"
-      :disabled="isViewMode"
-      class="text-input"
-    >
-      <option
-        v-for="option in MOOD_OPTIONS"
-        :key="option.value"
-        :value="option.value"
-      >
+    <!-- 기분 선택 -->
+    <select v-model="diary.mood" class="text-input" :disabled="isViewMode">
+      <option v-for="option in MOOD_OPTIONS" :key="option.value" :value="option.value">
         {{ option.label }}
       </option>
     </select>
 
-    <label for="imageUpload">이미지 업로드</label>
-    <input
-      id="imageUpload"
-      ref="fileInputRef"
-      type="file"
-      accept="image/*"
-      @change="handleImageChange"
-      :disabled="isViewMode"
-    />
+    <!-- 이미지 업로드 -->
+    <input type="file" ref="fileInputRef" @change="handleImageChange" accept="image/*" v-if="!isViewMode" />
 
-    <div v-if="previewImages.length > 0" class="preview-list">
-      <div class="preview-item" v-for="(url, idx) in previewImages" :key="idx">
-        <img :src="url" alt="프리뷰 이미지" />
-        <button
-          v-if="!isViewMode"
-          class="remove-btn"
-          @click="removeImage(idx)"
-        >
-          삭제
-        </button>
-      </div>
+    <!-- 이미지 미리보기 -->
+    <div class="preview-list" v-if="previewImages.length">
+      <img v-for="(img, index) in previewImages" :key="index" :src="img" class="preview-image" />
+      <button @click="removeImage" v-if="!isViewMode">이미지 제거</button>
     </div>
-    <div v-else class="no-image">이미지가 없습니다.</div>
 
+    <!-- 버튼 -->
     <div class="button-group">
       <button v-if="isCreateMode" @click="createDiary">등록</button>
-      <button v-if="isEditMode" @click="updateDiary">수정 완료</button>
-
-      <template v-if="isCreateMode || isEditMode">
-        <button @click="cancelEdit">취소</button>
-      </template>
-
-      <template v-if="isViewMode">
-        <button @click="setMode('edit')">수정</button>
-        <button @click="deleteDiary">삭제</button>
-      </template>
+      <button v-else-if="isEditMode" @click="updateDiary">수정 완료</button>
+      <button v-if="isEditMode" @click="cancelEdit">취소</button>
+      <button v-if="isViewMode" @click="setMode('edit')">수정</button>
+      <button v-if="!isCreateMode" @click="deleteDiary">삭제</button>
     </div>
   </div>
 </template>

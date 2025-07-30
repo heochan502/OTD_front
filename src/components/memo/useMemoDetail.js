@@ -2,7 +2,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import MemoHttpService from '@/services/memo/MemoHttpService';
 
-export function useMemoDetail() {
+export function useMemoDetail(props, emit) {
   const memo = ref({
     id: null,
     memoName: '',
@@ -14,26 +14,20 @@ export function useMemoDetail() {
   const previewImages = ref([]);
   const fileInputRef = ref(null);
   const mode = ref('view');
-
-  const router = useRouter();
   const route = useRoute();
+  const router = useRouter();
+  const accountStore = useAccountStore();
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isViewMode = computed(() => mode.value === 'view');
   const isEditMode = computed(() => mode.value === 'edit');
-  const imageCount = computed(() => previewImages.value.length ?? 0);
-  const hasNoImages = computed(() => isViewMode.value && imageCount.value === 0);
+  const hasNoImages = computed(() => isViewMode.value && previewImages.value.length === 0);
 
-  const setMode = (m) => (mode.value = m);
+  const setMode = (newMode) => {
+    mode.value = newMode;
+  };
 
-  const clearForm = () => {
-    memo.value = {
-      id: null,
-      memoName: '',
-      memoContent: '',
-      createdAt: null,
-      imageFileName: null,
-    };
+  const clearPreviewImages = () => {
     previewImages.value.forEach((url) => {
       if (url.startsWith('blob:')) URL.revokeObjectURL(url);
     });
@@ -41,32 +35,15 @@ export function useMemoDetail() {
     if (fileInputRef.value) fileInputRef.value.value = '';
   };
 
-  const fetchMemo = async (id) => {
-    try {
-      const resultData = await MemoHttpService.findById(id);
-      if (!resultData) {
-        alert('해당 메모를 찾을 수 없습니다.');
-        return router.push('/memo/list');
-      }
-      memo.value = resultData;
-      previewImages.value = resultData.imageFileName
-        ? [`/pic/${resultData.imageFileName}`]
-        : [];
-    } catch (e) {
-      alert('메모 조회 중 오류 발생');
-      router.push('/memo/list');
-    }
-  };
-
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const extAllowed = ['jpg', 'jpeg', 'png', 'gif'];
-    const maxSize = 5 * 1024 * 1024;
+    const allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
     const ext = file.name.split('.').pop().toLowerCase();
+    const maxSize = 5 * 1024 * 1024;
 
-    if (!extAllowed.includes(ext)) {
+    if (!allowedExts.includes(ext)) {
       alert('허용되지 않는 파일 형식입니다.');
       return;
     }
@@ -75,18 +52,12 @@ export function useMemoDetail() {
       return;
     }
 
-    previewImages.value.forEach((url) => {
-      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-    });
+    clearPreviewImages();
     previewImages.value = [URL.createObjectURL(file)];
   };
 
   const removeImage = () => {
-    if (previewImages.value[0]?.startsWith('blob:')) {
-      URL.revokeObjectURL(previewImages.value[0]);
-    }
-    previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = '';
+    clearPreviewImages();
     memo.value.imageFileName = null;
   };
 
@@ -95,31 +66,43 @@ export function useMemoDetail() {
       const formData = new FormData();
       formData.append('memoData', new Blob([JSON.stringify(memo.value)], { type: 'application/json' }));
       const file = fileInputRef.value?.files?.[0];
-      if (file) formData.append('memoImageFiles', file);
+      if (file) {
+        formData.append('memoImageFiles', file);
+      }
 
       await MemoHttpService.create(formData);
       alert('메모가 등록되었습니다.');
-      router.push('/memo/list');
+      emit('created');
+      memo.value = { id: null, memoName: '', memoContent: '', createdAt: null, imageFileName: null };
+      clearPreviewImages();
     } catch (e) {
-      alert('메모 등록 실패');
-      console.error(e);
+      alert('등록 실패');
+      console.error('등록 오류:', e);
     }
   };
 
   const updateMemo = async () => {
     try {
-      const formData = new FormData();
-      formData.append('memoData', new Blob([JSON.stringify(memo.value)], { type: 'application/json' }));
       const file = fileInputRef.value?.files?.[0];
+      const formData = new FormData();
+
+      const memoData = {
+        id: memo.value.id,
+        memoName: memo.value.memoName,
+        memoContent: memo.value.memoContent,
+        imageFileName: memo.value.imageFileName,
+      };
+
+      formData.append('memoData', new Blob([JSON.stringify(memoData)], { type: 'application/json' }));
       if (file) formData.append('memoImageFiles', file);
 
       await MemoHttpService.modify(formData);
       alert('수정 완료');
       setMode('view');
       await fetchMemo(memo.value.id);
-    } catch (e) {
+      emit('updated');
+    } catch (err) {
       alert('수정 실패');
-      console.error(e);
     }
   };
 
@@ -128,10 +111,10 @@ export function useMemoDetail() {
     try {
       await MemoHttpService.deleteById(memo.value.id);
       alert('삭제 완료');
-      router.push('/memo/list');
-    } catch (e) {
+      emit('deleted');
+      router.push('/memoAndDiary/memo/list');
+    } catch (err) {
       alert('삭제 실패');
-      console.error(e);
     }
   };
 
@@ -140,45 +123,65 @@ export function useMemoDetail() {
       setMode('view');
       await fetchMemo(memo.value.id);
     } else {
-      router.push('/memo/list');
+      emit('cancel');
+      router.push('/memoAndDiary/memo/list');
     }
   };
 
+  const fetchMemo = async (id) => {
+    try {
+      const result = await MemoHttpService.findById(id);
+      if (!result) {
+        return router.push('/memoAndDiary/memo/list');
+      }
+      memo.value = result;
+      previewImages.value = result.imageFileName ? [`/pic/${result.imageFileName}`] : [];
+    } catch (err) {
+      alert('메모 조회 실패');
+      router.push('/memoAndDiary/memo/list');
+    }
+  };
+
+  watch(
+    () => props?.memoProp,
+    (newVal) => {
+      if (newVal) {
+        memo.value = { ...newVal };
+        previewImages.value = newVal.imageFileName ? [`/pic/${newVal.imageFileName}`] : [];
+        setMode('view');
+      }
+    },
+    { immediate: true }
+  );
+
   onMounted(async () => {
-    await nextTick();
     const id = route.params.id;
-    if (route.path === '/memo/add') {
-      setMode('create');
-    } else if (id) {
+    if (!props?.memoProp && id && id !== 'create') {
       setMode('view');
       await fetchMemo(id);
+    } else if (!props?.memoProp) {
+      setMode('create');
     }
   });
 
   onBeforeUnmount(() => {
-    previewImages.value.forEach((url) => {
-      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-    });
+    clearPreviewImages();
   });
 
   return {
     memo,
     previewImages,
     fileInputRef,
-    mode,
     isCreateMode,
     isViewMode,
     isEditMode,
+    hasNoImages,
     setMode,
-    clearForm,
-    fetchMemo,
     handleImageChange,
     removeImage,
     createMemo,
     updateMemo,
     deleteMemo,
     cancelEdit,
-    hasNoImages,
-    imageCount,
   };
 }

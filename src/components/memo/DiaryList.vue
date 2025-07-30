@@ -1,114 +1,75 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { MOOD_OPTIONS } from '@/components/memo/useDiaryDetail';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
-import { useAccountStore } from '@/stores/counter';
-import { formatDateTime } from '@/utils/MemoAndDiaryApi';
+
+const props = defineProps({});
+const emit = defineEmits(['select']);
 
 const diaryList = ref([]);
-const router = useRouter();
-const accountStore = useAccountStore();
 
-const fetchDiaryList = async () => {
+const fetchDiaries = async () => {
   try {
-    const params = {
-      memberNoLogin: accountStore.state.memberNoLogin,
-      currentPage: 1,
-      pageSize: 10,
-      offset: 0,
-    };
-    diaryList.value = await DiaryHttpService.findAll(params);
-  } catch (error) {
-    console.error('📔 다이어리 목록 로딩 실패:', error);
-    alert('다이어리 목록을 불러오지 못했습니다.');
+    const res = await DiaryHttpService.findAll({ currentPage: 1, pageSize: 100 });
+    diaryList.value = res.diaryList;
+  } catch (err) {
+    alert('다이어리 목록 조회 실패');
+    console.error(err);
   }
 };
 
-const goToDiaryDetail = (id) => {
-  router.push(`/memoAndDiary/diary/${id}`);
+onMounted(() => {
+  fetchDiaries();
+});
+
+const getMoodLabel = (value) => {
+  const mood = MOOD_OPTIONS.find((m) => m.value === value);
+  return mood ? mood.label : '기타';
 };
 
-onMounted(fetchDiaryList);
+// ✅ 외부에서 호출할 수 있도록 expose
+defineExpose({
+  fetchDiaries,
+});
 </script>
 
 <template>
-  <div class="list-container">
-    <h2>📔 다이어리 목록</h2>
-    <div v-if="diaryList.length === 0" class="empty-message">
-      등록된 다이어리가 없습니다.
+  <div class="diary-list">
+    <div
+      v-for="item in diaryList"
+      :key="item.id"
+      class="diary-item"
+      @click="$emit('select', item)"
+    >
+      <h3>{{ item.diaryName }}</h3>
+      <p>{{ item.diaryContent }}</p>
+      <p>기분: {{ getMoodLabel(item.mood) }}</p>
+      <img
+        v-if="item.imageFileName"
+        :src="`/pic/${item.imageFileName}`"
+        class="preview-image"
+        alt="diary"
+      />
     </div>
-    <ul v-else class="list-wrapper">
-      <li
-        v-for="item in diaryList"
-        :key="item.id"
-        class="list-item"
-        @click="goToDiaryDetail(item.id)"
-      >
-        <div class="title">{{ item.diaryName }}</div>
-        <div class="content">{{ item.diaryContent }}</div>
-        <div class="date">{{ formatDateTime(item.createdAt ?? item.created_at) }}</div>
-      </li>
-    </ul>
   </div>
 </template>
 
 <style scoped>
-.list-container {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 24px;
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  color: #000;
+.diary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-
-h2 {
-  text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-}
-
-.list-wrapper {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.list-item {
+.diary-item {
+  background: #f5f5f5;
   padding: 16px;
-  margin-bottom: 12px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
-
-.list-item:hover {
-  background-color: #f0f0f0;
-}
-
-.title {
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.content {
-  margin-top: 6px;
-  color: #444;
-}
-
-.date {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  color: #888;
-  text-align: right;
-}
-
-.empty-message {
-  color: #777;
-  text-align: center;
-  padding: 40px;
+.preview-image {
+  margin-top: 12px;
+  max-width: 200px;
+  border-radius: 8px;
 }
 </style>

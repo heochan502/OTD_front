@@ -5,66 +5,58 @@ axios.defaults.withCredentials = true;
 
 class MemoHttpService {
   async findAll(params) {
-    try {
-      const res = await axios.get('/memo', { params });
-      return res.data.resultData;
-    } catch (err) {
-      console.error('📄 메모 목록 조회 실패:', err);
-      throw err;
-    }
+    return this._request('get', '/memo', { params }, '메모 목록 조회');
   }
 
   async findById(id) {
-    try {
-      const res = await axios.get(`/memo/${id}`);
-      return res.data.resultData;
-    } catch (err) {
-      console.error(`📄 메모(ID: ${id}) 조회 실패:`, err);
-      throw err;
-    }
+    return this._request('get', `/memo/${id}`, null, `메모(ID: ${id}) 조회`);
   }
 
   async create(formData) {
-    try {
-      const res = await axios.post('/memo', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      return res.data.resultData;
-    } catch (err) {
-      const status = err.response?.status;
-      if (status === 401) {
-        console.error('🔒 401: 로그인 필요');
-      } else if (status === 403) {
-        console.error('⛔ 403: 권한 없음');
-      } else if (status === 500) {
-        console.error('💥 500: 서버 오류');
-      } else {
-        console.error('📄 메모 생성 실패:', err);
-      }
-      throw err;
-    }
+    return this._request('post', '/memo', formData, '메모 등록', {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   }
 
   async modify(formData) {
+    return this._request('put', '/memo', formData, '메모 수정', {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  }
+
+  async deleteById(id) {
+    return this._request('delete', `/memo?id=${id}`, null, `메모(ID: ${id}) 삭제`);
+  }
+
+  async _request(method, url, data, context, extraConfig = {}) {
     try {
-      const res = await axios.put('/memo', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      let res;
+      if (method === 'get' || method === 'delete') {
+        res = await axios[method](url, { ...data, ...extraConfig });
+      } else {
+        res = await axios[method](url, data, extraConfig);
+      }
       return res.data.resultData;
     } catch (err) {
-      console.error('📄 메모 수정 실패:', err);
+      this._handleError(err, context);
       throw err;
     }
   }
 
-  async deleteById(id) {
-    try {
-      const res = await axios.delete(`/memo?id=${id}`);
-      return res.data.resultData;
-    } catch (err) {
-      console.error(`🗑️ 메모(ID: ${id}) 삭제 실패:`, err);
-      throw err;
+  _handleError(err, context) {
+    const status = err.response?.status;
+    let message = `❌ ${context} 중 오류가 발생했습니다.`;
+
+    if (status === 401) {
+      message = '🔒 로그인 후 이용해주세요.';
+    } else if (status === 403) {
+      message = '⛔ 권한이 없습니다.';
+    } else if (status === 500) {
+      message = '💥 서버 내부 오류가 발생했습니다.';
     }
+
+    alert(message);
+    console.error(`❌ ${context} 실패:`, err);
   }
 }
 
