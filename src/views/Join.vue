@@ -254,9 +254,23 @@ const handleFieldTouch = (field) => {
   validateField(field, state.form[field]);
 };
 
-// 비밀번호 확인 computed
+// 비밀번호 확인 computed - 실시간 확인용
 const isPasswordMatch = computed(() => {
   return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
+});
+
+// 비밀번호 일치 여부를 실시간으로 확인하는 computed
+const passwordMatchStatus = computed(() => {
+  if (!state.form.memberPw || !state.form.memberPw2) {
+    return { show: false, isMatch: false, message: '' };
+  }
+  
+  const isMatch = state.form.memberPw === state.form.memberPw2;
+  return {
+    show: true,
+    isMatch,
+    message: isMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'
+  };
 });
 
 // Watch 함수들 - 실시간 검증
@@ -266,7 +280,6 @@ watch(
     if (state.validation.memberId.touched) {
       validateField('memberId', newValue);
     }
-    // 아이디가 변경되면 중복확인 초기화
     resetIdValidation();
   }
 );
@@ -284,9 +297,14 @@ watch(
   }
 );
 
+// 비밀번호 확인 필드 실시간 검증 개선
 watch(
   () => state.form.memberPw2,
   (newValue) => {
+    // 터치되지 않았더라도 입력이 시작되면 즉시 검증
+    if (newValue) {
+      state.validation.memberPw2.touched = true;
+    }
     if (state.validation.memberPw2.touched) {
       validateField('memberPw2', newValue);
     }
@@ -356,11 +374,17 @@ const toggleTerms = (termKey) => {
 const checkDuplicateId = async () => {
   const trimmedId = state.form.memberId.trim();
 
-  // 기본 유효성 검사 먼저 실행
+  // 아무것도 입력하지 않았으면 조용히 리턴
+  if (!trimmedId) {
+    return;
+  }
+
   const validation = validateMemberId(trimmedId);
   if (!validation.isValid) {
-    state.generalError = validation.message;
-    setTimeout(() => (state.generalError = ''), 3000);
+    // 상단 메시지 대신 필드 자체에만 메시지 표시
+    state.validation.memberId.touched = true;
+    state.validation.memberId.isValid = false;
+    state.validation.memberId.message = validation.message;
     return;
   }
 
@@ -381,6 +405,7 @@ const checkDuplicateId = async () => {
     }
   } catch (error) {
     console.error('중복확인 에러:', error);
+    // 네트워크 오류만 상단에 표시
     state.generalError = '중복 확인 중 오류가 발생했습니다.';
     setTimeout(() => (state.generalError = ''), 3000);
   } finally {
@@ -391,10 +416,17 @@ const checkDuplicateId = async () => {
 const checkDuplicateEmail = async () => {
   const trimmedEmail = state.form.email.trim();
 
+  // 아무것도 입력하지 않았으면 조용히 리턴
+  if (!trimmedEmail) {
+    return;
+  }
+
   const validation = validateEmail(trimmedEmail);
   if (!validation.isValid) {
-    state.generalError = validation.message;
-    setTimeout(() => (state.generalError = ''), 3000);
+    // 상단 메시지 대신 필드 자체에만 메시지 표시
+    state.validation.email.touched = true;
+    state.validation.email.isValid = false;
+    state.validation.email.message = validation.message;
     return;
   }
 
@@ -415,6 +447,7 @@ const checkDuplicateEmail = async () => {
     }
   } catch (error) {
     console.error('이메일 중복확인 에러:', error);
+    // 네트워크 오류만 상단에 표시
     state.generalError = '중복 확인 중 오류가 발생했습니다.';
     setTimeout(() => (state.generalError = ''), 3000);
   } finally {
@@ -425,10 +458,17 @@ const checkDuplicateEmail = async () => {
 const checkDuplicateNickname = async () => {
   const trimmedNick = state.form.memberNick.trim();
 
+  // 아무것도 입력하지 않았으면 조용히 리턴
+  if (!trimmedNick) {
+    return;
+  }
+
   const validation = validateNickname(trimmedNick);
   if (!validation.isValid) {
-    state.generalError = validation.message;
-    setTimeout(() => (state.generalError = ''), 3000);
+    // 상단 메시지 대신 필드 자체에만 메시지 표시
+    state.validation.memberNick.touched = true;
+    state.validation.memberNick.isValid = false;
+    state.validation.memberNick.message = validation.message;
     return;
   }
 
@@ -449,6 +489,7 @@ const checkDuplicateNickname = async () => {
     }
   } catch (error) {
     console.error('닉네임 중복확인 에러:', error);
+    // 네트워크 오류만 상단에 표시
     state.generalError = '중복 확인 중 오류가 발생했습니다.';
     setTimeout(() => (state.generalError = ''), 3000);
   } finally {
@@ -491,13 +532,11 @@ const isFormValid = () => {
 
 // 회원가입 제출
 const submit = async () => {
-  // 모든 필드를 touched로 설정하여 검증 메시지 표시
   Object.keys(state.validation).forEach((field) => {
     state.validation[field].touched = true;
     validateField(field, state.form[field]);
   });
 
-  // 중복확인 체크
   if (!state.validation.memberId.checked || !state.validation.memberId.available) {
     state.generalError = '아이디 중복 확인을 해주세요.';
     setTimeout(() => (state.generalError = ''), 3000);
@@ -516,7 +555,6 @@ const submit = async () => {
     return;
   }
 
-  // 필수 약관 동의 확인
   if (!state.terms.terms1 || !state.terms.terms2 || !state.terms.terms3) {
     state.generalError = '필수 약관에 모두 동의해주세요.';
     setTimeout(() => (state.generalError = ''), 3000);
@@ -536,6 +574,8 @@ const submit = async () => {
     const res = await join(state.form);
     if (res.status === 200) {
       state.showSuccess = true;
+      // alert 추가
+      alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
       setTimeout(async () => {
         await router.push('/login');
       }, 2000);
@@ -633,26 +673,35 @@ const submit = async () => {
 
           <div class="form-group">
             <label for="memberPw2">비밀번호 확인 *</label>
-            <input
-              type="password"
-              id="memberPw2"
-              placeholder="비밀번호를 한번더 확인해주세요"
-              v-model="state.form.memberPw2"
-              :class="{
-                error: state.validation.memberPw2.touched && !state.validation.memberPw2.isValid,
-                success: state.validation.memberPw2.touched && state.validation.memberPw2.isValid && state.form.memberPw2,
-              }"
-              @blur="handleFieldTouch('memberPw2')"
-              @input="state.validation.memberPw2.touched && validateField('memberPw2', state.form.memberPw2)"
-            />
+            <div class="password-confirm-wrapper">
+              <input
+                type="password"
+                id="memberPw2"
+                placeholder="비밀번호를 한번더 확인해주세요"
+                v-model="state.form.memberPw2"
+                :class="{
+                  error: state.form.memberPw2 && !passwordMatchStatus.isMatch,
+                  success: passwordMatchStatus.show && passwordMatchStatus.isMatch,
+                }"
+                @blur="handleFieldTouch('memberPw2')"
+                @input="() => {
+                  if (state.form.memberPw2) {
+                    state.validation.memberPw2.touched = true;
+                    validateField('memberPw2', state.form.memberPw2);
+                  }
+                }"
+              />
+            </div>
+            <!-- 실시간 비밀번호 일치 메시지 -->
             <div
-              v-if="state.validation.memberPw2.touched && state.validation.memberPw2.message"
+              v-if="passwordMatchStatus.show"
               :class="[
                 'field-message',
-                state.validation.memberPw2.isValid ? 'field-success' : 'field-error'
+                'password-match-message',
+                passwordMatchStatus.isMatch ? 'field-success' : 'field-error'
               ]"
             >
-              {{ state.validation.memberPw2.message }}
+              {{ passwordMatchStatus.message }}
             </div>
           </div>
 
@@ -1057,7 +1106,6 @@ const submit = async () => {
   text-align: center;
 }
 
-
 .error-message,
 .success-message {
   display: flex;
@@ -1084,7 +1132,6 @@ const submit = async () => {
   margin-right: 8px;
   font-weight: bold;
 }
-
 
 .form-group {
   margin-bottom: 18px;
@@ -1114,7 +1161,6 @@ const submit = async () => {
   box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.1);
 }
 
-
 .joininput input.error {
   border-color: #dc2626;
   background-color: #fef2f2;
@@ -1134,7 +1180,6 @@ const submit = async () => {
 .joininput input:focus.success {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
 }
-
 
 .field-message {
   font-size: 12px;
@@ -1159,10 +1204,15 @@ const submit = async () => {
   align-items: center;
 }
 
-
 .input-wrapper {
   display: flex;
   gap: 8px;
+}
+
+/* 비밀번호 확인 관련 스타일 */
+.password-match-message {
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .btn-small {
@@ -1188,7 +1238,6 @@ const submit = async () => {
   cursor: not-allowed;
   background: #999;
 }
-
 
 .terms {
   margin: 25px 0;
@@ -1326,7 +1375,6 @@ const submit = async () => {
 .terms-text::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
-
 
 .btn-submit {
   width: 100%;

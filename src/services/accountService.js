@@ -41,6 +41,7 @@ export const checkNickname = (nickname) => {
   return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
 };
 
+
 export const changePassword = (params) => {
   return axios.put('/user/password', params).catch((e) => e.response);
 };
