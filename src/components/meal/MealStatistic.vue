@@ -2,6 +2,8 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useBaseDate, useDayDefine, useWeeklyStore } from '@/stores/mealStore';
 
+import { getWeekTotal } from '@/services/meal/mealService'
+
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
 const weeklyStore = useWeeklyStore();
@@ -44,17 +46,23 @@ function getWeekDates(dateString) {
 
 watch(
   selectedDate,
-  (newDate) => {
+ (newDate) => {
     weekDates.value = getWeekDates(newDate);
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
-    console.log(
-      '주시작 : ',
-      selectedDate.value,
-      weekDay.getWeekDate.startDate,
-      nowDay.nowDay
-    );
-  
+    // console.log(
+    //   '주시작11 : ',
+    //   selectedDate.value,
+    //   weekDay.getWeekDate,
+    //   nowDay.nowDay
+    // );
+
+    const res =  getWeekTotal(weekDay.getWeekDate);
+    if (res.status === 200) {
+      weeklyStore.weeklyRawData = res.data;
+      // console.log("통신구역 " );
+    }
+
   },
   { immediate: true }
 );

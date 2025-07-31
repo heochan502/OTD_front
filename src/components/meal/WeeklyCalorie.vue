@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, nextTick, reactive, watch } from 'vue';
 
-import { useBaseDate,useWeeklyStore ,} from '@/stores/mealStore';
+import { useBaseDate, useWeeklyStore, } from '@/stores/mealStore';
 import { getWeekTotal } from '@/services/meal/mealService'
 import MealStatistic from './MealStatistic.vue';
 
@@ -13,11 +13,11 @@ const weeklyStore = useWeeklyStore();
 const weekDay = useBaseDate();
 
 const xData = ['월', '화', '수', '목', '금', '토', '일'];
-const yData = [0, 0,  0,  0,  0,  0,  0];
+const yData = Array(xData.length).fill(0);
 
 
 const getDayName = (dateString) => {
-  const days = ['월', '화', '수', '목', '금', '토','일'];
+  const days = ['월', '화', '수', '목', '금', '토', '일'];
   const date = new Date(dateString);
   return days[date.getDay()];
 };
@@ -29,7 +29,7 @@ let myChart = null; // ECharts 인스턴스
 
 const option = {
 
-  
+
   // 차트 옵션 설정
   //마우스 올렸을때 나오는 정보값
   tooltip: {
@@ -118,26 +118,29 @@ const option = {
     },
   },
 };
-const getStatistic = async(weeky)=>{
-  
-  const res = await getWeekTotal(weeky);
-  if (res.status === 200)
-  {
-    weeklyStore.weeklyRawData = res.data; 
-  }
-  console.log("데이터 확인 ", weeklyStore.weeklyRawData );
+const getStatistic = async (weeky) => {
 
-  weeklyStore.weeklyRawData.forEach(item => {
-    const dayName = getDayName(item.mealDay); // '화', '수', ...
-    const index = xData.indexOf(dayName);      // 요일 인덱스 찾기   
-    if (index !== -1) {
-      yData[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
-    }
-  });
+  const res = await getWeekTotal(weeky);
+  if (res.status === 200) {
+    weeklyStore.weeklyRawData = res.data;
+  }
+  // console.log("데이터 확인 ", weeklyStore.weeklyRawData);
+    // 기존 y축 데이터 0으로 만드는격 
+  const yDataTemp = Array(xData.length).fill(0);
+    weeklyStore.weeklyRawData.forEach(item => {
+      const dayName = getDayName(item.mealDay); // '화', '수', ...
+      const index = xData.indexOf(dayName);      // 요일 인덱스 찾기   
+      if (index !== -1) {
+        yDataTemp[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
+      }
+    });
+    // 0인덱스 부터 ydata 길이만큼 temp를 넣겟다 
+    // ydata 기존값 날리면서 새로운 데이터 넣기
+  yData.splice(0, yData.length, ...yDataTemp);
 }
 
 onMounted(async () => {
-  
+
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화    
@@ -146,8 +149,8 @@ onMounted(async () => {
   } else {
     console.warn('chartRef is null');
   }
-  console.log("주시작 : ", weekDay.getWeekDate);
-  
+  // console.log("주시작 : ", weekDay.getWeekDate);
+
 });
 
 watch(weekDay.getWeekDate, (newVal) => {
@@ -155,11 +158,11 @@ watch(weekDay.getWeekDate, (newVal) => {
 });
 
 const testFunc = async (param) => {
-	console.log("파람::" , param);
-  // await nextTick();
+  // console.log("파람::" , param);
+  await nextTick();
   await getStatistic(weekDay.getWeekDate);
-   myChart = echarts.init(chartRef.value);
-   myChart.setOption(option);
+  myChart = echarts.init(chartRef.value);
+  myChart.setOption(option);
 };
 
 
@@ -178,6 +181,7 @@ const testFunc = async (param) => {
   width: 80%;
   height: 100%;
 }
+
 .main-container {
   width: 80%;
 }

@@ -1,3 +1,4 @@
+import 'vuetify/styles';
 import './assets/main.css';
 
 import { createApp } from 'vue';
@@ -7,7 +8,6 @@ import App from './App.vue';
 import router from './router';
 
 import '@mdi/font/css/materialdesignicons.css';
-import 'vuetify/styles';
 import vuetify from './plugins/vuetify';
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css';

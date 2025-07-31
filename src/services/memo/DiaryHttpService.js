@@ -4,7 +4,9 @@ axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
 
 class DiaryHttpService {
+
   async findAll(params) {
+<<<<<<< HEAD
     try {
       const res = await axios.get('/memoAndDiary/diary', { params });
       console.log('서버 응답:', res.data.resultData);
@@ -17,6 +19,18 @@ class DiaryHttpService {
       console.error('서버 요청 실패:', err);
       throw err;
     }
+=======
+    console.log("params", params);
+  const res = await axios.get('/memoAndDiary/diary', { params });
+  console.log('API 응답 데이터:', res.data);
+  
+  // 만약 res.data가 배열이라면 아래처럼 바꿔야 함
+  if (Array.isArray(res.data)) {
+    return res.data;
+  }
+  // 보통 resultData에 배열이 있다면 이게 맞음
+    return res.data.resultData;
+>>>>>>> 49355e2c250da3a5bd6c85c90f3375c904d4870a
   }
 
   async findById(diaryId) {

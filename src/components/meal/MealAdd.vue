@@ -7,15 +7,18 @@ import {
   inputMealData,
   getMealData,
   modifyMealdata,
+  getWeekTotal
 } from '@/services/meal/mealService';
 import { useRouter } from 'vue-router';
 import {
   useDayDefine,
   useAlldayMeal,
-  useCalorieCalcul,
+  useCalorieCalcul, useWeeklyStore, useBaseDate
 } from '@/stores/mealStore';
 
 const dayStore = useDayDefine();
+const weeklyData = useWeeklyStore();
+const weekDay = useBaseDate();
 
 const router = useRouter();
 
@@ -161,7 +164,19 @@ const calcCalories = (item) => {
 
 const inputData = useAlldayMeal();
 
+
+
+
+const saveClick =()=> {
+  if (window.confirm("저장 하시겠습니까?")) {
+    saveMeal();
+  } else {
+    console.log("취소되었습니다.");
+  }
+}
 const setItem = () => {
+
+  
   inputData.dayMealCategory.foodDbId = itemList.value.map(
     (info) => info.foodDbId
   );
@@ -193,10 +208,21 @@ const saveMeal = async () => {
   }
   if (res.status !== 200) {
     console.log('입력 ', res);
+    // 주간 뿌려주는 데이터 변경
+    const result = await getWeekTotal(weekDay.getWeekDate);
+    console.log("수정하고 주간 데이터 변경 ", result.data);
+    weeklyData.weeklyRawData = result.data;
   }
 };
 
 //수정 하는곳
+function updateClick() {
+  if (window.confirm("수정 하시겠습니까?")) {
+    updateMeal();
+  } else {
+    console.log("취소되었습니다.");
+  }
+}
 
 const updateMeal = async () => {
   setItem();
@@ -210,8 +236,15 @@ const updateMeal = async () => {
 
   if (itemList.value.length > 0) {
     saveText.value = '수정하기';
+
+    // 주간 뿌려주는 데이터 변경
+    const res = await getWeekTotal(weekDay.getWeekDate);
+    console.log("수정하고 주간 데이터 변경 ", res.data);
+    weeklyData.weeklyRawData = res.data;   
+    
   } else {
     saveText.value = '저장하기';
+   
   }
   console.log('값:::', res);
 };
@@ -427,7 +460,7 @@ onMounted(() => {
 
     <v-btn
       class="mealsaday text-center ml-5 text-body-3"
-      @click="saveText === '저장하기' ? saveMeal() : updateMeal()"
+      @click="saveText === '저장하기' ? saveClick() : updateClick()"
       >{{ saveText }}</v-btn
     >
   </div>

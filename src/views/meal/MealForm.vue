@@ -1,7 +1,7 @@
 <script setup>
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
-import { ref, reactive, onMounted,computed } from 'vue';
+import { ref, reactive, onMounted,computed ,watch} from 'vue';
 import {useRouter} from "vue-router";
 import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
 
@@ -44,17 +44,24 @@ onMounted(async() => {
   // console.log('maxKcal:', maxKcal.value);  
    await ondayMealData.mealFormData();
    
-   console.log("정보 데이터 :",calorieData.value);
-  // console.log("기존 데이터 :", ondayMealData); // 이게 ref인지 reactive인지도 확인
-  total.value = weeklyData.weeklyRawData.reduce((sum, day) => sum + day.totalCalorie, 0);
-  avg.value = total.value / weeklyData.weeklyRawData.length;
-  // console.log("인포 :", weeklyData.weeklyRawData);
+  console.log("정보 데이터 :", weeklyData.weeklyRawData);
   
-  // console.log("여기에 데이터 들어옴 :",ondayMealData.itemInfo);
-  // itemInfo.value= ondayMealData.itemInfo.value;
 
 });
 
+watch(
+  () => weeklyData.weeklyRawData,
+  (newData) => {
+    if (newData.length !== 0) {
+      total.value = newData.reduce((sum, day) => sum + day.totalCalorie, 0);
+      avg.value = total.value / newData.length;
+    } else {
+      avg.value = 0;
+    }
+  },
+  { immediate: true, deep: true }
+);
+const formatNumber = (num) => num.toLocaleString();
 </script>
 
 <template>
@@ -63,8 +70,8 @@ onMounted(async() => {
       <div class="left">
         <div class="progress-container w-full">
             <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-              :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
-            :rightString="`${maxKcal - calorieData.allDayCalorie}kcal 더 먹을 수 있어요!`" :max="maxKcal"
+              :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
+            :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
             customsize="totalcal" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
@@ -96,7 +103,7 @@ onMounted(async() => {
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ avg.toFixed(0) }}kcal 먹었어요</span>
+      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
       
       <div class=" d-flex  justify-content-end ">
       <WeeklyCalorie class="" />

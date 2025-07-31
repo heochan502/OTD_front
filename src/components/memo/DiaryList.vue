@@ -9,11 +9,29 @@ const diaryList = ref([]);
 const accountStore = useAccountStore();
 
 const fetchDiaryList = async () => {
+<<<<<<< HEAD
   const params = {
     currentPage: 1,
     pageSize: 5,
     memberNoLogin: accountStore.loggedInId,
   };
+=======
+  try {
+    console.log("accountStore", accountStore.loggedInId);
+    const params = {
+      memberNoLogin: accountStore.loggedInId,
+      currentPage: 1,
+      pageSize: 10,
+      offset: 0,
+    };
+    diaryList.value = await DiaryHttpService.findAll(params);
+  
+  } catch (e) {
+    alert('다이어리 목록 로딩 실패');
+    console.error(e);
+  }
+};
+>>>>>>> 49355e2c250da3a5bd6c85c90f3375c904d4870a
 
   try {
     const result = await DiaryHttpService.findAll(params);
