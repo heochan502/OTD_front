@@ -172,7 +172,7 @@ const todayColor = (day) => {
     <h3 class="calendar_title">
       <a href="#" @click.prevent="prevMonth"
         ><img
-          src="/src/assets/image/button.png"
+          src="/image/button.png"
           alt="이전 달 보기"
           class="rotate"
       /></a>
@@ -180,7 +180,7 @@ const todayColor = (day) => {
       >년 <b>{{ currentMonth }}</b
       >월
       <a href="#" @click.prevent="nextMonth"
-        ><img src="/src/assets/image/button.png" alt="다음 달 보기"
+        ><img src="/image/button.png" alt="다음 달 보기"
       /></a>
     </h3>
     <table class="table">

@@ -1,9 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/accountService';
 
 const router = useRouter();
+const route = useRoute();
 const counter = useAccountStore();
 
 function goHome() {
@@ -45,10 +46,14 @@ const logoutAccount = async () => {
           to="/reminder"
           href="#"
           class="nav-menu"
-          active-class="active"
+          :class="{ active: route.path.startsWith('/reminder') }"
           >리마인더</router-link
         >
-        <router-link to="/meal" href="#" class="nav-menu" active-class="active"
+        <router-link
+          to="/meal"
+          href="#"
+          class="nav-menu"
+          :class="{ active: route.path.startsWith('/meal') }"
           >식단</router-link
         >
         <router-link
@@ -56,16 +61,21 @@ const logoutAccount = async () => {
           href="#"
           class="nav-menu"
           active-class="active"
+          :class="{ active: route.path.startsWith('/elog' || '/hlog') }"
           >건강</router-link
         >
-        <router-link to="/memoAndDiary" href="#" class="nav-menu" active-class="active"
+        <router-link
+          to="/memoAndDiary"
+          href="#"
+          class="nav-menu"
+          :class="{ active: route.path.startsWith('/memoAndDiary') }"
           >기록</router-link
         >
         <router-link
           to="/community"
           href="#"
           class="nav-menu"
-          active-class="active"
+          :class="{ active: route.path.startsWith('/community') }"
           >커뮤니티</router-link
         >
       </nav>
