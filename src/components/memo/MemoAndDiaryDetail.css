@@ -84,6 +84,12 @@ input[type="file"] {
 }
 
 /* === 이미지 미리보기 === */
+.preview-container {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+}
+
 .preview-list {
   width: 720px;
   display: flex;
@@ -154,16 +160,22 @@ input[type="file"] {
   opacity: 0.9;
 }
 
-/* === 리스트 아이템 (공통) === */
+/* === 리스트 아이템 (내용 좌측, 이미지 우측 정렬) === */
 .memo-item,
 .diary-item {
-  width: 100%;
-  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   background: #f5f5f5;
   padding: var(--spacing-md);
   border-radius: var(--border-radius-base);
   box-shadow: 0 2px 8px var(--shadow-light);
-  cursor: pointer;
+  margin-bottom: var(--spacing-md);
+}
+
+.memo-content,
+.diary-content {
+  flex: 1;
 }
 
 /* === 리스트 아이템 간격 === */
@@ -174,11 +186,11 @@ input[type="file"] {
 
 /* === 리스트 내부 이미지 미리보기 === */
 .preview-image {
-  max-width: 100px;
-  max-height: 100px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  margin-top: var(--spacing-sm);
   border-radius: var(--border-radius-base);
+  margin-left: var(--spacing-md);
 }
 
 /* === 작성일 표시 === */
@@ -206,7 +218,66 @@ input[type="file"] {
   .text-input,
   .textarea,
   input[type="file"],
+  
   .preview-list {
     width: 100%;
+  }
+
+  .memo-item,
+  .diary-item {
+  flex-direction: column;
+  align-items: flex-start;
+  }
+  
+  .diary-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  }
+
+  .diary-text {
+  flex: 1;
+  padding-right: 16px;
+  }
+
+  .diary-image-wrapper {
+  flex-shrink: 0;
+  }
+  .preview-image {
+  width: 100px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  }
+
+  .mood-options {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .mood-button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gray-ccc);
+    background-color: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+  }
+
+  .mood-button.selected {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: bold;
+  }
+
+  .hidden-radio {
+    display: none;
+  }
+
+  .mood-button:has(input[value='']) {
+    font-style: italic;
+    color: var(--color-gray-ccc);
   }
 }

@@ -1,33 +1,37 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL + '/memoAndDiary';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
 
 class DiaryHttpService {
   async findAll(params) {
     try {
-      const res = await axios.get('/diary', { params });
-      console.log('서버 응답:', res.data);
-      return res.data;
+      const res = await axios.get('/memoAndDiary/diary', { params });
+      console.log('서버 응답:', res.data.resultData);
+      return res.data.resultData;
     } catch (err) {
+      console.error('❌ API 요청이 HTML을 반환했습니다. 경로 확인 필요');
+      if (err.response?.data) {
+        console.error(err.response.data);
+      }
       console.error('서버 요청 실패:', err);
       throw err;
     }
   }
 
-  async findById(id) {
+  async findById(diaryId) {
     try {
-      const res = await axios.get(`/diary/${id}`);
+      const res = await axios.get(`/memoAndDiary/diary/${diaryId}`);
       return res.data.resultData;
     } catch (err) {
-      this._handleError(err, `다이어리(ID: ${id}) 조회`);
+      this._handleError(err, `다이어리(ID: ${diaryId}) 조회`);
       throw err;
     }
   }
 
   async create(formData) {
     try {
-      const res = await axios.post('/diary', formData, {
+      const res = await axios.post('/memoAndDiary/diary', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return res.data.resultData;
@@ -39,7 +43,7 @@ class DiaryHttpService {
 
   async modify(formData) {
     try {
-      const res = await axios.put('/diary', formData, {
+      const res = await axios.put('/memoAndDiary/diary', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return res.data.resultData;
@@ -49,12 +53,12 @@ class DiaryHttpService {
     }
   }
 
-  async delete(id) {
+  async deleteById(diaryId) {
     try {
-      const res = await axios.delete(`/diary/${id}`);
+      const res = await axios.delete(`/memoAndDiary/diary/${diaryId}`);
       return res.data.resultData;
     } catch (err) {
-      this._handleError(err, `다이어리(ID: ${id}) 삭제`);
+      this._handleError(err, `다이어리(ID: ${diaryId}) 삭제`);
       throw err;
     }
   }

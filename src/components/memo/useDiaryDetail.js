@@ -1,5 +1,5 @@
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 import { useAccountStore } from '@/stores/counter';
 
@@ -13,126 +13,77 @@ export const MOOD_OPTIONS = [
 
 export function useDiaryDetail(emit) {
   const router = useRouter();
-  const route = useRoute();
   const accountStore = useAccountStore();
 
-  const mode = ref('create');
   const diary = ref({
-    id: null,
+    diaryId: null,
     diaryName: '',
     diaryContent: '',
-    mood: '',
-    imageFileName: null,
     createdAt: null,
+    diaryImage: null,
+    mood: '',
   });
+
+  const mode = ref('create');
+  const setMode = (value) => {
+    mode.value = value;
+  };
+  const isCreateMode = computed(() => mode.value === 'create');
+  const isEditMode = computed(() => mode.value === 'edit');
 
   const previewImages = ref([]);
   const fileInputRef = ref(null);
-  const isCreateMode = computed(() => mode.value === 'create');
-  const isEditMode = computed(() => mode.value === 'edit');
-  const isViewMode = computed(() => mode.value === 'view');
-  const isTitleValid = computed(() => diary.value.diaryName.trim().length >= 1);
-  const isContentValid = computed(() => diary.value.diaryContent.trim().length >= 10);
 
-  const setMode = (newMode) => {
-    mode.value = newMode;
-  };
+  const isTitleValid = computed(() => diary.value.diaryName?.trim().length > 0);
+  const isContentValid = computed(() => diary.value.diaryContent?.trim().length > 0);
 
   const clearForm = () => {
     diary.value = {
-      id: null,
+      diaryId: null,
       diaryName: '',
       diaryContent: '',
-      mood: '',
-      imageFileName: null,
       createdAt: null,
+      diaryImage: null,
+      mood: '',
     };
-    clearPreviewImages();
-  };
-
-  const determineMode = () => {
-    const path = route.path;
-    if (path.includes('/edit')) {
-      mode.value = 'edit';
-    } else if (path.includes('/add')) {
-      mode.value = 'create';
-    } else {
-      mode.value = 'view';
-    }
-  };
-
-  const fetchDiary = async (id) => {
-    try {
-      const data = await DiaryHttpService.findById(id);
-      diary.value = data;
-      if (data.imageFileName) {
-        previewImages.value = [`/pic/${data.imageFileName}`];
-      }
-    } catch (err) {
-      console.error('다이어리 조회 실패:', err);
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      clearPreviewImages();
-      previewImages.value = Array.from(files).map((file) => URL.createObjectURL(file));
-    }
-  };
-
-  const clearPreviewImages = () => {
-    previewImages.value.forEach((url) => URL.revokeObjectURL(url));
     previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = null;
+    fileInputRef.value && (fileInputRef.value.value = null);
   };
 
-  const createDiary = async () => {
-    const formData = new FormData();
-    formData.append('diaryName', diary.value.diaryName);
-    formData.append('diaryContent', diary.value.diaryContent);
-    formData.append('mood', diary.value.mood);
-    formData.append('memberNoLogin', accountStore.loggedInId);
-    if (fileInputRef.value?.files?.[0]) {
-      formData.append('diaryImageFiles', fileInputRef.value.files[0]);
-    }
+  const createDiary = async (e) => {
+    e.preventDefault();
+    if (!isTitleValid.value || !isContentValid.value) return;
 
-    try {
-      const res = await DiaryHttpService.create(formData);
-      emit('created', res);
-      clearPreviewImages();
-      clearForm();
-    } catch (err) {
-      console.error('🛑 다이어리 등록 실패:', err);
+    const formData = new FormData();
+    const diaryData = { ...diary.value, memberNoLogin: accountStore.state.memberNoLogin };
+    formData.append('diaryData', new Blob([JSON.stringify(diaryData)], { type: 'application/json' }));
+    
+    const files = fileInputRef.value?.files;
+    if (files?.length) {
+      formData.append('diaryImage', files[0]);
     }
+    await DiaryHttpService.create(formData);
+    emit('created');
   };
 
-  const updateDiary = async () => {
-    const formData = new FormData();
-    formData.append('id', diary.value.id);
-    formData.append('diaryName', diary.value.diaryName);
-    formData.append('diaryContent', diary.value.diaryContent);
-    formData.append('mood', diary.value.mood);
-    formData.append('memberNoLogin', accountStore.loggedInId);
-    if (fileInputRef.value?.files?.[0]) {
-      formData.append('diaryImageFiles', fileInputRef.value.files[0]);
-    }
+  const updateDiary = async (e) => {
+    e.preventDefault();
+    if (!isTitleValid.value || !isContentValid.value) return;
 
-    try {
-      const res = await DiaryHttpService.modify(formData);
-      emit('updated', res);
-      clearPreviewImages();
-    } catch (err) {
-      console.error('🛑 다이어리 수정 실패:', err);
-    }
+    const formData = new FormData();
+    const diaryData = { ...diary.value, memberNoLogin: accountStore.state.memberNoLogin };
+    formData.append('diaryData', new Blob([JSON.stringify(diaryData)], { type: 'application/json' }));
+    const files = fileInputRef.value?.files;
+    if (files?.length) formData.append('diaryImage', files[0]);
+
+    await DiaryHttpService.modify(formData);
+    emit('updated');
   };
 
   const deleteDiary = async () => {
-    try {
-      await DiaryHttpService.delete(diary.value.id);
-      emit('deleted', diary.value.id);
-    } catch (err) {
-      console.error('🛑 다이어리 삭제 실패:', err);
+    if (diary.value.diaryId) {
+      await DiaryHttpService.deleteById(diary.value.diaryId);
+      emit('deleted');
     }
   };
 
@@ -140,35 +91,80 @@ export function useDiaryDetail(emit) {
     emit('cancel');
   };
 
+const removeImage = (index) => {
+  previewImages.value.splice(index, 1);
+  diary.value.diaryImage = null;
+  if (fileInputRef.value) {
+    fileInputRef.value.value = null;
+  }
+};
+
+  const setDiaryProp = (incomingDiary) => {
+    if (incomingDiary) {
+      diary.value = { ...incomingDiary };
+      previewImages.value = incomingDiary.diaryImage ? [`/pic/${incomingDiary.diaryImage}`] : [];
+    }
+  };
+
+  const fetchDiary = async (id) => {
+    try {
+      const data = await DiaryHttpService.findById(id);
+      diary.value = data;
+      previewImages.value = data.diaryImage ? [`/pic/${data.diaryImage}`] : [];
+    } catch (error) {
+      console.error('📔 다이어리 조회 실패:', error);
+    }
+  };
+  const handleImageChange = (event) => {
+  const files = event.target.files;
+  previewImages.value = [];
+
+  if (files && files.length > 0) {
+    for (const file of files) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImages.value.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+    // diary.value.diaryImage = files[0].name;
+  }
+};
+
   onMounted(() => {
-    determineMode();
-    if (route.params.id) {
-      fetchDiary(route.params.id);
+    if (!accountStore.state.loggedIn) {
+      alert('로그인 후 이용해주세요.');
+      router.push('/account/login');
+    }
+
+    if (mode.value === 'edit' && diary.value.diaryId) {
+      fetchDiary(diary.value.diaryId);
     }
   });
 
   onBeforeUnmount(() => {
-    clearPreviewImages();
+    clearForm();
   });
 
   return {
+    diary,
     mode,
+    setMode,
     isCreateMode,
     isEditMode,
-    isViewMode,
-    diary,
+    isTitleValid,
+    isContentValid,
     previewImages,
     fileInputRef,
-    MOOD_OPTIONS,
     createDiary,
     updateDiary,
     deleteDiary,
     cancelEdit,
-    handleFileChange,
-    clearPreviewImages,
-    isTitleValid,
-    isContentValid,
-    setMode,
+    removeImage,
     clearForm,
+    setDiaryProp,
+    fetchDiary,
+    handleImageChange,
+    removeImage,
   };
 }

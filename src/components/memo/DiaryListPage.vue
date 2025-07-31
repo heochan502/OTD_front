@@ -1,64 +1,43 @@
 <script setup>
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick } from 'vue';
 import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import DiaryList from '@/components/memo/DiaryList.vue';
-import { useRoute } from 'vue-router';
-import DiaryHttpService from '@/services/memo/DiaryHttpService';
 
 const selectedDiary = ref(null);
-const mode = ref('create');  // 'create' | 'view' | 'edit'
+const mode = ref('create');
 
 const diaryListRef = ref(null);
 const diaryDetailRef = ref(null);
 
-const route = useRoute();
-
 const handleCreated = async () => {
-  handleClear();
   await diaryListRef.value?.fetchDiaryList();
+  diaryDetailRef.value?.clearForm?.();
+  selectedDiary.value = null;
+  mode.value = 'create';
 };
 
 const handleUpdated = async () => {
-  handleClear();
   await diaryListRef.value?.fetchDiaryList();
+  selectedDiary.value = null;
+  mode.value = 'create';
 };
 
 const handleDeleted = async () => {
   selectedDiary.value = null;
-  mode.value = 'create';
   await nextTick();
   diaryDetailRef.value?.clearForm?.();
   await diaryListRef.value?.fetchDiaryList();
+  mode.value = 'create';
 };
 
 const handleSelect = (diary) => {
   selectedDiary.value = diary;
-  mode.value = 'view';
+  mode.value = 'edit';
 };
 
 const handleClear = () => {
   selectedDiary.value = null;
   mode.value = 'create';
-};
-
-onMounted(() => {
-  if (route.params.id) {
-    mode.value = 'view';
-    fetchDiary(route.params.id);  
-  } else {
-    mode.value = 'create'; 
-  }
-});
-
-const fetchDiary = async (id) => {
-  try {
-    const response = await DiaryHttpService.findById(id);
-    if (response && response.data) {
-      selectedDiary.value = response.data;
-    }
-  } catch (error) {
-    console.error('다이어리 조회 실패:', error);
-  }
 };
 </script>
 
@@ -73,6 +52,9 @@ const fetchDiary = async (id) => {
       @deleted="handleDeleted"
       @cancel="handleClear"
     />
-    <DiaryList ref="diaryListRef" @select="handleSelect" />
+    <DiaryList
+      ref="diaryListRef"
+      @select="handleSelect"
+    />
   </div>
 </template>
