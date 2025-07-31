@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
-import buttonImg from '@/image/button.png';
+
 
 const reminderStore = useReminderStore();
 

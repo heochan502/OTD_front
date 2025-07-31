@@ -82,7 +82,8 @@ const state = reactive({
   generalError: '',
 });
 
-// 유효성 검사 함수들
+
+
 const validateMemberId = (memberId) => {
   if (!memberId.trim()) {
     return { isValid: false, message: '아이디를 입력해주세요.' };
@@ -254,19 +255,19 @@ const handleFieldTouch = (field) => {
   validateField(field, state.form[field]);
 };
 
-// 비밀번호 확인 computed
+
 const isPasswordMatch = computed(() => {
   return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
 });
 
-// Watch 함수들 - 실시간 검증
+
 watch(
   () => state.form.memberId,
   (newValue) => {
     if (state.validation.memberId.touched) {
       validateField('memberId', newValue);
     }
-    // 아이디가 변경되면 중복확인 초기화
+
     resetIdValidation();
   }
 );
@@ -277,7 +278,7 @@ watch(
     if (state.validation.memberPw.touched) {
       validateField('memberPw', newValue);
     }
-    // 비밀번호가 변경되면 비밀번호 확인도 다시 검증
+
     if (state.validation.memberPw2.touched) {
       validateField('memberPw2', state.form.memberPw2);
     }
@@ -331,7 +332,7 @@ watch(
   }
 );
 
-// 약관 동의 관련 함수들
+
 const allCheck = () => {
   const value = state.terms.all;
   state.terms.terms1 = value;
@@ -352,11 +353,11 @@ const toggleTerms = (termKey) => {
   state.termsExpanded[termKey] = !state.termsExpanded[termKey];
 };
 
-// 중복확인 함수들
+
 const checkDuplicateId = async () => {
   const trimmedId = state.form.memberId.trim();
 
-  // 기본 유효성 검사 먼저 실행
+
   const validation = validateMemberId(trimmedId);
   if (!validation.isValid) {
     state.generalError = validation.message;
@@ -456,7 +457,7 @@ const checkDuplicateNickname = async () => {
   }
 };
 
-// 중복확인 초기화 함수들
+
 const resetIdValidation = () => {
   state.validation.memberId.checked = false;
   state.validation.memberId.available = false;
@@ -481,7 +482,7 @@ const resetNickValidation = () => {
   }
 };
 
-// 폼 유효성 검사
+
 const isFormValid = () => {
   return Object.values(state.validation).every((field) => field.isValid) &&
          state.validation.memberId.checked && state.validation.memberId.available &&
@@ -489,15 +490,15 @@ const isFormValid = () => {
          state.validation.memberNick.checked && state.validation.memberNick.available;
 };
 
-// 회원가입 제출
+
 const submit = async () => {
-  // 모든 필드를 touched로 설정하여 검증 메시지 표시
+
   Object.keys(state.validation).forEach((field) => {
     state.validation[field].touched = true;
     validateField(field, state.form[field]);
   });
 
-  // 중복확인 체크
+
   if (!state.validation.memberId.checked || !state.validation.memberId.available) {
     state.generalError = '아이디 중복 확인을 해주세요.';
     setTimeout(() => (state.generalError = ''), 3000);
@@ -516,7 +517,7 @@ const submit = async () => {
     return;
   }
 
-  // 필수 약관 동의 확인
+
   if (!state.terms.terms1 || !state.terms.terms2 || !state.terms.terms3) {
     state.generalError = '필수 약관에 모두 동의해주세요.';
     setTimeout(() => (state.generalError = ''), 3000);
@@ -562,12 +563,6 @@ const submit = async () => {
         <div class="message-icon">✓</div>
         <div>회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.</div>
       </div>
-
-      <div v-if="state.generalError" class="error-message">
-        <div class="message-icon">⚠</div>
-        <div>{{ state.generalError }}</div>
-      </div>
-
       <form @submit.prevent="submit" class="join-form">
         <div class="joininput">
           <div class="form-group">
