@@ -16,19 +16,9 @@ const fetchMemoList = async () => {
     memberNoLogin: accountStore.loggedInId,
   };
   try {
-<<<<<<< HEAD
     const result = await MemoHttpService.findAll(params);
     console.log('[memoList] 서버 응답:', result);
     memoList.value = result.memoList || result.memolist || [];
-=======
-    const result = await MemoHttpService.findAll({
-      currentPage: 1,  // 페이지 번호 (필요에 따라 추가)
-      pageSize: 10,    // 페이지 크기 (필요에 따라 추가)
-    });
-    memoList.value = result.memos;
-    console.log("메모리스트 벨류 ", memoList.value);
-    console.log("메모리스트 벨류 ", result);
->>>>>>> 49355e2c250da3a5bd6c85c90f3375c904d4870a
   } catch (e) {
     console.error('❌ 메모 목록 조회 중 오류:', e);
     memoList.value = [];
@@ -45,7 +35,6 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-<<<<<<< HEAD
   <div class="memo-list">
     <div
       v-for="memo in memoList"
@@ -65,11 +54,6 @@ const formatDate = (dateStr) => {
     </div>
 
     <div v-show="memoList.length === 0" class="empty-message">
-=======
-  <div class="memo-list-wrapper">
-    <h2>메모 목록</h2>
-    <div v-if="memoList.value===null" class="empty-message">
->>>>>>> 49355e2c250da3a5bd6c85c90f3375c904d4870a
       등록된 메모가 없습니다.
     </div>
   </div>

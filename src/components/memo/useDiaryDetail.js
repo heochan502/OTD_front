@@ -110,7 +110,9 @@ const removeImage = (index) => {
     try {
       const data = await DiaryHttpService.findById(id);
       diary.value = data;
-      previewImages.value = data.diaryImage ? [`/pic/${data.diaryImage}`] : [];
+      previewImages.value = data.diaryImage
+      ? [`http://localhost:8080/api/OTD/memoAndDiary/diary/image/${data.diaryImage}`]
+      : [];
     } catch (error) {
       console.error('📔 다이어리 조회 실패:', error);
     }
