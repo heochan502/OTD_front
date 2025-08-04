@@ -16,7 +16,7 @@ import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 import CommunityView from '@/views/community/CommunityView.vue';
 
 import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/components/meal/MealAdd.vue';
+import MealAdd from '@/views/meal/MealAdd.vue';
 import MealStatistic from '@/components/meal/MealStatistic.vue';
 
 import HealthMain from '@/views/health/HealthMain.vue';
