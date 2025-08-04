@@ -120,7 +120,8 @@ onMounted(async () => {
             {{ weather.localName }}
           </div>
           <div class="condition">
-            {{ weather.sky }} {{ weather.sky === '비' ? weather.rh1 : '' }}
+            {{ weather.sky }}
+            {{ weather.sky === '비' ? weather.rh1 + '(mm)' : '' }}
           </div>
         </div>
 
