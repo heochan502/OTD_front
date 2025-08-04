@@ -26,7 +26,9 @@ import HlogForm from '@/views/health/HlogForm.vue';
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
+
 import ProfileDetail from '@/views/ProfileDetail.vue';
+
 
 import Location from '@/components/location/Location.vue';
 
@@ -73,6 +75,7 @@ const router = createRouter({
       path: '/memoAndDiary',
       name: 'memoAndDiary',
       component: MemoAndDiary,
+
       meta: { requiresAuth: true },
       children: [
         { path: 'memo/list', name: 'MemoListPage', component: MemoListPage },
@@ -84,6 +87,7 @@ const router = createRouter({
         { path: 'diary/:id', name: 'DiaryDetail', component: DiaryDetail },
       ],
     },
+  
   ],
 });
 

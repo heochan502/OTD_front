@@ -20,6 +20,7 @@ const logoutAccount = async () => {
     return;
   }
   counter.setLoggedIn(false);
+  router.push('/login');
 };
 </script>
 
@@ -60,7 +61,10 @@ const logoutAccount = async () => {
           href="#"
           class="nav-menu"
           active-class="active"
-          :class="{ active: route.path.startsWith('/elog' || '/hlog') }"
+          :class="{
+            active:
+              route.path.startsWith('/elog') + route.path.startsWith('/hlog'),
+          }"
           >건강</router-link
         >
         <router-link
