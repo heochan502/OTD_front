@@ -50,17 +50,17 @@ watch(
     weekDates.value = getWeekDates(newDate);
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
-    console.log(
-      '주시작11 : ',
-      selectedDate.value,
-      weekDay.getWeekDate,
-      nowDay.nowDay
-    );
+    // console.log(
+    //   '주시작11 : ',
+    //   selectedDate.value,
+    //   weekDay.getWeekDate,
+    //   nowDay.nowDay
+    // );
 
     const res =  getWeekTotal(weekDay.getWeekDate);
     if (res.status === 200) {
       weeklyStore.weeklyRawData = res.data;
-      console.log("통신구역 " );
+      // console.log("통신구역 " );
     }
 
   },

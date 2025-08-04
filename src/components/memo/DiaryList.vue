@@ -1,79 +1,76 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
-import { formatDateTime } from '@/utils/MemoAndDiaryApi';
 import { useAccountStore } from '@/stores/counter';
+import '@/components/memo/MemoAndDiaryDetail.css';
 
+const emit = defineEmits(['select']);
 const diaryList = ref([]);
-const router = useRouter();
 const accountStore = useAccountStore();
 
 const fetchDiaryList = async () => {
-  try {
-    console.log("accountStore", accountStore.loggedInId);
-    const params = {
-      memberNoLogin: accountStore.loggedInId,
-      currentPage: 1,
-      pageSize: 10,
-      offset: 0,
-    };
-    diaryList.value = await DiaryHttpService.findAll(params);
-  
-  } catch (e) {
-    alert('다이어리 목록 로딩 실패');
-    console.error(e);
-  }
-};
+  const params = {
+    currentPage: 1,
+    pageSize: 5,
+    memberNoLogin: accountStore.loggedInId,
+  };
 
-const goToDiaryDetail = (id) => {
-  router.push(`/memoAndDiary/diary/${id}`);
+  try {
+    const result = await DiaryHttpService.findAll(params);
+
+    // 🔍 여기 로그 추가
+    console.log('[📘 diaryList 전체 응답]', result);
+    console.table(result?.diaryList);
+    result?.diaryList?.forEach((item, idx) => {
+      console.log(`[${idx}] diaryId: ${item.diaryId}, diaryName: ${item.diaryName}, diaryImage: ${item.diaryImage}`);
+    });
+
+    diaryList.value = result?.diaryList || [];
+  } catch (err) {
+    console.error('다이어리 목록 조회 실패:', err);
+    diaryList.value = [];
+  }
 };
 
 onMounted(fetchDiaryList);
+defineExpose({ fetchDiaryList });
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return isNaN(date) ? '' : date.toLocaleDateString();
+};
 </script>
 
 <template>
-  <div class="diary-list-wrapper">
-    <h2>다이어리 목록</h2>
-    <div v-if="diaryList.length === 0" class="empty-message">
+  <div class="memo-list">
+    <div v-if="Array.isArray(diaryList) && diaryList.length > 0">
+      <div
+        v-for="diary in diaryList"
+        :key="diary.diaryId"
+        class="memo-item"
+        @click="$emit('select', diary)"
+      >
+        <div class="diary-item-content">
+          <div class="diary-text">
+          <h3>{{ diary.diaryName }}</h3>
+          <p>{{ diary.diaryContent }}</p>
+          <span class="date">{{ formatDate(diary.createdAt) }}</span>
+        </div>
+        <div class="diary-image-wrapper" v-if="diary.diaryImage">
+        <img
+          :src="`http://localhost:8080/pic/${diary.diaryImage}`"
+          class="preview-image"
+          alt="다이어리 이미지"
+          @error="e => console.error('❌ 이미지 로딩 실패:', e.target.src)"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div v-else class="empty-message">
       등록된 다이어리가 없습니다.
     </div>
-    <ul v-else>
-      <li
-        v-for="item in diaryList"
-        :key="item.id"
-        class="diary-item"
-        @click="goToDiaryDetail(item.id)"
-      >
-        <div class="diary-title">{{ item.diaryName }}</div>
-        <div class="diary-content">{{ item.diaryContent }}</div>
-        <div class="diary-date">{{ formatDateTime(item.createdAt) }}</div>
-      </li>
-    </ul>
   </div>
 </template>
-
-<style scoped>
-.diary-list-wrapper {
-  padding: 20px;
-}
-
-.diary-item {
-  cursor: pointer;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.diary-item:hover {
-  background-color: #f9f9f9;
-}
-
-.empty-message {
-  color: #888;
-  text-align: center;
-}
-.diary {
-  color: black !important;
-  }
-</style>

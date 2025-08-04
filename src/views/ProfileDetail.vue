@@ -1,12 +1,12 @@
 <script setup>
-import { reactive, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { getProfile, updateProfile } from '@/services/accountService';
-import { useAccountStore } from '@/stores/counter';
+import { reactive, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { getProfile, updateProfile, checkEmail, checkNickname } from '@/services/accountService'
+import { useAccountStore } from '@/stores/counter'
 
-const router = useRouter();
-const counter = useAccountStore();
-const photoInput = ref(null);
+const router = useRouter()
+const counter = useAccountStore()
+const photoInput = ref(null)
 
 const state = reactive({
   form: {
@@ -16,7 +16,7 @@ const state = reactive({
     name: '',
     birthDate: '',
     memberNick: '',
-    profileImg: '',
+    profileImg: ''
   },
   originalForm: {},
   loading: true,
@@ -26,354 +26,533 @@ const state = reactive({
     name: {
       isValid: true,
       message: '',
-      touched: false,
+      touched: false
     },
     email: {
       isValid: true,
       message: '',
       touched: false,
+      checking: false
     },
     memberNick: {
       isValid: true,
       message: '',
       touched: false,
+      checking: false
     },
     birthDate: {
       isValid: true,
       message: '',
-      touched: false,
-    },
+      touched: false
+    }
   },
-  generalError: '',
-});
+  generalError: ''
+})
 
 const formatDateForInput = (birthDate) => {
-  if (!birthDate || birthDate.length !== 8) return birthDate;
-  return `${birthDate.slice(0, 4)}-${birthDate.slice(
-    4,
-    6
-  )}-${birthDate.substring(6, 8)}`;
-};
+  if (!birthDate || birthDate.length !== 8) return birthDate
+  return `${birthDate.slice(0, 4)}-${birthDate.slice(4, 6)}-${birthDate.substring(6, 8)}`
+}
 
 const formatDateForSave = (dateString) => {
-  if (!dateString) return '';
-  return dateString.replace(/-/g, '');
-};
+  if (!dateString) return ''
+  return dateString.replace(/-/g, '')
+}
 
-const handleImgError = (e) => {
-  state.form.profileImg =
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIwIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yMCA5NUMyMCA4MCA0MCA2NyA2MCA2N0M4MCA2NyAxMDAgODAgMTAwIDk1IiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo=';
-};
+const handleImgError = () => {
+  state.form.profileImg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIwIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yMCA5NUMyMCA4MCA0MCA2NyA2MCA2N0M4MCA2NyAxMDAgODAgMTAwIDk1IiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo='
+}
 
 const changeProfilePhoto = () => {
-  photoInput.value?.click();
-};
+  photoInput.value?.click()
+}
 
 const handlePhotoChange = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  console.log('선택된 파일:', file.name, file.size, file.type);
+  const file = event.target.files[0]
+  if (!file) return
 
   if (file.size > 5 * 1024 * 1024) {
-    state.generalError = '이미지 파일 크기는 5MB 이하로 업로드해주세요.';
-    setTimeout(() => (state.generalError = ''), 3000);
-    return;
+    state.generalError = '이미지 파일 크기는 5MB 이하로 업로드해주세요.'
+    setTimeout(() => (state.generalError = ''), 3000)
+    return
   }
 
   if (!file.type.startsWith('image/')) {
-    state.generalError = '이미지 파일만 업로드 가능합니다.';
-    setTimeout(() => (state.generalError = ''), 3000);
-    return;
+    state.generalError = '이미지 파일만 업로드 가능합니다.'
+    setTimeout(() => (state.generalError = ''), 3000)
+    return
   }
 
-  const reader = new FileReader();
-
+  const reader = new FileReader()
   reader.onload = (e) => {
-    console.log('파일 읽기 완료, 데이터 길이:', e.target.result.length);
-    state.form.profileImg = e.target.result;
-  };
+    state.form.profileImg = e.target.result
+  }
+  reader.onerror = () => {
+    state.generalError = '이미지 파일을 읽는 중 오류가 발생했습니다.'
+    setTimeout(() => (state.generalError = ''), 3000)
+  }
+  reader.readAsDataURL(file)
+  event.target.value = ''
+}
 
-  reader.onerror = (e) => {
-    console.error('파일 읽기 실패:', e);
-    state.generalError = '이미지 파일을 읽는 중 오류가 발생했습니다.';
-    setTimeout(() => (state.generalError = ''), 3000);
-  };
+const handleBirthDateInput = (event) => {
+  let value = event.target.value.replace(/[^0-9]/g, '')
+  
+  if (value.length > 8) {
+    value = value.slice(0, 8)
+  }
+  
+  if (value.length >= 5) {
+    value = value.slice(0, 4) + '-' + value.slice(4)
+  }
+  if (value.length >= 8) {
+    value = value.slice(0, 7) + '-' + value.slice(7)
+  }
+  
+  state.form.birthDate = value
+  
+  if (state.validation.birthDate.touched) {
+    validateField('birthDate', value)
+  }
+}
 
-  reader.readAsDataURL(file);
+const checkEmailDuplication = async (email) => {
+  if (!email || email === state.originalForm.email) {
+    console.log('이메일 중복 확인 생략:', email, '원본:', state.originalForm.email)
+    return { isValid: true, message: '' }
+  }
 
-  event.target.value = '';
-};
+  try {
+    state.validation.email.checking = true
+    console.log('이메일 중복 확인 API 호출:', `/user/check/email/${email}`)
+    
+    const response = await checkEmail(email)
+    console.log('이메일 API 전체 응답:', response)
+    console.log('응답 상태:', response?.status)
+    console.log('응답 데이터:', response?.data)
+    
+    if (response && response.status === 200) {
+      const data = response.data
+
+      console.log('데이터 타입:', typeof data)
+      console.log('데이터 내용:', data)
+      
+      let isDuplicate = false
+      
+    
+      if (typeof data === 'boolean') {
+        isDuplicate = data 
+      } else if (typeof data === 'object' && data !== null) {
+        isDuplicate = data.isDuplicate || 
+                      data.exists || 
+                      data.duplicate || 
+                      data.isExist ||
+                      data.available === false || 
+                      false
+      } else if (typeof data === 'string') {
+        isDuplicate = data === 'true' || data === 'duplicate' || data === 'exists'
+      }
+      
+      console.log('최종 중복 판정:', isDuplicate)
+      
+      if (isDuplicate) {
+        return { isValid: false, message: '이미 사용 중인 이메일입니다.' }
+      } else {
+        return { isValid: true, message: '사용 가능한 이메일입니다.' }
+      }
+    } else if (response && response.status === 404) {
+      console.log('404 응답 - 사용 가능으로 처리')
+      return { isValid: true, message: '사용 가능한 이메일입니다.' }
+    } else {
+      console.error('이메일 API 응답 오류 - 상태코드:', response?.status)
+      console.error('오류 데이터:', response?.data)
+      return { isValid: false, message: `이메일 중복 확인 중 오류가 발생했습니다. (${response?.status})` }
+    }
+  } catch (error) {
+    console.error('이메일 중복 확인 에러:', error)
+    console.error('에러 상세:', error.response)
+    
+  
+    if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
+      return { isValid: true, message: '중복 확인 서버에 연결할 수 없습니다. 임시로 진행합니다.' }
+    }
+    
+    return { isValid: false, message: '이메일 중복 확인 중 오류가 발생했습니다.' }
+  } finally {
+    state.validation.email.checking = false
+  }
+}
+
+const checkNicknameDuplication = async (nickname) => {
+  if (!nickname || nickname === state.originalForm.memberNick) {
+    console.log('닉네임 중복 확인 생략:', nickname, '원본:', state.originalForm.memberNick)
+    return { isValid: true, message: '' }
+  }
+
+  try {
+    state.validation.memberNick.checking = true
+    console.log('닉네임 중복 확인 API 호출:', `/user/check/nickname/${nickname}`)
+    
+    const response = await checkNickname(nickname)
+    console.log('닉네임 API 전체 응답:', response)
+    console.log('응답 상태:', response?.status)
+    console.log('응답 데이터:', response?.data)
+    
+    if (response && response.status === 200) {
+      const data = response.data
+      
+     
+      console.log('데이터 타입:', typeof data)
+      console.log('데이터 내용:', data)
+      
+      let isDuplicate = false
+   
+      if (typeof data === 'boolean') {
+        isDuplicate = data 
+      } else if (typeof data === 'object' && data !== null) {
+        isDuplicate = data.isDuplicate || 
+                      data.exists || 
+                      data.duplicate || 
+                      data.isExist ||
+                      data.available === false || 
+                      false
+      } else if (typeof data === 'string') {
+        isDuplicate = data === 'true' || data === 'duplicate' || data === 'exists'
+      }
+      
+      console.log('최종 중복 판정:', isDuplicate)
+      
+      if (isDuplicate) {
+        return { isValid: false, message: '이미 사용 중인 닉네임입니다.' }
+      } else {
+        return { isValid: true, message: '사용 가능한 닉네임입니다.' }
+      }
+    } else if (response && response.status === 404) {
+ 
+      console.log('404 응답 - 사용 가능으로 처리')
+      return { isValid: true, message: '사용 가능한 닉네임입니다.' }
+    } else {
+      console.error('닉네임 API 응답 오류 - 상태코드:', response?.status)
+      console.error('오류 데이터:', response?.data)
+      return { isValid: false, message: `닉네임 중복 확인 중 오류가 발생했습니다. (${response?.status})` }
+    }
+  } catch (error) {
+    console.error('닉네임 중복 확인 에러:', error)
+    console.error('에러 상세:', error.response)
+    
+
+    if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
+      return { isValid: true, message: '중복 확인 서버에 연결할 수 없습니다. 임시로 진행합니다.' }
+    }
+    
+    return { isValid: false, message: '닉네임 중복 확인 중 오류가 발생했습니다.' }
+  } finally {
+    state.validation.memberNick.checking = false
+  }
+}
 
 const validateName = (name) => {
   if (!name.trim()) {
-    return { isValid: false, message: '이름을 입력해주세요.' };
+    return { isValid: false, message: '이름을 입력해주세요.' }
   }
   if (name.trim().length < 2) {
-    return { isValid: false, message: '이름은 최소 2글자 이상이어야 합니다.' };
+    return { isValid: false, message: '이름은 최소 2글자 이상이어야 합니다.' }
   }
-  if (name.trim().length > 10) {
-    return {
-      isValid: false,
-      message: '이름은 최대 10글자까지 입력 가능합니다.',
-    };
+  if (name.trim().length > 20) {
+    return { isValid: false, message: '이름은 최대 20글자까지 입력 가능합니다.' }
   }
-
-  const nameRegex = /^[가-힣a-zA-Z\s]+$/;
+  const nameRegex = /^[가-힣a-zA-Z\s]+$/
   if (!nameRegex.test(name.trim())) {
-    return {
-      isValid: false,
-      message: '이름은 한글 또는 영문만 입력 가능합니다.',
-    };
+    return { isValid: false, message: '이름은 한글 또는 영문만 입력 가능합니다.' }
   }
-  return { isValid: true, message: '' };
-};
+  return { isValid: true, message: '' }
+}
 
-const validateEmail = (email) => {
+const validateEmail = async (email) => {
   if (!email.trim()) {
-    return { isValid: false, message: '이메일을 입력해주세요.' };
+    return { isValid: false, message: '이메일을 입력해주세요.' }
   }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email)) {
-    return { isValid: false, message: '올바른 이메일 형식을 입력해주세요.' };
+    return { isValid: false, message: '올바른 이메일 형식을 입력해주세요.' }
   }
   if (email.length > 50) {
-    return {
-      isValid: false,
-      message: '이메일은 최대 50자까지 입력 가능합니다.',
-    };
+    return { isValid: false, message: '이메일은 최대 50자까지 입력 가능합니다.' }
   }
-  return { isValid: true, message: '' };
-};
+  
+  const duplicateResult = await checkEmailDuplication(email)
+  return duplicateResult
+}
 
-const validateNickname = (nickname) => {
+const validateNickname = async (nickname) => {
   if (nickname && nickname.trim()) {
     if (nickname.trim().length < 2) {
-      return {
-        isValid: false,
-        message: '닉네임은 최소 2글자 이상이어야 합니다.',
-      };
+      return { isValid: false, message: '닉네임은 최소 2글자 이상이어야 합니다.' }
     }
     if (nickname.trim().length > 15) {
-      return {
-        isValid: false,
-        message: '닉네임은 최대 15글자까지 입력 가능합니다.',
-      };
+      return { isValid: false, message: '닉네임은 최대 15글자까지 입력 가능합니다.' }
     }
-
-    const nicknameRegex = /^[가-힣a-zA-Z0-9_]+$/;
+    const nicknameRegex = /^[가-힣a-zA-Z0-9_]+$/
     if (!nicknameRegex.test(nickname.trim())) {
-      return {
-        isValid: false,
-        message: '닉네임은 한글, 영문, 숫자, 언더스코어(_)만 사용 가능합니다.',
-      };
+      return { isValid: false, message: '닉네임은 한글, 영문, 숫자, 언더스코어(_)만 사용 가능합니다.' }
     }
+    
+    const duplicateResult = await checkNicknameDuplication(nickname.trim())
+    return duplicateResult
   }
-  return { isValid: true, message: '' };
-};
+  return { isValid: true, message: '' }
+}
 
 const validateBirthDate = (birthDate) => {
   if (birthDate && birthDate.trim()) {
-    const dateRegex = /^\d{8}$/;
-    if (!dateRegex.test(birthDate.replace(/-/g, ''))) {
-      return { isValid: false, message: 'YYYYMMDD 형식으로 입력해주세요.' };
+    const cleanDate = birthDate.replace(/-/g, '')
+    const dateRegex = /^\d{8}$/
+    
+    if (!dateRegex.test(cleanDate)) {
+      return { isValid: false, message: 'YYYYMMDD 형식으로 8자리 숫자를 입력해주세요.' }
     }
 
-    const cleanDate = birthDate.replace(/-/g, '');
-    const year = parseInt(cleanDate.substring(0, 4));
-    const month = parseInt(cleanDate.substring(4, 6));
-    const day = parseInt(cleanDate.substring(6, 8));
-
-    const currentYear = new Date().getFullYear();
+    const year = parseInt(cleanDate.substring(0, 4))
+    const month = parseInt(cleanDate.substring(4, 6))
+    const day = parseInt(cleanDate.substring(6, 8))
+    const currentYear = new Date().getFullYear()
 
     if (year < 1900 || year > currentYear) {
-      return { isValid: false, message: '올바른 연도를 입력해주세요.' };
+      return { isValid: false, message: '올바른 연도를 입력해주세요.' }
     }
     if (month < 1 || month > 12) {
-      return { isValid: false, message: '올바른 월을 입력해주세요.' };
+      return { isValid: false, message: '올바른 월을 입력해주세요.' }
     }
     if (day < 1 || day > 31) {
-      return { isValid: false, message: '올바른 일을 입력해주세요.' };
+      return { isValid: false, message: '올바른 일을 입력해주세요.' }
     }
 
-    const testDate = new Date(year, month - 1, day);
-    if (
-      testDate.getFullYear() !== year ||
-      testDate.getMonth() !== month - 1 ||
-      testDate.getDate() !== day
-    ) {
-      return { isValid: false, message: '존재하지 않는 날짜입니다.' };
+    const testDate = new Date(year, month - 1, day)
+    if (testDate.getFullYear() !== year || testDate.getMonth() !== month - 1 || testDate.getDate() !== day) {
+      return { isValid: false, message: '존재하지 않는 날짜입니다.' }
     }
 
     if (testDate > new Date()) {
-      return { isValid: false, message: '미래 날짜는 입력할 수 없습니다.' };
+      return { isValid: false, message: '미래 날짜는 입력할 수 없습니다.' }
     }
   }
-  return { isValid: true, message: '' };
-};
+  return { isValid: true, message: '' }
+}
 
-
-const validateField = (field, value) => {
-  let result;
+const validateField = async (field, value) => {
+  let result
 
   switch (field) {
     case 'name':
-      result = validateName(value);
-      break;
+      result = validateName(value)
+      break
     case 'email':
-      result = validateEmail(value);
-      break;
+      result = await validateEmail(value)
+      break
     case 'memberNick':
-      result = validateNickname(value);
-      break;
+      result = await validateNickname(value)
+      break
     case 'birthDate':
-      result = validateBirthDate(value);
-      break;
+      result = validateBirthDate(value)
+      break
     default:
-      result = { isValid: true, message: '' };
+      result = { isValid: true, message: '' }
   }
 
   state.validation[field] = {
     ...state.validation[field],
     isValid: result.isValid,
-    message: result.message,
-  };
-};
+    message: result.message
+  }
+}
 
 const handleFieldTouch = (field) => {
-  state.validation[field].touched = true;
-  validateField(field, state.form[field]);
-};
+  state.validation[field].touched = true
+  validateField(field, state.form[field])
+}
 
 const isFormValid = () => {
-  return Object.values(state.validation).every((field) => field.isValid);
-};
+  const validationResult = Object.values(state.validation).every((field) => field.isValid)
+  console.log('폼 유효성 검사:', {
+    validation: state.validation,
+    result: validationResult,
+    emailChecking: state.validation.email.checking,
+    nicknameChecking: state.validation.memberNick.checking
+  })
+  return validationResult
+}
 
-watch(
-  () => state.form.name,
-  (newValue) => {
-    if (state.validation.name.touched) {
-      validateField('name', newValue);
-    }
-  }
-);
+let emailTimeout
+let nicknameTimeout
 
-watch(
-  () => state.form.email,
-  (newValue) => {
-    if (state.validation.email.touched) {
-      validateField('email', newValue);
-    }
+watch(() => state.form.name, (newValue) => {
+  if (state.validation.name.touched) {
+    validateField('name', newValue)
   }
-);
+})
 
-watch(
-  () => state.form.memberNick,
-  (newValue) => {
-    if (state.validation.memberNick.touched) {
-      validateField('memberNick', newValue);
-    }
+watch(() => state.form.email, (newValue) => {
+  if (state.validation.email.touched) {
+    clearTimeout(emailTimeout)
+    emailTimeout = setTimeout(() => {
+      validateField('email', newValue)
+    }, 500)
   }
-);
+})
 
-watch(
-  () => state.form.birthDate,
-  (newValue) => {
-    if (state.validation.birthDate.touched) {
-      validateField('birthDate', newValue);
-    }
+watch(() => state.form.memberNick, (newValue) => {
+  if (state.validation.memberNick.touched) {
+    clearTimeout(nicknameTimeout)
+    nicknameTimeout = setTimeout(() => {
+      validateField('memberNick', newValue)
+    }, 500)
   }
-);
+})
+
+watch(() => state.form.birthDate, (newValue) => {
+  if (state.validation.birthDate.touched) {
+    validateField('birthDate', newValue)
+  }
+})
 
 const saveProfile = async () => {
-  Object.keys(state.validation).forEach((field) => {
-    state.validation[field].touched = true;
-    validateField(field, state.form[field]);
-  });
+  console.log('=== 프로필 저장 시작 ===')
+  
+
+  for (const field of Object.keys(state.validation)) {
+    state.validation[field].touched = true
+    await validateField(field, state.form[field])
+  }
+
+  console.log('검증 결과:', state.validation)
+  console.log('폼 유효성:', isFormValid())
 
   if (!isFormValid()) {
-    state.generalError = '입력 정보를 다시 확인해주세요.';
-    setTimeout(() => (state.generalError = ''), 3000);
-    return;
+    state.generalError = '입력 정보를 다시 확인해주세요.'
+    setTimeout(() => (state.generalError = ''), 3000)
+    console.log('폼 검증 실패')
+    return
   }
 
-  state.saving = true;
-  state.generalError = '';
+  state.saving = true
+  state.generalError = ''
 
   try {
+
     const formData = {
-      ...state.form,
+      memberNoLogin: state.form.memberNoLogin,
+      memberId: state.form.memberId,
+      email: state.form.email?.trim(),
+      name: state.form.name?.trim(),
       birthDate: formatDateForSave(state.form.birthDate),
-    };
+      memberNick: state.form.memberNick?.trim() || null,
+      memberImg: state.form.profileImg || null  
+    }
 
-    console.log('전송할 데이터:', formData);
+    Object.keys(formData).forEach(key => {
+      if (formData[key] === '' || formData[key] === undefined) {
+        if (key === 'memberNick' || key === 'profileImg' || key === 'birthDate') {
+          formData[key] = null 
+        }
+      }
+    })
 
-    const res = await updateProfile(formData);
+    console.log('원본 폼 데이터:', state.form)
+    console.log('전송할 데이터:', formData)
+    console.log('JSON 문자열:', JSON.stringify(formData, null, 2))
 
-    console.log('API 응답:', res);
+    const res = await updateProfile(formData)
+    
+    console.log('프로필 업데이트 응답:', res)
+    console.log('응답 상태:', res?.status)
+    console.log('응답 데이터:', res?.data)
 
     if (res && res.status === 200) {
-      state.showSuccess = true;
-      state.originalForm = { ...state.form };
-
-      setTimeout(() => {
-        state.showSuccess = false;
-      }, 3000);
+      state.showSuccess = true
+      state.originalForm = { ...state.form }
+      console.log('프로필 업데이트 성공')
+      setTimeout(() => { state.showSuccess = false }, 3000)
     } else {
-      console.error('수정 실패 - 전체 응답:', res);
-      state.generalError = `정보 수정에 실패했습니다. 상태코드: ${
-        res?.status || '알 수 없음'
-      }`;
+      console.error('프로필 업데이트 실패 - 상태코드:', res?.status)
+      console.error('오류 응답:', res?.data)
+      
+
+      let errorMessage = '정보 수정에 실패했습니다.'
+      
+      if (res?.data?.message) {
+        errorMessage = res.data.message
+      } else if (res?.data?.error) {
+        errorMessage = res.data.error
+      } else if (res?.status === 500) {
+        errorMessage = '서버 내부 오류가 발생했습니다. 서버 로그를 확인해주세요.'
+      } else if (res?.status) {
+        errorMessage = `정보 수정에 실패했습니다. 상태코드: ${res.status}`
+      }
+      
+      state.generalError = errorMessage
     }
   } catch (error) {
-    console.error('Profile update error:', error);
-    state.generalError = '오류가 발생했습니다: ' + error.message;
+    console.error('프로필 업데이트 에러:', error)
+    console.error('에러 상세:', error.response)
+    
+    let errorMessage = '오류가 발생했습니다: ' + error.message
+
+    if (error.code === 'ERR_NETWORK') {
+      errorMessage = '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.'
+    } else if (error.response) {
+
+      console.error('서버 오류 응답:', error.response.data)
+      
+      if (error.response.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.response.status === 401) {
+        errorMessage = '로그인이 필요합니다.'
+      } else if (error.response.status === 403) {
+        errorMessage = '권한이 없습니다.'
+      } else if (error.response.status === 422) {
+        errorMessage = '입력 데이터가 올바르지 않습니다.'
+      } else if (error.response.status === 500) {
+        errorMessage = '서버 내부 오류가 발생했습니다. 관리자에게 문의하세요.'
+      }
+    }
+    
+    state.generalError = errorMessage
   } finally {
-    state.saving = false;
+    state.saving = false
+    console.log('=== 프로필 저장 완료 ===')
   }
-};
+}
 
 onMounted(async () => {
   if (!counter.state.loggedIn) {
-    router.push('/login');
-    return;
+    router.push('/login')
+    return
   }
 
   try {
-    console.log('프로필 정보 로딩 시작...');
-    const res = await getProfile();
-    console.log('getProfile 응답:', res);
-
+    const res = await getProfile()
     if (res && res.status === 200) {
       const profileData = {
         ...res.data,
-        birthDate: formatDateForInput(res.data.birthDate),
-      };
-
-      console.log('처리된 프로필 데이터:', profileData);
-
-      Object.assign(state.form, profileData);
-      state.originalForm = { ...profileData };
+        birthDate: formatDateForInput(res.data.birthDate)
+      }
+      Object.assign(state.form, profileData)
+      state.originalForm = { ...profileData }
     } else {
-      console.error('프로필 로딩 실패:', res);
-      state.generalError = '프로필 정보를 불러오는데 실패했습니다.';
+      state.generalError = '프로필 정보를 불러오는데 실패했습니다.'
     }
   } catch (error) {
-    console.error('Profile loading error:', error);
-    state.generalError = '프로필 정보를 불러오는 중 오류가 발생했습니다.';
+    state.generalError = '프로필 정보를 불러오는 중 오류가 발생했습니다.'
   } finally {
-    state.loading = false;
+    state.loading = false
   }
-});
+})
 
-watch(
-  () => counter.state.loggedIn,
-  (isLoggedIn) => {
-    if (!isLoggedIn) {
-      router.push('/login');
-    }
+watch(() => counter.state.loggedIn, (isLoggedIn) => {
+  if (!isLoggedIn) {
+    router.push('/login')
   }
-);
+})
 </script>
 
 <template>
@@ -401,13 +580,11 @@ watch(
               <div class="header">
                 <h1>회원정보 수정</h1>
               </div>
+              
               <div class="profile-photo-section">
                 <div class="photo-wrapper" @click="changeProfilePhoto">
                   <img
-                    :src="
-                      state.form.profileImg ||
-                      'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIwIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yMCA5NUMyMCA4MCA0MCA2NyA2MCA2N0M4MCA2NyAxMDAgODAgMTAwIDk1IiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo='
-                    "
+                    :src="state.form.profileImg || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIwIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yMCA5NUMyMCA4MCA0MCA2NyA2MCA2N0M4MCA2NyAxMDAgODAgMTAwIDk1IiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo='"
                     alt="프로필 사진"
                     class="profile-img"
                     @error="handleImgError"
@@ -421,13 +598,14 @@ watch(
                   type="file"
                   accept="image/*"
                   @change="handlePhotoChange"
-                  style="display: none"
+                  style="display: none;"
                 />
                 <div class="photo-info">
                   <p>클릭하여 프로필 사진을 변경하세요</p>
                   <p class="photo-hint">JPG, PNG, GIF 파일 (최대 5MB)</p>
                 </div>
               </div>
+              
               <h3 class="section-title">기본 정보</h3>
 
               <div class="form-row">
@@ -453,38 +631,22 @@ watch(
                     required
                     placeholder="이메일을 입력하세요"
                     :class="{
-                      error:
-                        state.validation.email.touched &&
-                        !state.validation.email.isValid,
-                      success:
-                        state.validation.email.touched &&
-                        state.validation.email.isValid &&
-                        state.form.email,
+                      error: state.validation.email.touched && !state.validation.email.isValid,
+                      success: state.validation.email.touched && state.validation.email.isValid && state.form.email,
                     }"
                     @blur="handleFieldTouch('email')"
-                    @input="
-                      state.validation.email.touched &&
-                        validateField('email', state.form.email)
-                    "
                   />
-                  <div
-                    v-if="
-                      state.validation.email.touched &&
-                      state.validation.email.message
-                    "
-                    class="field-error"
-                  >
-                    {{ state.validation.email.message }}
+                  <div v-if="state.validation.email.checking" class="field-checking">
+                    이메일 중복을 확인하는 중...
                   </div>
                   <div
-                    v-else-if="
-                      state.validation.email.touched &&
-                      state.validation.email.isValid &&
-                      state.form.email
-                    "
-                    class="field-success"
+                    v-else-if="state.validation.email.touched && state.validation.email.message"
+                    :class="{
+                      'field-error': !state.validation.email.isValid,
+                      'field-success': state.validation.email.isValid
+                    }"
                   >
-                    올바른 이메일 형식입니다.
+                    {{ state.validation.email.message }}
                   </div>
                 </div>
               </div>
@@ -499,35 +661,19 @@ watch(
                     required
                     placeholder="이름을 입력하세요"
                     :class="{
-                      error:
-                        state.validation.name.touched &&
-                        !state.validation.name.isValid,
-                      success:
-                        state.validation.name.touched &&
-                        state.validation.name.isValid &&
-                        state.form.name,
+                      error: state.validation.name.touched && !state.validation.name.isValid,
+                      success: state.validation.name.touched && state.validation.name.isValid && state.form.name,
                     }"
                     @blur="handleFieldTouch('name')"
-                    @input="
-                      state.validation.name.touched &&
-                        validateField('name', state.form.name)
-                    "
                   />
                   <div
-                    v-if="
-                      state.validation.name.touched &&
-                      state.validation.name.message
-                    "
+                    v-if="state.validation.name.touched && state.validation.name.message"
                     class="field-error"
                   >
                     {{ state.validation.name.message }}
                   </div>
                   <div
-                    v-else-if="
-                      state.validation.name.touched &&
-                      state.validation.name.isValid &&
-                      state.form.name
-                    "
+                    v-else-if="state.validation.name.touched && state.validation.name.isValid && state.form.name"
                     class="field-success"
                   >
                     올바른 이름입니다.
@@ -544,38 +690,22 @@ watch(
                     v-model="state.form.memberNick"
                     placeholder="닉네임을 입력하세요"
                     :class="{
-                      error:
-                        state.validation.memberNick.touched &&
-                        !state.validation.memberNick.isValid,
-                      success:
-                        state.validation.memberNick.touched &&
-                        state.validation.memberNick.isValid &&
-                        state.form.memberNick,
+                      error: state.validation.memberNick.touched && !state.validation.memberNick.isValid,
+                      success: state.validation.memberNick.touched && state.validation.memberNick.isValid && state.form.memberNick,
                     }"
                     @blur="handleFieldTouch('memberNick')"
-                    @input="
-                      state.validation.memberNick.touched &&
-                        validateField('memberNick', state.form.memberNick)
-                    "
                   />
-                  <div
-                    v-if="
-                      state.validation.memberNick.touched &&
-                      state.validation.memberNick.message
-                    "
-                    class="field-error"
-                  >
-                    {{ state.validation.memberNick.message }}
+                  <div v-if="state.validation.memberNick.checking" class="field-checking">
+                    닉네임 중복을 확인하는 중...
                   </div>
                   <div
-                    v-else-if="
-                      state.validation.memberNick.touched &&
-                      state.validation.memberNick.isValid &&
-                      state.form.memberNick
-                    "
-                    class="field-success"
+                    v-else-if="state.validation.memberNick.touched && state.validation.memberNick.message"
+                    :class="{
+                      'field-error': !state.validation.memberNick.isValid,
+                      'field-success': state.validation.memberNick.isValid
+                    }"
                   >
-                    사용 가능한 닉네임입니다.
+                    {{ state.validation.memberNick.message }}
                   </div>
                 </div>
               </div>
@@ -586,38 +716,24 @@ watch(
                   <input
                     type="text"
                     id="birthDate"
-                    v-model="state.form.birthDate"
-                    placeholder="YYYYMMDD 또는 YYYY-MM-DD"
+                    :value="state.form.birthDate"
+                    placeholder="YYYYMMDD (8자리 숫자)"
+                    maxlength="10"
                     :class="{
-                      error:
-                        state.validation.birthDate.touched &&
-                        !state.validation.birthDate.isValid,
-                      success:
-                        state.validation.birthDate.touched &&
-                        state.validation.birthDate.isValid &&
-                        state.form.birthDate,
+                      error: state.validation.birthDate.touched && !state.validation.birthDate.isValid,
+                      success: state.validation.birthDate.touched && state.validation.birthDate.isValid && state.form.birthDate,
                     }"
                     @blur="handleFieldTouch('birthDate')"
-                    @input="
-                      state.validation.birthDate.touched &&
-                        validateField('birthDate', state.form.birthDate)
-                    "
+                    @input="handleBirthDateInput"
                   />
                   <div
-                    v-if="
-                      state.validation.birthDate.touched &&
-                      state.validation.birthDate.message
-                    "
+                    v-if="state.validation.birthDate.touched && state.validation.birthDate.message"
                     class="field-error"
                   >
                     {{ state.validation.birthDate.message }}
                   </div>
                   <div
-                    v-else-if="
-                      state.validation.birthDate.touched &&
-                      state.validation.birthDate.isValid &&
-                      state.form.birthDate
-                    "
+                    v-else-if="state.validation.birthDate.touched && state.validation.birthDate.isValid && state.form.birthDate"
                     class="field-success"
                   >
                     올바른 날짜 형식입니다.
@@ -633,7 +749,8 @@ watch(
               <button
                 type="submit"
                 class="btn btn-primary"
-                :disabled="state.saving || !isFormValid()"
+                :disabled="state.saving || !isFormValid() || state.validation.email.checking || state.validation.memberNick.checking"
+                @click="console.log('저장 버튼 클릭', { saving: state.saving, formValid: isFormValid(), emailChecking: state.validation.email.checking, nicknameChecking: state.validation.memberNick.checking })"
               >
                 <span v-if="state.saving">저장 중...</span>
                 <span v-else>저장하기</span>
@@ -647,7 +764,6 @@ watch(
 </template>
 
 <style scoped>
-
 .error-message,
 .success-message {
   display: flex;
@@ -691,6 +807,14 @@ watch(
   align-items: center;
 }
 
+.field-checking {
+  color: #3b82f6;
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+}
+
 .form-group input.error {
   border-color: #dc2626;
   background-color: #fef2f2;
@@ -710,7 +834,6 @@ watch(
 .form-group input:focus.success {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
 }
-
 
 .page-wrapper {
   min-height: 100vh;

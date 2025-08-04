@@ -1,99 +1,113 @@
 <script setup>
-import { ref } from 'vue';
-import MemoHttpService from '@/services/memo/MemoHttpService';
-import { useRouter } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useMemoDetail } from '@/components/memo/useMemoDetail';
+import { defineEmits, defineProps } from 'vue';
 import '@/components/memo/MemoAndDiaryDetail.css';
 
-const router = useRouter();
-
-const memo = ref({
-  memoName: '',
-  memoContent: '',
-  memoImageFiles: null,
+const emit = defineEmits(['created', 'updated', 'deleted', 'cancel']);
+const props = defineProps({
+  memoProp: {
+    type: Object,
+    default: () => null,
+  },
 });
 
-const previewImages = ref([]);
+const {
+  memo,
+  previewImages,
+  fileInputRef,
+  isCreateMode,
+  isEditMode,
+  isViewMode,
+  isTitleValid,
+  isContentValid,
+  setMode,
+  handleImageChange,
+  removeImage,
+  createMemo,
+  updateMemo,
+  deleteMemo,
+  cancelEdit,
+  clearPreviewImages,
+} = useMemoDetail(props, emit);
 
-const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    memo.value.memoImageFiles = file;
-    previewImages.value = [URL.createObjectURL(file)];
-  }
-};
+const titleText = computed(() => {
+  if (isCreateMode.value) return '메모 등록';
+  if (isEditMode.value) return '메모 수정';
+  return '메모 보기';
+});
 
-const saveMemo = async () => {
-  if (!memo.value.memoName || !memo.value.memoContent) {
-    alert('제목과 내용을 모두 입력해주세요!');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append(
-    'memoData',
-    new Blob(
-      [JSON.stringify({
-        memoName: memo.value.memoName,
-        memoContent: memo.value.memoContent,
-      })],
-      { type: 'application/json' }
-    )
-  );
-
-  if (memo.value.memoImageFiles) {
-    formData.append('memoImageFiles', memo.value.memoImageFiles);
-  }
-
-  try {
-    await MemoHttpService.create(formData);
-    alert('메모가 저장되었습니다!');
-    router.push('/memoAndDiary/memolist');
-  } catch (error) {
-    console.error('메모 저장 실패:', error);
-    alert('메모 저장 실패');
-  }
-};
+watch(
+  () => props.memoProp,
+  (newMemo) => {
+    if (newMemo) {
+      memo.value = { ...newMemo };
+      setMode('view');
+      clearPreviewImages(); // 선택 시 이전 이미지 프리뷰 제거
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
   <div class="memo-detail">
-    <h2>메모 등록</h2>
+    <h2>{{ titleText }}</h2>
 
     <label for="memoName">제목</label>
-    <input
-      id="memoName"
-      v-model="memo.memoName"
-      type="text"
-      placeholder="제목 입력"
-      class="text-input"
-    />
+    <input id="memoName" v-model="memo.memoName" class="text-input" />
+    <p v-if="memo.memoName.length > 0 && !isTitleValid" class="error">
+      제목은 10자 이상 입력해주세요.
+    </p>
 
     <label for="memoContent">내용</label>
-    <textarea
-      id="memoContent"
-      v-model="memo.memoContent"
-      placeholder="내용 입력"
-      class="textarea"
-    ></textarea>
+    <textarea id="memoContent" v-model="memo.memoContent" class="textarea" />
+    <p v-if="memo.memoContent.length > 0 && !isContentValid" class="error">
+      내용은 10자 이상 입력해주세요.
+    </p>
 
-    <label for="imageUpload">이미지 업로드</label>
+    <label>이미지</label>
+
+    <div v-if="memo.imageFileName && previewImages.length === 0" class="preview-list">
+      <div class="preview-item">
+        <img :src="`/pic/${memo.imageFileName}`" alt="등록된 이미지" />
+      </div>
+    </div>
+
+    <div v-if="previewImages.length > 0" class="preview-list">
+      <div v-for="(img, idx) in previewImages" :key="idx" class="preview-item">
+        <img :src="img" alt="미리보기 이미지" />
+        <button v-if="!isViewMode" @click="removeImage(idx)" class="delete-btn">삭제</button>
+      </div>
+    </div>
+
     <input
-      id="imageUpload"
+      v-if="!isViewMode"
+      ref="fileInputRef"
       type="file"
       accept="image/*"
       @change="handleImageChange"
     />
 
-    <div v-if="previewImages.length > 0" class="preview-list">
-      <div class="preview-item" v-for="(url, idx) in previewImages" :key="idx">
-        <img :src="url" alt="미리보기 이미지" />
-        <button class="remove-btn" @click="previewImages.splice(idx, 1)">삭제</button>
-      </div>
-    </div>
-    <div v-else class="no-image">이미지가 없습니다.</div>
-
     <div class="button-group">
-      <button @click="saveMemo">등록</button>
+      <button
+        v-if="isCreateMode"
+        :disabled="!isTitleValid || !isContentValid"
+        @click="createMemo"
+      >
+        등록
+      </button>
+
+      <template v-else-if="isEditMode">
+        <button :disabled="!isTitleValid || !isContentValid" @click="updateMemo">수정 완료</button>
+        <button @click="cancelEdit">취소</button>
+      </template>
+
+      <template v-else>
+        <button @click="setMode('edit')">수정</button>
+        <button @click="deleteMemo">삭제</button>
+        <button @click="cancelEdit">목록</button>
+      </template>
     </div>
   </div>
 </template>

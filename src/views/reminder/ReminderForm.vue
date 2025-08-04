@@ -178,18 +178,18 @@ const submit = async () => {
     <div class="form-card">
       <span>
         <router-link :to="state.reminder.id ? '/reminder/list' : '/reminder'">
-          <img src="/src/image/cancel.png" alt="취소" class="cancel" />
+          <img src="/image/cancel.png" alt="취소" class="cancel" />
         </router-link>
       </span>
       <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
         <span :class="{ on: isDateMode }" class="off date-box">날짜 지정</span>
-        <span class="date">{{ formattedDate }}</span>
-        <img
-          src="/src/image/button.png"
-          alt="날짜 선택하기"
-          @click="openCalendar"
-          class="calendar-button"
-        />
+        <span @click="openCalendar">
+          <span class="date">{{ formattedDate }}</span>
+          <img
+            src="/image/button.png"
+            alt="날짜 선택하기"
+            class="calendar-button"
+        /></span>
         <div class="calendar">
           <calendar
             v-if="showCalendar"
@@ -206,8 +206,8 @@ const submit = async () => {
         <img
           :src="
             state.reminder.alarm
-              ? '/src/image/alarm_on.png'
-              : '/src/image/alarm_off.png'
+              ? '/image/alarm_on.png'
+              : '/image/alarm_off.png'
           "
           alt="알람 상태"
           class="alarm-img"
@@ -221,7 +221,7 @@ const submit = async () => {
           <img
             v-for="(dow, index) in dowImage"
             :key="index"
-            :src="`/src/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
+            :src="`/image/${dow.key}_${dow.isOn ? 'on' : 'off'}.png`"
             :alt="dow.name"
             @click="imageToggle(index)"
             class="toggle-img"
@@ -266,6 +266,7 @@ const submit = async () => {
   }
 
   .form-card {
+    cursor: pointer;
     position: relative;
     border-radius: 10px;
     padding: 20px 30px 30px 30px;
@@ -296,6 +297,7 @@ const submit = async () => {
       .calendar-button {
         display: inline-block;
         vertical-align: middle;
+        cursor: pointer;
       }
 
       .date {

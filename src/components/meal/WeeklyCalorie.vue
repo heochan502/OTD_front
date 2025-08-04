@@ -124,7 +124,7 @@ const getStatistic = async (weeky) => {
   if (res.status === 200) {
     weeklyStore.weeklyRawData = res.data;
   }
-  console.log("데이터 확인 ", weeklyStore.weeklyRawData);
+  // console.log("데이터 확인 ", weeklyStore.weeklyRawData);
     // 기존 y축 데이터 0으로 만드는격 
   const yDataTemp = Array(xData.length).fill(0);
     weeklyStore.weeklyRawData.forEach(item => {
@@ -149,7 +149,7 @@ onMounted(async () => {
   } else {
     console.warn('chartRef is null');
   }
-  console.log("주시작 : ", weekDay.getWeekDate);
+  // console.log("주시작 : ", weekDay.getWeekDate);
 
 });
 
