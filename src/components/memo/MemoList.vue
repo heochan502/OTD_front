@@ -1,90 +1,60 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useAccountStore } from '@/stores/counter';
 import MemoHttpService from '@/services/memo/MemoHttpService';
-import { formatDateTime } from '@/utils/MemoAndDiaryApi';
+import '@/components/memo/MemoAndDiaryDetail.css';
 
 const memoList = ref([]);
-const router = useRouter();
+const emit = defineEmits(['select']);
+const accountStore = useAccountStore();
 
 const fetchMemoList = async () => {
+  console.log('[memoList] 로그인된 유저 ID:', accountStore.loggedInId);
+  const params = {
+    currentPage: 1,
+    pageSize: 100,
+    memberNoLogin: accountStore.loggedInId,
+  };
   try {
-    const result = await MemoHttpService.findAll({
-      currentPage: 1,  // 페이지 번호 (필요에 따라 추가)
-      pageSize: 10,    // 페이지 크기 (필요에 따라 추가)
-    });
-    memoList.value = result.memos;
-    console.log("메모리스트 벨류 ", memoList.value);
-    console.log("메모리스트 벨류 ", result);
+    const result = await MemoHttpService.findAll(params);
+    console.log('[memoList] 서버 응답:', result);
+    memoList.value = result.memoList || result.memolist || [];
   } catch (e) {
-    alert('메모 목록 로딩 실패');
-    console.error(e);
+    console.error('❌ 메모 목록 조회 중 오류:', e);
+    memoList.value = [];
   }
 };
 
-const goToMemoDetail = (id) => {
-  router.push(`/memoAndDiary/memo/${id}`); // 해당 메모 상세 페이지로 이동
-};
+onMounted(fetchMemoList);
+defineExpose({ fetchMemoList });
 
-onMounted(async () => {
-  await fetchMemoList();  // 메모 목록을 가져옴
-});
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString();
+};
 </script>
 
 <template>
-  <div class="memo-list-wrapper">
-    <h2>메모 목록</h2>
-    <div v-if="memoList.value===null" class="empty-message">
+  <div class="memo-list">
+    <div
+      v-for="memo in memoList"
+      :key="memo.id"
+      class="memo-item"
+      @click="$emit('select', memo)"
+    >
+      <h3>{{ memo.memoName }}</h3>
+      <p>{{ memo.memoContent }}</p>
+      <span class="date">{{ formatDate(memo.createdAt) }}</span>
+      <img
+        v-show="memo.memoImageFileName"
+        :src="`/pic/${memo.memoImageFileName}`"
+        class="preview-image"
+        alt="memo"
+      />
+    </div>
+
+    <div v-show="memoList.length === 0" class="empty-message">
       등록된 메모가 없습니다.
     </div>
-    <ul v-else>
-      <li
-        v-for="item in memoList"
-        :key="item.id"
-        class="memo-item"
-        @click="goToMemoDetail(item.id)"
-      >
-        <div class="memo-title">{{ item.memoName }}</div>
-        <div class="memo-content">{{ item.memoContent }}</div>
-        <div class="memo-date">{{ formatDateTime(item.createdAt) }}</div>
-      </li>
-    </ul>
   </div>
 </template>
-
-<style scoped>
-.diary-list {
-  max-width: 600px;
-  margin: 0 auto;
-}
-.diary-list ul {
-  list-style: none;
-  padding: 0;
-}
-.diary-list li {
-  cursor: pointer;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-.diary-list img {
-  display: block;
-  margin-top: 0.5rem;
-}
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.diary-title, .diary-content, .diary-date {
-  color: black !important;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-</style>
