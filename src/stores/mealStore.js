@@ -42,7 +42,7 @@ export const useDayDefine = defineStore("useDayDefine",()=>
       const dayDefine = ref("");
 
       const currentTime = ref("");
-      const nowDay = ref("");
+      const nowDay = ref();
       const updateTime = () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -57,7 +57,7 @@ export const useDayDefine = defineStore("useDayDefine",()=>
 
       // 컴포넌트가 호출되면 바로 현재시간 설정
       const initCurrentTime = () => {
-        const now = new Date();
+        // const now = new Date();
         nowDay.value = new Date().toISOString().slice(0, 10); // 혹은 '월 2024-07-28' 등
       };
 
