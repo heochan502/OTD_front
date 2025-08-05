@@ -104,3 +104,81 @@ watch(
     </div>
   </div>
 </template>
+
+<style scoped>
+.diary-detail {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
+.diary-detail h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.diary-detail label {
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.text-input,
+.textarea,
+input[type="file"] {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 5px 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-sizing: border-box;
+}
+
+.textarea {
+  height: 350px;
+  resize: vertical;
+}
+
+.mood-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.mood-button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mood-button.selected {
+  background-color: #50C3F7;
+  color: white;
+  font-weight: bold;
+}
+
+.hidden-radio {
+  display: none;
+}
+
+.preview-list,
+.preview-item,
+.preview-item img,
+.remove-btn,
+.button-group,
+.button-group button {
+  /* 재사용을 위해 memo와 동일하게 작성 */
+}
+</style>

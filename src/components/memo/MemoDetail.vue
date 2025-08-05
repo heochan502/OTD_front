@@ -111,3 +111,104 @@ watch(
     </div>
   </div>
 </template>
+
+<style scoped>
+.memo-detail {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
+.memo-detail h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.memo-detail label {
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.text-input,
+.textarea,
+input[type="file"] {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 5px 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-sizing: border-box;
+}
+
+.textarea {
+  height: 350px;
+  resize: vertical;
+}
+
+.preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.preview-item {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  background-color: #eee;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.button-group button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #50C3F7;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+</style>

@@ -74,3 +74,87 @@ const formatDate = (dateStr) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.diary-list {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
+.diary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f5f5f5;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.diary-content {
+  flex: 1;
+}
+
+.diary-list > .diary-item + .diary-item {
+  margin-top: 24px;
+}
+
+.preview-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-left: 24px;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  margin-top: 20px;
+}
+
+/* 📱 모바일 반응형 */
+@media (max-width: 768px) {
+  .diary-list {
+    padding: 16px;
+  }
+
+  .diary-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .preview-image {
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .diary-item-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .diary-text {
+    flex: 1;
+    padding-right: 16px;
+  }
+
+  .diary-image-wrapper {
+    flex-shrink: 0;
+  }
+}
+</style>
