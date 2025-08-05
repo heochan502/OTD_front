@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 import { useAccountStore } from '@/stores/counter';
-import '@/components/memo/MemoAndDiaryDetail.css';
 
 const emit = defineEmits(['select']);
 const diaryList = ref([]);
@@ -17,14 +16,8 @@ const fetchDiaryList = async () => {
 
   try {
     const result = await DiaryHttpService.findAll(params);
-
-    // 🔍 여기 로그 추가
     console.log('[📘 diaryList 전체 응답]', result);
     console.table(result?.diaryList);
-    result?.diaryList?.forEach((item, idx) => {
-      console.log(`[${idx}] diaryId: ${item.diaryId}, diaryName: ${item.diaryName}, diaryImage: ${item.diaryImage}`);
-    });
-
     diaryList.value = result?.diaryList || [];
   } catch (err) {
     console.error('다이어리 목록 조회 실패:', err);
@@ -43,33 +36,32 @@ const formatDate = (dateStr) => {
 </script>
 
 <template>
-  <div class="memo-list">
+  <div class="diary-list">
     <div v-if="Array.isArray(diaryList) && diaryList.length > 0">
       <div
         v-for="diary in diaryList"
         :key="diary.diaryId"
-        class="memo-item"
+        class="diary-item"
         @click="$emit('select', diary)"
       >
         <div class="diary-item-content">
           <div class="diary-text">
-          <h3>{{ diary.diaryName }}</h3>
-          <p>{{ diary.diaryContent }}</p>
-          <span class="date">{{ formatDate(diary.createdAt) }}</span>
+            <h3>{{ diary.diaryName }}</h3>
+            <p>{{ diary.diaryContent }}</p>
+            <span class="diary-date">{{ formatDate(diary.createdAt) }}</span>
+          </div>
+          <div class="diary-image-wrapper" v-if="diary.diaryImage">
+            <img
+              :src="`http://localhost:8080/pic/${diary.diaryImage}`"
+              class="diary-preview-image"
+              alt="다이어리 이미지"
+              @error="e => console.error('❌ 이미지 로딩 실패:', e.target.src)"
+            />
+          </div>
         </div>
-        <div class="diary-image-wrapper" v-if="diary.diaryImage">
-        <img
-          :src="`http://localhost:8080/pic/${diary.diaryImage}`"
-          class="preview-image"
-          alt="다이어리 이미지"
-          @error="e => console.error('❌ 이미지 로딩 실패:', e.target.src)"
-        />
       </div>
     </div>
-  </div>
-</div>
-
-    <div v-else class="empty-message">
+    <div v-else class="diary-empty-message">
       등록된 다이어리가 없습니다.
     </div>
   </div>
@@ -97,15 +89,19 @@ const formatDate = (dateStr) => {
   margin-bottom: 24px;
 }
 
-.diary-content {
+.diary-item-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.diary-text {
   flex: 1;
+  padding-right: 16px;
 }
 
-.diary-list > .diary-item + .diary-item {
-  margin-top: 24px;
-}
-
-.preview-image {
+.diary-preview-image {
   width: 120px;
   height: 120px;
   object-fit: cover;
@@ -113,15 +109,19 @@ const formatDate = (dateStr) => {
   margin-left: 24px;
 }
 
-.date {
+.diary-date {
   font-size: 0.9rem;
   color: #888;
 }
 
-.empty-message {
+.diary-empty-message {
   text-align: center;
   color: #999;
   margin-top: 20px;
+}
+
+.diary-image-wrapper {
+  flex-shrink: 0;
 }
 
 /* 📱 모바일 반응형 */
@@ -135,26 +135,18 @@ const formatDate = (dateStr) => {
     align-items: flex-start;
   }
 
-  .preview-image {
+  .diary-preview-image {
     width: 100px;
     height: auto;
     border-radius: 8px;
     object-fit: cover;
+    margin-left: 0;
+    margin-top: 12px;
   }
 
   .diary-item-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .diary-text {
-    flex: 1;
-    padding-right: 16px;
-  }
-
-  .diary-image-wrapper {
-    flex-shrink: 0;
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

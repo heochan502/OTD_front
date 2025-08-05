@@ -43,7 +43,7 @@ watch(
     if (newMemo) {
       memo.value = { ...newMemo };
       setMode('view');
-      clearPreviewImages(); // 선택 시 이전 이미지 프리뷰 제거
+      clearPreviewImages();
     }
   },
   { immediate: true }
@@ -52,32 +52,32 @@ watch(
 
 <template>
   <div class="memo-detail">
-    <h2>{{ titleText }}</h2>
+    <h2 class="memo-title">{{ titleText }}</h2>
 
-    <label for="memoName">제목</label>
-    <input id="memoName" v-model="memo.memoName" class="text-input" />
-    <p v-if="memo.memoName.length > 0 && !isTitleValid" class="error">
+    <label for="memoName" class="memo-label">제목</label>
+    <input id="memoName" v-model="memo.memoName" class="memo-input" />
+    <p v-if="memo.memoName.length > 0 && !isTitleValid" class="memo-error">
       제목은 10자 이상 입력해주세요.
     </p>
 
-    <label for="memoContent">내용</label>
-    <textarea id="memoContent" v-model="memo.memoContent" class="textarea" />
-    <p v-if="memo.memoContent.length > 0 && !isContentValid" class="error">
+    <label for="memoContent" class="memo-label">내용</label>
+    <textarea id="memoContent" v-model="memo.memoContent" class="memo-textarea" />
+    <p v-if="memo.memoContent.length > 0 && !isContentValid" class="memo-error">
       내용은 10자 이상 입력해주세요.
     </p>
 
-    <label>이미지</label>
+    <label class="memo-label">이미지</label>
 
-    <div v-if="memo.imageFileName && previewImages.length === 0" class="preview-list">
-      <div class="preview-item">
+    <div v-if="memo.imageFileName && previewImages.length === 0" class="memo-preview-list">
+      <div class="memo-preview-item">
         <img :src="`/pic/${memo.imageFileName}`" alt="등록된 이미지" />
       </div>
     </div>
 
-    <div v-if="previewImages.length > 0" class="preview-list">
-      <div v-for="(img, idx) in previewImages" :key="idx" class="preview-item">
+    <div v-if="previewImages.length > 0" class="memo-preview-list">
+      <div v-for="(img, idx) in previewImages" :key="idx" class="memo-preview-item">
         <img :src="img" alt="미리보기 이미지" />
-        <button v-if="!isViewMode" @click="removeImage(idx)" class="delete-btn">삭제</button>
+        <button v-if="!isViewMode" @click="removeImage(idx)" class="memo-remove-btn">삭제</button>
       </div>
     </div>
 
@@ -87,9 +87,10 @@ watch(
       type="file"
       accept="image/*"
       @change="handleImageChange"
+      class="memo-file-input"
     />
 
-    <div class="button-group">
+    <div class="memo-button-group">
       <button
         v-if="isCreateMode"
         :disabled="!isTitleValid || !isContentValid"
@@ -123,14 +124,14 @@ watch(
   color: #000;
 }
 
-.memo-detail h2 {
+.memo-title {
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
   margin-bottom: 24px;
 }
 
-.memo-detail label {
+.memo-label {
   display: block;
   margin-top: 20px;
   margin-bottom: 5px;
@@ -138,9 +139,9 @@ watch(
   font-size: 1.2rem;
 }
 
-.text-input,
-.textarea,
-input[type="file"] {
+.memo-input,
+.memo-textarea,
+.memo-file-input {
   width: 100%;
   font-size: 1.1rem;
   padding: 5px 24px;
@@ -150,19 +151,19 @@ input[type="file"] {
   box-sizing: border-box;
 }
 
-.textarea {
+.memo-textarea {
   height: 350px;
   resize: vertical;
 }
 
-.preview-list {
+.memo-preview-list {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
   margin-top: 24px;
 }
 
-.preview-item {
+.memo-preview-item {
   width: 120px;
   height: 120px;
   position: relative;
@@ -171,13 +172,13 @@ input[type="file"] {
   overflow: hidden;
 }
 
-.preview-item img {
+.memo-preview-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.remove-btn {
+.memo-remove-btn {
   position: absolute;
   top: 5px;
   right: 5px;
@@ -194,14 +195,21 @@ input[type="file"] {
   justify-content: center;
 }
 
-.button-group {
+.memo-error {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: -16px;
+  margin-bottom: 12px;
+}
+
+.memo-button-group {
   display: flex;
   justify-content: center;
   gap: 24px;
   margin-top: 24px;
 }
 
-.button-group button {
+.memo-button-group button {
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: 8px;
@@ -210,5 +218,10 @@ input[type="file"] {
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+.memo-button-group button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>

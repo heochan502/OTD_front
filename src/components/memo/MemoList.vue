@@ -42,23 +42,26 @@ const formatDate = (dateStr) => {
       class="memo-item"
       @click="$emit('select', memo)"
     >
-      <h3>{{ memo.memoName }}</h3>
-      <p>{{ memo.memoContent }}</p>
-      <span class="date">{{ formatDate(memo.createdAt) }}</span>
+      <div class="memo-content">
+        <h3>{{ memo.memoName }}</h3>
+        <p>{{ memo.memoContent }}</p>
+        <span class="date">{{ formatDate(memo.createdAt) }}</span>
+      </div>
       <img
-        v-show="memo.memoImageFileName"
+        v-if="memo.memoImageFileName"
         :src="`/pic/${memo.memoImageFileName}`"
         class="preview-image"
         alt="memo"
       />
     </div>
 
-    <div v-show="memoList.length === 0" class="empty-message">
+    <div v-if="memoList.length === 0" class="empty-message">
       등록된 메모가 없습니다.
     </div>
   </div>
 </template>
 
+<style scoped>
 :root {
   --color-primary: #50C3F7;
   --color-text-dark: #000;
@@ -342,3 +345,4 @@ input[type="file"] {
     color: var(--color-gray-ccc);
   }
 }
+</style>
