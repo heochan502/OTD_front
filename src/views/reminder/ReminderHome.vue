@@ -119,7 +119,7 @@ const routerDate = (date) => {
     reminderStore.setSelectedDate(formattedDate);
     router.push('/reminder/list');
   } else {
-    router.push('reminder/form');
+    router.push('/reminder/form');
   }
 };
 </script>
