@@ -82,7 +82,7 @@ const state = reactive({
   generalError: '',
 });
 
-// 유효성 검사 함수들
+
 const validateMemberId = (memberId) => {
   if (!memberId.trim()) {
     return { isValid: false, message: '아이디를 입력해주세요.' };
@@ -254,12 +254,11 @@ const handleFieldTouch = (field) => {
   validateField(field, state.form[field]);
 };
 
-// 비밀번호 확인 computed - 실시간 확인용
+
 const isPasswordMatch = computed(() => {
   return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
 });
 
-// 비밀번호 일치 여부를 실시간으로 확인하는 computed
 const passwordMatchStatus = computed(() => {
   if (!state.form.memberPw || !state.form.memberPw2) {
     return { show: false, isMatch: false, message: '' };
@@ -273,7 +272,7 @@ const passwordMatchStatus = computed(() => {
   };
 });
 
-// Watch 함수들 - 실시간 검증
+
 watch(
   () => state.form.memberId,
   (newValue) => {
@@ -290,18 +289,17 @@ watch(
     if (state.validation.memberPw.touched) {
       validateField('memberPw', newValue);
     }
-    // 비밀번호가 변경되면 비밀번호 확인도 다시 검증
+ 
     if (state.validation.memberPw2.touched) {
       validateField('memberPw2', state.form.memberPw2);
     }
   }
 );
 
-// 비밀번호 확인 필드 실시간 검증 개선
 watch(
   () => state.form.memberPw2,
   (newValue) => {
-    // 터치되지 않았더라도 입력이 시작되면 즉시 검증
+
     if (newValue) {
       state.validation.memberPw2.touched = true;
     }
@@ -370,18 +368,18 @@ const toggleTerms = (termKey) => {
   state.termsExpanded[termKey] = !state.termsExpanded[termKey];
 };
 
-// 중복확인 함수들
+
 const checkDuplicateId = async () => {
   const trimmedId = state.form.memberId.trim();
 
-  // 아무것도 입력하지 않았으면 조용히 리턴
+
   if (!trimmedId) {
     return;
   }
 
   const validation = validateMemberId(trimmedId);
   if (!validation.isValid) {
-    // 상단 메시지 대신 필드 자체에만 메시지 표시
+
     state.validation.memberId.touched = true;
     state.validation.memberId.isValid = false;
     state.validation.memberId.message = validation.message;
@@ -405,7 +403,7 @@ const checkDuplicateId = async () => {
     }
   } catch (error) {
     console.error('중복확인 에러:', error);
-    // 네트워크 오류만 상단에 표시
+
     state.generalError = '중복 확인 중 오류가 발생했습니다.';
     setTimeout(() => (state.generalError = ''), 3000);
   } finally {
@@ -416,14 +414,14 @@ const checkDuplicateId = async () => {
 const checkDuplicateEmail = async () => {
   const trimmedEmail = state.form.email.trim();
 
-  // 아무것도 입력하지 않았으면 조용히 리턴
+
   if (!trimmedEmail) {
     return;
   }
 
   const validation = validateEmail(trimmedEmail);
   if (!validation.isValid) {
-    // 상단 메시지 대신 필드 자체에만 메시지 표시
+
     state.validation.email.touched = true;
     state.validation.email.isValid = false;
     state.validation.email.message = validation.message;
@@ -447,7 +445,7 @@ const checkDuplicateEmail = async () => {
     }
   } catch (error) {
     console.error('이메일 중복확인 에러:', error);
-    // 네트워크 오류만 상단에 표시
+
     state.generalError = '중복 확인 중 오류가 발생했습니다.';
     setTimeout(() => (state.generalError = ''), 3000);
   } finally {
@@ -458,14 +456,14 @@ const checkDuplicateEmail = async () => {
 const checkDuplicateNickname = async () => {
   const trimmedNick = state.form.memberNick.trim();
 
-  // 아무것도 입력하지 않았으면 조용히 리턴
+
   if (!trimmedNick) {
     return;
   }
 
   const validation = validateNickname(trimmedNick);
   if (!validation.isValid) {
-    // 상단 메시지 대신 필드 자체에만 메시지 표시
+
     state.validation.memberNick.touched = true;
     state.validation.memberNick.isValid = false;
     state.validation.memberNick.message = validation.message;
@@ -489,7 +487,7 @@ const checkDuplicateNickname = async () => {
     }
   } catch (error) {
     console.error('닉네임 중복확인 에러:', error);
-    // 네트워크 오류만 상단에 표시
+
     state.generalError = '중복 확인 중 오류가 발생했습니다.';
     setTimeout(() => (state.generalError = ''), 3000);
   } finally {
@@ -497,7 +495,7 @@ const checkDuplicateNickname = async () => {
   }
 };
 
-// 중복확인 초기화 함수들
+
 const resetIdValidation = () => {
   state.validation.memberId.checked = false;
   state.validation.memberId.available = false;
@@ -522,7 +520,7 @@ const resetNickValidation = () => {
   }
 };
 
-// 폼 유효성 검사
+
 const isFormValid = () => {
   return Object.values(state.validation).every((field) => field.isValid) &&
          state.validation.memberId.checked && state.validation.memberId.available &&
@@ -530,7 +528,6 @@ const isFormValid = () => {
          state.validation.memberNick.checked && state.validation.memberNick.available;
 };
 
-// 회원가입 제출
 const submit = async () => {
   Object.keys(state.validation).forEach((field) => {
     state.validation[field].touched = true;
@@ -692,7 +689,7 @@ const submit = async () => {
                 }"
               />
             </div>
-            <!-- 실시간 비밀번호 일치 메시지 -->
+          
             <div
               v-if="passwordMatchStatus.show"
               :class="[
@@ -1209,7 +1206,6 @@ const submit = async () => {
   gap: 8px;
 }
 
-/* 비밀번호 확인 관련 스타일 */
 .password-match-message {
   font-weight: 500;
   transition: all 0.3s ease;
