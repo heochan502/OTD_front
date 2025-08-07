@@ -2,7 +2,6 @@
 import { ref, onMounted } from "vue";
 import { useAccountStore } from "@/stores/counter";
 import MemoHttpService from "@/services/memo/MemoHttpService";
-// import '@/components/memo/MemoAndDiaryDetail.css';
 
 const memoList = ref([]);
 const emit = defineEmits(["select"]);
