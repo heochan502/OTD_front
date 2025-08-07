@@ -1,9 +1,20 @@
 <script setup>
 import { reactive, computed } from "vue";
+import { useHealthStore } from "@/stores/healthStore";
+import { getDateString, filterHealthLogsByDate } from "@/utils/reportUtils";
+
+const healthStore = useHealthStore();
+
+const todayStr = getDateString();
+const todayLogs = computed(() =>
+  filterHealthLogsByDate(healthStore.logs, todayStr)
+);
+console.log(todayLogs.value[0].height);
 
 const healthlog = reactive({
-  weight: 60,
-  height: 170,
+  weight: todayLogs.value[0].weight,
+  height: todayLogs.value[0].height,
+  lastWeight: healthStore.logs,
 });
 
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
@@ -55,11 +66,11 @@ const maxBmi = 40;
     <v-col class="content_right" cols="6">
       <div class="small_box">
         <span>weight</span>
-        <span class="value">{{ healthlog.weight }}kg</span>
+        <span class="value">{{ healthlog.weight }} kg</span>
       </div>
       <div class="small_box">
         <span>height</span>
-        <span class="value">{{ healthlog.height }}cm</span>
+        <span class="value">{{ healthlog.height }} cm</span>
       </div>
       <div class="medium-box">
         <span class="subtitle"> BMI </span>
