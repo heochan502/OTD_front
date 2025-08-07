@@ -17,12 +17,18 @@ api.interceptors.response.use(
   }
 );
 
-export function formatDateTime(dateStr, weekday = false) {
-  const options = weekday
-    ? { weekday: "short", year: "numeric", month: "2-digit", day: "2-digit" }
-    : { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" };
+export function formatDateTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid Date';
 
-  return new Date(dateStr).toLocaleString("ko-KR", options);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+
+  return `${y}-${m}-${d} ${hh}:${mm}`;
 }
 
 export default api;
