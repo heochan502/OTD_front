@@ -17,8 +17,10 @@ const yData = Array(xData.length).fill(0);
 
 
 const getDayName = (dateString) => {
-  const days = ['월', '화', '수', '목', '금', '토', '일'];
+  const days = [ '일','월', '화', '수', '목', '금', '토'];
   const date = new Date(dateString);
+  // console.log("요일 : ", date.getDay());
+  // console.log("요일 : ", days[date.getDay()]);
   return days[date.getDay()];
 };
 
@@ -129,6 +131,7 @@ const getStatistic = async (weeky) => {
   const yDataTemp = Array(xData.length).fill(0);
     weeklyStore.weeklyRawData.forEach(item => {
       const dayName = getDayName(item.mealDay); // '화', '수', ...
+      
       const index = xData.indexOf(dayName);      // 요일 인덱스 찾기   
       if (index !== -1) {
         yDataTemp[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
@@ -161,7 +164,7 @@ const testFunc = async (param) => {
   // console.log("파람::" , param);
   await nextTick();
   await getStatistic(weekDay.getWeekDate);
-  myChart = echarts.init(chartRef.value);
+  // myChart = echarts.init(chartRef.value);
   myChart.setOption(option);
 };
 
