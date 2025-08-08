@@ -55,15 +55,15 @@ const formatDate = (dateStr) => {
               :src="`http://localhost:8080/pic/${diary.diaryImage}`"
               class="diary-preview-image"
               alt="다이어리 이미지"
-              @error="e => console.error('❌ 이미지 로딩 실패:', e.target.src)"
+              @error="
+                (e) => console.error('❌ 이미지 로딩 실패:', e.target.src)
+              "
             />
           </div>
         </div>
       </div>
     </div>
-    <div v-else class="diary-empty-message">
-      등록된 다이어리가 없습니다.
-    </div>
+    <div v-else class="diary-empty-message">등록된 다이어리가 없습니다.</div>
   </div>
 </template>
 

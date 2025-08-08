@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue';
 import { useMemoDetail } from '@/components/memo/useMemoDetail';
 import { defineEmits, defineProps } from 'vue';
-import '@/components/memo/MemoAndDiaryDetail.css';
 
 const emit = defineEmits(['created', 'updated', 'deleted', 'cancel']);
 const props = defineProps({

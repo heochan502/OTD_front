@@ -126,7 +126,7 @@ const router = createRouter({
       name: 'memoAndDiary',
       component: MemoAndDiary,
       props: true,
-      meta: { requiresAuth: true},
+      meta: { requiresAuth: true },
     },
     {
       path: '/memoAndDiary/memo',
@@ -136,27 +136,27 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/diary",
-      name: "diary",
+      path: '/memoAndDiary/diary',
+      name: 'diary',
       component: DiaryDetail,
       props: true,
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/memolist",
-      name: "MemoList",
+      path: '/memoAndDiary/memo/list',
+      name: 'MemoList',
       component: MemoList,
       props: true,
     },
     {
-      path: "/memoAndDiary/diarylist",
-      name: "DiaryList",
+      path: '/memoAndDiary/diary/list',
+      name: 'DiaryList',
       component: DiaryList,
       props: true,
     },
     {
-      path: "/detail",
-      name: "profile_detail",
+      path: '/detail',
+      name: 'profile_detail',
       component: ProfileDetail,
       meta: { requiresAuth: true },
     },
@@ -165,8 +165,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return "/login";
+    return '/login';
   }
 });
 export default router;
-
