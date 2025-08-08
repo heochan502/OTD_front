@@ -14,7 +14,7 @@ import {
 
 const exerciseStore = useExerciseStore();
 
-console.log(exerciseStore.logs);
+// console.log(exerciseStore.logs);
 
 // YYYY-MM-DD
 const todayStr = getDateString();

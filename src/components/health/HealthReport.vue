@@ -1,29 +1,42 @@
 <script setup>
-import { reactive, computed } from "vue";
+import { reactive, computed, onMounted } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
 import { getDateString, filterHealthLogsByDate } from "@/utils/reportUtils";
-
 const healthStore = useHealthStore();
+const state = reactive({
+  logs: [],
+});
 
-const todayStr = getDateString();
-const todayLogs = computed(() =>
-  filterHealthLogsByDate(healthStore.logs, todayStr)
-);
-console.log(todayLogs.value[0].height);
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
+  state.logs = healthStore.logs;
+});
+// const temp = Object.keys(state.logs[0]);
+// console.log("여기", temp);
+// const todayStr = getDateString();
+// const todayLogs = computed(() =>
+//   filterHealthLogsByDate(healthStore.logs, todayStr)
+// );
+// console.log(todayLogs.value[0].height);
 
-const healthlog = reactive({
-  weight: todayLogs.value[0].weight,
-  height: todayLogs.value[0].height,
-  lastWeight: healthStore.logs,
+const lastIdx = healthStore.logs.length > 0 ? healthStore.logs.length - 1 : 0;
+const lastRecordedMetrics = reactive({
+  weight: 0,
+  height: 0,
 });
 
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
 const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
 
+const minBmi = 15;
+const maxBmi = 40;
+
 const bmi = computed(() => {
-  const heightInMeters = healthlog.height / 100;
-  if (!heightInMeters || !healthlog.weight) return 0;
-  return parseFloat((healthlog.weight / heightInMeters ** 2).toFixed(1));
+  const heightInMeters = lastRecordedMetrics.height / 100;
+  if (!heightInMeters || !lastRecordedMetrics.weight) return 0;
+  return parseFloat(
+    (lastRecordedMetrics.weight / heightInMeters ** 2).toFixed(1)
+  );
 });
 
 const bmiStatus = computed(() => {
@@ -34,9 +47,6 @@ const bmiStatus = computed(() => {
   else if (userBmi < 35) return "비만";
   else return "고도비만";
 });
-
-const minBmi = 15;
-const maxBmi = 40;
 </script>
 
 <template>
@@ -66,16 +76,18 @@ const maxBmi = 40;
     <v-col class="content_right" cols="6">
       <div class="small_box">
         <span>weight</span>
-        <span class="value">{{ healthlog.weight }} kg</span>
+        <span class="value"> {{ lastRecordedMetrics.weight }} kg </span>
       </div>
       <div class="small_box">
         <span>height</span>
-        <span class="value">{{ healthlog.height }} cm</span>
+        <span class="value"> {{ lastRecordedMetrics.height }} cm </span>
       </div>
       <div class="medium-box">
         <span class="subtitle"> BMI </span>
         <div class="d-flex justify-space-between">
-          <span class="value">{{ bmi }} </span>
+          <span class="value">
+            <!-- {{ bmi }} -->
+          </span>
           <v-btn
             variant="flat"
             size="x-small"
