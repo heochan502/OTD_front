@@ -30,6 +30,7 @@ const submit = async () => {
 </script>
 
 <template>
+
   <div class="login-page">
     <div class="form-container">
       <h2 class="title">로그인</h2>
@@ -62,6 +63,7 @@ const submit = async () => {
       </form>
     </div>
   </div>
+
 </template>
 
 <style scoped>

@@ -93,11 +93,7 @@ const modify = (id) => {
                     <img
                       v-for="(dow, index) in dowImage"
                       :key="dow"
-                      :src="`/src/assets/image/${dow}_${
-                        reminder.repeat && reminder.repeatDow.includes(index)
-                          ? 'on'
-                          : 'off'
-                      }.png`"
+                      :src="`/image/${dow}_${reminder.repeat && reminder.repeatDow.includes(index) ? 'on' : 'off'}.png`"
                       :alt="dow"
                       class="img"
                     />
@@ -111,8 +107,8 @@ const modify = (id) => {
                   <img
                     :src="
                       reminder.alarm
-                        ? '/src/assets/image/alarm_on.png'
-                        : '/src/assets/image/alarm_off.png'
+                        ? '/image/alarm_on.png'
+                        : '/image/alarm_off.png'
                     "
                     alt="알람 유무"
                     class="img alarm"
@@ -122,7 +118,7 @@ const modify = (id) => {
                       'button-hide':
                         reminder.content === '' || reminder.content === null,
                     }"
-                    src="/src/assets/image/button.png"
+                    src="/image/button.png"
                     alt="상세보기"
                     @click="viewDetail(reminder.id)"
                     class="img detail"
@@ -136,13 +132,13 @@ const modify = (id) => {
           </li>
           <div class="edit">
             <img
-              src="/src/assets/image/delete.png"
+              src="/image/delete.png"
               alt="삭제"
               @click="remove(reminder.id)"
               class="img"
             />
             <img
-              src="/src/assets/image/modify.png"
+              src="/image/modify.png"
               alt="수정"
               @click="modify(reminder.id)"
               class="img"

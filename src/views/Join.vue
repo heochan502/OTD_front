@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   join,
@@ -21,15 +21,47 @@ const state = reactive({
     memberNick: '',
   },
   validation: {
-    memberIdChecked: false,
-    memberIdAvailable: false,
-    memberIdMessage: '',
-    emailChecked: false,
-    emailAvailable: false,
-    emailMessage: '',
-    nickChecked: false,
-    nickAvailable: false,
-    nickMessage: '',
+    memberId: {
+      isValid: true,
+      message: '',
+      touched: false,
+      checked: false,
+      available: false,
+    },
+    memberPw: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+    memberPw2: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+    email: {
+      isValid: true,
+      message: '',
+      touched: false,
+      checked: false,
+      available: false,
+    },
+    name: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+    birthDate: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+    memberNick: {
+      isValid: true,
+      message: '',
+      touched: false,
+      checked: false,
+      available: false,
+    },
   },
   terms: {
     all: false,
@@ -38,19 +70,284 @@ const state = reactive({
     terms3: false,
     terms4: false,
   },
-  // 약관 아코디언 상태 추가
   termsExpanded: {
     terms1: false,
     terms2: false,
     terms3: false,
     terms4: false,
   },
+  loading: false,
+  saving: false,
+  showSuccess: false,
+  generalError: '',
 });
-//비밀번호 확인
+
+
+const validateMemberId = (memberId) => {
+  if (!memberId.trim()) {
+    return { isValid: false, message: '아이디를 입력해주세요.' };
+  }
+  if (memberId.trim().length < 4) {
+    return { isValid: false, message: '아이디는 4자 이상이어야 합니다.' };
+  }
+  if (memberId.trim().length > 20) {
+    return { isValid: false, message: '아이디는 최대 20자까지 입력 가능합니다.' };
+  }
+  const idRegex = /^[a-zA-Z0-9_]+$/;
+  if (!idRegex.test(memberId.trim())) {
+    return { isValid: false, message: '아이디는 영문, 숫자, 언더스코어(_)만 사용 가능합니다.' };
+  }
+  return { isValid: true, message: '' };
+};
+
+const validatePassword = (password) => {
+  if (!password) {
+    return { isValid: false, message: '비밀번호를 입력해주세요.' };
+  }
+  if (password.length < 2) {
+    return { isValid: false, message: '비밀번호는 2자 이상이어야 합니다.' };
+  }
+  if (password.length > 20) {
+    return { isValid: false, message: '비밀번호는 최대 20자까지 입력 가능합니다.' };
+  }
+  return { isValid: true, message: '' };
+};
+
+const validatePasswordConfirm = (password, passwordConfirm) => {
+  if (!passwordConfirm) {
+    return { isValid: false, message: '비밀번호 확인을 입력해주세요.' };
+  }
+  if (password !== passwordConfirm) {
+    return { isValid: false, message: '비밀번호가 일치하지 않습니다.' };
+  }
+  return { isValid: true, message: '비밀번호가 일치합니다.' };
+};
+
+const validateEmail = (email) => {
+  if (!email.trim()) {
+    return { isValid: false, message: '이메일을 입력해주세요.' };
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { isValid: false, message: '올바른 이메일 형식을 입력해주세요.' };
+  }
+  if (email.length > 50) {
+    return { isValid: false, message: '이메일은 최대 50자까지 입력 가능합니다.' };
+  }
+  return { isValid: true, message: '' };
+};
+
+const validateName = (name) => {
+  if (!name.trim()) {
+    return { isValid: false, message: '이름을 입력해주세요.' };
+  }
+  if (name.trim().length < 2) {
+    return { isValid: false, message: '이름은 최소 2글자 이상이어야 합니다.' };
+  }
+  if (name.trim().length > 20) {
+    return { isValid: false, message: '이름은 최대 20글자까지 입력 가능합니다.' };
+  }
+  const nameRegex = /^[가-힣a-zA-Z\s]+$/;
+  if (!nameRegex.test(name.trim())) {
+    return { isValid: false, message: '이름은 한글 또는 영문만 입력 가능합니다.' };
+  }
+  return { isValid: true, message: '' };
+};
+
+const validateBirthDate = (birthDate) => {
+  if (!birthDate.trim()) {
+    return { isValid: false, message: '생년월일을 입력해주세요.' };
+  }
+  const dateRegex = /^\d{8}$/;
+  if (!dateRegex.test(birthDate.replace(/-/g, ''))) {
+    return { isValid: false, message: 'YYYYMMDD 형식으로 입력해주세요.' };
+  }
+
+  const cleanDate = birthDate.replace(/-/g, '');
+  const year = parseInt(cleanDate.substring(0, 4));
+  const month = parseInt(cleanDate.substring(4, 6));
+  const day = parseInt(cleanDate.substring(6, 8));
+
+  const currentYear = new Date().getFullYear();
+
+  if (year < 1900 || year > currentYear) {
+    return { isValid: false, message: '올바른 연도를 입력해주세요.' };
+  }
+  if (month < 1 || month > 12) {
+    return { isValid: false, message: '올바른 월을 입력해주세요.' };
+  }
+  if (day < 1 || day > 31) {
+    return { isValid: false, message: '올바른 일을 입력해주세요.' };
+  }
+
+  const testDate = new Date(year, month - 1, day);
+  if (
+    testDate.getFullYear() !== year ||
+    testDate.getMonth() !== month - 1 ||
+    testDate.getDate() !== day
+  ) {
+    return { isValid: false, message: '존재하지 않는 날짜입니다.' };
+  }
+
+  if (testDate > new Date()) {
+    return { isValid: false, message: '미래 날짜는 입력할 수 없습니다.' };
+  }
+
+  return { isValid: true, message: '' };
+};
+
+const validateNickname = (nickname) => {
+  if (!nickname.trim()) {
+    return { isValid: false, message: '닉네임을 입력해주세요.' };
+  }
+  if (nickname.trim().length < 2) {
+    return { isValid: false, message: '닉네임은 최소 2글자 이상이어야 합니다.' };
+  }
+  if (nickname.trim().length > 15) {
+    return { isValid: false, message: '닉네임은 최대 15글자까지 입력 가능합니다.' };
+  }
+  const nicknameRegex = /^[가-힣a-zA-Z0-9_]+$/;
+  if (!nicknameRegex.test(nickname.trim())) {
+    return { isValid: false, message: '닉네임은 한글, 영문, 숫자, 언더스코어(_)만 사용 가능합니다.' };
+  }
+  return { isValid: true, message: '' };
+};
+
+const validateField = (field, value) => {
+  let result;
+
+  switch (field) {
+    case 'memberId':
+      result = validateMemberId(value);
+      break;
+    case 'memberPw':
+      result = validatePassword(value);
+      break;
+    case 'memberPw2':
+      result = validatePasswordConfirm(state.form.memberPw, value);
+      break;
+    case 'email':
+      result = validateEmail(value);
+      break;
+    case 'name':
+      result = validateName(value);
+      break;
+    case 'birthDate':
+      result = validateBirthDate(value);
+      break;
+    case 'memberNick':
+      result = validateNickname(value);
+      break;
+    default:
+      result = { isValid: true, message: '' };
+  }
+
+  state.validation[field] = {
+    ...state.validation[field],
+    isValid: result.isValid,
+    message: result.message,
+  };
+};
+
+const handleFieldTouch = (field) => {
+  state.validation[field].touched = true;
+  validateField(field, state.form[field]);
+};
+
+
 const isPasswordMatch = computed(() => {
   return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
 });
-//약관동의
+
+const passwordMatchStatus = computed(() => {
+  if (!state.form.memberPw || !state.form.memberPw2) {
+    return { show: false, isMatch: false, message: '' };
+  }
+  
+  const isMatch = state.form.memberPw === state.form.memberPw2;
+  return {
+    show: true,
+    isMatch,
+    message: isMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'
+  };
+});
+
+
+watch(
+  () => state.form.memberId,
+  (newValue) => {
+    if (state.validation.memberId.touched) {
+      validateField('memberId', newValue);
+    }
+    resetIdValidation();
+  }
+);
+
+watch(
+  () => state.form.memberPw,
+  (newValue) => {
+    if (state.validation.memberPw.touched) {
+      validateField('memberPw', newValue);
+    }
+ 
+    if (state.validation.memberPw2.touched) {
+      validateField('memberPw2', state.form.memberPw2);
+    }
+  }
+);
+
+watch(
+  () => state.form.memberPw2,
+  (newValue) => {
+
+    if (newValue) {
+      state.validation.memberPw2.touched = true;
+    }
+    if (state.validation.memberPw2.touched) {
+      validateField('memberPw2', newValue);
+    }
+  }
+);
+
+watch(
+  () => state.form.email,
+  (newValue) => {
+    if (state.validation.email.touched) {
+      validateField('email', newValue);
+    }
+    resetEmailValidation();
+  }
+);
+
+watch(
+  () => state.form.name,
+  (newValue) => {
+    if (state.validation.name.touched) {
+      validateField('name', newValue);
+    }
+  }
+);
+
+watch(
+  () => state.form.birthDate,
+  (newValue) => {
+    if (state.validation.birthDate.touched) {
+      validateField('birthDate', newValue);
+    }
+  }
+);
+
+watch(
+  () => state.form.memberNick,
+  (newValue) => {
+    if (state.validation.memberNick.touched) {
+      validateField('memberNick', newValue);
+    }
+    resetNickValidation();
+  }
+);
+
+// 약관 동의 관련 함수들
 const allCheck = () => {
   const value = state.terms.all;
   state.terms.terms1 = value;
@@ -70,164 +367,225 @@ const updateAllCheck = () => {
 const toggleTerms = (termKey) => {
   state.termsExpanded[termKey] = !state.termsExpanded[termKey];
 };
-//아이디,이메일,닉네임 체크
+
+
 const checkDuplicateId = async () => {
   const trimmedId = state.form.memberId.trim();
-  console.log('아이디 체크:', trimmedId);
+
 
   if (!trimmedId) {
-    alert('아이디를 입력해주세요.');
     return;
   }
 
-  if (trimmedId.length < 4) {
-    alert('아이디는 4자 이상이어야 합니다.');
+  const validation = validateMemberId(trimmedId);
+  if (!validation.isValid) {
+
+    state.validation.memberId.touched = true;
+    state.validation.memberId.isValid = false;
+    state.validation.memberId.message = validation.message;
     return;
   }
 
   try {
+    state.loading = true;
     const res = await checkMemberId(trimmedId);
-    console.log('중복확인 응답:', res);
     if (res.status === 200) {
-      state.validation.memberIdChecked = true;
-      state.validation.memberIdAvailable = res.data.available;
-      state.validation.memberIdMessage = res.data.message;
+      state.validation.memberId.checked = true;
+      state.validation.memberId.available = res.data.available;
+      
       if (res.data.available) {
-        alert('사용 가능한 아이디입니다.');
+        state.validation.memberId.message = '사용 가능한 아이디입니다.';
+        state.validation.memberId.isValid = true;
       } else {
-        alert('이미 사용중인 아이디입니다.');
+        state.validation.memberId.message = '이미 사용중인 아이디입니다.';
+        state.validation.memberId.isValid = false;
       }
     }
   } catch (error) {
     console.error('중복확인 에러:', error);
-    alert('중복 확인 중 오류가 발생했습니다.');
+
+    state.generalError = '중복 확인 중 오류가 발생했습니다.';
+    setTimeout(() => (state.generalError = ''), 3000);
+  } finally {
+    state.loading = false;
   }
 };
 
 const checkDuplicateEmail = async () => {
   const trimmedEmail = state.form.email.trim();
 
-  console.log('이메일 체크:', trimmedEmail);
 
   if (!trimmedEmail) {
-    alert('이메일을 입력해주세요.');
     return;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(trimmedEmail)) {
-    alert('올바른 이메일 형식이 아닙니다.');
+  const validation = validateEmail(trimmedEmail);
+  if (!validation.isValid) {
+
+    state.validation.email.touched = true;
+    state.validation.email.isValid = false;
+    state.validation.email.message = validation.message;
     return;
   }
 
   try {
+    state.loading = true;
     const res = await checkEmail(trimmedEmail);
     if (res.status === 200) {
-      state.validation.emailChecked = true;
-      state.validation.emailAvailable = res.data.available;
-      state.validation.emailMessage = res.data.message;
-
+      state.validation.email.checked = true;
+      state.validation.email.available = res.data.available;
+      
       if (res.data.available) {
-        alert('사용 가능한 이메일입니다.');
+        state.validation.email.message = '사용 가능한 이메일입니다.';
+        state.validation.email.isValid = true;
       } else {
-        alert('이미 사용중인 이메일입니다.');
+        state.validation.email.message = '이미 사용중인 이메일입니다.';
+        state.validation.email.isValid = false;
       }
     }
   } catch (error) {
     console.error('이메일 중복확인 에러:', error);
-    alert('중복 확인 중 오류가 발생했습니다.');
+
+    state.generalError = '중복 확인 중 오류가 발생했습니다.';
+    setTimeout(() => (state.generalError = ''), 3000);
+  } finally {
+    state.loading = false;
   }
 };
 
 const checkDuplicateNickname = async () => {
   const trimmedNick = state.form.memberNick.trim();
 
-  console.log('닉네임 체크:', trimmedNick);
 
   if (!trimmedNick) {
-    alert('닉네임을 입력해주세요.');
     return;
   }
 
-  if (trimmedNick.length < 2) {
-    alert('닉네임은 2자 이상이어야 합니다.');
+  const validation = validateNickname(trimmedNick);
+  if (!validation.isValid) {
+
+    state.validation.memberNick.touched = true;
+    state.validation.memberNick.isValid = false;
+    state.validation.memberNick.message = validation.message;
     return;
   }
 
   try {
+    state.loading = true;
     const res = await checkNickname(trimmedNick);
     if (res.status === 200) {
-      state.validation.nickChecked = true;
-      state.validation.nickAvailable = res.data.available;
-      state.validation.nickMessage = res.data.message;
-
+      state.validation.memberNick.checked = true;
+      state.validation.memberNick.available = res.data.available;
+      
       if (res.data.available) {
-        alert('사용 가능한 닉네임입니다.');
+        state.validation.memberNick.message = '사용 가능한 닉네임입니다.';
+        state.validation.memberNick.isValid = true;
       } else {
-        alert('이미 사용중인 닉네임입니다.');
+        state.validation.memberNick.message = '이미 사용중인 닉네임입니다.';
+        state.validation.memberNick.isValid = false;
       }
     }
   } catch (error) {
     console.error('닉네임 중복확인 에러:', error);
-    alert('중복 확인 중 오류가 발생했습니다.');
+
+    state.generalError = '중복 확인 중 오류가 발생했습니다.';
+    setTimeout(() => (state.generalError = ''), 3000);
+  } finally {
+    state.loading = false;
   }
 };
 
-//중복확인 초기화
+
 const resetIdValidation = () => {
-  state.validation.memberIdChecked = false;
-  state.validation.memberIdAvailable = false;
-  state.validation.memberIdMessage = '';
+  state.validation.memberId.checked = false;
+  state.validation.memberId.available = false;
+  if (state.validation.memberId.touched && state.validation.memberId.message.includes('사용')) {
+    state.validation.memberId.message = '';
+  }
 };
 
 const resetEmailValidation = () => {
-  state.validation.emailChecked = false;
-  state.validation.emailAvailable = false;
-  state.validation.emailMessage = '';
+  state.validation.email.checked = false;
+  state.validation.email.available = false;
+  if (state.validation.email.touched && state.validation.email.message.includes('사용')) {
+    state.validation.email.message = '';
+  }
 };
 
 const resetNickValidation = () => {
-  state.validation.nickChecked = false;
-  state.validation.nickAvailable = false;
-  state.validation.nickMessage = '';
+  state.validation.memberNick.checked = false;
+  state.validation.memberNick.available = false;
+  if (state.validation.memberNick.touched && state.validation.memberNick.message.includes('사용')) {
+    state.validation.memberNick.message = '';
+  }
+};
+
+
+const isFormValid = () => {
+  return Object.values(state.validation).every((field) => field.isValid) &&
+         state.validation.memberId.checked && state.validation.memberId.available &&
+         state.validation.email.checked && state.validation.email.available &&
+         state.validation.memberNick.checked && state.validation.memberNick.available;
 };
 
 const submit = async () => {
-  if (!isPasswordMatch.value) {
-    alert('비밀번호가 일치하지 않습니다.');
+  Object.keys(state.validation).forEach((field) => {
+    state.validation[field].touched = true;
+    validateField(field, state.form[field]);
+  });
+
+  if (!state.validation.memberId.checked || !state.validation.memberId.available) {
+    state.generalError = '아이디 중복 확인을 해주세요.';
+    setTimeout(() => (state.generalError = ''), 3000);
     return;
   }
 
-  if (
-    !state.validation.memberIdChecked ||
-    !state.validation.memberIdAvailable
-  ) {
-    alert('아이디 중복 확인을 해주세요.');
+  if (!state.validation.email.checked || !state.validation.email.available) {
+    state.generalError = '이메일 중복 확인을 해주세요.';
+    setTimeout(() => (state.generalError = ''), 3000);
     return;
   }
 
-  if (!state.validation.emailChecked || !state.validation.emailAvailable) {
-    alert('이메일 중복 확인을 해주세요.');
+  if (!state.validation.memberNick.checked || !state.validation.memberNick.available) {
+    state.generalError = '닉네임 중복 확인을 해주세요.';
+    setTimeout(() => (state.generalError = ''), 3000);
     return;
   }
 
-  if (!state.validation.nickChecked || !state.validation.nickAvailable) {
-    alert('닉네임 중복 확인을 해주세요.');
-    return;
-  }
   if (!state.terms.terms1 || !state.terms.terms2 || !state.terms.terms3) {
-    alert('필수 약관에 모두 동의해주세요.');
+    state.generalError = '필수 약관에 모두 동의해주세요.';
+    setTimeout(() => (state.generalError = ''), 3000);
     return;
   }
 
-  const res = await join(state.form);
-  if (res.status === 200) {
-    alert('회원가입을 축하합니다.');
-    await router.push('/login');
-  } else if (res.status === 409) {
-    alert(res.data.message);
-  } else {
-    alert(`회원가입 실패: ${res.data?.message || '서버 오류'}`);
+  if (!isFormValid()) {
+    state.generalError = '입력 정보를 다시 확인해주세요.';
+    setTimeout(() => (state.generalError = ''), 3000);
+    return;
+  }
+
+  state.saving = true;
+  state.generalError = '';
+
+  try {
+    const res = await join(state.form);
+    if (res.status === 200) {
+      state.showSuccess = true;
+      // alert 추가
+      alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+      setTimeout(async () => {
+        await router.push('/login');
+      }, 2000);
+    } else if (res.status === 409) {
+      state.generalError = res.data.message;
+    } else {
+      state.generalError = `회원가입 실패: ${res.data?.message || '서버 오류'}`;
+    }
+  } catch (error) {
+    console.error('회원가입 에러:', error);
+    state.generalError = '회원가입 중 오류가 발생했습니다: ' + error.message;
+  } finally {
+    state.saving = false;
   }
 };
 </script>
@@ -236,6 +594,17 @@ const submit = async () => {
   <div class="join-page">
     <div class="form-container">
       <h2 class="title">회원가입</h2>
+      
+      <div v-if="state.showSuccess" class="success-message">
+        <div class="message-icon">✓</div>
+        <div>회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.</div>
+      </div>
+
+      <div v-if="state.generalError" class="error-message">
+        <div class="message-icon">⚠</div>
+        <div>{{ state.generalError }}</div>
+      </div>
+
       <form @submit.prevent="submit" class="join-form">
         <div class="joininput">
           <div class="form-group">
@@ -246,21 +615,32 @@ const submit = async () => {
                 id="memberId"
                 placeholder="아이디를 입력해 주세요 (4자 이상)"
                 v-model="state.form.memberId"
-                @input="resetIdValidation"
+                :class="{
+                  error: state.validation.memberId.touched && !state.validation.memberId.isValid,
+                  success: state.validation.memberId.touched && state.validation.memberId.isValid && state.validation.memberId.available,
+                }"
+                @blur="handleFieldTouch('memberId')"
+                @input="state.validation.memberId.touched && validateField('memberId', state.form.memberId)"
               />
-              <button type="button" class="btn-small" @click="checkDuplicateId">
-                중복확인
+              <button 
+                type="button" 
+                class="btn-small" 
+                @click="checkDuplicateId"
+                :disabled="state.loading"
+              >
+                <span v-if="state.loading">확인중...</span>
+                <span v-else>중복확인</span>
               </button>
             </div>
-            <p
-              v-if="state.validation.memberIdChecked"
+            <div
+              v-if="state.validation.memberId.touched && state.validation.memberId.message"
               :class="[
-                'validation-message',
-                state.validation.memberIdAvailable ? 'success' : 'error',
+                'field-message',
+                (state.validation.memberId.isValid && state.validation.memberId.available) ? 'field-success' : 'field-error'
               ]"
             >
-              {{ state.validation.memberIdMessage }}
-            </p>
+              {{ state.validation.memberId.message }}
+            </div>
           </div>
 
           <div class="form-group">
@@ -268,31 +648,58 @@ const submit = async () => {
             <input
               type="password"
               id="memberPw"
-              placeholder="비밀번호를 입력해주세요"
+              placeholder="비밀번호를 입력해주세요(2자 이상)"
               v-model="state.form.memberPw"
+              :class="{
+                error: state.validation.memberPw.touched && !state.validation.memberPw.isValid,
+                success: state.validation.memberPw.touched && state.validation.memberPw.isValid && state.form.memberPw,
+              }"
+              @blur="handleFieldTouch('memberPw')"
+              @input="state.validation.memberPw.touched && validateField('memberPw', state.form.memberPw)"
             />
-          </div>
-          <div class="form-group">
-            <label for="memberPw2">비밀번호 확인*</label>
-            <input
-              type="password"
-              id="memberPw2"
-              placeholder="비밀번호를 한번더 확인해주세요"
-              v-model="state.form.memberPw2"
-            />
-            <p
-              v-if="state.form.memberPw2"
+            <div
+              v-if="state.validation.memberPw.touched && state.validation.memberPw.message"
               :class="[
-                'validation-message',
-                isPasswordMatch ? 'success' : 'error',
+                'field-message',
+                state.validation.memberPw.isValid ? 'field-success' : 'field-error'
               ]"
             >
-              {{
-                isPasswordMatch
-                  ? '비밀번호가 일치합니다.'
-                  : '비밀번호가 일치하지 않습니다.'
-              }}
-            </p>
+              {{ state.validation.memberPw.message }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="memberPw2">비밀번호 확인 *</label>
+            <div class="password-confirm-wrapper">
+              <input
+                type="password"
+                id="memberPw2"
+                placeholder="비밀번호를 한번더 확인해주세요"
+                v-model="state.form.memberPw2"
+                :class="{
+                  error: state.form.memberPw2 && !passwordMatchStatus.isMatch,
+                  success: passwordMatchStatus.show && passwordMatchStatus.isMatch,
+                }"
+                @blur="handleFieldTouch('memberPw2')"
+                @input="() => {
+                  if (state.form.memberPw2) {
+                    state.validation.memberPw2.touched = true;
+                    validateField('memberPw2', state.form.memberPw2);
+                  }
+                }"
+              />
+            </div>
+          
+            <div
+              v-if="passwordMatchStatus.show"
+              :class="[
+                'field-message',
+                'password-match-message',
+                passwordMatchStatus.isMatch ? 'field-success' : 'field-error'
+              ]"
+            >
+              {{ passwordMatchStatus.message }}
+            </div>
           </div>
 
           <div class="form-group">
@@ -303,25 +710,32 @@ const submit = async () => {
                 id="email"
                 placeholder="이메일을 입력해 주세요"
                 v-model="state.form.email"
-                @input="resetEmailValidation"
+                :class="{
+                  error: state.validation.email.touched && !state.validation.email.isValid,
+                  success: state.validation.email.touched && state.validation.email.isValid && state.validation.email.available,
+                }"
+                @blur="handleFieldTouch('email')"
+                @input="state.validation.email.touched && validateField('email', state.form.email)"
               />
               <button
                 type="button"
                 class="btn-small"
                 @click="checkDuplicateEmail"
+                :disabled="state.loading"
               >
-                중복확인
+                <span v-if="state.loading">확인중...</span>
+                <span v-else>중복확인</span>
               </button>
             </div>
-            <p
-              v-if="state.validation.emailChecked"
+            <div
+              v-if="state.validation.email.touched && state.validation.email.message"
               :class="[
-                'validation-message',
-                state.validation.emailAvailable ? 'success' : 'error',
+                'field-message',
+                (state.validation.email.isValid && state.validation.email.available) ? 'field-success' : 'field-error'
               ]"
             >
-              {{ state.validation.emailMessage }}
-            </p>
+              {{ state.validation.email.message }}
+            </div>
           </div>
 
           <div class="form-group">
@@ -329,9 +743,30 @@ const submit = async () => {
             <input
               type="text"
               id="name"
-              placeholder="이름을 입력해 주세요"
+              placeholder="이름을 입력해 주세요(한글, 영문 2자 이상)"
               v-model="state.form.name"
+              :class="{
+                error: state.validation.name.touched && !state.validation.name.isValid,
+                success: state.validation.name.touched && state.validation.name.isValid && state.form.name,
+              }"
+              @blur="handleFieldTouch('name')"
+              @input="state.validation.name.touched && validateField('name', state.form.name)"
             />
+            <div
+              v-if="state.validation.name.touched && state.validation.name.message"
+              :class="[
+                'field-message',
+                state.validation.name.isValid ? 'field-success' : 'field-error'
+              ]"
+            >
+              {{ state.validation.name.message }}
+            </div>
+            <div
+              v-else-if="state.validation.name.touched && state.validation.name.isValid && state.form.name"
+              class="field-success"
+            >
+              올바른 이름입니다.
+            </div>
           </div>
 
           <div class="form-group">
@@ -342,7 +777,28 @@ const submit = async () => {
               placeholder="YYYYMMDD"
               maxlength="8"
               v-model="state.form.birthDate"
+              :class="{
+                error: state.validation.birthDate.touched && !state.validation.birthDate.isValid,
+                success: state.validation.birthDate.touched && state.validation.birthDate.isValid && state.form.birthDate,
+              }"
+              @blur="handleFieldTouch('birthDate')"
+              @input="state.validation.birthDate.touched && validateField('birthDate', state.form.birthDate)"
             />
+            <div
+              v-if="state.validation.birthDate.touched && state.validation.birthDate.message"
+              :class="[
+                'field-message',
+                state.validation.birthDate.isValid ? 'field-success' : 'field-error'
+              ]"
+            >
+              {{ state.validation.birthDate.message }}
+            </div>
+            <div
+              v-else-if="state.validation.birthDate.touched && state.validation.birthDate.isValid && state.form.birthDate"
+              class="field-success"
+            >
+              올바른 날짜 형식입니다.
+            </div>
           </div>
 
           <div class="form-group">
@@ -351,27 +807,34 @@ const submit = async () => {
               <input
                 type="text"
                 id="memberNick"
-                placeholder="닉네임을 입력해 주세요 (2자 이상)"
+                placeholder="닉네임을 입력해 주세요(한글, 영문, 숫자, _만 사용 가능)"
                 v-model="state.form.memberNick"
-                @input="resetNickValidation"
+                :class="{
+                  error: state.validation.memberNick.touched && !state.validation.memberNick.isValid,
+                  success: state.validation.memberNick.touched && state.validation.memberNick.isValid && state.validation.memberNick.available,
+                }"
+                @blur="handleFieldTouch('memberNick')"
+                @input="state.validation.memberNick.touched && validateField('memberNick', state.form.memberNick)"
               />
               <button
                 type="button"
                 class="btn-small"
                 @click="checkDuplicateNickname"
+                :disabled="state.loading"
               >
-                중복확인
+                <span v-if="state.loading">확인중...</span>
+                <span v-else>중복확인</span>
               </button>
             </div>
-            <p
-              v-if="state.validation.nickChecked"
+            <div
+              v-if="state.validation.memberNick.touched && state.validation.memberNick.message"
               :class="[
-                'validation-message',
-                state.validation.nickAvailable ? 'success' : 'error',
+                'field-message',
+                (state.validation.memberNick.isValid && state.validation.memberNick.available) ? 'field-success' : 'field-error'
               ]"
             >
-              {{ state.validation.nickMessage }}
-            </p>
+              {{ state.validation.memberNick.message }}
+            </div>
           </div>
         </div>
 
@@ -588,7 +1051,16 @@ const submit = async () => {
             </div>
           </div>
         </div>
-        <button type="submit" class="btn-submit">회원가입</button>
+        
+        <button 
+          type="submit" 
+          class="btn-submit"
+          :disabled="state.saving || !isFormValid()"
+        >
+          <span v-if="state.saving">가입 처리중...</span>
+          <span v-else>회원가입</span>
+        </button>
+        
         <div class="bottom-links">
           <div class="already">
             <p class="log">이미 계정이 있으신가요?</p>
@@ -628,6 +1100,34 @@ const submit = async () => {
   font-weight: 700;
   margin-bottom: 25px;
   color: #333;
+  text-align: center;
+}
+
+.error-message,
+.success-message {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.success-message {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+}
+
+.message-icon {
+  margin-right: 8px;
+  font-weight: bold;
 }
 
 .form-group {
@@ -639,26 +1139,76 @@ const submit = async () => {
   font-size: 14px;
   font-weight: 500;
   color: #333;
+  margin-bottom: 6px;
 }
 
 .joininput input {
   width: 100%;
   padding: 12px 14px;
   font-size: 14px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 8px;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  background-color: white;
 }
 
 .joininput input:focus {
   border-color: #2a9df4;
-  box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.15);
+  box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.1);
+}
+
+.joininput input.error {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.joininput input.success {
+  border-color: #16a34a;
+  background-color: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.joininput input:focus.error {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.joininput input:focus.success {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.field-message {
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.field-success {
+  color: #16a34a;
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .input-wrapper {
   display: flex;
   gap: 8px;
+}
+
+.password-match-message {
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .btn-small {
@@ -670,33 +1220,19 @@ const submit = async () => {
   border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  min-width: 80px;
 }
 
-.btn-small:hover {
+.btn-small:hover:not(:disabled) {
   background: #333;
 }
 
-.validation-message {
-  margin-top: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.validation-message.success {
-  color: #2e7d32;
-  background-color: #e8f5e9;
-  border: 1px solid #a5d6a7;
-}
-
-.validation-message.error {
-  color: #c62828;
-  background-color: #ffebee;
-  border: 1px solid #ef9a9a;
+.btn-small:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #999;
 }
 
 .terms {
@@ -727,13 +1263,6 @@ const submit = async () => {
   color: #333;
   cursor: pointer;
   margin: 0;
-}
-
-.terms .agree-all {
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 12px;
-  display: block;
 }
 
 .terms-accordion {
@@ -854,12 +1383,21 @@ const submit = async () => {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 20px;
 }
 
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   background: #1c7fd1;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #ccc;
+  transform: none;
+  box-shadow: none;
 }
 
 .bottom-links {
@@ -898,12 +1436,5 @@ const submit = async () => {
 .goHome:hover {
   color: #333;
   text-decoration: underline;
-}
-
-.terms li {
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 </style>

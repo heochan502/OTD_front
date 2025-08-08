@@ -154,6 +154,12 @@ watch(
             >
               정보 수정
             </router-link>
+            <router-link 
+              to="/password" 
+              class="btn btn-primary3"
+            >
+              비밀번호변경
+            </router-link>
           </div>
         </div>
       </div>
@@ -234,11 +240,6 @@ watch(
 
 .profile-content {
   animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .profile-photo-section {
@@ -380,6 +381,13 @@ watch(
 .btn-primary {
   background: #5BA7F7;
   color: white;
+  
+
+}
+.btn-primary3 {
+  background: #5BA7F7;
+  color: white;
+  
 }
 .btn-primary2 {
   background: white;

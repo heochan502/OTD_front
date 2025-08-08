@@ -61,7 +61,7 @@ watch(
   },
   { immediate: true, deep: true }
 );
-
+const formatNumber = (num) => num.toLocaleString();
 </script>
 
 <template>
@@ -70,8 +70,8 @@ watch(
       <div class="left">
         <div class="progress-container w-full">
             <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-              :leftString="`${calorieData.allDayCalorie}/${maxKcal}kcal`"
-            :rightString="`${maxKcal - calorieData.allDayCalorie}kcal 더 먹을 수 있어요!`" :max="maxKcal"
+              :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
+            :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
             customsize="totalcal" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
@@ -103,7 +103,7 @@ watch(
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ avg.toFixed(0) }}kcal 먹었어요</span>
+      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
       
       <div class=" d-flex  justify-content-end ">
       <WeeklyCalorie class="" />

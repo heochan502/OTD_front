@@ -8,7 +8,7 @@ const weekDay = useBaseDate();
 const nowDay = useDayDefine();
 const weeklyStore = useWeeklyStore();
 
-const selectedDate = ref(nowDay.nowDay); // 초기화 및 선택하는 날짜 들어감
+const selectedDate = ref(nowDay.currentTime); // 초기화 및 선택하는 날짜 들어감
 const weekDates = ref([]);
 
 // 날짜 : 각종 량 출력 하는거 하다가 맒
@@ -37,6 +37,7 @@ function getWeekDates(dateString) {
     // 주 시작 일 과 끝일만 넣기
     //    if(i===0 || i===6){
     const currentDate = new Date(startDate);
+    console.log(startDate, typeof startDate);
     currentDate.setDate(startDate.getDate() + i);
     result.push(currentDate.toISOString().slice(0, 10));
     //    }
@@ -50,17 +51,17 @@ watch(
     weekDates.value = getWeekDates(newDate);
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
-    console.log(
-      '주시작11 : ',
-      selectedDate.value,
-      weekDay.getWeekDate,
-      nowDay.nowDay
-    );
+    // console.log(
+    //   '주시작11 : ',
+    //   selectedDate.value,
+    //   weekDay.getWeekDate,
+    //   nowDay.nowDay
+    // );
 
     const res =  getWeekTotal(weekDay.getWeekDate);
     if (res.status === 200) {
       weeklyStore.weeklyRawData = res.data;
-      console.log("통신구역 " );
+      // console.log("통신구역 " );
     }
 
   },
