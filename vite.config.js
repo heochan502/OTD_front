@@ -21,7 +21,7 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    vueDevTools(),
+    //vueDevTools(),
     vuetify({ autoImport: true }), // vuetify 자동 구성
   ],
   resolve: {
