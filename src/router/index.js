@@ -1,7 +1,5 @@
-
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
-
 
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
 import ReminderForm from '@/views/reminder/ReminderForm.vue';
@@ -24,7 +22,6 @@ import ElogDetail from '@/views/health/ElogDetail.vue';
 import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
-
 
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
@@ -132,7 +129,7 @@ const router = createRouter({
       name: 'memoAndDiary',
       component: MemoAndDiary,
       props: true,
-      meta: { requiresAuth: true},
+      meta: { requiresAuth: true },
     },
     {
       path: '/memoAndDiary/memo',
@@ -142,27 +139,27 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/diary",
-      name: "diary",
+      path: '/memoAndDiary/diary',
+      name: 'diary',
       component: DiaryDetail,
       props: true,
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/memolist",
-      name: "MemoList",
+      path: '/memoAndDiary/memolist',
+      name: 'MemoList',
       component: MemoList,
       props: true,
     },
     {
-      path: "/memoAndDiary/diarylist",
-      name: "DiaryList",
+      path: '/memoAndDiary/diarylist',
+      name: 'DiaryList',
       component: DiaryList,
       props: true,
     },
     {
-      path: "/detail",
-      name: "profile_detail",
+      path: '/detail',
+      name: 'profile_detail',
       component: ProfileDetail,
       meta: { requiresAuth: true },
     },
@@ -172,7 +169,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return "/login";
+    return '/login';
   }
 });
 
