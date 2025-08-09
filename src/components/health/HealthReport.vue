@@ -1,28 +1,10 @@
 <script setup>
-import { reactive, computed, onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
-import { getDateString, filterHealthLogsByDate } from "@/utils/reportUtils";
 const healthStore = useHealthStore();
-const state = reactive({
-  logs: [],
-});
 
 onMounted(async () => {
   await healthStore.fetchHealthlogs();
-  state.logs = healthStore.logs;
-});
-// const temp = Object.keys(state.logs[0]);
-// console.log("여기", temp);
-// const todayStr = getDateString();
-// const todayLogs = computed(() =>
-//   filterHealthLogsByDate(healthStore.logs, todayStr)
-// );
-// console.log(todayLogs.value[0].height);
-
-const lastIdx = healthStore.logs.length > 0 ? healthStore.logs.length - 1 : 0;
-const lastRecordedMetrics = reactive({
-  weight: 0,
-  height: 0,
 });
 
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
@@ -32,16 +14,17 @@ const minBmi = 15;
 const maxBmi = 40;
 
 const bmi = computed(() => {
-  const heightInMeters = lastRecordedMetrics.height / 100;
-  if (!heightInMeters || !lastRecordedMetrics.weight) return 0;
+  const heightInMeters = (healthStore.logs[0]?.height || 0) / 100;
+  if (!heightInMeters || !healthStore.logs[0]?.weight) return 0;
   return parseFloat(
-    (lastRecordedMetrics.weight / heightInMeters ** 2).toFixed(1)
+    (healthStore.logs[0]?.weight / heightInMeters ** 2).toFixed(1)
   );
 });
 
 const bmiStatus = computed(() => {
   const userBmi = bmi.value;
-  if (userBmi < 18.5) return "저체중";
+  if (userBmi === 0) return "기록없음";
+  else if (userBmi < 18.5) return "저체중";
   else if (userBmi < 25) return "정상체중";
   else if (userBmi < 30) return "과체중";
   else if (userBmi < 35) return "비만";
@@ -76,17 +59,23 @@ const bmiStatus = computed(() => {
     <v-col class="content_right" cols="6">
       <div class="small_box">
         <span>weight</span>
-        <span class="value"> {{ lastRecordedMetrics.weight }} kg </span>
+        <span class="value">
+          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.weight }}
+          kg
+        </span>
       </div>
       <div class="small_box">
         <span>height</span>
-        <span class="value"> {{ lastRecordedMetrics.height }} cm </span>
+        <span class="value">
+          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.height }}
+          cm
+        </span>
       </div>
       <div class="medium-box">
         <span class="subtitle"> BMI </span>
         <div class="d-flex justify-space-between">
           <span class="value">
-            <!-- {{ bmi }} -->
+            {{ bmi }}
           </span>
           <v-btn
             variant="flat"
