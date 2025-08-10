@@ -1,14 +1,29 @@
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
-// import { getDateString } from "@/utils/reportUtils";
+import { getDateString, filterHealthLogsByDate } from "@/utils/reportUtils";
+import moodLevels from "@/assets/health/moodLevels.json";
+import sleepQualitys from "@/assets/health/sleepQualitys.json";
 const healthStore = useHealthStore();
 
 onMounted(async () => {
   await healthStore.fetchHealthlogs();
 });
 
-// const todayStr = getDateString();
+const todayStr = getDateString();
+const todayLog = computed(() =>
+  filterHealthLogsByDate(healthStore.logs, todayStr)
+);
+
+const state = computed(() => {
+  const log = todayLog.value[0] || {};
+  return [
+    moodLevels[log.moodLevel].label || 0,
+    sleepQualitys[log.sleepQuality].label || 0,
+    log.diastolicBp || 0,
+    log.sugarLevel || 0,
+  ];
+});
 
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
 const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
@@ -53,8 +68,17 @@ const bmiStatus = computed(() => {
         >
           <v-carousel-item class="sheet" v-for="(item, i) in subtitle" :key="i">
             <v-sheet :color="colors[i]" height="100%">
-              <div class="d-flex fill-height justify-center pa-3">
-                <div class="text-h6">{{ item }}</div>
+              <div class="d-flex justify-center align-center flex-column pa-3">
+                <div class="text-h6 pa-3">{{ item }}</div>
+                <div
+                  v-if="!todayLog || todayLog.length === 0"
+                  class="fill-height"
+                >
+                  기록없음
+                </div>
+                <div v-else class="text-h3 pa-3 fill-height">
+                  {{ state[i] }}
+                </div>
               </div>
             </v-sheet>
           </v-carousel-item>

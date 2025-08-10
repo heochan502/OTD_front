@@ -24,8 +24,8 @@ function stopCycle() {
     intervalId = null;
   }
 }
-onMounted(startCycle);
-onUnmounted(stopCycle);
+// onMounted(startCycle);
+// onUnmounted(stopCycle);
 </script>
 
 <template>
