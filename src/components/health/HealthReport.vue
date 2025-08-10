@@ -1,11 +1,14 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
+// import { getDateString } from "@/utils/reportUtils";
 const healthStore = useHealthStore();
 
 onMounted(async () => {
   await healthStore.fetchHealthlogs();
 });
+
+// const todayStr = getDateString();
 
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
 const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
@@ -14,7 +17,9 @@ const minBmi = 15;
 const maxBmi = 40;
 
 const bmi = computed(() => {
+  if (!healthStore.logs.length) return 0;
   const heightInMeters = (healthStore.logs[0]?.height || 0) / 100;
+
   if (!heightInMeters || !healthStore.logs[0]?.weight) return 0;
   return parseFloat(
     (healthStore.logs[0]?.weight / heightInMeters ** 2).toFixed(1)
