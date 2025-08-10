@@ -1,57 +1,41 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useHealthStore } from "@/stores/healthStore";
+import { round } from "lodash";
 
-const exhale = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const checking = ref(false);
-const heartbeats = ref([]);
-const avg = computed(() => {
-  const sum = heartbeats.value.reduce((acc, cur) => acc + cur, 0);
-  const length = heartbeats.value.length;
-  if (!sum && !length) return 0;
-  return Math.ceil(sum / length);
+const healthStore = useHealthStore();
+
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
 });
-function heartbeat() {
-  return Math.ceil(Math.random() * (120 - 80) + 80);
-}
-async function takePulse(inhale = true) {
-  checking.value = true;
-  inhale && (await exhale(1000));
-  heartbeats.value = Array.from({ length: 20 }, heartbeat);
-  checking.value = false;
-}
-takePulse(false);
+
+const gradients = [
+  ["#222"],
+  ["#42b3f4"],
+  ["red", "orange", "yellow"],
+  ["purple", "violet"],
+  ["#00c6ff", "#F0F", "#FF0"],
+  ["#f72047", "#ffd200", "#1feaea"],
+];
+
+const value = ref([0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0]);
 </script>
 
 <template>
-  <v-card class="mx-auto ma-10">
-    <template v-slot:prepend>
-      <v-icon
-        class="me-8"
-        icon="mdi-weight-kilogram"
-        size="64"
-        @click="takePulse"
-      ></v-icon>
-    </template>
-
-    <template v-slot:title>
-      <div class="text-caption text-grey text-uppercase">평균 체중</div>
-
-      <span class="text-h3 font-weight-black" v-text="avg || '—'"></span>
-      <strong v-if="avg">Kg</strong>
-    </template>
-
-    <v-sheet color="transparent">
-      <v-sparkline
-        :key="String(avg)"
-        :gradient="['#D4FFEC', '#3BBEFF', '#4596FB']"
-        :line-width="3"
-        :model-value="heartbeats"
-        :smooth="16"
-        stroke-linecap="round"
-        auto-draw
-      ></v-sparkline>
-    </v-sheet>
-  </v-card>
+  <v-sparkline
+    :auto-line-width="true"
+    :radius="10"
+    :gradient="gradients"
+    :gradient-direction="top"
+    :line-width="2"
+    :model-value="value"
+    :lineCap="round"
+    :padding="8"
+    :smooth="true"
+    :stroke-linecap="lineCap"
+    :type="trend"
+    auto-draw
+  ></v-sparkline>
 </template>
 
 <style lang="scss" scoped></style>
