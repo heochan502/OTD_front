@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue';
 import { useAccountStore } from '@/stores/counter';
 import { usecommunityStore } from '@/stores/communityStore';
-import axios from 'axios';
+import { fetchMents } from '@/services/community/mentService';
+// import axios from 'axios';
 
 const account = useAccountStore();
 const store = usecommunityStore();
@@ -10,12 +11,13 @@ const post = store.selectedPost;
 
 const ments = ref([]);
 const newMent = ref('');
-
-const fetchMents = async () => {
+console.log('ment생성', ments);
+const mentList = async () => {
   if (!post?.postId) return;
   try {
-    const res = await axios.get(`/api/OTD/community/comment/${post.postId}`);
+    const res = await fetchMents(post.postId);
     ments.value = res.data;
+    console.log('여기', res);
   } catch (err) {
     console.error('댓글 조회 실패:', err);
   }
@@ -64,7 +66,7 @@ function formatDate(dateStr) {
   });
 }
 
-onMounted(fetchMents);
+onMounted(mentList);
 </script>
 
 <template>
