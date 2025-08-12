@@ -39,9 +39,12 @@ function getWeekDates(dateString) {
     const currentDate = new Date(startDate);
     console.log(startDate, typeof startDate);
     currentDate.setDate(startDate.getDate() + i);
-    result.push(currentDate.toISOString().slice(0, 10));
+    console.log("날짜 : ", String(currentDate).slice(0, 10));
+    result.push(String(currentDate).slice(0, 10));
     //    }
   }
+  // 여기서 날짜 관련한 데이터 편집 해야함 
+  // 한굴 표기로 
   return result;
 }
 
