@@ -8,7 +8,7 @@ const weekDay = useBaseDate();
 const nowDay = useDayDefine();
 const weeklyStore = useWeeklyStore();
 
-const selectedDate = ref(nowDay.currentTime); // 초기화 및 선택하는 날짜 들어감
+const selectedDate = ref(nowDay.currentTime.slice(3, 13)); // 초기화 및 선택하는 날짜 들어감
 const weekDates = ref([]);
 
 // 날짜 : 각종 량 출력 하는거 하다가 맒
@@ -24,24 +24,27 @@ const weekDates = ref([]);
 // });
 
 function getWeekDates(dateString) {
+  // 오늘 날짜 까져옴
   const date = new Date(dateString);
   //0 일요일 ~
   const dayOfWeek = date.getDay();
 
+  // 현재 나 선택한 날짜 
   const startDate = new Date(date);
+  // console.log(dayOfWeek + 1, typeof dateString);
   // 해당 요일의 번호를 빼서 월요일로 초기화
   startDate.setDate(date.getDate() - dayOfWeek + 1);
   const result = [];
-
+  const currentDate = new Date(startDate);
+  // console.log("시작 날짜 : ", String(currentDate).slice(0, 10));
   for (let i = 0; i < 7; i++) {
-    // 주 시작 일 과 끝일만 넣기
-    //    if(i===0 || i===6){
-    const currentDate = new Date(startDate);
-    console.log(startDate, typeof startDate);
+   
+    // console.log(startDate, typeof startDate);
     currentDate.setDate(startDate.getDate() + i);
-    console.log("날짜 : ", String(currentDate).slice(0, 10));
-    result.push(String(currentDate).slice(0, 10));
-    //    }
+    // console.log("날짜 : ", String(currentDate).slice(0, 10));
+    result.push(nowDay.updateTime(currentDate).slice(3, 13));
+    // console.log("날짜 : ", result[i]);
+    
   }
   // 여기서 날짜 관련한 데이터 편집 해야함 
   // 한굴 표기로 
@@ -51,15 +54,14 @@ function getWeekDates(dateString) {
 watch(
   selectedDate,
  (newDate) => {
+  if (!newDate) {
+    newDate = nowDay.currentTime; // 선택된 날짜가 없으면 현재 날짜로 설정
+  } 
+
     weekDates.value = getWeekDates(newDate);
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
-    // console.log(
-    //   '주시작11 : ',
-    //   selectedDate.value,
-    //   weekDay.getWeekDate,
-    //   nowDay.nowDay
-    // );
+ 
 
     const res =  getWeekTotal(weekDay.getWeekDate);
     if (res.status === 200) {

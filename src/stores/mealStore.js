@@ -43,8 +43,17 @@ export const useDayDefine = defineStore("useDayDefine",()=>
 
       const currentTime = ref("");
       const nowDay = ref();
-      const updateTime = () => {
-        const now = new Date();
+      const updateTime = (times) => {
+        let now = new Date();
+        // times가 주어지면 그 시간을 사용, 아니면 현재 시간 사용
+        if (times) {
+            now = new Date(times);
+          
+        }
+        else{
+            now = new Date();   
+        }
+        // const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, "0");
         const day = String(now.getDate()).padStart(2, "0");
@@ -52,6 +61,9 @@ export const useDayDefine = defineStore("useDayDefine",()=>
         const hours = String(now.getHours()).padStart(2, "0");
         const minutes = String(now.getMinutes()).padStart(2, "0");
         const seconds = String(now.getSeconds()).padStart(2, "0");
+        if(times){
+          return `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
         currentTime.value = `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       };
 
