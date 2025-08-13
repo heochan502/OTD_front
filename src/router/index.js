@@ -143,13 +143,13 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/memo/list",
+      path: "/memoAndDiary/memolist",
       name: "MemoList",
       component: MemoList,
       props: true,
     },
     {
-      path: "/memoAndDiary/diary/list",
+      path: "/memoAndDiary/diarylist",
       name: "DiaryList",
       component: DiaryList,
       props: true,
