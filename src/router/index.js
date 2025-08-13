@@ -1,8 +1,5 @@
-
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
-
-
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
 import ReminderForm from '@/views/reminder/ReminderForm.vue';
 import ReminderList from '@/views/reminder/ReminderList.vue';
@@ -12,11 +9,10 @@ import DiaryList from '@/components/memo/DiaryList.vue';
 import MemoDetail from '@/components/memo/MemoDetail.vue';
 import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
-
 import CommunityView from '@/views/community/CommunityView.vue';
 
 import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/components/meal/MealAdd.vue';
+import MealAdd from '@/views/meal/MealAdd.vue';
 import MealStatistic from '@/components/meal/MealStatistic.vue';
 
 import HealthMain from '@/views/health/HealthMain.vue';
@@ -25,15 +21,12 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
-
 import Join from '@/views/Join.vue';
 import Login from '@/views/Login.vue';
 import Profile from '@/views/Profile.vue';
-import Password from '@/views/Password.vue';
-
-import Location from '@/components/location/Location.vue';
 import ProfileDetail from '@/views/ProfileDetail.vue';
 
+import Location from '@/components/location/Location.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -133,7 +126,7 @@ const router = createRouter({
       name: 'memoAndDiary',
       component: MemoAndDiary,
       props: true,
-      meta: { requiresAuth: true},
+      meta: { requiresAuth: true },
     },
     {
       path: '/memoAndDiary/memo',
@@ -143,45 +136,36 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/diary",
-      name: "diary",
+      path: '/memoAndDiary/diary',
+      name: 'diary',
       component: DiaryDetail,
       props: true,
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/memolist",
-      name: "MemoList",
+      path: '/memoAndDiary/memolist',
+      name: 'MemoList',
       component: MemoList,
       props: true,
     },
     {
-      path: "/memoAndDiary/diarylist",
-      name: "DiaryList",
+      path: '/memoAndDiary/diarylist',
+      name: 'DiaryList',
       component: DiaryList,
       props: true,
     },
     {
-      path: "/detail",
-      name: "profile_detail",
+      path: '/detail',
+      name: 'profile_detail',
       component: ProfileDetail,
       meta: { requiresAuth: true },
-    },    
-    {
-      path: "/password",
-      name: "password",
-      component: Password,
-      meta: { requiresAuth: true },
     },
-  
   ],
 });
-
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return "/login";
+    return '/login';
   }
 });
-
 export default router;
