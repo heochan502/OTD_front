@@ -10,8 +10,8 @@ const LocalWeather = async () => {
   const res = await getWeather();
   console.log('Weather res.data', res.data);
   weather.value = res.data;
-  if (weather.value.pty !== '없음') {
-    weather.value.sky = weather.value.pty;
+  if (weather.value.ncstPty !== '없음') {
+    weather.value.villageSky = weather.value.ncstPty;
   }
 };
 // 한줄 알림
@@ -20,9 +20,9 @@ const memberNickName = async () => {
   nickName.value = res.data.memberNick;
 };
 const popMessage = computed(() => {
-  const pop = weather.value.pop;
-  const per = '오늘은 비올 확률이' + weather.value.pop + ' % !!';
-  const sky = weather.value.sky;
+  const pop = weather.value.villagePop;
+  const per = '오늘은 비올 확률이' + weather.value.villagePop + ' % !!';
+  const sky = weather.value.villageSky;
   if ((pop < 10 && sky === '맑음') || (pop < 10 && sky === '구름 많음')) {
     return '오늘의 날씨는 ' + sky + '이네요! 즐거운 하루 보내세요.';
   } else if (
@@ -54,7 +54,7 @@ const skyEmojiList = {
 };
 
 const skyEmoji = computed(() => {
-  return skyEmojiList[weather.value?.sky] || skyEmojiList.default;
+  return skyEmojiList[weather.value?.villageSky] || skyEmojiList.default;
 });
 
 const dayTimes = computed(() => {
@@ -82,7 +82,7 @@ const backgroundImg = {
 };
 
 const weatherBackground = computed(() => {
-  const sky = weather.value?.sky || '';
+  const sky = weather.value?.villageSky || '';
   const time = dayTimes.value;
   console.log('time', time);
   return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
@@ -120,8 +120,8 @@ onMounted(async () => {
             {{ weather.localName }}
           </div>
           <div class="condition">
-            {{ weather.sky }}
-            {{ weather.sky === '비' ? weather.rh1 + '(mm)' : '' }}
+            {{ weather.villageSky }}
+            {{ weather.villageSky === '비' ? weather.ncstRh1 + '(mm)' : '' }}
           </div>
         </div>
 
@@ -130,21 +130,29 @@ onMounted(async () => {
             <div class="weather-icon">{{ skyEmoji }}</div>
             <div class="temperature">
               {{
-                weather.tem === undefined
+                weather.ncstTem === undefined
                   ? '날씨를 불러오지 못하였습니다....'
-                  : weather.tem + '℃'
+                  : weather.ncstTem + '℃'
               }}
             </div>
           </div>
           <div class="max_min_temperature">
             {{
-              weather.tmn === undefined
+              weather.villageTmn === undefined
                 ? ''
-                : '최저 ' + weather.tmn + '° / 최고 ' + weather.tmx + '°'
+                : '최저 ' +
+                  weather.villageTmn +
+                  '° / 최고 ' +
+                  weather.villageTmx +
+                  '°'
             }}
           </div>
           <div class="humidity">
-            {{ weather.reh === undefined ? '' : '습도' + weather.reh + '%' }}
+            {{
+              weather.ncstReh === undefined
+                ? ''
+                : '습도' + weather.ncstReh + '%'
+            }}
           </div>
         </div>
       </div>
@@ -253,7 +261,7 @@ onMounted(async () => {
       font-size: 3rem;
     }
 
-    .temperature {
+    .ncstTemperature {
       font-size: 2rem;
       font-weight: bold;
     }
