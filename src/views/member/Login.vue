@@ -1,8 +1,7 @@
 <script setup>
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { login } from '@/services/accountService';
-
+import { login } from '@/services/member/accountService';
 
 const router = useRouter();
 
@@ -24,13 +23,12 @@ const submit = async () => {
       alert('아이디/비밀번호를 확인해 주세요!');
       break;
     case 500:
-      alert('아이디/비밀번호를 확인해 주세요')
+      alert('아이디/비밀번호를 확인해 주세요');
   }
 };
 </script>
 
 <template>
-
   <div class="login-page">
     <div class="form-container">
       <h2 class="title">로그인</h2>
@@ -57,13 +55,12 @@ const submit = async () => {
         </div>
         <button type="submit" class="btn-submit">로그인</button>
         <div class="already">
-           <p class="log">아직 가입하지 않으셨다면</p>
-           <router-link to="/signup" class="go-join">회원가입</router-link>
+          <p class="log">아직 가입하지 않으셨다면</p>
+          <router-link to="/signup" class="go-join">회원가입</router-link>
         </div>
       </form>
     </div>
   </div>
-
 </template>
 
 <style scoped>

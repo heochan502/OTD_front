@@ -1,10 +1,10 @@
 <script setup>
-import Layout from "./views/layout/Layout.vue";
+import Layout from './views/layout/Layout.vue';
 
-import { useRoute, useRouter } from "vue-router";
-import { ref, watch, onMounted } from "vue";
-import { useAccountStore } from "./stores/counter";
-import { check } from "./services/accountService";
+import { useRoute, useRouter } from 'vue-router';
+import { ref, watch, onMounted } from 'vue';
+import { useAccountStore } from './stores/counter';
+import { check } from './services/member/accountService';
 
 const route = useRoute();
 const router = useRouter();
@@ -13,12 +13,12 @@ const counter = useAccountStore();
 const isInitializing = ref(true);
 
 const checkAccount = async () => {
-  console.log("로그인 체크");
+  console.log('로그인 체크');
   const res = await check();
   if (res === null || res.status != 200) {
     counter.setChecked(false);
     counter.setLoggedIn(false);
-    return false; 
+    return false;
   } else {
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
@@ -29,18 +29,18 @@ const checkAccount = async () => {
 
 onMounted(async () => {
   const isLoggedIn = await checkAccount();
-  isInitializing.value = false; 
+  isInitializing.value = false;
   if (!isLoggedIn) {
-    router.replace("/login");
+    router.replace('/login');
   }
 });
 
-
-watch(() => route.path,() => {
+watch(
+  () => route.path,
+  () => {
     checkAccount();
   }
 );
-
 </script>
 
 <template>
@@ -51,10 +51,7 @@ watch(() => route.path,() => {
     </div>
     <Layout v-else />
   </div>
-  <div class="footer">
-
-  </div>
-  
+  <div class="footer"></div>
 </template>
 
 <style>
@@ -69,7 +66,7 @@ watch(() => route.path,() => {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  font-family: "Noto Sans KR", sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 .spinner {
@@ -83,8 +80,12 @@ watch(() => route.path,() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-container p {
