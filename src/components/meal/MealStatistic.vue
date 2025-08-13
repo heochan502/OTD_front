@@ -59,6 +59,8 @@ watch(
   } 
 
     weekDates.value = getWeekDates(newDate);
+    //여기 데이터 확인 
+    // TODO : 여기 데이터 확인 
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
  
@@ -68,6 +70,7 @@ watch(
       weeklyStore.weeklyRawData = res.data;
       // console.log("통신구역 " );
     }
+    
 
   },
   { immediate: true }

@@ -12,7 +12,12 @@ const weeklyStore = useWeeklyStore();
 
 const weekDay = useBaseDate();
 
-const xData = ['월', '화', '수', '목', '금', '토', '일'];
+// const xData = ['월', '화', '수', '목', '금', '토', '일'];
+const xData ={
+  dates : [],
+  dayName: ['월', '화', '수', '목', '금', '토', '일']};
+
+
 const yData = Array(xData.length).fill(0);
 
 
@@ -58,7 +63,7 @@ const option = {
   // 범례 설정
   xAxis: {
     type: 'category',
-    data: xData,
+    data: xData.dayName,
     axisLabel: {
       color: '#000000', // 텍스트 색상
       fontSize: 14, // 글자 크기
@@ -121,22 +126,27 @@ const option = {
   },
 };
 const getStatistic = async (weeky) => {
-
   const res = await getWeekTotal(weeky);
+  console.log("weeky:", weeky);
   if (res.status === 200) {
     weeklyStore.weeklyRawData = res.data;
   }
   // console.log("데이터 확인 ", weeklyStore.weeklyRawData);
     // 기존 y축 데이터 0으로 만드는격 
   const yDataTemp = Array(xData.length).fill(0);
+  console.log("weeklyStore.weeklyRawData:", weeklyStore.weeklyRawData);
     weeklyStore.weeklyRawData.forEach(item => {
       const dayName = getDayName(item.mealDay); // '화', '수', ...
       
-      const index = xData.indexOf(dayName);      // 요일 인덱스 찾기   
+      const index = xData.dayName.indexOf(dayName);      // 요일 인덱스 찾기   
       if (index !== -1) {
+        console.log("item.mealDay: {}, index : {}", item.mealDay, index);
+        xData.dates[index] = item.mealDay; // 날짜 추가
         yDataTemp[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
       }
     });
+  console.log("item.yDataTemp:", yDataTemp);
+  console.log("xData.dates:", xData.dates);
     // 0인덱스 부터 ydata 길이만큼 temp를 넣겟다 
     // ydata 기존값 날리면서 새로운 데이터 넣기
   yData.splice(0, yData.length, ...yDataTemp);
@@ -152,6 +162,14 @@ onMounted(async () => {
   } else {
     console.warn('chartRef is null');
   }
+
+  myChart.on('click', (params) => {
+    if (params.componentType === "series") {
+      const dataIndex = params.dataIndex;
+      const dayName = xData[dataIndex];
+      console.log("Clicked on:", params);
+    }
+  });
   // console.log("주시작 : ", weekDay.getWeekDate);
 
 });
