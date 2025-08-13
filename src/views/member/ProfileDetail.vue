@@ -494,7 +494,7 @@ watch(
 const saveProfile = async () => {
   console.log('=== 프로필 저장 시작 ===');
 
-  // 모든 필드 검증
+
   for (const field of Object.keys(state.validation)) {
     state.validation[field].touched = true;
     await validateField(field, state.form[field]);

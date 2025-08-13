@@ -85,14 +85,14 @@ watch(
 watch(
   () => router.currentRoute.value.fullPath,
   (newPath, oldPath) => {
-    // 다른 페이지에서 프로필 페이지로 돌아올 때
+
     if (newPath === '/profile' && oldPath && oldPath !== '/profile') {
       loadProfile();
     }
   }
 );
 
-// 컴포넌트가 다시 활성화될 때도 로드 (keep-alive 사용 시)
+
 watch(
   () => counter.state.loggedIn,
   (isLoggedIn, oldValue) => {

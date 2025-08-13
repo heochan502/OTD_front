@@ -170,12 +170,12 @@ const changePasswordSubmit = async () => {
     console.log('API 응답:', res);
 
     if (res && res.status === 200) {
-      // 폼 초기화
+   
       state.form.currentPassword = '';
       state.form.newPassword = '';
       state.form.confirmPassword = '';
 
-      // 검증 상태 초기화
+
       Object.keys(state.validation).forEach((field) => {
         state.validation[field] = {
           isValid: true,
@@ -184,7 +184,7 @@ const changePasswordSubmit = async () => {
         };
       });
 
-      // 프로필 페이지로 이동
+
       router.push('/profile');
     } else {
       console.error('비밀번호 변경 실패 - 전체 응답:', res);
@@ -209,7 +209,7 @@ const changePasswordSubmit = async () => {
   } catch (error) {
     console.error('Password change error:', error);
 
-    // 서버에서 500 에러나 다른 에러가 발생했을 때도 현재 비밀번호 검증 실패로 처리
+
     if (
       error.status === 500 ||
       error.data?.message === '서버 내부 오류가 발생했습니다.'
@@ -274,7 +274,7 @@ watch(
                     }"
                     @blur="handleFieldTouch('currentPassword')"
                     @input="
-                      // 입력할 때마다 에러 상태 초기화
+                  
                       if (!state.validation.currentPassword.isValid) {
                         state.validation.currentPassword.isValid = true;
                         state.validation.currentPassword.message = '';
@@ -456,7 +456,7 @@ watch(
   margin: 0;
 }
 
-/* 고정된 메시지 영역 */
+
 .message-area {
   min-height: 60px;
   margin-bottom: 20px;
