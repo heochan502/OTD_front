@@ -1,41 +1,62 @@
 <script setup>
-import { reactive, onMounted ,watch } from 'vue';
+import { reactive, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { getProfile, deleteMember } from '@/services/accountService';
+import { getProfile, deleteMember } from '@/services/member/accountService';
 import { useAccountStore } from '@/stores/counter';
-
 
 const router = useRouter();
 const counter = useAccountStore();
 
 const state = reactive({
-  form: {  
+  form: {
     memberNoLogin: 0,
     memberId: '',
     email: '',
     name: '',
     birthDate: '',
     memberNick: '',
-    profileImage: ''
+    profileImage: '',
   },
   loading: true,
-  error: null
 });
 
 const formatBirthDate = (birthDate) => {
   if (!birthDate || birthDate.length !== 8) return birthDate;
-  return `${birthDate.slice(0, 4)}년 ${birthDate.slice(4, 6)}월 ${birthDate.substring(6, 8)}일`;
+  return `${birthDate.slice(0, 4)}년 ${birthDate.slice(
+    4,
+    6
+  )}월 ${birthDate.substring(6, 8)}일`;
 };
 
 const handleImageError = (e) => {
   state.form.profileImage = '';
 };
 
+const loadProfile = async () => {
+  if (!counter.state.loggedIn) {
+    router.push('/login');
+    return;
+  }
+
+  try {
+    state.loading = true;
+    const res = await getProfile();
+
+    if (res && res.status === 200) {
+      Object.assign(state.form, res.data);
+    }
+  } catch (error) {
+    console.error('Profile loading error:', error);
+  } finally {
+    state.loading = false;
+  }
+};
+
 const remove = async (memberNoLogin) => {
   if (!confirm('정말 회원 탈퇴하시겠습니까?')) return;
 
   try {
-    const res = await deleteMember(memberNoLogin); 
+    const res = await deleteMember(memberNoLogin);
     if (res.status === 200) {
       alert('회원 탈퇴가 완료되었습니다.');
       router.push('/login');
@@ -48,28 +69,8 @@ const remove = async (memberNoLogin) => {
   }
 };
 
-
-onMounted(async () => {
-  if (!counter.state.loggedIn) {
-    router.push('/login');
-    return;
-  }
-
-  try {
-    const res = await getProfile();
-    
-    if (res === undefined || res.status !== 200) {
-      state.error = '프로필 정보를 불러오는데 실패했습니다.';
-      return;
-    }
-    
-    Object.assign(state.form, res.data);
-  } catch (error) {
-    state.error = '오류가 발생했습니다.';
-    console.error('Profile loading error:', error);
-  } finally {
-    state.loading = false;
-  }
+onMounted(() => {
+  loadProfile();
 });
 
 watch(
@@ -77,6 +78,26 @@ watch(
   (isLoggedIn) => {
     if (!isLoggedIn) {
       router.push('/login');
+    }
+  }
+);
+
+watch(
+  () => router.currentRoute.value.fullPath,
+  (newPath, oldPath) => {
+    // 다른 페이지에서 프로필 페이지로 돌아올 때
+    if (newPath === '/profile' && oldPath && oldPath !== '/profile') {
+      loadProfile();
+    }
+  }
+);
+
+// 컴포넌트가 다시 활성화될 때도 로드 (keep-alive 사용 시)
+watch(
+  () => counter.state.loggedIn,
+  (isLoggedIn, oldValue) => {
+    if (isLoggedIn && oldValue !== undefined) {
+      loadProfile();
     }
   }
 );
@@ -94,18 +115,17 @@ watch(
           <div class="loading-spinner"></div>
           <p>정보를 불러오는 중...</p>
         </div>
-        
 
         <div v-else class="profile-content">
           <div class="profile-photo-section">
             <div class="photo-wrapper">
               <div v-if="state.form.profileImage" class="profile-img-container">
-                <img 
-                  :src="state.form.profileImage" 
-                  alt="프로필 사진" 
+                <img
+                  :src="state.form.profileImage"
+                  alt="프로필 사진"
                   class="profile-img"
                   @error="handleImageError"
-                >
+                />
               </div>
               <div v-else class="profile-img default-avatar">
                 <span>{{ (state.form.name || '사용자').charAt(0) }}</span>
@@ -113,7 +133,11 @@ watch(
             </div>
             <div class="user-info">
               <h2>{{ state.form.name || '사용자명 없음' }}</h2>
-              <p>@{{ state.form.memberNick || state.form.memberId || '닉네임 없음' }}</p>
+              <p>
+                @{{
+                  state.form.memberNick || state.form.memberId || '닉네임 없음'
+                }}
+              </p>
             </div>
           </div>
 
@@ -141,23 +165,23 @@ watch(
                 </div>
                 <div class="info-item">
                   <span class="label">생년월일</span>
-                  <span class="value">{{ formatBirthDate(state.form.birthDate) }}</span>
+                  <span class="value">{{
+                    formatBirthDate(state.form.birthDate)
+                  }}</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="button-group">
-            <span class="btn btn-primary2" @click.prevent="remove(state.form.memberNoLogin)">회원탈퇴</span>
-            <router-link 
-              to="/detail" 
-              class="btn btn-primary"
+            <span
+              class="btn btn-primary2"
+              @click.prevent="remove(state.form.memberNoLogin)"
+              >회원탈퇴</span
             >
+            <router-link to="/profile/detail" class="btn btn-primary">
               정보 수정
             </router-link>
-            <router-link 
-              to="/password" 
-              class="btn btn-primary3"
-            >
+            <router-link to="/profile/password" class="btn btn-primary3">
               비밀번호변경
             </router-link>
           </div>
@@ -176,7 +200,8 @@ watch(
   min-height: 100vh;
   background: #f8fafb;
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .container {
@@ -189,9 +214,8 @@ watch(
 }
 
 .header {
-  color: #1e293b;;
+  color: #1e293b;
   padding: 40px 30px;
-
   text-align: center;
 }
 
@@ -222,15 +246,19 @@ watch(
   width: 32px;
   height: 32px;
   border: 3px solid #f1f3f5;
-  border-top: 3px solid #5BA7F7;
+  border-top: 3px solid #5ba7f7;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 20px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-wrapper p {
@@ -273,7 +301,7 @@ watch(
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #5BA7F7 0%, #4A9EF5 100%);
+  background: linear-gradient(135deg, #5ba7f7 0%, #4a9ef5 100%);
   border: 3px solid #e9ecef;
   display: flex;
   align-items: center;
@@ -296,12 +324,11 @@ watch(
 }
 
 .user-info p {
-  color: #5BA7F7;
+  color: #5ba7f7;
   font-size: 1rem;
   margin: 0;
   font-weight: 500;
 }
-
 
 .info-cards {
   margin-bottom: 40px;
@@ -379,28 +406,27 @@ watch(
 }
 
 .btn-primary {
-  background: #5BA7F7;
+  background: #5ba7f7;
   color: white;
-  
+}
 
-}
 .btn-primary3 {
-  background: #5BA7F7;
+  background: #5ba7f7;
   color: white;
-  
 }
+
 .btn-primary2 {
   background: white;
   color: #6b7280;
   border: 2px solid #e5e7eb;
 }
 
-
 .btn-primary:hover {
-  background: #4A9EF5;
+  background: #4a9ef5;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(91, 167, 247, 0.3);
 }
+
 .btn-primary2:hover {
   background: #f9fafb;
   border-color: #d1d5db;
@@ -415,5 +441,4 @@ watch(
   background: #5a6268;
   transform: translateY(-1px);
 }
-
 </style>
