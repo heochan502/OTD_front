@@ -162,12 +162,6 @@ const router = createRouter({
       props: true,
     },
     {
-      path: "/profile",
-      name: "profile",
-      component: Profile,
-      meta: { requiresAuth: true },
-    },
-    {
       path: "/detail",
       name: "profile_detail",
       component: ProfileDetail,

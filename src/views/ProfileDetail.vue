@@ -133,21 +133,22 @@ const checkEmailDuplication = async (email) => {
     
     if (response && response.status === 200) {
       const data = response.data
-
+      
+      // 서버에서 다양한 형식으로 응답할 수 있으므로 모든 경우를 확인
       console.log('데이터 타입:', typeof data)
       console.log('데이터 내용:', data)
       
       let isDuplicate = false
       
-    
+      // 가능한 응답 형식들
       if (typeof data === 'boolean') {
-        isDuplicate = data 
+        isDuplicate = data // true면 중복, false면 사용가능
       } else if (typeof data === 'object' && data !== null) {
         isDuplicate = data.isDuplicate || 
                       data.exists || 
                       data.duplicate || 
                       data.isExist ||
-                      data.available === false || 
+                      data.available === false || // available이 false면 중복
                       false
       } else if (typeof data === 'string') {
         isDuplicate = data === 'true' || data === 'duplicate' || data === 'exists'
@@ -161,6 +162,7 @@ const checkEmailDuplication = async (email) => {
         return { isValid: true, message: '사용 가능한 이메일입니다.' }
       }
     } else if (response && response.status === 404) {
+      // 404는 보통 "존재하지 않음" = "사용 가능"을 의미할 수 있음
       console.log('404 응답 - 사용 가능으로 처리')
       return { isValid: true, message: '사용 가능한 이메일입니다.' }
     } else {
@@ -172,7 +174,7 @@ const checkEmailDuplication = async (email) => {
     console.error('이메일 중복 확인 에러:', error)
     console.error('에러 상세:', error.response)
     
-  
+    // 네트워크 오류나 서버 오류 시에는 일단 진행 가능하도록 처리
     if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
       return { isValid: true, message: '중복 확인 서버에 연결할 수 없습니다. 임시로 진행합니다.' }
     }
@@ -201,20 +203,21 @@ const checkNicknameDuplication = async (nickname) => {
     if (response && response.status === 200) {
       const data = response.data
       
-     
+      // 서버에서 다양한 형식으로 응답할 수 있으므로 모든 경우를 확인
       console.log('데이터 타입:', typeof data)
       console.log('데이터 내용:', data)
       
       let isDuplicate = false
-   
+      
+      // 가능한 응답 형식들
       if (typeof data === 'boolean') {
-        isDuplicate = data 
+        isDuplicate = data // true면 중복, false면 사용가능
       } else if (typeof data === 'object' && data !== null) {
         isDuplicate = data.isDuplicate || 
                       data.exists || 
                       data.duplicate || 
                       data.isExist ||
-                      data.available === false || 
+                      data.available === false || // available이 false면 중복
                       false
       } else if (typeof data === 'string') {
         isDuplicate = data === 'true' || data === 'duplicate' || data === 'exists'
@@ -228,7 +231,7 @@ const checkNicknameDuplication = async (nickname) => {
         return { isValid: true, message: '사용 가능한 닉네임입니다.' }
       }
     } else if (response && response.status === 404) {
- 
+      // 404는 보통 "존재하지 않음" = "사용 가능"을 의미할 수 있음
       console.log('404 응답 - 사용 가능으로 처리')
       return { isValid: true, message: '사용 가능한 닉네임입니다.' }
     } else {
@@ -240,7 +243,7 @@ const checkNicknameDuplication = async (nickname) => {
     console.error('닉네임 중복 확인 에러:', error)
     console.error('에러 상세:', error.response)
     
-
+    // 네트워크 오류나 서버 오류 시에는 일단 진행 가능하도록 처리
     if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
       return { isValid: true, message: '중복 확인 서버에 연결할 수 없습니다. 임시로 진행합니다.' }
     }
@@ -418,7 +421,7 @@ watch(() => state.form.birthDate, (newValue) => {
 const saveProfile = async () => {
   console.log('=== 프로필 저장 시작 ===')
   
-
+  // 모든 필드 검증
   for (const field of Object.keys(state.validation)) {
     state.validation[field].touched = true
     await validateField(field, state.form[field])
@@ -446,8 +449,9 @@ const saveProfile = async () => {
       name: state.form.name?.trim(),
       birthDate: formatDateForSave(state.form.birthDate),
       memberNick: state.form.memberNick?.trim() || null,
-      memberImg: state.form.profileImg || null  
+      memberImg: state.form.profileImg || null  // 백엔드 필드명에 맞춤: profileImg → memberImg
     }
+
 
     Object.keys(formData).forEach(key => {
       if (formData[key] === '' || formData[key] === undefined) {
@@ -476,7 +480,6 @@ const saveProfile = async () => {
       console.error('프로필 업데이트 실패 - 상태코드:', res?.status)
       console.error('오류 응답:', res?.data)
       
-
       let errorMessage = '정보 수정에 실패했습니다.'
       
       if (res?.data?.message) {
@@ -496,6 +499,7 @@ const saveProfile = async () => {
     console.error('에러 상세:', error.response)
     
     let errorMessage = '오류가 발생했습니다: ' + error.message
+    
 
     if (error.code === 'ERR_NETWORK') {
       errorMessage = '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.'
@@ -507,6 +511,7 @@ const saveProfile = async () => {
         errorMessage = error.response.data.message
       } else if (error.response.status === 401) {
         errorMessage = '로그인이 필요합니다.'
+
       } else if (error.response.status === 403) {
         errorMessage = '권한이 없습니다.'
       } else if (error.response.status === 422) {
