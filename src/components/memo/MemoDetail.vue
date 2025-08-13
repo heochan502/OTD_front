@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useMemoDetail } from '@/components/memo/useMemoDetail.js';
-import { defineEmits, defineProps } from 'vue';
+import {  defineProps } from 'vue';
 
 const emit = defineEmits(['created', 'updated', 'deleted', 'cancel']);
 const props = defineProps({
