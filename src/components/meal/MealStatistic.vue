@@ -36,14 +36,14 @@ function getWeekDates(dateString) {
   startDate.setDate(date.getDate() - dayOfWeek + 1);
   const result = [];
   const currentDate = new Date(startDate);
-  // console.log("시작 날짜 : ", String(currentDate).slice(0, 10));
+  console.log("시작 날짜 : ", String(currentDate).slice(0, 10));
   for (let i = 0; i < 7; i++) {
    
     // console.log(startDate, typeof startDate);
-    currentDate.setDate(startDate.getDate() + i);
-    // console.log("날짜 : ", String(currentDate).slice(0, 10));
+    // console.log("커런트 데이트 : ", String(currentDate).slice(0, 10));
     result.push(nowDay.updateTime(currentDate).slice(3, 13));
     // console.log("날짜 : ", result[i]);
+    currentDate.setDate(currentDate.getDate() + 1);
     
   }
   // 여기서 날짜 관련한 데이터 편집 해야함 
@@ -63,7 +63,7 @@ watch(
     // TODO : 여기 데이터 확인 
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
- 
+    // console.log ("데이터 확인첫날 끝날 : ",weekDay.getWeekDate );
 
     const res =  getWeekTotal(weekDay.getWeekDate);
     if (res.status === 200) {
