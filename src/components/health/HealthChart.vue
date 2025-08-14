@@ -18,7 +18,8 @@ const gradients = [
   ["#f72047", "#ffd200", "#1feaea"],
 ];
 
-const value = ref([0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0]);
+const value = ref([]);
+const weightDatum = healthStore.logs.map((item) => item.weight);
 </script>
 
 <template>
@@ -28,7 +29,7 @@ const value = ref([0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0]);
     :gradient="gradients"
     :gradient-direction="top"
     :line-width="2"
-    :model-value="value"
+    :model-value="weightDatum"
     :lineCap="round"
     :padding="8"
     :smooth="true"

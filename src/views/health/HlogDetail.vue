@@ -90,21 +90,24 @@ const deleteLog = async () => {
               dark
               @click="toggle"
             >
-              <div class="text-h6 subtitle">
-                {{ field.label }}
-              </div>
-              <div class="text-center content">
-                {{
-                  field.key === "moodLevel"
-                    ? moodLevels.find((e) => e.level === state.hlog[field.key])
-                        ?.label
-                    : field.key === "sleepQuality"
-                    ? sleepQualitys.find(
-                        (e) => e.level === state.hlog[field.key]
-                      )?.label
-                    : state.hlog[field.key] +
-                      (field.unit ? ` ${field.unit}` : "")
-                }}
+              <div>
+                <div class="text-h6 subtitle">
+                  {{ field.label }}
+                </div>
+                <div class="text-center content">
+                  {{
+                    field.key === "moodLevel"
+                      ? moodLevels.find(
+                          (e) => e.level === state.hlog[field.key]
+                        )?.label
+                      : field.key === "sleepQuality"
+                      ? sleepQualitys.find(
+                          (e) => e.level === state.hlog[field.key]
+                        )?.label
+                      : state.hlog[field.key] +
+                        (field.unit ? ` ${field.unit}` : "")
+                  }}
+                </div>
               </div>
             </v-card>
           </v-item>

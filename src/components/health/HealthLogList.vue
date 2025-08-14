@@ -75,6 +75,7 @@ const detail = (healthlogId) => {
 .list-wrap {
   height: 300px;
   overflow: auto;
+  overflow-x: hidden;
 }
 ul {
   display: flex;
