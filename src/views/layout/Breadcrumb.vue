@@ -1,7 +1,7 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
-import { logout } from '@/services/accountService';
+import { logout } from '@/services/member/accountService';
 
 const router = useRouter();
 const route = useRoute();
