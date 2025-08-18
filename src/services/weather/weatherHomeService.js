@@ -9,6 +9,6 @@ export const getNickName = () => {
   return axios.get('/weather/info').catch((e) => e.response);
 };
 
-export const getSrtFcst = () => {
-  return axios.get('/weather/fcst').catch((e) => e.response);
+export const getDailyWeather = () => {
+  return axios.get('/weather/daily').catch((e) => e.response);
 };

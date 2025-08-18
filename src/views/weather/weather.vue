@@ -3,13 +3,13 @@ import { ref, onMounted, computed } from 'vue';
 import {
   getWeather,
   getNickName,
-  getSrtFcst,
+  getDailyWeather,
 } from '@/services/weather/weatherHomeService';
 
 const weather = ref(null);
 const open = ref(false);
 const nickName = ref('');
-const fcstWeather = ref(null);
+const dayWeather = ref(null);
 
 const LocalWeather = async () => {
   const res = await getWeather();
@@ -20,10 +20,10 @@ const LocalWeather = async () => {
   }
 };
 
-const FcstWeather = async () => {
-  const res = await getSrtFcst();
-  console.log('fcst :', res.data);
-  fcstWeather.value = res.data;
+const DayWeather = async () => {
+  const res = await getDailyWeather();
+  console.log('daily :', res.data);
+  dayWeather.value = res.data;
 };
 
 // 한줄 알림
@@ -116,7 +116,7 @@ onMounted(async () => {
   <div class="header flex justify-between items-center w-full px-4 pt-2">
     <span
       class="live px-4 py-1 text-white font-semibold text-sm"
-      @click="FcstWeather"
+      @click="DayWeather"
     >
       실시간 날씨 정보
     </span>
