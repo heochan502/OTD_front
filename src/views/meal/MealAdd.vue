@@ -115,21 +115,7 @@ const changeText = debounce((type) => {
   searchFoodName(type);
 }, 50);
 
-// 아래 value 나 append뒤에 적힌건 함수화해서 값넘겨서 값보고 그떄별로 다르게 표시되는거
 
-// 현재 시간
-// const currentTime = ref('');
-// const updateTime = () => {
-//   const now = new Date();
-//   const year = now.getFullYear();
-//   const month = String(now.getMonth() + 1).padStart(2, '0');
-//   const day = String(now.getDate()).padStart(2, '0');
-//   const ampm = String(now.getHours() - 12 <= 0 ? '오전' : '오후');
-//   const hours = String(now.getHours()).padStart(2, '0');
-//   const minutes = String(now.getMinutes()).padStart(2, '0');
-//   const seconds = String(now.getSeconds()).padStart(2, '0');
-//   currentTime.value = `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-// };
 
 // 목록 추가
 const onItemClick = (item) => {
@@ -250,12 +236,34 @@ const updateMeal = async () => {
 };
 
 const saveText = ref('저장하기');
+
+// 모달 상태
+const dialog = ref({
+  visible: false,
+  type: 'save', // 'save' or 'update'
+})
+// 모달 열기
+const openDialog = (type) => {
+  dialog.value.type = type;
+  dialog.value.visible = true;
+}
+
+// 확인 버튼 클릭 시 실행
+const confirmAction = () => {
+  if (dialog.value.type === 'save') {
+    saveMeal();
+  } else {
+    updateMeal();
+  }
+  dialog.value.visible = false
+}
 // 화면 뿌리기
 
-const getData = useAlldayMeal();
+
 
 const getMeal = async () => {
   const getlist = {
+  // 아침: Br  점심: Lu 저녁: Di
     mealBrLuDi: dayStore.dayDefine,
     mealDay: dayStore.currentTime.slice(3, 13),
   };
@@ -460,10 +468,26 @@ onMounted(() => {
 
     <v-btn
       class="mealsaday text-center ml-5 text-body-3"
-      @click="saveText === '저장하기' ? saveClick() : updateClick()"
+      @click="openDialog(saveText === '저장하기' ? 'save' : 'update')"
       >{{ saveText }}</v-btn
     >
   </div>
+
+  <v-dialog v-model="dialog.visible" max-width="500px">
+    <v-card>
+      <v-card-title class="text-h5">
+        {{ dialog.type === 'save' ? '저장' : '수정' }} 확인
+      </v-card-title>
+      <v-card-text>
+        {{ dialog.type === 'save' ? '저장하시겠습니까?' : '수정하시겠습니까?' }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text @click="dialog.visible = false">취소</v-btn>
+        <v-btn color="primary" @click="confirmAction">확인</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   <!-- <v-btn class="mealsaday text-center " @click="modifyMeal">수정</v-btn> -->
 </template>
 

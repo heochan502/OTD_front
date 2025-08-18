@@ -4,8 +4,11 @@ import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted,computed ,watch} from 'vue';
 import {useRouter} from "vue-router";
 import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
+import dayjs from 'dayjs';
 
+import 'dayjs/locale/ko'; 
 
+dayjs.locale('ko');
 
 const dayStore = useDayDefine();
 const ondayMealData = useCalorieCalcul();
@@ -31,7 +34,7 @@ const calorieData = computed(() => {
   }
   return {
     allDayCalorie: 0,
-    mealDay: '',
+    mealDay: new dayjs().format('YYYY년 MM월 DD일 dddd'),
     totalFat: 0,
     totalCarbohydrate: 0,
     totalProtein: 0,
@@ -41,8 +44,8 @@ const total = ref(0);
 const avg =ref(0);
 onMounted(async() => {
   // console.log('totalKcal:', totalKcal.value);
-  // console.log('maxKcal:', maxKcal.value);  
-   await ondayMealData.mealFormData();
+  // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
+  await ondayMealData.mealFormData(new dayjs().format('YYYY-MM-DD'));
    
   console.log("정보 데이터 :", weeklyData.weeklyRawData);
   
@@ -58,6 +61,7 @@ watch(
     } else {
       avg.value = 0;
     }
+   
   },
   { immediate: true, deep: true }
 );
@@ -69,8 +73,9 @@ const formatNumber = (num) => num.toLocaleString();
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-            <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-              :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
+          <span class="totalkcal text-h6 font-weight-black" >{{ calorieData.mealDay }} 칼로리</span>
+          <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
+            :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
             :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
             customsize="totalcal" />
           <div class="inprogressbar">
@@ -103,11 +108,12 @@ const formatNumber = (num) => num.toLocaleString();
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
-      
+      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균
+        {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
+
       <div class=" d-flex  justify-content-end ">
-      <WeeklyCalorie class="" />
-    </div>
+        <WeeklyCalorie class="" />
+      </div>
     </div>
     <div class="bottom ">
 
