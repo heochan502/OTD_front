@@ -27,9 +27,10 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
             totalProtein: 0,
           },
         ];
+        console.log(":가져오는 값 :", getData);
       }
 
-      console.log(":가져오는 값 :", getData);
+     
       // getData null 일때  다른 값 들어가게 해야함
       else{
       itemInfo.value = [
