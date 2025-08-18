@@ -3,13 +3,19 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useBaseDate, useDayDefine, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
 
 import { getWeekTotal } from '@/services/meal/mealService'
+import dayjs from "dayjs";
+
+import "dayjs/locale/ko";
+
+dayjs.locale("ko");
+
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
 const weeklyStore = useWeeklyStore();
 const ondayMealData = useCalorieCalcul();
 
-const selectedDate = ref(nowDay.currentTime.slice(3, 13)); // 초기화 및 선택하는 날짜 들어감
+const selectedDate = ref(ondayMealData.itemInfo.mealDay); // 초기화 및 선택하는 날짜 들어감
 const weekDates = ref([]);
 
 const getWeekDates = (dateString) => {
@@ -18,11 +24,21 @@ const getWeekDates = (dateString) => {
   //0 일요일 ~
   const dayOfWeek = date.getDay();
 
+  console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
+
+
   // 현재 나 선택한 날짜 
   const startDate = new Date(date);
+
   // console.log(dayOfWeek + 1, typeof dateString);
   // 해당 요일의 번호를 빼서 월요일로 초기화
-  startDate.setDate(date.getDate() - dayOfWeek + 1);
+  if (dayOfWeek === 0) {
+    startDate.setDate(startDate.getDate() - 6);
+  } 
+  else {
+    startDate.setDate(date.getDate() - dayOfWeek + 1);
+  }
+  console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
   const result = [];
   for (let i = 0; i < 7; i++) {
    
@@ -43,11 +59,12 @@ const getWeekDates = (dateString) => {
 watch(
   selectedDate,
  (newDate) => {
+
   if (!newDate) {
     newDate = new dayjs().format('YYYY-MM-DD'); // 선택된 날짜가 없으면 현재 날짜로 설정
+    
   } 
-
-    // console.log("선택된 날짜 : ", newDate);
+   console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
     ondayMealData.mealFormData(newDate);
     weekDates.value = getWeekDates(newDate);
 
