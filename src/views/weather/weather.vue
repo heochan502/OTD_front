@@ -1,10 +1,15 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { getWeather, getNickName } from '@/services/weather/weatherHomeService';
+import {
+  getWeather,
+  getNickName,
+  getSrtFcst,
+} from '@/services/weather/weatherHomeService';
 
 const weather = ref(null);
 const open = ref(false);
 const nickName = ref('');
+const fcstWeather = ref(null);
 
 const LocalWeather = async () => {
   const res = await getWeather();
@@ -14,6 +19,13 @@ const LocalWeather = async () => {
     weather.value.villageSky = weather.value.ncstPty;
   }
 };
+
+const FcstWeather = async () => {
+  const res = await getSrtFcst();
+  console.log('fcst :', res.data);
+  fcstWeather.value = res.data;
+};
+
 // 한줄 알림
 const memberNickName = async () => {
   const res = await getNickName();
@@ -102,7 +114,10 @@ onMounted(async () => {
     >{{ popMessage }}
   </div>
   <div class="header flex justify-between items-center w-full px-4 pt-2">
-    <span class="live px-4 py-1 text-white font-semibold text-sm">
+    <span
+      class="live px-4 py-1 text-white font-semibold text-sm"
+      @click="FcstWeather"
+    >
       실시간 날씨 정보
     </span>
     <button @click="toggleMenu" class="menu px-2 py-1 text-sm font-bold">
@@ -261,7 +276,7 @@ onMounted(async () => {
       font-size: 3rem;
     }
 
-    .ncstTemperature {
+    .temperature {
       font-size: 2rem;
       font-weight: bold;
     }

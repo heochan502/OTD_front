@@ -8,3 +8,7 @@ export const getWeather = () => {
 export const getNickName = () => {
   return axios.get('/weather/info').catch((e) => e.response);
 };
+
+export const getSrtFcst = () => {
+  return axios.get('/weather/fcst').catch((e) => e.response);
+};
