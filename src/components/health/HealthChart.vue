@@ -6,11 +6,13 @@ import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 
 dayjs.extend(isoWeek);
+
 const props = defineProps({
   selectedDate: {
     type: String,
     required: true,
   },
+  selectedField: String,
 });
 
 const healthStore = useHealthStore();
@@ -40,22 +42,16 @@ const weeklyLogs = computed(() => {
 });
 
 // 요일별 체중 배열 (월~일, 1~7)
-const weeklyWeight = computed(() => {
+const weeklyData = computed(() => {
   const days = Array(7).fill(null);
   weeklyLogs.value.forEach((log) => {
     const day = dayjs(log.healthlogDatetime);
     const weekday = day.isoWeekday();
-    days[weekday - 1] = log.weight;
+    const value = log[props.selectedField]; // selectedField에 따라 값 선택
+    days[weekday - 1] = value;
   });
-
   return days;
 });
-
-console.log("이번주", weekRange.value);
-console.log("주간 기록", weeklyLogs.value);
-console.log("주간 체중", weeklyWeight.value);
-
-const gradients = [["#30cfd0"], ["#330867"]];
 
 const labels = ref(["월", "화", "수", "목", "금", "토", "일"]);
 // const weightDatum = healthStore.logs.map((item) => item.weight);
@@ -64,7 +60,7 @@ const labels = ref(["월", "화", "수", "목", "금", "토", "일"]);
 <template>
   <v-card class="chart">
     <v-sparkline
-      :model-value="weeklyWeight"
+      :model-value="weeklyData"
       :auto-line-width="true"
       :gradient="['#3BBEFF', '#ffffff']"
       :gradient-direction="top"

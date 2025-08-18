@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import moodLevels from "@/assets/health/moodLevels.json";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
 import HealthCart from "@/components/health/HealthChart.vue";
@@ -46,6 +46,7 @@ const fields = [
   { key: "diastolicBp", label: "이완기 혈압", unit: "mmHg" },
   { key: "sugarLevel", label: "혈당", unit: "mg/dL" },
 ];
+const selectedField = ref("weight");
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
@@ -115,7 +116,10 @@ const deleteLog = async () => {
       </div>
     </v-item-group>
     <!-- 통계 그래프 -->
-    <HealthCart :selectedDate="state.hlog.healthlogDatetime" />
+    <HealthCart
+      :selectedDate="state.hlog.healthlogDatetime"
+      :selectedField="selectedField"
+    />
   </v-container>
 </template>
 
