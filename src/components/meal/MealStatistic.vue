@@ -1,12 +1,13 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { useBaseDate, useDayDefine, useWeeklyStore } from '@/stores/mealStore';
+import { useBaseDate, useDayDefine, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
 
 import { getWeekTotal } from '@/services/meal/mealService'
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
 const weeklyStore = useWeeklyStore();
+const ondayMealData = useCalorieCalcul();
 
 const selectedDate = ref(nowDay.currentTime.slice(3, 13)); // 초기화 및 선택하는 날짜 들어감
 const weekDates = ref([]);
@@ -23,7 +24,7 @@ const weekDates = ref([]);
 //   }));
 // });
 
-function getWeekDates(dateString) {
+const getWeekDates = (dateString) => {
   // 오늘 날짜 까져옴
   const date = new Date(dateString);
   //0 일요일 ~
@@ -35,14 +36,14 @@ function getWeekDates(dateString) {
   // 해당 요일의 번호를 빼서 월요일로 초기화
   startDate.setDate(date.getDate() - dayOfWeek + 1);
   const result = [];
-  const currentDate = new Date(startDate);
-  // console.log("시작 날짜 : ", String(currentDate).slice(0, 10));
   for (let i = 0; i < 7; i++) {
    
     // console.log(startDate, typeof startDate);
-    currentDate.setDate(startDate.getDate() + i);
-    // console.log("날짜 : ", String(currentDate).slice(0, 10));
-    result.push(nowDay.updateTime(currentDate).slice(3, 13));
+    const weekDate =  new Date(startDate.toISOString().slice(0,10));
+    weekDate.setDate(weekDate.getDate() + i);
+    // console.log("날짜 겟데이타 : ", startDate.toISOString().slice(0, 10));
+    // console.log("날짜 만든거 : ", weekDate);
+    result.push(nowDay.updateTime(weekDate).slice(3, 13));
     // console.log("날짜 : ", result[i]);
     
   }
@@ -55,10 +56,14 @@ watch(
   selectedDate,
  (newDate) => {
   if (!newDate) {
-    newDate = nowDay.currentTime; // 선택된 날짜가 없으면 현재 날짜로 설정
+    newDate = new dayjs().format('YYYY-MM-DD'); // 선택된 날짜가 없으면 현재 날짜로 설정
   } 
 
+    // console.log("선택된 날짜 : ", newDate);
+    ondayMealData.mealFormData(newDate);
     weekDates.value = getWeekDates(newDate);
+
+    //여기 데이터 확인 
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
  
@@ -66,8 +71,10 @@ watch(
     const res =  getWeekTotal(weekDay.getWeekDate);
     if (res.status === 200) {
       weeklyStore.weeklyRawData = res.data;
-      // console.log("통신구역 " );
+      
     }
+   weeklyStore.weekyDate = weekDates.value;
+  //  console.log("통신구역 ", weeklyStore.weekyDate);
 
   },
   { immediate: true }

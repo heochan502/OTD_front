@@ -8,32 +8,33 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
 
   const dayStore = useDayDefine();
     const itemInfo = ref([]);
-    const mealFormData = async () =>
+    const mealFormData = async (dateStr) =>
     {
       // 처음 화면 상단 그래프 부분 출력용
       dayStore.updateTime();
-      const dataStr = dayStore.currentTime.slice(3, 13)
-      const getData = await getMealTotalOnDay(dataStr);
-      // console.log(":넘어 온 데이터:",getData);      
-      itemInfo.value =  [{            
-      mealDay : getData.mealDay,
-      allDayCalorie: getData.totalCalorie,
-      totalFat :getData.totalFat,
-      totalCarbohydrate :getData.totalCarbohydrate,
-      totalProtein : getData.totalProtein,      
-    }];
-
+      // const dataStr = dayStore.currentTime.slice(3, 13);
+      console.log(":보내는 날짜 :", dateStr);
+      const getData = await getMealTotalOnDay(dateStr);
+      itemInfo.value = [
+        {
+          mealDay: getData.mealDay,
+          allDayCalorie: getData.totalCalorie,
+          totalFat: getData.totalFat,
+          totalCarbohydrate: getData.totalCarbohydrate,
+          totalProtein: getData.totalProtein,
+        },
+      ];
     }
     // 아래 두기능 안쓰는중 
     const inputFoodInfo = (foodInfo) => {
     itemInfo.value.push(foodInfo);
     };
 
-    const getItemInfoByIndex = (index) => {
+    const setDate = (index) => {
     return itemInfo.value[index];
     };
 
-    return { itemInfo, inputFoodInfo, getItemInfoByIndex, mealFormData };
+    return { itemInfo, inputFoodInfo, setDate, mealFormData };
 });
 
 export const useDayDefine = defineStore("useDayDefine",()=>
@@ -105,7 +106,10 @@ export const useBaseDate = defineStore("useBaseDate",()=>{
 
 export const useWeeklyStore = defineStore('weekly', ()=>{
   const weeklyRawData = ref([]);
+  const weekyDate = ref([]);
   return {
     weeklyRawData,
+    weekyDate
   };
 });
+
