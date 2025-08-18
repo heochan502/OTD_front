@@ -1,23 +1,54 @@
 <script setup>
 import { onMounted, ref, nextTick, reactive, watch } from 'vue';
 
-import { useBaseDate, useWeeklyStore, } from '@/stores/mealStore';
+import { useBaseDate, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
 import { getWeekTotal } from '@/services/meal/mealService'
 import MealStatistic from './MealStatistic.vue';
 
 import * as echarts from 'echarts';
 
+import dayjs from 'dayjs';
+
+import 'dayjs/locale/ko';
+
+dayjs.locale('ko');
+
+const ondayMealData = useCalorieCalcul();
 const weeklyStore = useWeeklyStore();
 
 
 const weekDay = useBaseDate();
 
-const xData = ['월', '화', '수', '목', '금', '토', '일'];
-const yData = Array(xData.length).fill(0);
+// const xData = ['월', '화', '수', '목', '금', '토', '일'];
+const xData = {
+  dates: [],
+  dayName: ['월', '화', '수', '목', '금', '토', '일']
+};
+
+const getYData = ref({});
+
+const len = xData.dayName.length;
+
+// const yData = Array(xData.dayName.length).fill(0);
+const yData = ['totalCalorie', 'totalFat', 'totalCarbohydrate', 'totalProtein']
+  .reduce((acc, key) => ({ ...acc, [key]: Array(len).fill(0) }), {})
+
+/*const yData= {
+// 탄 * 4 단 * 4 지 * 9  
+  totalCalorie: Array(len).fill(0),
+  totalFat: Array(len).fill(0),
+  totalCarbohydrate: Array(len).fill(0),
+  totalProtein: Array(len).fill(0),
+
+}
+// 위랑 아래랑 같은 식 
+const yData = ['totalCalorie', 'totalFat', 'totalCarbohydrate', 'totalProtein']
+  .reduce((acc, key) => ({ ...acc, [key]: Array(len).fill(0) }), {})
+*/
 
 
 const getDayName = (dateString) => {
-  const days = [ '일','월', '화', '수', '목', '금', '토'];
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
   const date = new Date(dateString);
   // console.log("요일 : ", date.getDay());
   // console.log("요일 : ", days[date.getDay()]);
@@ -31,18 +62,21 @@ let myChart = null; // ECharts 인스턴스
 
 const option = {
 
-
   // 차트 옵션 설정
   //마우스 올렸을때 나오는 정보값
   tooltip: {
     trigger: 'axis',
+    // 마우스 오버 했을때 나오는 정보
     formatter: function (params) {
       // 막대 그래프는 일반적으로 하나만 있어서 params[0] 사용
       const data = params[0];
+      // 아래 toLocaleString 터지는 거 방지 
+      data.data = data.data ? data.data : 0;
       // data.marker는 색상 표시
       // data.data는 해당 데이터 값
       // data.axisValue는 x축의 값
-      return `${data.axisValue}요일 <br />${data.marker} ${data.data.toLocaleString()} kcal`;
+      // console.log("params:", params);
+      return `${xData.dates[params[0].dataIndex]}  <br /> ${data.axisValue}요일 <br />${data.marker} ${data.data.toLocaleString()} kcal`;
     },
   },
   legend: {
@@ -58,7 +92,7 @@ const option = {
   // 범례 설정
   xAxis: {
     type: 'category',
-    data: xData,
+    data: xData.dayName,
     axisLabel: {
       color: '#000000', // 텍스트 색상
       fontSize: 14, // 글자 크기
@@ -78,7 +112,8 @@ const option = {
       color: '#000000',
       fontSize: 12,
       fontWeight: 'bold',
-      formatter: '{value} kcal', // y축 값 옆에 단위 추가
+      formatter: '{value} kcal'
+
     },
     splitLine: {
       lineStyle: {
@@ -88,27 +123,27 @@ const option = {
     },
   },
   // 차트 스타일 설정
-  series: [
-    {
-      name: '요일 ',
-      type: 'bar',
-      seriesLayoutBy: 'row',
-      data: yData,
-      // 막대그래프 스타일 설정
-
-      barWidth: '50%',
-      itemStyle: {
-        borderRadius: [30, 30, 0, 0],
-        color: '#D9D9D9',
-        animation: true, // 기본 애니메이션
-        animationDuration: 5000, // 초기 진입 애니메이션 시간
-        // animationDurationUpdate: 5000, //  데이터 업데이트 시 애니메이션 시간
-        animationDelay: 500, // 애니메이션 지연 시간
-        // animationEasing: 'elasticOut', // 애니메이션 효과
-        // animationDelay: (idx) => idx * 100, // 각 막대마다 애니메이션 지연 시간
-      },
+  series:
+  {
+    name: '',
+    type: 'bar',
+    seriesLayoutBy: 'row',
+     // y축 데이터와 x축 날짜를 결합
+    // 막대그래프 스타일 설정
+    data: yData.totalCalorie,
+    barWidth: '50%',
+    itemStyle: {
+      borderRadius: [30, 30, 0, 0],
+      color: '#D9D9D9',
+      animation: true, // 기본 애니메이션
+      animationDuration: 5000, // 초기 진입 애니메이션 시간
+      // animationDurationUpdate: 5000, //  데이터 업데이트 시 애니메이션 시간
+      animationDelay: 500, // 애니메이션 지연 시간
+      // animationEasing: 'elasticOut', // 애니메이션 효과
+      // animationDelay: (idx) => idx * 100, // 각 막대마다 애니메이션 지연 시간
     },
-  ],
+  },
+
   graphic: {
     type: 'text',
     right: '5%',
@@ -121,25 +156,48 @@ const option = {
   },
 };
 const getStatistic = async (weeky) => {
-
   const res = await getWeekTotal(weeky);
+  // console.log("weeky:", weeky);
   if (res.status === 200) {
     weeklyStore.weeklyRawData = res.data;
   }
-  // console.log("데이터 확인 ", weeklyStore.weeklyRawData);
-    // 기존 y축 데이터 0으로 만드는격 
-  const yDataTemp = Array(xData.length).fill(0);
-    weeklyStore.weeklyRawData.forEach(item => {
-      const dayName = getDayName(item.mealDay); // '화', '수', ...
-      
-      const index = xData.indexOf(dayName);      // 요일 인덱스 찾기   
-      if (index !== -1) {
-        yDataTemp[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
-      }
-    });
-    // 0인덱스 부터 ydata 길이만큼 temp를 넣겟다 
-    // ydata 기존값 날리면서 새로운 데이터 넣기
-  yData.splice(0, yData.length, ...yDataTemp);
+
+  // 기존 y축 데이터 0으로 만드는격 
+  // const yDataTemp = Array(xData.dayName.length).fill(0);
+  // console.log("weeklyStore.weeklyRawData:", weeklyStore.weeklyRawData);
+
+
+  xData.dates= weeklyStore.weekyDate; // 날짜 추가
+
+  yData.totalCalorie = Array(xData.dayName.length).fill(0);
+  yData.totalFat = Array(xData.dayName.length).fill(0);
+  yData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
+  yData.totalProtein = Array(xData.dayName.length).fill(0);
+
+  weeklyStore.weeklyRawData.forEach(item => {
+    const dayName = getDayName(item.mealDay); // '화', '수', ...
+
+    const index = xData.dayName.indexOf(dayName);      // 요일 인덱스 찾기   
+    if (index !== -1) {
+      // console.log("item.mealDay: {}, index : {}", item.mealDay, index);
+      yData.totalCalorie[index] = item.totalCalorie; // 해당 요일 자리에 값 대입
+      yData.totalFat[index] = item.totalFat;
+      yData.totalCarbohydrate[index] = item.totalCarbohydrate;
+      yData.totalProtein[index] = item.totalProtein;
+
+      // xData.dates[index] = item.mealDay; // 날짜 추가
+      // yDataTemp[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
+    }
+    // myChart.series.data = yData.totalCalorie;
+   
+  });
+  // console.log("item.yDataTemp:", yDataTemp);
+  // console.log("xData.dates:", xData.dates);
+  // 0인덱스 부터 ydata 길이만큼 temp를 넣겟다 
+  // ydata 기존값 날리면서 새로운 데이터 넣기
+  // yData.splice(0, xData.dayName.length, ...yDataTemp);
+
+  // console.log("yData:", yData);
 }
 
 onMounted(async () => {
@@ -150,8 +208,19 @@ onMounted(async () => {
     await getStatistic(weekDay.getWeekDate); // 주 시작 과 끝 보내서 데이터 받아오기
     myChart.setOption(option); // 차트 옵션 설정
   } else {
-    console.warn('chartRef is null');
+    // console.warn('chartRef is null');
   }
+
+  // 차트 클릭 이벤트 핸들러
+  myChart.on('click', (params) => {
+    if (params.componentType === "series") {
+      const dataIndex = params.dataIndex;
+      const dayName = xData.dates[dataIndex];
+      // console.log("Clicked on:", params);
+      // console.log("Clicked on day:", dayName);
+      ondayMealData.mealFormData(dayName);
+    }
+  });
   // console.log("주시작 : ", weekDay.getWeekDate);
 
 });

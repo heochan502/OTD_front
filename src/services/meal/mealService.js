@@ -41,9 +41,7 @@ export const getMealData = async (getlist) => {
 };
 
 export const getMealTotalOnDay = async (nowDay) => {
-  // console.log('오늘 정보', nowDay);
-
-
+    // console.log('오늘 정보', nowDay);
   const res = await axios.get("meal/eatenMeal", {params :{mealDay:nowDay}});
   // console.log("json이겟지? :", res.data);
   // const data = res.data;

@@ -4,8 +4,11 @@ import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted,computed ,watch} from 'vue';
 import {useRouter} from "vue-router";
 import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
+import dayjs from 'dayjs';
 
+import 'dayjs/locale/ko'; 
 
+dayjs.locale('ko');
 
 const dayStore = useDayDefine();
 const ondayMealData = useCalorieCalcul();
@@ -23,6 +26,7 @@ const  mealadd = (day)=>{
 };
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
+// 여기서 과거 데이터 보여주는거 고쳐야함
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
   // null, undefined, 배열 길이 체크
@@ -31,7 +35,7 @@ const calorieData = computed(() => {
   }
   return {
     allDayCalorie: 0,
-    mealDay: '',
+    mealDay: new dayjs().format('YYYY년 MM월 DD일 dddd'),
     totalFat: 0,
     totalCarbohydrate: 0,
     totalProtein: 0,
@@ -41,12 +45,9 @@ const total = ref(0);
 const avg =ref(0);
 onMounted(async() => {
   // console.log('totalKcal:', totalKcal.value);
-  // console.log('maxKcal:', maxKcal.value);  
-   await ondayMealData.mealFormData();
-   
-  console.log("정보 데이터 :", weeklyData.weeklyRawData);
-  
-
+  // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
+  await ondayMealData.mealFormData(new dayjs().format('YYYY-MM-DD'));   
+  // console.log("정보 데이터 :", weeklyData.weeklyRawData);
 });
 
 watch(
@@ -58,10 +59,16 @@ watch(
     } else {
       avg.value = 0;
     }
+   
   },
   { immediate: true, deep: true }
 );
 const formatNumber = (num) => num.toLocaleString();
+
+const clickProgressBar= category =>{
+console.log (category);
+}
+
 </script>
 
 <template>
@@ -69,10 +76,11 @@ const formatNumber = (num) => num.toLocaleString();
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-            <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-              :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
+          <span class="totalkcal text-h6 font-weight-black" >{{ calorieData.mealDay }} 칼로리</span>
+          <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
+            :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
             :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
-            customsize="totalcal" />
+            customsize="totalcal" @click="clickProgressBar('totalCalorie')" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
               :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
@@ -103,11 +111,12 @@ const formatNumber = (num) => num.toLocaleString();
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
-      
+      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균
+        {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
+
       <div class=" d-flex  justify-content-end ">
-      <WeeklyCalorie class="" />
-    </div>
+        <WeeklyCalorie class="" />
+      </div>
     </div>
     <div class="bottom ">
 

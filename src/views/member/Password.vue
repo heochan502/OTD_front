@@ -1,9 +1,8 @@
 <script setup>
 import { reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { changePassword } from '@/services/accountService';
+import { changePassword } from '@/services/member/accountService';
 import { useAccountStore } from '@/stores/counter';
-
 
 const router = useRouter();
 const counter = useAccountStore();
@@ -32,10 +31,7 @@ const state = reactive({
     },
   },
   saving: false,
-  showSuccess: false,
-  generalError: '',
 });
-
 
 const validateCurrentPassword = (password) => {
   if (!password) {
@@ -52,10 +48,16 @@ const validateNewPassword = (password) => {
     return { isValid: false, message: '새 비밀번호는 2자 이상이어야 합니다.' };
   }
   if (password.length > 20) {
-    return { isValid: false, message: '새 비밀번호는 최대 20자까지 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '새 비밀번호는 최대 20자까지 입력 가능합니다.',
+    };
   }
   if (password === state.form.currentPassword) {
-    return { isValid: false, message: '현재 비밀번호와 다른 비밀번호를 입력해주세요.' };
+    return {
+      isValid: false,
+      message: '현재 비밀번호와 다른 비밀번호를 입력해주세요.',
+    };
   }
   return { isValid: true, message: '' };
 };
@@ -100,12 +102,13 @@ const handleFieldTouch = (field) => {
 };
 
 const isFormValid = () => {
-  return Object.values(state.validation).every((field) => field.isValid) &&
-         state.form.currentPassword && 
-         state.form.newPassword && 
-         state.form.confirmPassword;
+  return (
+    Object.values(state.validation).every((field) => field.isValid) &&
+    state.form.currentPassword &&
+    state.form.newPassword &&
+    state.form.confirmPassword
+  );
 };
-
 
 watch(
   () => state.form.currentPassword,
@@ -142,22 +145,17 @@ watch(
   }
 );
 
-
 const changePasswordSubmit = async () => {
-
   Object.keys(state.validation).forEach((field) => {
     state.validation[field].touched = true;
     validateField(field, state.form[field]);
   });
 
   if (!isFormValid()) {
-    state.generalError = '입력 정보를 다시 확인해주세요.';
-    setTimeout(() => (state.generalError = ''), 3000);
     return;
   }
 
   state.saving = true;
-  state.generalError = '';
 
   try {
     const requestData = {
@@ -172,13 +170,11 @@ const changePasswordSubmit = async () => {
     console.log('API 응답:', res);
 
     if (res && res.status === 200) {
-      state.showSuccess = true;
-      
-
+   
       state.form.currentPassword = '';
       state.form.newPassword = '';
       state.form.confirmPassword = '';
-      
+
 
       Object.keys(state.validation).forEach((field) => {
         state.validation[field] = {
@@ -188,30 +184,51 @@ const changePasswordSubmit = async () => {
         };
       });
 
-      setTimeout(() => {
-        state.showSuccess = false;
-      }, 3000);
+
+      router.push('/profile');
     } else {
       console.error('비밀번호 변경 실패 - 전체 응답:', res);
-      
+
       if (res?.status === 401) {
-        state.generalError = '현재 비밀번호가 올바르지 않습니다.';
+        // 401 에러일 때 현재 비밀번호 필드에 에러 표시
+        state.validation.currentPassword.isValid = false;
+        state.validation.currentPassword.message =
+          '현재 비밀번호가 올바르지 않습니다.';
+        state.validation.currentPassword.touched = true;
       } else if (res?.status === 400) {
-        state.generalError = res.data?.message || '잘못된 요청입니다.';
+        // 400 에러의 경우 개별 필드 검증에서 처리되도록
+        console.error('잘못된 요청:', res.data?.message);
       } else {
-        state.generalError = `비밀번호 변경에 실패했습니다. 상태코드: ${
-          res?.status || '알 수 없음'
-        }`;
+        console.error(
+          `비밀번호 변경에 실패했습니다. 상태코드: ${
+            res?.status || '알 수 없음'
+          }`
+        );
       }
     }
   } catch (error) {
     console.error('Password change error:', error);
-    state.generalError = '오류가 발생했습니다: ' + error.message;
+
+
+    if (
+      error.status === 500 ||
+      error.data?.message === '서버 내부 오류가 발생했습니다.'
+    ) {
+      state.validation.currentPassword.isValid = false;
+      state.validation.currentPassword.message =
+        '현재 비밀번호가 올바르지 않습니다.';
+      state.validation.currentPassword.touched = true;
+    }
+
+    console.error('비밀번호 변경 실패 - 전체 응답:', error);
+    console.error('서버 에러 메시지:', error.data);
+    console.error('에러 상세:', error.data?.message);
+    console.error('에러 코드:', error.data?.code);
+    console.error('전송한 데이터:', error.config?.data);
   } finally {
     state.saving = false;
   }
 };
-
 
 watch(
   () => counter.state.loggedIn,
@@ -229,21 +246,13 @@ watch(
     <div class="container">
       <div class="content-container">
         <div class="password-change-content">
-          <div v-if="state.showSuccess" class="success-message">
-            <div class="message-icon">✓</div>
-            <div>비밀번호가 성공적으로 변경되었습니다!</div>
-          </div>
-
-          <div v-if="state.generalError" class="error-message">
-            <div class="message-icon">⚠</div>
-            <div>{{ state.generalError }}</div>
-          </div>
-
           <form @submit.prevent="changePasswordSubmit">
             <div class="section">
               <div class="header">
                 <h1>비밀번호 변경</h1>
-                <p class="subtitle">보안을 위해 주기적으로 비밀번호를 변경해주세요.</p>
+                <p class="subtitle">
+                  보안을 위해 주기적으로 비밀번호를 변경해주세요.
+                </p>
               </div>
 
               <div class="form-row">
@@ -265,28 +274,32 @@ watch(
                     }"
                     @blur="handleFieldTouch('currentPassword')"
                     @input="
+                  
+                      if (!state.validation.currentPassword.isValid) {
+                        state.validation.currentPassword.isValid = true;
+                        state.validation.currentPassword.message = '';
+                      }
                       state.validation.currentPassword.touched &&
-                        validateField('currentPassword', state.form.currentPassword)
+                        validateField(
+                          'currentPassword',
+                          state.form.currentPassword
+                        );
                     "
                   />
-                  <div
-                    v-if="
-                      state.validation.currentPassword.touched &&
-                      state.validation.currentPassword.message
-                    "
-                    class="field-error"
-                  >
-                    {{ state.validation.currentPassword.message }}
-                  </div>
-                  <div
-                    v-else-if="
-                      state.validation.currentPassword.touched &&
-                      state.validation.currentPassword.isValid &&
-                      state.form.currentPassword
-                    "
-                    class="field-success"
-                  >
-                    현재 비밀번호가 입력되었습니다.
+                  <div class="field-message-area">
+                    <div
+                      v-if="
+                        state.validation.currentPassword.touched &&
+                        state.validation.currentPassword.message
+                      "
+                      :class="[
+                        state.validation.currentPassword.isValid
+                          ? 'field-success'
+                          : 'field-error',
+                      ]"
+                    >
+                      {{ state.validation.currentPassword.message }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -314,24 +327,26 @@ watch(
                         validateField('newPassword', state.form.newPassword)
                     "
                   />
-                  <div
-                    v-if="
-                      state.validation.newPassword.touched &&
-                      state.validation.newPassword.message
-                    "
-                    class="field-error"
-                  >
-                    {{ state.validation.newPassword.message }}
-                  </div>
-                  <div
-                    v-else-if="
-                      state.validation.newPassword.touched &&
-                      state.validation.newPassword.isValid &&
-                      state.form.newPassword
-                    "
-                    class="field-success"
-                  >
-                    사용 가능한 비밀번호입니다.
+                  <div class="field-message-area">
+                    <div
+                      v-if="
+                        state.validation.newPassword.touched &&
+                        state.validation.newPassword.message
+                      "
+                      class="field-error"
+                    >
+                      {{ state.validation.newPassword.message }}
+                    </div>
+                    <div
+                      v-else-if="
+                        state.validation.newPassword.touched &&
+                        state.validation.newPassword.isValid &&
+                        state.form.newPassword
+                      "
+                      class="field-success"
+                    >
+                      사용 가능한 비밀번호입니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -356,19 +371,26 @@ watch(
                     @blur="handleFieldTouch('confirmPassword')"
                     @input="
                       state.validation.confirmPassword.touched &&
-                        validateField('confirmPassword', state.form.confirmPassword)
+                        validateField(
+                          'confirmPassword',
+                          state.form.confirmPassword
+                        )
                     "
                   />
-                  <div
-                    v-if="
-                      state.validation.confirmPassword.touched &&
-                      state.validation.confirmPassword.message
-                    "
-                    :class="[
-                      state.validation.confirmPassword.isValid ? 'field-success' : 'field-error'
-                    ]"
-                  >
-                    {{ state.validation.confirmPassword.message }}
+                  <div class="field-message-area">
+                    <div
+                      v-if="
+                        state.validation.confirmPassword.touched &&
+                        state.validation.confirmPassword.message
+                      "
+                      :class="[
+                        state.validation.confirmPassword.isValid
+                          ? 'field-success'
+                          : 'field-error',
+                      ]"
+                    >
+                      {{ state.validation.confirmPassword.message }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -432,6 +454,21 @@ watch(
   color: #64748b;
   font-size: 14px;
   margin: 0;
+}
+
+
+.message-area {
+  min-height: 60px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.field-message-area {
+  min-height: 20px;
+  margin-top: 4px;
+  display: flex;
+  align-items: flex-start;
 }
 
 .error-message,
