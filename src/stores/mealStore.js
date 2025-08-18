@@ -14,7 +14,8 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
       // const dataStr = dayStore.currentTime.slice(3, 13);
       console.log(":보내는 날짜 :", dateStr);
       const getData = await getMealTotalOnDay(dateStr);
-      if (!getData.value)
+      console.log("바로 가져온값 : ",getData );
+      if (getData==="" || getData === null)
       {
         itemInfo.value =[ 
           {
@@ -29,7 +30,7 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
       else{
       itemInfo.value = [
         {
-          mealDay: getData.mealDay,
+          mealDay: dateStr,
           allDayCalorie: getData.totalCalorie,
           totalFat: getData.totalFat,
           totalCarbohydrate: getData.totalCarbohydrate,
@@ -129,14 +130,32 @@ export const useWeeklyStore = defineStore('weekly', ()=>{
 
 // 프로그래스 바 눌렀을때 변경되는거
 export const useClickProgressBar = defineStore('useClickProgressBar', ()=>{
-  const nowCategory = ref(0);
+  const nowCategory = ref(null);
   
   const nowProgress= (category)=>{
     // category : 0 totalCalorie 전체 칼로리
     // 1: tansu 탄수화물  * 4 배수
     // 2: protein  단백질  * 4 배수
     // 3: jibang 지방  * 9 배수
-    return this.nowCategory = category === 0 ? 0 : category === 1 ? 1:2;
+    // console.log(category);
+    switch ( category){
+    
+    case 1:
+      return nowCategory.value = 1;
+
+    case 2:
+      return nowCategory.value = 2;
+  
+    case 3:
+      return nowCategory.value = 3; 
+      case 0:
+    default :  
+      return nowCategory.value = 0;
+      
+    }
+    
+    
   }
+  return { nowProgress, nowCategory  };
 }
 )

@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, nextTick, reactive, watch } from 'vue';
 
-import { useBaseDate, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
+import { useBaseDate, useWeeklyStore, useCalorieCalcul , useClickProgressBar} from '@/stores/mealStore';
 import { getWeekTotal } from '@/services/meal/mealService'
 import MealStatistic from './MealStatistic.vue';
 
@@ -13,6 +13,7 @@ import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 
+const clickProgress =useClickProgressBar();
 const ondayMealData = useCalorieCalcul();
 const weeklyStore = useWeeklyStore();
 
@@ -22,10 +23,13 @@ const weekDay = useBaseDate();
 // const xData = ['월', '화', '수', '목', '금', '토', '일'];
 const xData = {
   dates: [],
-  dayName: ['월', '화', '수', '목', '금', '토', '일']
+  dayName: ['월', '화', '수', '목', '금', '토', '일'],
+  totalCalorie:[0,0,0,0,0,0,0],
+  totalFat :[0,0,0,0,0,0,0],
+  totalCarbohydrate :[0,0,0,0,0,0,0],
+  totalProtein :[0,0,0,0,0,0,0],
 };
 
-const getYData = ref({});
 
 const len = xData.dayName.length;
 
@@ -61,7 +65,6 @@ const chartRef = ref(null); // 차트 DOM 요소 참조
 let myChart = null; // ECharts 인스턴스
 
 const option = {
-
   // 차트 옵션 설정
   //마우스 올렸을때 나오는 정보값
   tooltip: {
@@ -130,7 +133,7 @@ const option = {
     seriesLayoutBy: 'row',
      // y축 데이터와 x축 날짜를 결합
     // 막대그래프 스타일 설정
-    data: yData.totalCalorie,
+    data: xData.totalCalorie,
     barWidth: '50%',
     itemStyle: {
       borderRadius: [30, 30, 0, 0],
@@ -166,13 +169,12 @@ const getStatistic = async (weeky) => {
   // const yDataTemp = Array(xData.dayName.length).fill(0);
   // console.log("weeklyStore.weeklyRawData:", weeklyStore.weeklyRawData);
 
-
   xData.dates= weeklyStore.weekyDate; // 날짜 추가
 
-  yData.totalCalorie = Array(xData.dayName.length).fill(0);
-  yData.totalFat = Array(xData.dayName.length).fill(0);
-  yData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
-  yData.totalProtein = Array(xData.dayName.length).fill(0);
+  // xData.totalCalorie = Array(xData.dayName.length).fill(0);
+  // yData.totalFat = Array(xData.dayName.length).fill(0);
+  // yData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
+  // yData.totalProtein = Array(xData.dayName.length).fill(0);
 
   weeklyStore.weeklyRawData.forEach(item => {
     const dayName = getDayName(item.mealDay); // '화', '수', ...
@@ -180,10 +182,10 @@ const getStatistic = async (weeky) => {
     const index = xData.dayName.indexOf(dayName);      // 요일 인덱스 찾기   
     if (index !== -1) {
       // console.log("item.mealDay: {}, index : {}", item.mealDay, index);
-      yData.totalCalorie[index] = item.totalCalorie; // 해당 요일 자리에 값 대입
-      yData.totalFat[index] = item.totalFat;
-      yData.totalCarbohydrate[index] = item.totalCarbohydrate;
-      yData.totalProtein[index] = item.totalProtein;
+      xData.totalCalorie[index] = item.totalCalorie; // 해당 요일 자리에 값 대입
+      xData.totalFat[index] = item.totalFat;
+      xData.totalCarbohydrate[index] = item.totalCarbohydrate;
+      xData.totalProtein[index] = item.totalProtein;
 
       // xData.dates[index] = item.mealDay; // 날짜 추가
       // yDataTemp[index] = item.totalCalorie;       // 해당 요일 자리에 값 대입
@@ -192,7 +194,13 @@ const getStatistic = async (weeky) => {
    
   });
   // console.log("item.yDataTemp:", yDataTemp);
-  // console.log("xData.dates:", xData.dates);
+
+  // 아래가 y축 데이터 바꾼는거
+  // xData.totalCalorie = yData.totalCalorie;
+  option.series.data= xData.totalCalorie;
+  myChart.setOption(option, true);
+  // console.log("xData.dates:", xData.totalCalorie);
+  
   // 0인덱스 부터 ydata 길이만큼 temp를 넣겟다 
   // ydata 기존값 날리면서 새로운 데이터 넣기
   // yData.splice(0, xData.dayName.length, ...yDataTemp);
@@ -208,7 +216,7 @@ onMounted(async () => {
     await getStatistic(weekDay.getWeekDate); // 주 시작 과 끝 보내서 데이터 받아오기
     myChart.setOption(option); // 차트 옵션 설정
   } else {
-    // console.warn('chartRef is null');
+    console.warn('chartRef is null');
   }
 
   // 차트 클릭 이벤트 핸들러
@@ -226,16 +234,43 @@ onMounted(async () => {
 });
 
 watch(weekDay.getWeekDate, (newVal) => {
-  testFunc(newVal);
+  newWeekFunc(newVal);
 });
 
-const testFunc = async (param) => {
+const newWeekFunc = async (param) => {
   // console.log("파람::" , param);
   await nextTick();
   await getStatistic(weekDay.getWeekDate);
   // myChart = echarts.init(chartRef.value);
-  myChart.setOption(option);
+  myChart.setOption(option);  
 };
+
+watch (clickProgress.nowCategory, (newProgress)=>{
+   // 아래가 y축 데이터 바꾼는거
+  //  xData.totalCalorie = yData.totalCalorie;
+  option.series.data = xData.totalCalorie;
+  console.log("클릭시 탄수 :",  clickProgress.nowCategory);
+  switch ( newProgress){
+    
+    case 1:
+      option.series.data = xData.totalCarbohydrate;
+      console.log("클릭시 탄수 :",  xData.totalCarbohydrate);
+      break;
+    case 2:
+      option.series.data = xData.totalProtein;
+      break;
+    case 3:
+      option.series.data = xData.totalFat;
+      case 0:
+    default :  
+      option.series.data = xData.totalCalorie;
+      break;
+    }
+   return myChart.setOption(option, true);
+  //  myChart.setOption({
+  //   series: [{ data: newData }]
+  // });
+});
 
 
 </script>

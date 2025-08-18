@@ -3,7 +3,7 @@ import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted,computed ,watch} from 'vue';
 import {useRouter} from "vue-router";
-import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
+import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate, useClickProgressBar } from "@/stores/mealStore";
 import dayjs from 'dayjs';
 
 import 'dayjs/locale/ko'; 
@@ -14,6 +14,7 @@ const dayStore = useDayDefine();
 const ondayMealData = useCalorieCalcul();
 const weeklyData = useWeeklyStore();
 const baseDate = useBaseDate();
+const clickProgress = useClickProgressBar();
 
 const maxKcal = ref(2500);
 
@@ -66,7 +67,8 @@ watch(
 const formatNumber = (num) => num.toLocaleString();
 
 const clickProgressBar= category =>{
-console.log (category);
+  clickProgress.nowProgress(category);
+console.log (clickProgress.nowCategory);
 }
 
 </script>
@@ -80,17 +82,17 @@ console.log (category);
           <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
             :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
             :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
-            customsize="totalcal" @click="clickProgressBar('totalCalorie')" />
+            customsize="totalcal" @click="clickProgressBar(0)" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
               :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
-              :max="(maxKcal * 0.6)/4" customsize="tansu" />
+              :max="(maxKcal * 0.6)/4" customsize="tansu"   @click="clickProgressBar(1)"/>
             <ProgressBar class="protein" :value="calorieData.totalProtein" :leftString="`단백질`"
               :rightString="`${(calorieData.totalProtein/ ((maxKcal * 0.15)/4) * 100).toFixed(1)}%`"
-              customsize="protein" :max="(maxKcal * 0.15)/4" />
+              customsize="protein" :max="(maxKcal * 0.15)/4" @click="clickProgressBar(2)"/>
             <ProgressBar class="jibang" :value="calorieData.totalFat" :leftString="`지방`"
               :rightString="`${(calorieData.totalFat/ ((maxKcal * 0.25) / 9) * 100).toFixed(1)}%`" customsize="jibang"
-              :max="(maxKcal * 0.25)/9" />
+              :max="(maxKcal * 0.25)/9"  @click="clickProgressBar(3)"/>
           </div>
         </div>
       </div>

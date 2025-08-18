@@ -12,18 +12,6 @@ const ondayMealData = useCalorieCalcul();
 const selectedDate = ref(nowDay.currentTime.slice(3, 13)); // 초기화 및 선택하는 날짜 들어감
 const weekDates = ref([]);
 
-// 날짜 : 각종 량 출력 하는거 하다가 맒
-// const getYData = computed(async () => {
-//   const days = ['월', '화', '수', '목', '금', '토', '일'];
-//   return  days.map((day, idx) => ({
-//     day,
-//     calo: weeklyStore.weeklyRawData[idx]?.totalCalorie ?? 0,
-//     carbo: weeklyStore.weeklyRawData[idx]?.totalCarbohydrate ?? 0,
-//     fat: weeklyStore.weeklyRawData[idx]?.totalFat ?? 0,
-//     protein: weeklyStore.weeklyRawData[idx]?.totalProtein ?? 0,
-//   }));
-// });
-
 const getWeekDates = (dateString) => {
   // 오늘 날짜 까져옴
   const date = new Date(dateString);
