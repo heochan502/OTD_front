@@ -114,7 +114,8 @@ const deleteLog = async () => {
         </div>
       </div>
     </v-item-group>
-    <HealthCart />
+    <!-- 통계 그래프 -->
+    <HealthCart :selectedDate="state.hlog.healthlogDatetime" />
   </v-container>
 </template>
 
