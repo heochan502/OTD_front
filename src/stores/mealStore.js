@@ -15,6 +15,23 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
       // const dataStr = dayStore.currentTime.slice(3, 13);
       console.log(":보내는 날짜 :", dateStr);
       const getData = await getMealTotalOnDay(dateStr);
+
+      if (getData === null)
+      {
+        itemInfo.value = [
+          {
+            mealDay: getData.mealDay,
+            allDayCalorie:0,
+            totalFat: 0,
+            totalCarbohydrate: 0,
+            totalProtein: 0,
+          },
+        ];
+      }
+
+      console.log(":가져오는 값 :", getData);
+      // getData null 일때  다른 값 들어가게 해야함
+      else{
       itemInfo.value = [
         {
           mealDay: getData.mealDay,
@@ -83,6 +100,8 @@ export const useDayDefine = defineStore("useDayDefine",()=>
     }
 );
 
+
+// 하루의 모든 
 export const useAlldayMeal = defineStore("useAllDayDefine", ()=>{
 
      const dayMealCategory = ref({
@@ -95,7 +114,7 @@ export const useAlldayMeal = defineStore("useAllDayDefine", ()=>{
      return { dayMealCategory };
 }
 );
-
+// 주의 시작과 끝
 export const useBaseDate = defineStore("useBaseDate",()=>{
   const getWeekDate= ref({
     startDate:'',
@@ -104,6 +123,7 @@ export const useBaseDate = defineStore("useBaseDate",()=>{
   return { getWeekDate };
 });
 
+// 주간 
 export const useWeeklyStore = defineStore('weekly', ()=>{
   const weeklyRawData = ref([]);
   const weekyDate = ref([]);

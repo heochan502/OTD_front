@@ -26,6 +26,7 @@ const  mealadd = (day)=>{
 };
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
+// 여기서 과거 데이터 보여주는거 고쳐야함
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
   // null, undefined, 배열 길이 체크
