@@ -25,6 +25,7 @@ const xData = {
   dayName: ['월', '화', '수', '목', '금', '토', '일']
 };
 
+const getYData = ref({});
 
 const len = xData.dayName.length;
 
@@ -156,14 +157,14 @@ const option = {
 };
 const getStatistic = async (weeky) => {
   const res = await getWeekTotal(weeky);
-  console.log("weeky:", weeky);
+  // console.log("weeky:", weeky);
   if (res.status === 200) {
     weeklyStore.weeklyRawData = res.data;
   }
 
   // 기존 y축 데이터 0으로 만드는격 
   // const yDataTemp = Array(xData.dayName.length).fill(0);
-  console.log("weeklyStore.weeklyRawData:", weeklyStore.weeklyRawData);
+  // console.log("weeklyStore.weeklyRawData:", weeklyStore.weeklyRawData);
 
 
   xData.dates= weeklyStore.weekyDate; // 날짜 추가
@@ -178,7 +179,7 @@ const getStatistic = async (weeky) => {
 
     const index = xData.dayName.indexOf(dayName);      // 요일 인덱스 찾기   
     if (index !== -1) {
-      console.log("item.mealDay: {}, index : {}", item.mealDay, index);
+      // console.log("item.mealDay: {}, index : {}", item.mealDay, index);
       yData.totalCalorie[index] = item.totalCalorie; // 해당 요일 자리에 값 대입
       yData.totalFat[index] = item.totalFat;
       yData.totalCarbohydrate[index] = item.totalCarbohydrate;
@@ -196,7 +197,7 @@ const getStatistic = async (weeky) => {
   // ydata 기존값 날리면서 새로운 데이터 넣기
   // yData.splice(0, xData.dayName.length, ...yDataTemp);
 
-  console.log("yData:", yData);
+  // console.log("yData:", yData);
 }
 
 onMounted(async () => {
@@ -207,7 +208,7 @@ onMounted(async () => {
     await getStatistic(weekDay.getWeekDate); // 주 시작 과 끝 보내서 데이터 받아오기
     myChart.setOption(option); // 차트 옵션 설정
   } else {
-    console.warn('chartRef is null');
+    // console.warn('chartRef is null');
   }
 
   // 차트 클릭 이벤트 핸들러

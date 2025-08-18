@@ -153,15 +153,7 @@ const inputData = useAlldayMeal();
 
 
 
-const saveClick =()=> {
-  if (window.confirm("저장 하시겠습니까?")) {
-    saveMeal();
-  } else {
-    console.log("취소되었습니다.");
-  }
-}
 const setItem = () => {
-
   
   inputData.dayMealCategory.foodDbId = itemList.value.map(
     (info) => info.foodDbId
@@ -193,7 +185,7 @@ const saveMeal = async () => {
     saveText.value = '수정하기';
   }
   if (res.status !== 200) {
-    console.log('입력 ', res);
+    // console.log('입력 ', res);
     // 주간 뿌려주는 데이터 변경
     const result = await getWeekTotal(weekDay.getWeekDate);
     console.log("수정하고 주간 데이터 변경 ", result.data);
@@ -201,14 +193,6 @@ const saveMeal = async () => {
   }
 };
 
-//수정 하는곳
-function updateClick() {
-  if (window.confirm("수정 하시겠습니까?")) {
-    updateMeal();
-  } else {
-    console.log("취소되었습니다.");
-  }
-}
 
 const updateMeal = async () => {
   setItem();
@@ -225,14 +209,14 @@ const updateMeal = async () => {
 
     // 주간 뿌려주는 데이터 변경
     const res = await getWeekTotal(weekDay.getWeekDate);
-    console.log("수정하고 주간 데이터 변경 ", res.data);
+    // console.log("수정하고 주간 데이터 변경 ", res.data);
     weeklyData.weeklyRawData = res.data;   
     
   } else {
     saveText.value = '저장하기';
    
   }
-  console.log('값:::', res);
+  // console.log('값:::', res);
 };
 
 const saveText = ref('저장하기');

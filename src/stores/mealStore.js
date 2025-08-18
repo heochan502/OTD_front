@@ -1,4 +1,3 @@
-
 import { defineStore } from 'pinia';
 import { getMealTotalOnDay } from '@/services/meal/mealService';
 import { ref } from 'vue';
@@ -15,6 +14,19 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
       // const dataStr = dayStore.currentTime.slice(3, 13);
       console.log(":보내는 날짜 :", dateStr);
       const getData = await getMealTotalOnDay(dateStr);
+      if (!getData.value)
+      {
+        itemInfo.value =[ 
+          {
+            "mealDay": dateStr,
+            "allDayCalorie":0,
+            "totalFat": 0,
+            "totalCarbohydrate": 0,
+            "totalProtein": 0,
+          }];         
+      }     
+      // getData null 일때  다른 값 들어가게 해야함
+      else{
       itemInfo.value = [
         {
           mealDay: getData.mealDay,
@@ -24,18 +36,17 @@ export const useCalorieCalcul = defineStore('mealInfo',  () => {
           totalProtein: getData.totalProtein,
         },
       ];
+   
+      }
+      console.log(":가져오는 값 :", itemInfo.value);
     }
-    // 아래 두기능 안쓰는중 
-    const inputFoodInfo = (foodInfo) => {
-    itemInfo.value.push(foodInfo);
-    };
+    
+ 
 
-    const setDate = (index) => {
-    return itemInfo.value[index];
-    };
 
-    return { itemInfo, inputFoodInfo, setDate, mealFormData };
-});
+    return { itemInfo,  mealFormData };
+  }
+);
 
 export const useDayDefine = defineStore("useDayDefine",()=>
     {
@@ -83,6 +94,8 @@ export const useDayDefine = defineStore("useDayDefine",()=>
     }
 );
 
+
+// 하루의 모든 
 export const useAlldayMeal = defineStore("useAllDayDefine", ()=>{
 
      const dayMealCategory = ref({
@@ -95,7 +108,7 @@ export const useAlldayMeal = defineStore("useAllDayDefine", ()=>{
      return { dayMealCategory };
 }
 );
-
+// 주의 시작과 끝
 export const useBaseDate = defineStore("useBaseDate",()=>{
   const getWeekDate= ref({
     startDate:'',
@@ -104,6 +117,7 @@ export const useBaseDate = defineStore("useBaseDate",()=>{
   return { getWeekDate };
 });
 
+// 주간 전체 데이터 
 export const useWeeklyStore = defineStore('weekly', ()=>{
   const weeklyRawData = ref([]);
   const weekyDate = ref([]);
@@ -113,3 +127,16 @@ export const useWeeklyStore = defineStore('weekly', ()=>{
   };
 });
 
+// 프로그래스 바 눌렀을때 변경되는거
+export const useClickProgressBar = defineStore('useClickProgressBar', ()=>{
+  const nowCategory = ref(0);
+  
+  const nowProgress= (category)=>{
+    // category : 0 totalCalorie 전체 칼로리
+    // 1: tansu 탄수화물  * 4 배수
+    // 2: protein  단백질  * 4 배수
+    // 3: jibang 지방  * 9 배수
+    return this.nowCategory = category === 0 ? 0 : category === 1 ? 1:2;
+  }
+}
+)

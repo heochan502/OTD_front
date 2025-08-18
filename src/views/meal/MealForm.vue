@@ -26,6 +26,7 @@ const  mealadd = (day)=>{
 };
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
+// 여기서 과거 데이터 보여주는거 고쳐야함
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
   // null, undefined, 배열 길이 체크
@@ -45,11 +46,8 @@ const avg =ref(0);
 onMounted(async() => {
   // console.log('totalKcal:', totalKcal.value);
   // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
-  await ondayMealData.mealFormData(new dayjs().format('YYYY-MM-DD'));
-   
-  console.log("정보 데이터 :", weeklyData.weeklyRawData);
-  
-
+  await ondayMealData.mealFormData(new dayjs().format('YYYY-MM-DD'));   
+  // console.log("정보 데이터 :", weeklyData.weeklyRawData);
 });
 
 watch(
@@ -66,6 +64,11 @@ watch(
   { immediate: true, deep: true }
 );
 const formatNumber = (num) => num.toLocaleString();
+
+const clickProgressBar= category =>{
+console.log (category);
+}
+
 </script>
 
 <template>
@@ -77,7 +80,7 @@ const formatNumber = (num) => num.toLocaleString();
           <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
             :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
             :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
-            customsize="totalcal" />
+            customsize="totalcal" @click="clickProgressBar('totalCalorie')" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
               :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
