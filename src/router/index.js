@@ -27,7 +27,6 @@ import Profile from "@/views/member/Profile.vue";
 import ProfileDetail from "@/views/member/ProfileDetail.vue";
 import ProfilePassword from "@/views/member/Password.vue";
 
-import Location from "@/components/location/Location.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -117,8 +116,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/profile/detail",
-      name: "profile_detail",
+      path: '/profile/detail',
+      name: 'profile_detail',
       component: ProfileDetail,
       meta: { requiresAuth: true },
     },
@@ -129,14 +128,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/location",
-      name: "location",
-      component: Location,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/memoAndDiary",
-      name: "memoAndDiary",
+      path: '/memoAndDiary',
+      name: 'memoAndDiary',
       component: MemoAndDiary,
       props: true,
       meta: { requiresAuth: true },
@@ -156,14 +149,14 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/memolist",
-      name: "MemoList",
+      path: '/memoAndDiary/memo/list',
+      name: 'MemoList',
       component: MemoList,
       props: true,
     },
     {
-      path: "/memoAndDiary/diarylist",
-      name: "DiaryList",
+      path: '/memoAndDiary/diary/list',
+      name: 'DiaryList',
       component: DiaryList,
       props: true,
     },
