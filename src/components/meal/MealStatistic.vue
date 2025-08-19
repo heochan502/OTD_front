@@ -24,7 +24,7 @@ const getWeekDates = (dateString) => {
   //0 일요일 ~
   const dayOfWeek = date.getDay();
 
-  console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
+  // console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
 
 
   // 현재 나 선택한 날짜 
@@ -38,7 +38,7 @@ const getWeekDates = (dateString) => {
   else {
     startDate.setDate(date.getDate() - dayOfWeek + 1);
   }
-  console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
+  // console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
   const result = [];
   for (let i = 0; i < 7; i++) {
    
@@ -64,7 +64,7 @@ watch(
     newDate = new dayjs().format('YYYY-MM-DD'); // 선택된 날짜가 없으면 현재 날짜로 설정
     
   } 
-   console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
+  //  console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
     ondayMealData.mealFormData(newDate);
     weekDates.value = getWeekDates(newDate);
 
@@ -97,12 +97,7 @@ watch(
       class="mb-4 text-black"
       variant="underlined"
     ></v-text-field>
-
-    <!-- <v-list>
-        <v-list-item v-for="date in getYData.value " :key="date.day">
-    <v-list-item-title> 출력 부부 ㄴ: {{ date.day }} {{ date.calo }}</v-list-item-title>
-    </v-list-item>
-    </v-list> -->
+   
   </div>
 </template>
 
