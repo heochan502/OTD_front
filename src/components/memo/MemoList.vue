@@ -37,7 +37,7 @@ const formatDate = (dateStr) => {
   <div class="memo-list-wrapper">
     <div
       v-for="memo in memoList"
-      :key="memo.id"
+      :key="memo.memoId"
       class="memo-list-item"
       @click="$emit('select', memo)"
     >
@@ -47,8 +47,8 @@ const formatDate = (dateStr) => {
         <span class="memo-list-date">{{ formatDate(memo.createdAt) }}</span>
       </div>
       <img
-        v-if="memo.memoImageFileName"
-        :src="`/pic/${memo.memoImageFileName}`"
+        v-if="memo.memoImage"
+        :src="`/pic/${memo.memoImage}`"
         class="memo-list-image"
         alt="memo"
         @error="e => e.target.style.display = 'none'"

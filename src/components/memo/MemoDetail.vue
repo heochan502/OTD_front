@@ -67,9 +67,9 @@ watch(
 
     <label class="memo-label">이미지</label>
 
-    <div v-if="memo.imageFileName && previewImages.length === 0" class="memo-preview-list">
+    <div v-if="memo.memoImage && previewImages.length === 0" class="memo-preview-list">
       <div class="memo-preview-item">
-        <img :src="`/pic/${memo.imageFileName}`" alt="등록된 이미지" />
+        <img :src="`/pic/${memo.memoImage}`" alt="등록된 이미지" />
       </div>
     </div>
 

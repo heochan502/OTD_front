@@ -9,10 +9,10 @@ export function useMemoDetail(props, emit) {
   const route = useRoute();
 
   const memo = ref({
-    id: null,
+    memoId: null,
     memoName: '',
     memoContent: '',
-    imageFileName: null,
+    memoImage: null,
     createdAt: null,
   });
 
@@ -62,19 +62,18 @@ export function useMemoDetail(props, emit) {
     }
   };
 
+  const buildFormData = (memoDataKey, memoObj, fileKey, inputEl) => {
+    const fd = new FormData();
+    const { memoImage, createdAt, ...rest } = memoObj;
+    fd.append(memoDataKey, new Blob([JSON.stringify(rest)], { type: 'application/json' }));
+    const file = inputEl?.files?.[0];
+    if (file) fd.append(fileKey, file);
+      return fd;
+  }
+
   const createMemo = async () => {
     try {
-      const formData = new FormData();
-      const memoData = new Blob(
-        [JSON.stringify(memo.value)],
-        { type: 'application/json' }
-      );
-
-      formData.append('memoData', memoData);
-      if (fileInputRef.value?.files[0]) {
-        formData.append('memoImageFiles', fileInputRef.value.files[0]);
-      }
-
+      const formData = buildFormData('memoData', memo.value, 'memoImageFiles', fileInputRef.value);
       await MemoHttpService.create(formData);
       emit('created');
       clearPreviewImages();
@@ -85,17 +84,7 @@ export function useMemoDetail(props, emit) {
 
   const updateMemo = async () => {
     try {
-      const formData = new FormData();
-      const memoData = new Blob(
-        [JSON.stringify(memo.value)],
-        { type: 'application/json' }
-      );
-
-      formData.append('memoData', memoData);
-      if (fileInputRef.value?.files[0]) {
-        formData.append('memoImageFiles', fileInputRef.value.files[0]);
-      }
-
+      const formData = buildFormData('memoData', memo.value, 'memoImageFiles', fileInputRef.value);
       await MemoHttpService.modify(formData);
       emit('updated');
       setMode('view');
@@ -108,7 +97,7 @@ export function useMemoDetail(props, emit) {
   const deleteMemo = async () => {
     try {
       if (confirm('정말 삭제하시겠습니까?')) {
-        await MemoHttpService.deleteById(memo.value.id);
+        await MemoHttpService.deleteById(memo.value.memoId) ?? MemoHttpService.remove(memo.value.memoId);
         emit('deleted');
       }
     } catch (err) {
@@ -123,7 +112,13 @@ export function useMemoDetail(props, emit) {
   const fetchCurrentMemo = async (id) => {
     try {
       const data = await MemoHttpService.findById(id);
-      memo.value = data;
+      memo.value = {
+        memoId: data.memoId ?? null,
+        memoName: data.memoName ?? '',
+        memoContent: data.memoContent ?? '',
+        memoImage: data.memoImage ?? null,
+        createdAt: data.createdAt ?? null,
+      };
       clearPreviewImages();
     } catch (err) {
       console.error('메모 조회 실패', err);
@@ -133,8 +128,14 @@ watch(
   () => props.memoProp,
   (newMemo) => {
     if (newMemo) {
-      memo.value = { ...newMemo };
-      setMode('view'); // 선택 시 항상 view 모드로 진입
+      memo.value = {
+        memoId: newMemo.memoId ?? null,
+        memoName: newMemo.memoName ?? '',
+        memoContent: newMemo.memoContent ?? '',
+        memoImage: newMemo.memoImage ?? null,
+        createdAt: newMemo.createdAt ?? null,
+      };
+      setMode('view');
       clearPreviewImages();
     }
   },
