@@ -19,6 +19,7 @@ import {
 const dayStore = useDayDefine();
 const weeklyData = useWeeklyStore();
 const weekDay = useBaseDate();
+const calorieData = useCalorieCalcul();
 
 const router = useRouter();
 
@@ -137,6 +138,7 @@ const onItemClick = (item) => {
 
 // 배열 데이터 삭제
 const removeItem = (index) => {
+  console.log('삭제할 인덱스:', index);
   itemList.value.splice(index, 1);
 };
 //칼로리 계산
@@ -200,9 +202,9 @@ const updateMeal = async () => {
   //현재 시간 기점이라 생각해야함
   // inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
 
-  // console.log(" 수정데이터들/ : ", inputData.dayMealCategory);
+  console.log(" 수정데이터들/ : ", inputData.dayMealCategory);
 
-  const res = await modifyMealdata(inputData.dayMealCategory);
+  const resultModify = await modifyMealdata(inputData.dayMealCategory);
 
   if (itemList.value.length > 0) {
     saveText.value = '수정하기';
@@ -249,7 +251,8 @@ const getMeal = async () => {
   const getlist = {
   // 아침: Br  점심: Lu 저녁: Di
     mealBrLuDi: dayStore.dayDefine,
-    mealDay: dayStore.currentTime.slice(3, 13),
+    mealDay: calorieData.itemInfo.mealDay,
+    
   };
   // console.log(" data들 : ",  getlist);
   const lisData = await getMealData(getlist);
@@ -275,8 +278,8 @@ const getMeal = async () => {
     mealDay: item.mealDay,
   }));
 
-  console.log(' data들 : ', itemList.value);
-  // console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log(' data들 : ', dayStore.currentTime.slice(3, 13));
+  // console.log(" 데이터", calorieData.itemInfo.mealDay);
   // 데이터 넣는곳
   // itemList.value.push({
   //   foodDbId: foodInfo.foodDbId,
@@ -314,7 +317,7 @@ onMounted(() => {
           }}
           kcal</span
         >
-        <span class="ml-10"> {{ dayStore.currentTime }} </span>
+        <span class="ml-10"> 현재 시간 : {{ dayStore.currentTime }} </span>
       </div>
       <v-row dense class="justify-center">
         <v-col cols="12" md="5">
@@ -430,7 +433,7 @@ onMounted(() => {
                   </div>
                   <div>
                     <v-card-actions>
-                      <v-btn icon color="blue" @click="removeItem(i)">
+                      <v-btn icon color="blue" @click="removeItem(itemList.indexOf(item))">
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
                     </v-card-actions>
