@@ -145,7 +145,7 @@ watch(
         <v-card>
           <v-card-title class="text-h8">지역 저장</v-card-title>
           <v-card-text>
-            <Location />
+            <Location @close="dialog.location = false" />
           </v-card-text>
         </v-card>
       </v-dialog>

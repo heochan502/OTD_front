@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'vue-router';
 import { useWeatherStore } from '@/stores/weatherStore';
 
+const emit = defineEmits(['close']);
 const weatherStore = useWeatherStore();
 const router = useRouter();
 const keyword = ref('');
@@ -24,11 +25,36 @@ const state = reactive({
 const confirmDialog = ref(false);
 const alertDialog = ref({ visible: false, message: '' });
 const confirmMessage = ref('');
+const actions = ref(null);
+const selectedLocalId = ref(null);
+const selectedLocationName = ref('');
 
-const openConfirm = (message) => {
+const openConfirm = (message, action, localId = null, locationName = '') => {
   confirmDialog.value = true;
   confirmMessage.value = message;
+  actions.value = action;
+  selectedLocalId.value = localId;
+  selectedLocationName.value = locationName;
 };
+const confirmYes = async () => {
+  confirmDialog.value = false;
+
+  if (actions.value === 'select') {
+    const res = await selectLocation(selectedLocalId.value);
+    if (res && res.status === 200) {
+      weatherStore.triggerRefresh();
+      emit('close');
+      router.push('/');
+    }
+  } else if (actions.value === 'remove') {
+    const res = await removeLocation(selectedLocalId.value);
+    if (res.status === 200) {
+      openAlert('삭제되었습니다.');
+      await LocalList();
+    }
+  }
+};
+
 const openAlert = (message) => {
   alertDialog.value.message = message;
   alertDialog.value.visible = true;
@@ -53,20 +79,6 @@ const saveLocal = (searchText) => {
   );
 };
 
-const selectWeatherLocation = async (localId, locationName) => {
-  const res = await selectLocation(localId);
-  if (res && res.status === 200) {
-    if (
-      openConfirm(
-        `${locationName}이(가) 선택 되었습니다. \n홈 화면으로 이동하시겠습니까?`
-      )
-    ) {
-      weatherStore.triggerRefresh();
-      router.push('/');
-    }
-  }
-};
-
 const saveSearchedLocation = async () => {
   if (!selectedLocation.value || !selectedLocation.value.localId) {
     openAlert('지역 정보가 일치하지 않습니다.');
@@ -75,16 +87,6 @@ const saveSearchedLocation = async () => {
   await saveLocation(selectedLocation.value.localId);
   openAlert('지역이 저장되었습니다.');
   await LocalList();
-};
-
-const removeLocal = async (localId) => {
-  if (openConfirm('선택한 지역을 삭제하시겠습니까?')) {
-    const res = await removeLocation(localId);
-    if (res.status === 200) {
-      openAlert('삭제되었습니다.');
-      await LocalList();
-    }
-  }
 };
 
 const LocalList = async () => {
@@ -148,7 +150,9 @@ onMounted(() => {
           <button
             class="btn btn-outline-primary btn-sm"
             @click="
-              selectWeatherLocation(
+              openConfirm(
+                `${item.city} ${item.county} ${item.town}이(가) 선택되었습니다. 홈 화면에 표시하겠습니까?`,
+                'select',
                 item.localId,
                 `${item.city} ${item.county} ${item.town}`
               )
@@ -158,7 +162,13 @@ onMounted(() => {
           </button>
           <button
             class="btn btn-outline-danger btn-sm"
-            @click="removeLocal(item.localId)"
+            @click="
+              openConfirm(
+                '선택한 지역을 삭제하시겠습니까?',
+                'remove',
+                item.localId
+              )
+            "
           >
             삭제
           </button>
@@ -169,7 +179,7 @@ onMounted(() => {
               <v-card-text>{{ confirmMessage }}</v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn color="success" text @click="handleConfirmYes">예</v-btn>
+                <v-btn color="success" text @click="confirmYes">예</v-btn>
                 <v-btn color="dark" text @click="confirmDialog = false"
                   >아니오</v-btn
                 >
