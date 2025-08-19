@@ -19,6 +19,7 @@ const state = reactive({
     name: '',
     birthDate: '',
     memberNick: '',
+    gender: '',
   },
   validation: {
     memberId: {
@@ -62,6 +63,15 @@ const state = reactive({
       checked: false,
       available: false,
     },
+    gender: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+  },
+  genderCheckbox: {
+    male: false,
+    female: false,
   },
   terms: {
     all: false,
@@ -238,6 +248,30 @@ const validateNickname = (nickname) => {
   }
   return { isValid: true, message: '' };
 };
+const validateGender = (gender) => {
+  if (!gender) {
+    return { isValid: false, message: '성별을 선택해주세요.' };
+  }
+  if (gender !== 'M' && gender !== 'F') {
+    return { isValid: false, message: '올바른 성별을 선택해주세요.' };
+  }
+  return { isValid: true, message: '' };
+};
+const handleGenderChange = (selectedGender) => {
+  if (selectedGender === 'M') {
+    state.genderCheckbox.male = !state.genderCheckbox.male;
+    state.genderCheckbox.female = false;
+    state.form.gender = state.genderCheckbox.male ? 'M' : '';
+  } else if (selectedGender === 'F') {
+    state.genderCheckbox.female = !state.genderCheckbox.female;
+    state.genderCheckbox.male = false;
+    state.form.gender = state.genderCheckbox.female ? 'F' : '';
+  }
+  
+  state.validation.gender.touched = true;
+  validateField('gender', state.form.gender);
+};
+
 
 const validateField = (field, value) => {
   let result;
@@ -264,6 +298,9 @@ const validateField = (field, value) => {
     case 'memberNick':
       result = validateNickname(value);
       break;
+    case 'gender':
+      result = validateGender(value);
+      break;
     default:
       result = { isValid: true, message: '' };
   }
@@ -274,6 +311,7 @@ const validateField = (field, value) => {
     message: result.message,
   };
 };
+
 
 const handleFieldTouch = (field) => {
   state.validation[field].touched = true;
@@ -369,6 +407,14 @@ watch(
       validateField('memberNick', newValue);
     }
     resetNickValidation();
+  }
+);
+watch(
+  () => state.form.gender,
+  (newValue) => {
+    if (state.validation.gender.touched) {
+      validateField('gender', newValue);
+    }
   }
 );
 
@@ -960,6 +1006,60 @@ const submit = async () => {
               {{ state.validation.memberNick.message }}
             </div>
           </div>
+          <div class="form-group">
+  <label for="gender">성별 *</label>
+  <div class="gender-checkbox-container">
+    <label class="checkbox-wrapper" @click.prevent="handleGenderChange('M')">
+      <div class="checkbox-container">
+        <input
+          type="checkbox"
+          :checked="state.genderCheckbox.male"
+          :class="{
+            error: state.validation.gender.touched && !state.validation.gender.isValid,
+            success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
+          }"
+          readonly
+        />
+        <div class="checkmark">
+          <svg v-if="state.genderCheckbox.male" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+      <span class="checkbox-text">남자</span>
+    </label>
+    
+    <label class="checkbox-wrapper" @click.prevent="handleGenderChange('F')">
+      <div class="checkbox-container">
+        <input
+          type="checkbox"
+          :checked="state.genderCheckbox.female"
+          :class="{
+            error: state.validation.gender.touched && !state.validation.gender.isValid,
+            success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
+          }"
+          readonly
+        />
+        <div class="checkmark">
+          <svg v-if="state.genderCheckbox.female" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+      <span class="checkbox-text">여자</span>
+    </label>
+  </div>
+  
+  <div
+    v-if="state.validation.gender.touched && state.validation.gender.message"
+    :class="[
+      'field-message',
+      state.validation.gender.isValid ? 'field-success' : 'field-error',
+    ]"
+  >
+    {{ state.validation.gender.message }}
+  </div>
+</div>
         </div>
 
         <div class="terms">
@@ -1560,5 +1660,100 @@ const submit = async () => {
 .goHome:hover {
   color: #333;
   text-decoration: underline;
+}
+
+.gender-checkbox-container {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+}
+
+.checkbox-wrapper:hover {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.checkbox-container {
+  position: relative;
+  margin-right: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.checkbox-wrapper:hover .checkmark {
+  border-color: #2a9df4;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+  background-color: #2a9df4;
+  border-color: #2a9df4;
+}
+
+.checkbox-container input[type="checkbox"].error + .checkmark {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.checkbox-container input[type="checkbox"].success + .checkmark {
+  border-color: #4fc3f7;
+}
+
+.checkbox-container input[type="checkbox"]:checked.success + .checkmark {
+  background-color: #4fc3f7;
+  border-color: #4fc3f7;
+}
+
+.check-icon {
+  width: 14px;
+  height: 14px;
+  color: white;
+  display: block;
+}
+
+.checkbox-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.checkbox-wrapper:hover .checkbox-text {
+  color: #2a9df4;
+}
+
+.checkbox-container input[type="checkbox"]:checked ~ .checkbox-text {
+  color: #2a9df4;
+  font-weight: 600;
 }
 </style>
