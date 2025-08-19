@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref } from "vue";
 import moodLevels from "@/assets/health/moodLevels.json";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
-import HealthCart from "@/components/health/HealthChart.vue";
+import HealthChart from "@/components/health/HealthChart.vue";
 import { useHealthStore } from "@/stores/healthStore";
 import { useRoute } from "vue-router";
 import { getHlog, deleteHlog } from "@/services/health/hlogService";
@@ -116,9 +116,10 @@ const deleteLog = async () => {
       </div>
     </v-item-group>
     <!-- 통계 그래프 -->
-    <HealthCart
+    <HealthChart
       :selectedDate="state.hlog.healthlogDatetime"
       :selectedField="selectedField"
+      :fields="fields"
     />
   </v-container>
 </template>

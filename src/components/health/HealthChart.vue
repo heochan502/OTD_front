@@ -3,8 +3,31 @@ import { computed, onMounted, ref } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
+// Chart.js
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+import { Line } from "vue-chartjs";
 
 dayjs.extend(isoWeek);
+
+// Chart.js 기본 세팅
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale
+);
 
 const props = defineProps({
   selectedDate: {
@@ -12,7 +35,9 @@ const props = defineProps({
     required: true,
   },
   selectedField: String,
+  fields: Object,
 });
+console.log(props.fields);
 
 const healthStore = useHealthStore();
 
@@ -29,7 +54,7 @@ const weekRange = computed(() => {
   };
 });
 
-// weekRange에 해당하는 데이터만 필터링
+// 주차 데이터 필터링
 const weeklyLogs = computed(() => {
   return healthStore.logs.filter((log) => {
     const day = dayjs(log.healthlogDatetime);
@@ -40,82 +65,97 @@ const weeklyLogs = computed(() => {
   });
 });
 
-// 요일별 체중 배열 (월~일, 1~7)
+// 주차 데이터 매핑 (월~일, 빈 값은 null)
 const weeklyData = computed(() => {
-  const days = Array(7).fill(null);
+  const days = Array(7).fill(0);
+  let lastValue = null;
   weeklyLogs.value.forEach((log) => {
     const day = dayjs(log.healthlogDatetime);
-    const weekday = day.isoWeekday();
-    let value = log[props.selectedField]; // selectedField에 따라 값 선택
-
-    days[weekday - 1] = value;
+    const weekday = day.isoWeekday(); // 1=월 ~ 7=일
+    let value = log[props.selectedField];
+    if (value != null) {
+      days[weekday - 1] = value;
+      lastValue = days[weekday - 1];
+    } else {
+      days[weekday - 1] = lastValue;
+    }
   });
-
   return days;
 });
+// X축 라벨 (월 ~ 일)
+const labels = ref(["월", "화", "수", "목", "금", "토", "일"]);
 
-const labels = ["월", "화", "수", "목", "금", "토", "일"];
-// const weightDatum = healthStore.logs.map((item) => item.weight);
+// Chart.js 데이터셋
+const chartData = computed(() => ({
+  labels: labels.value,
+  datasets: [
+    {
+      data: weeklyData.value,
+      borderColor: "#3BBEFF",
+      backgroundColor: "rgba(59, 190, 255, 0.2)",
+      fill: true,
+      pointRadius: 3,
+      pointBackgroundColor: "#3BBEFF",
+    },
+  ],
+}));
+
+// Chart.js 옵션
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    // 툴팁
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          const field = props.fields.find((f) => f.key === props.selectedField);
+          const unit = field?.unit || "";
+          if (context.parsed.y === 0) {
+            return "기록없음";
+          }
+          return `${context.parsed.y} ${unit}`;
+        },
+      },
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: false,
+      },
+      grid: {
+        display: false,
+      },
+    },
+    y: {
+      type: "linear",
+      suggestedMin: 50,
+      title: {
+        display: false,
+      },
+      grid: {
+        display: false,
+      },
+    },
+  },
+};
 </script>
 
 <template>
-  <div v-if="props.selectedField === sleepQuality">
-    <v-card class="chart">
-      <v-sparkline
-        :model-value="weeklyData"
-        :auto-line-width="true"
-        :gradient="['#3BBEFF', '#ffffff']"
-        :gradient-direction="top"
-        fill
-        :line-width="2"
-        :lineCap="round"
-        :smooth="true"
-        :radius="10"
-        :padding="8"
-        :stroke-linecap="lineCap"
-        :type="bar"
-        auto-draw
-        :labels="labels"
-      ></v-sparkline>
-    </v-card>
-  </div>
-  <div v-else>
-    <v-card class="chart">
-      <v-sparkline
-        :model-value="weeklyData"
-        :auto-line-width="true"
-        :gradient="['#3BBEFF', '#ffffff']"
-        :gradient-direction="top"
-        fill
-        :line-width="2"
-        :lineCap="round"
-        :smooth="true"
-        :radius="10"
-        :padding="8"
-        :stroke-linecap="lineCap"
-        :type="trend"
-        auto-draw
-        :labels="labels"
-      ></v-sparkline>
-    </v-card>
-  </div>
+  <v-card class="chart">
+    <Line :data="chartData" :options="chartOptions" />
+  </v-card>
 </template>
 
 <style lang="scss" scoped>
 .chart {
   display: flex;
-  height: 350px;
-}
-.week-labels {
-  display: flex;
-  justify-content: space-between;
   width: 100%;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #aaa;
-}
-.week-labels .selected {
-  color: #3bbeff;
-  font-weight: 600;
+  height: 350px;
+  padding: 12px;
 }
 </style>
