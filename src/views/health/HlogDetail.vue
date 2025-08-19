@@ -46,7 +46,7 @@ const fields = [
   { key: "diastolicBp", label: "이완기 혈압", unit: "mmHg" },
   { key: "sugarLevel", label: "혈당", unit: "mg/dL" },
 ];
-const selectedField = ref("weight");
+const selectedField = ref(fields[0].key);
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
@@ -77,10 +77,10 @@ const deleteLog = async () => {
       </div>
     </v-row>
 
-    <v-item-group selected-class="bg-blue">
+    <v-item-group v-model="selectedField" selected-class="bg-blue">
       <div class="item_group">
         <div v-for="(field, idx) in fields" :key="idx" class="card-wrapper">
-          <v-item v-slot="{ selectedClass, toggle }">
+          <v-item v-slot="{ selectedClass, toggle }" :value="field.key">
             <v-card
               :class="[
                 'd-flex flex-column justify-center align-center text-center',

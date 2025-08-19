@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
-import { round, stubArray } from "lodash";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 
@@ -47,35 +46,59 @@ const weeklyData = computed(() => {
   weeklyLogs.value.forEach((log) => {
     const day = dayjs(log.healthlogDatetime);
     const weekday = day.isoWeekday();
-    const value = log[props.selectedField]; // selectedField에 따라 값 선택
+    let value = log[props.selectedField]; // selectedField에 따라 값 선택
+
     days[weekday - 1] = value;
   });
+
   return days;
 });
 
-const labels = ref(["월", "화", "수", "목", "금", "토", "일"]);
+const labels = ["월", "화", "수", "목", "금", "토", "일"];
 // const weightDatum = healthStore.logs.map((item) => item.weight);
 </script>
 
 <template>
-  <v-card class="chart">
-    <v-sparkline
-      :model-value="weeklyData"
-      :auto-line-width="true"
-      :gradient="['#3BBEFF', '#ffffff']"
-      :gradient-direction="top"
-      fill
-      :line-width="2"
-      :lineCap="round"
-      :smooth="true"
-      :radius="10"
-      :padding="8"
-      :stroke-linecap="lineCap"
-      :type="trend"
-      auto-draw
-      :labels="labels"
-    ></v-sparkline>
-  </v-card>
+  <div v-if="props.selectedField === sleepQuality">
+    <v-card class="chart">
+      <v-sparkline
+        :model-value="weeklyData"
+        :auto-line-width="true"
+        :gradient="['#3BBEFF', '#ffffff']"
+        :gradient-direction="top"
+        fill
+        :line-width="2"
+        :lineCap="round"
+        :smooth="true"
+        :radius="10"
+        :padding="8"
+        :stroke-linecap="lineCap"
+        :type="bar"
+        auto-draw
+        :labels="labels"
+      ></v-sparkline>
+    </v-card>
+  </div>
+  <div v-else>
+    <v-card class="chart">
+      <v-sparkline
+        :model-value="weeklyData"
+        :auto-line-width="true"
+        :gradient="['#3BBEFF', '#ffffff']"
+        :gradient-direction="top"
+        fill
+        :line-width="2"
+        :lineCap="round"
+        :smooth="true"
+        :radius="10"
+        :padding="8"
+        :stroke-linecap="lineCap"
+        :type="trend"
+        auto-draw
+        :labels="labels"
+      ></v-sparkline>
+    </v-card>
+  </div>
 </template>
 
 <style lang="scss" scoped>
