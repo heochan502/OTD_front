@@ -27,7 +27,6 @@ import Profile from "@/views/member/Profile.vue";
 import ProfileDetail from "@/views/member/ProfileDetail.vue";
 import ProfilePassword from "@/views/member/Password.vue";
 
-import Location from '@/components/location/Location.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
