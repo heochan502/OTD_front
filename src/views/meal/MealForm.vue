@@ -50,7 +50,7 @@ const total = ref(0);
 const avg = ref(0);
 onMounted(async () => {
 
-  console.log('totalKcal:', ondayMealData.itemInfo.mealDay);
+  // console.log('totalKcal:', ondayMealData.itemInfo.mealDay);
   // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
   // 초기 데이터 없으면 현재 시간으로 설정/ 있으면 그전 데이터로 출력
   await nextTick();
@@ -85,7 +85,7 @@ const formatNumber = (num) => {
 
 const clickProgressBar = category => {
   clickProgress.nowProgress(category);
-  console.log(clickProgress.nowCategory);
+  // console.log(clickProgress.nowCategory);
 }
 
 </script>
