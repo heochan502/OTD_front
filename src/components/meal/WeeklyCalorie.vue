@@ -177,11 +177,13 @@ const getStatistic = async (weeky) => {
   // console.log("weeklyStore.weeklyRawData:", weeklyStore.weeklyRawData);
 
   xData.dates= weeklyStore.weekyDate; // 날짜 추가
-
-  // xData.totalCalorie = Array(xData.dayName.length).fill(0);
-  // yData.totalFat = Array(xData.dayName.length).fill(0);
-  // yData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
-  // yData.totalProtein = Array(xData.dayName.length).fill(0);
+  // 주간 데이터 없으면 배열 데이터 초기화
+ if (!weeklyStore.weeklyRawData.length){
+  xData.totalCalorie = Array(xData.dayName.length).fill(0);
+  xData.totalFat = Array(xData.dayName.length).fill(0);
+  xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
+  xData.totalProtein = Array(xData.dayName.length).fill(0);
+ }
 
   weeklyStore.weeklyRawData.forEach(item => {
     const dayName = getDayName(item.mealDay); // '화', '수', ...
@@ -200,11 +202,15 @@ const getStatistic = async (weeky) => {
     // myChart.series.data = yData.totalCalorie;
    
   });
+  // totalCalorie : Array(len).fill(0),
+  // totalFat : Array(len).fill(0),
+  // totalCarbohydrate : Array(len).fill(0),
+  // totalProtein : Array(len).fill(0),
   // console.log("item.yDataTemp:", yDataTemp);
 
   // 아래가 y축 데이터 바꾼는거
   // xData.totalCalorie = yData.totalCalorie;
-  option.series.data= xData.totalCalorie;
+  option.series.data = xData.totalCalorie;
   myChart.setOption(option, true);
   // console.log("xData.dates:", xData.totalCalorie);
   
@@ -220,8 +226,8 @@ onMounted(async () => {
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화    
-    await getStatistic(weekDay.getWeekDate); // 주 시작 과 끝 보내서 데이터 받아오기
-    myChart.setOption(option); // 차트 옵션 설정
+    await getStatistic(weekDay.getWeekDate); // 주 시작 과 끝 보내서 데이터 받아오기    
+    // myChart.setOption(option, true); // 차트 옵션 설정
   } else {
     console.warn('chartRef is null');
   }
@@ -261,7 +267,7 @@ const newWeekFunc = async (param) => {
   await nextTick();
   await getStatistic(weekDay.getWeekDate);
   // myChart = echarts.init(chartRef.value);
-  myChart.setOption(option);  
+  // myChart.setOption(option,true);  
 };
 
 watch (
