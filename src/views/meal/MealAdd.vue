@@ -167,8 +167,8 @@ const setItem = () => {
     }, 0)
     .toFixed(0);
   inputData.dayMealCategory.mealBrLuDi = dayStore.dayDefine;
-  //현재 시간 기점이라 생각해야함
-  inputData.dayMealCategory.mealDay = dayStore.currentTime.slice(3, 13);
+  //선택한 시간 기점이라 생각해야함
+  inputData.dayMealCategory.mealDay = calorieData.itemInfo.mealDay;
 };
 
 const saveMeal = async () => {

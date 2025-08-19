@@ -8,7 +8,7 @@ import "dayjs/locale/ko";
 dayjs.locale("ko");
 
 export const useCalorieCalcul = defineStore("mealInfo", () => {
-  const dayStore = useDayDefine();
+  // const dayStore = useDayDefine();
   const itemInfo = ref({
     mealDay: "", // 최소한 기본 구조를 잡아줌
     totalCalorie: 0,
@@ -18,7 +18,7 @@ export const useCalorieCalcul = defineStore("mealInfo", () => {
   });
   const mealFormData = async (dateStr) => {
     // 처음 화면 상단 그래프 부분 출력용
-    dayStore.updateTime();
+    // dayStore.updateTime();
     // const dataStr = dayStore.currentTime.slice(3, 13);
     // console.log(":보내는 날짜 :", dateStr);
     const getData = await getMealTotalOnDay(dateStr);

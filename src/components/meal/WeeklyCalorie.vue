@@ -13,29 +13,29 @@ import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 
-const clickProgress =useClickProgressBar();
+const clickProgress = useClickProgressBar();
 const ondayMealData = useCalorieCalcul();
 const weeklyStore = useWeeklyStore();
 
 
 const weekDay = useBaseDate();
-
+const len = 7;
 // const xData = ['월', '화', '수', '목', '금', '토', '일'];
 const xData = {
   dates: [],
   dayName: ['월', '화', '수', '목', '금', '토', '일'],
-  totalCalorie:[0,0,0,0,0,0,0],
-  totalFat :[0,0,0,0,0,0,0],
-  totalCarbohydrate :[0,0,0,0,0,0,0],
-  totalProtein :[0,0,0,0,0,0,0],
+  totalCalorie : Array(len).fill(0),
+  totalFat : Array(len).fill(0),
+  totalCarbohydrate : Array(len).fill(0),
+  totalProtein : Array(len).fill(0),
 };
 
 
-const len = xData.dayName.length;
+
 
 // const yData = Array(xData.dayName.length).fill(0);
-const yData = ['totalCalorie', 'totalFat', 'totalCarbohydrate', 'totalProtein']
-  .reduce((acc, key) => ({ ...acc, [key]: Array(len).fill(0) }), {})
+// const yData = ['totalCalorie', 'totalFat', 'totalCarbohydrate', 'totalProtein']
+//   .reduce((acc, key) => ({ ...acc, [key]: Array(len).fill(0) }), {})
 
 /*const yData= {
 // 탄 * 4 단 * 4 지 * 9  
@@ -65,6 +65,7 @@ const chartRef = ref(null); // 차트 DOM 요소 참조
 let myChart = null; // ECharts 인스턴스
 
 const option = {
+ 
   title: {
     text: `주간 총 ${clickProgress.nowCategory} 통계`,
   },
