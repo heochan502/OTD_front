@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, watch , shallowRef } from 'vue';
+import { reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   join,
@@ -7,17 +7,6 @@ import {
   checkEmail,
   checkNickname,
 } from '@/services/member/accountService';
-
-
-  // import { shallowRef } from 'vue'
-
-  const gender = shallowRef({ state: '성별', abbr: 'gender' });
-
-  const genders = [
-    { state: '남자', abbr: 'male' },
-    { state: '여자', abbr: 'Female' },
-  ];
-
 
 const router = useRouter();
 
@@ -29,9 +18,8 @@ const state = reactive({
     email: '',
     name: '',
     birthDate: '',
-    gender : '',
-    memberNick: '',
     gender: '',
+    memberNick: '',
   },
   validation: {
     memberId: {
@@ -63,17 +51,7 @@ const state = reactive({
       message: '',
       touched: false,
     },
-    gender: {
-      isValid: true,
-      message: '',
-      touched: false,
-    },
     birthDate: {
-      isValid: true,
-      message: '',
-      touched: false,
-    },
-    gender: {
       isValid: true,
       message: '',
       touched: false,
@@ -207,7 +185,7 @@ const validateBirthDate = (birthDate) => {
   if (!birthDate.trim()) {
     return { isValid: false, message: '생년월일을 입력해주세요.' };
   }
-const dateRegex = /^\d{8}$/;
+  const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(birthDate.replace(/-/g, ''))) {
     return { isValid: false, message: 'YYYYMMDD 형식으로 입력해주세요.' };
   }
@@ -244,20 +222,6 @@ const dateRegex = /^\d{8}$/;
 
   return { isValid: true, message: '' };
 };
-//성별 제약 조건 
-
-const validateGender = (inGender) => {
-  if (inGender==="성별") {
-    return { isValid: false, message: '성별을 입력해주세요.' };
-  }
-  state.gender = inGender.state;
-  console.log("state.gender",   state.gender );
-  return { isValid: true, message: '' };
-}
-
-// 성별 제약 조건
-
-
 
 const validateNickname = (nickname) => {
   if (!nickname.trim()) {
@@ -294,16 +258,15 @@ const validateGender = (gender) => {
   return { isValid: true, message: '' };
 };
 const handleGenderChange = (selectedGender) => {
-  if (selectedGender === 'M') {
-    state.genderCheckbox.male = !state.genderCheckbox.male;
-    state.genderCheckbox.female = false;
-    state.form.gender = state.genderCheckbox.male ? 'M' : '';
-  } else if (selectedGender === 'F') {
-    state.genderCheckbox.female = !state.genderCheckbox.female;
-    state.genderCheckbox.male = false;
-    state.form.gender = state.genderCheckbox.female ? 'F' : '';
-  }
-  
+if (selectedGender === 'M') {
+  state.genderCheckbox.male = true;      
+  state.genderCheckbox.female = false;    
+  state.form.gender = 'M';                
+} else if (selectedGender === 'F') {
+  state.genderCheckbox.female = true;
+  state.genderCheckbox.male = false;
+  state.form.gender = 'F';
+}
   state.validation.gender.touched = true;
   validateField('gender', state.form.gender);
 };
@@ -330,9 +293,6 @@ const validateField = (field, value) => {
       break;
     case 'birthDate':
       result = validateBirthDate(value);
-      break;
-    case 'gender':
-      result = validateGender(value);
       break;
     case 'memberNick':
       result = validateNickname(value);
@@ -440,17 +400,6 @@ watch(
 );
 
 watch(
-  () => gender.value,
-  (newValue) => {
-    if (newValue) {      
-    // console.log(newValue);
-      validateField('gender', newValue);
-    }
-  }
-);
-
-
-watch(
   () => state.form.memberNick,
   (newValue) => {
     if (state.validation.memberNick.touched) {
@@ -468,7 +417,6 @@ watch(
   }
 );
 
-// 약관 동의 관련 함수들
 const allCheck = () => {
   const value = state.terms.all;
   state.terms.terms1 = value;
@@ -703,7 +651,6 @@ const submit = async () => {
     const res = await join(state.form);
     if (res.status === 200) {
       state.showSuccess = true;
-      // alert 추가
       alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
       setTimeout(async () => {
         await router.push('/login');
@@ -957,11 +904,9 @@ const submit = async () => {
               올바른 이름입니다.
             </div>
           </div>
-          <!-- 생년 월일  -->
-          <label for="birthDate">생년월일 *</label>
-          <div id= "" class="form-group gender">
-         
-            <div class = "brithDateValide  w-75">
+
+          <div class="form-group">
+            <label for="birthDate">생년월일 *</label>
             <input
               type="text"
               id="birthDate"
@@ -976,14 +921,14 @@ const submit = async () => {
                   state.validation.birthDate.touched &&
                   state.validation.birthDate.isValid &&
                   state.form.birthDate,
-              } "
+              }"
               @blur="handleFieldTouch('birthDate')"
               @input="
                 state.validation.birthDate.touched &&
                   validateField('birthDate', state.form.birthDate)
-              "             
+              "
             />
-            <div 
+            <div
               v-if="
                 state.validation.birthDate.touched &&
                 state.validation.birthDate.message
@@ -996,168 +941,16 @@ const submit = async () => {
               ]"
             >
               {{ state.validation.birthDate.message }}
-            </div>   
-            <div 
+            </div>
+            <div
               v-else-if="
                 state.validation.birthDate.touched &&
                 state.validation.birthDate.isValid &&
                 state.form.birthDate
-              "             
-            >
-              올바른 날짜 형식입니다.   
-            </div>
-          </div>
-            <v-select 
-         
-    v-model="gender"
-    :hint="`${gender.abbr}`"
-    :items="genders"
-    item-title="state"
-    item-value="abbr"
-    label="Select"
-    variant="underlined"
-    persistent-hint
-    return-object
-    single-line       
-    :class="['w-25', 'h-25', 'ma-0'] ,{
-                error:
-                  state.validation.gender.touched &&
-                  !state.validation.gender.isValid,
-                success:
-                  state.validation.gender.touched &&
-                  state.validation.gender.isValid &&
-                  state.form.gender,
-              } "
-              @blur="handleFieldTouch('gender')"
-              @input="
-                state.validation.gender.touched &&
-                  validateField('gender', gender.title)
-              "               ></v-select>   
-  <div 
-              v-if="
-                state.validation.gender.touched &&
-                state.validation.gender.message
-              "
-              :class="[
-                'field-message',
-                state.validation.gender.isValid
-                  ? 'field-success'
-                  : 'field-error',
-              ]"
-            >
-              {{ state.validation.gender.message }}
-            </div>   
-            <div 
-              v-else-if="
-                state.validation.gender.touched &&
-                state.validation.gender.isValid &&
-                state.form.gender
-              "             
-            >
-              성별 선택 완료.   
-            </div>
-          </div>
-<!-- 여기 어디 넣어보자  -->
-          <!-- <div class="form-group">
-            <label for="gender">성별 *</label>
-            <input
-              type="text"
-              id="gender"
-              placeholder="남/여"
-              maxlength="8"
-              v-model="state.form.gender"
-              :class="{
-                error:
-                  state.validation.gender.touched &&
-                  !state.validation.gender.isValid,
-                success:
-                  state.validation.gender.touched &&
-                  state.validation.gender.isValid &&
-                  state.form.gender,
-              }"
-              @blur="handleFieldTouch('gender')"
-              @input="
-                state.validation.gender.touched &&
-                  validateField('gender', state.form.gender)
-              "
-            />
-            <div
-              v-if="
-                state.validation.gender.touched &&
-                state.validation.gender.message
-              "
-              :class="[
-                'field-message',
-                state.validation.gender.isValid
-                  ? 'field-success'
-                  : 'field-error',
-              ]"
-            >
-              {{ state.validation.gender.message }}
-            </div>
-            <div
-              v-else-if="
-                state.validation.gender.touched &&
-                state.validation.gender.isValid &&
-                state.form.gender
               "
               class="field-success"
             >
-              올바른 성별 형식입니다.
-            </div>
-          </div> -->
-          <div class="form-group">
-        
-
-</div>
-          <!-- 수정 -->
-          <div class="form-group">
-            <label for="memberNick">닉네임 *</label>
-            <div class="input-wrapper">
-              <input
-                type="text"
-                id="memberNick"
-                placeholder="닉네임을 입력해 주세요(한글, 영문, 숫자, _만 사용 가능)"
-                v-model="state.form.memberNick"
-                :class="{
-                  error:
-                    state.validation.memberNick.touched &&
-                    !state.validation.memberNick.isValid,
-                  success:
-                    state.validation.memberNick.touched &&
-                    state.validation.memberNick.isValid &&
-                    state.validation.memberNick.available,
-                }"
-                @blur="handleFieldTouch('memberNick')"
-                @input="
-                  state.validation.memberNick.touched &&
-                    validateField('memberNick', state.form.memberNick)
-                "
-              />
-              <button
-                type="button"
-                class="btn-small"
-                @click="checkDuplicateNickname"
-                :disabled="state.loading"
-              >
-                <span v-if="state.loading">확인중...</span>
-                <span v-else>중복확인</span>
-              </button>
-            </div>
-            <div
-              v-if="
-                state.validation.memberNick.touched &&
-                state.validation.memberNick.message
-              "
-              :class="[
-                'field-message',
-                state.validation.memberNick.isValid &&
-                state.validation.memberNick.available
-                  ? 'field-success'
-                  : 'field-error',
-              ]"
-            >
-              {{ state.validation.memberNick.message }}
+              올바른 날짜 형식입니다.
             </div>
           </div>
           <div class="form-group">
@@ -1214,6 +1007,56 @@ const submit = async () => {
     {{ state.validation.gender.message }}
   </div>
 </div>
+
+          <div class="form-group">
+            <label for="memberNick">닉네임 *</label>
+            <div class="input-wrapper">
+              <input
+                type="text"
+                id="memberNick"
+                placeholder="닉네임을 입력해 주세요(한글, 영문, 숫자, _만 사용 가능)"
+                v-model="state.form.memberNick"
+                :class="{
+                  error:
+                    state.validation.memberNick.touched &&
+                    !state.validation.memberNick.isValid,
+                  success:
+                    state.validation.memberNick.touched &&
+                    state.validation.memberNick.isValid &&
+                    state.validation.memberNick.available,
+                }"
+                @blur="handleFieldTouch('memberNick')"
+                @input="
+                  state.validation.memberNick.touched &&
+                    validateField('memberNick', state.form.memberNick)
+                "
+              />
+              <button
+                type="button"
+                class="btn-small"
+                @click="checkDuplicateNickname"
+                :disabled="state.loading"
+              >
+                <span v-if="state.loading">확인중...</span>
+                <span v-else>중복확인</span>
+              </button>
+            </div>
+            <div
+              v-if="
+                state.validation.memberNick.touched &&
+                state.validation.memberNick.message
+              "
+              :class="[
+                'field-message',
+                state.validation.memberNick.isValid &&
+                state.validation.memberNick.available
+                  ? 'field-success'
+                  : 'field-error',
+              ]"
+            >
+              {{ state.validation.memberNick.message }}
+            </div>
+          </div>
         </div>
 
         <div class="terms">
@@ -1511,23 +1354,6 @@ const submit = async () => {
 .form-group {
   margin-bottom: 18px;
 }
-/* 허찬 수정 부분 */
-.gender{
-  display: flex;
-  flex-direction: row;
-}
-
-.brithDateValide
-{
-  display: flex;
-  flex-direction: column;
-}
-.joininput .v-field__input
-{
-  padding: 0;
-  font-size: inherit;
-}
-/* 허찬 수정 부분 */
 
 .join-form label {
   display: block;
@@ -1537,8 +1363,7 @@ const submit = async () => {
   margin-bottom: 6px;
 }
 
-.joininput input,
-.joininput .v-select {
+.joininput input {
   width: 100%;
   padding: 12px 14px;
   font-size: 14px;
@@ -1549,47 +1374,39 @@ const submit = async () => {
   background-color: white;
 }
 
-.joininput input:focus,
-.joininput .v-field__input {
+.joininput input:focus {
   border-color: #2a9df4;
   box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.1);
 }
 
-.joininput input.error,
-.joininput .v-field__input {
+.joininput input.error {
   border-color: #dc2626;
   background-color: #fef2f2;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-.joininput input.success,
-.joininput .v-field__input {
+.joininput input.success {
   border-color: #16a34a;
   background-color: #f0fdf4;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
-.joininput input:focus.error
-.joininput .v-field__input {
+.joininput input:focus.error {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
 }
 
-.joininput input:focus.success
-.joininput .v-field__input {
+.joininput input:focus.success {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
 }
 
-.field-message ,
-.v-field__input{
+.field-message {
   font-size: 12px;
   margin-top: 4px;
   display: flex;
   align-items: center;
 }
 
-.field-error
-, .v-field__input
-{
+.field-error {
   color: #dc2626;
   font-size: 12px;
   margin-top: 4px;
@@ -1597,8 +1414,7 @@ const submit = async () => {
   align-items: center;
 }
 
-.field-success
-, .v-field__input{
+.field-success {
   color: #16a34a;
   font-size: 12px;
   margin-top: 4px;
