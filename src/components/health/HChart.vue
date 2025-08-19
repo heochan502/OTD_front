@@ -3,7 +3,6 @@ import { computed, onMounted, ref } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
-
 // Chart.js
 import {
   Chart as ChartJS,
@@ -35,8 +34,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  selectedField: String, // weight, sleep, exercise 등
+  selectedField: String,
+  fields: Object,
 });
+console.log(props.fields);
 
 const healthStore = useHealthStore();
 
@@ -67,15 +68,20 @@ const weeklyLogs = computed(() => {
 // 주차 데이터 매핑 (월~일, 빈 값은 null)
 const weeklyData = computed(() => {
   const days = Array(7).fill(null);
+  let lastValue = null;
   weeklyLogs.value.forEach((log) => {
     const day = dayjs(log.healthlogDatetime);
     const weekday = day.isoWeekday(); // 1=월 ~ 7=일
-    const value = log[props.selectedField];
-    days[weekday - 1] = value;
+    let value = log[props.selectedField];
+    if (value != null) {
+      days[weekday - 1] = value;
+      lastValue = days[weekday - 1];
+    } else {
+      days[weekday - 1] = lastValue;
+    }
   });
   return days;
 });
-
 // X축 라벨 (월 ~ 일)
 const labels = ref(["월", "화", "수", "목", "금", "토", "일"]);
 
@@ -84,13 +90,11 @@ const chartData = computed(() => ({
   labels: labels.value,
   datasets: [
     {
-      label: props.selectedField || "데이터",
       data: weeklyData.value,
       borderColor: "#3BBEFF",
-      backgroundColor: "rgba(59,190,255,0.2)",
-      tension: 0.3,
+      backgroundColor: "rgba(59, 190, 255, 0.2)",
       fill: true,
-      pointRadius: 6,
+      pointRadius: 3,
       pointBackgroundColor: "#3BBEFF",
     },
   ],
@@ -102,29 +106,40 @@ const chartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: true,
+      display: false,
       labels: {
         color: "#333",
       },
     },
+    // 툴팁
     tooltip: {
       callbacks: {
-        label: (context) => `${context.parsed.y} ${props.selectedField}`,
+        label: (context) => {
+          const field = props.fields.find((f) => f.key === props.selectedField);
+          const unit = field?.unit || "";
+
+          return `${context.parsed.y ?? 0} ${unit}`;
+        },
       },
     },
   },
   scales: {
     x: {
       title: {
-        display: true,
-        text: "요일",
+        display: false,
+      },
+      grid: {
+        display: false,
       },
     },
     y: {
-      beginAtZero: true,
+      type: "linear",
+      suggestedMin: 50,
       title: {
-        display: true,
-        text: props.selectedField,
+        display: false,
+      },
+      grid: {
+        display: false,
       },
     },
   },
@@ -140,6 +155,7 @@ const chartOptions = {
 <style lang="scss" scoped>
 .chart {
   display: flex;
+  width: 100%;
   height: 350px;
   padding: 12px;
 }
