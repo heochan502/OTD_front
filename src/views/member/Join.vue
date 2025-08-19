@@ -18,6 +18,7 @@ const state = reactive({
     email: '',
     name: '',
     birthDate: '',
+    gender : '',
     memberNick: '',
   },
   validation: {
@@ -46,6 +47,11 @@ const state = reactive({
       available: false,
     },
     name: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+    gender: {
       isValid: true,
       message: '',
       touched: false,
@@ -175,7 +181,7 @@ const validateBirthDate = (birthDate) => {
   if (!birthDate.trim()) {
     return { isValid: false, message: '생년월일을 입력해주세요.' };
   }
-  const dateRegex = /^\d{8}$/;
+const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(birthDate.replace(/-/g, ''))) {
     return { isValid: false, message: 'YYYYMMDD 형식으로 입력해주세요.' };
   }
@@ -212,6 +218,30 @@ const validateBirthDate = (birthDate) => {
 
   return { isValid: true, message: '' };
 };
+//성별 제약 조건 
+
+const validateGender = (gender) => {
+  if (!gender.trim()) {
+    return { isValid: false, message: '성별을 입력해주세요.' };
+  }
+  if (gender.trim().length > 6) {
+    return {
+      isValid: false,
+      message: '성별은 최대 6글자 입니다.',
+    };
+  }
+  const genderRegex = /^[가-힣a-zA-Z]+$/;
+  if (!genderRegex.test(gender.trim())) {
+    return {
+      isValid: false,
+      message: '성별은 한글, 영문 만 사용 가능합니다.',
+    };
+  }
+  return { isValid: true, message: '' };
+}
+// 성별 제약 조건
+
+
 
 const validateNickname = (nickname) => {
   if (!nickname.trim()) {
@@ -260,6 +290,9 @@ const validateField = (field, value) => {
       break;
     case 'birthDate':
       result = validateBirthDate(value);
+      break;
+    case 'gender':
+      result = validateGender(value);
       break;
     case 'memberNick':
       result = validateNickname(value);
@@ -861,7 +894,7 @@ const submit = async () => {
               올바른 이름입니다.
             </div>
           </div>
-
+          <!-- 생년 월일  -->
           <div class="form-group">
             <label for="birthDate">생년월일 *</label>
             <input
@@ -910,7 +943,58 @@ const submit = async () => {
               올바른 날짜 형식입니다.
             </div>
           </div>
-
+<!-- 여기 어디 넣어보자  -->
+          <!-- <div class="form-group">
+            <label for="gender">성별 *</label>
+            <input
+              type="text"
+              id="gender"
+              placeholder="남/여"
+              maxlength="8"
+              v-model="state.form.gender"
+              :class="{
+                error:
+                  state.validation.gender.touched &&
+                  !state.validation.gender.isValid,
+                success:
+                  state.validation.gender.touched &&
+                  state.validation.gender.isValid &&
+                  state.form.gender,
+              }"
+              @blur="handleFieldTouch('gender')"
+              @input="
+                state.validation.gender.touched &&
+                  validateField('gender', state.form.gender)
+              "
+            />
+            <div
+              v-if="
+                state.validation.gender.touched &&
+                state.validation.gender.message
+              "
+              :class="[
+                'field-message',
+                state.validation.gender.isValid
+                  ? 'field-success'
+                  : 'field-error',
+              ]"
+            >
+              {{ state.validation.gender.message }}
+            </div>
+            <div
+              v-else-if="
+                state.validation.gender.touched &&
+                state.validation.gender.isValid &&
+                state.form.gender
+              "
+              class="field-success"
+            >
+              올바른 성별 형식입니다.
+            </div>
+          </div> -->
+          
+          
+          <!-- 수정 -->
           <div class="form-group">
             <label for="memberNick">닉네임 *</label>
             <div class="input-wrapper">
