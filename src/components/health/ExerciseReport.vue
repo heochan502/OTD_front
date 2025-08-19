@@ -6,23 +6,25 @@ import { getFeedbackMessage } from "@/utils/getFeedbackMessage";
 import {
   getDateString,
   getYesterdayDateString,
-  filterLogsByDate,
+  filterExerciseLogsByDate,
   calcKcal,
   calcDuration,
   calcEffortAvg,
-} from "@/utils/exerciseReportUtils";
+} from "@/utils/reportUtils";
 
 const exerciseStore = useExerciseStore();
+
+// console.log(exerciseStore.logs);
 
 // YYYY-MM-DD
 const todayStr = getDateString();
 const yesterdayStr = getYesterdayDateString();
 
 const todayLogs = computed(() =>
-  filterLogsByDate(exerciseStore.logs, todayStr)
+  filterExerciseLogsByDate(exerciseStore.logs, todayStr)
 );
 const yesterdayLogs = computed(() =>
-  filterLogsByDate(exerciseStore.logs, yesterdayStr)
+  filterExerciseLogsByDate(exerciseStore.logs, yesterdayStr)
 );
 
 const todayKcal = computed(() => calcKcal(todayLogs.value));

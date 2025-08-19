@@ -1,31 +1,55 @@
 <script setup>
-import { reactive, computed } from "vue";
+import { computed, onMounted, reactive } from "vue";
+import { useHealthStore } from "@/stores/healthStore";
+import { getDateString, filterHealthLogsByDate } from "@/utils/reportUtils";
+import moodLevels from "@/assets/health/moodLevels.json";
+import sleepQualitys from "@/assets/health/sleepQualitys.json";
+const healthStore = useHealthStore();
 
-const healthlog = reactive({
-  weight: 60,
-  height: 170,
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
+});
+
+const todayStr = getDateString();
+const todayLog = computed(() =>
+  filterHealthLogsByDate(healthStore.logs, todayStr)
+);
+
+const state = computed(() => {
+  const log = todayLog.value[0] || {};
+  return [
+    moodLevels[log.moodLevel].label || 0,
+    sleepQualitys[log.sleepQuality].label || 0,
+    log.diastolicBp || 0,
+    log.sugarLevel || 0,
+  ];
 });
 
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
 const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
 
+const minBmi = 15;
+const maxBmi = 40;
+
 const bmi = computed(() => {
-  const heightInMeters = healthlog.height / 100;
-  if (!heightInMeters || !healthlog.weight) return 0;
-  return parseFloat((healthlog.weight / heightInMeters ** 2).toFixed(1));
+  if (!healthStore.logs.length) return 0;
+  const heightInMeters = (healthStore.logs[0]?.height || 0) / 100;
+
+  if (!heightInMeters || !healthStore.logs[0]?.weight) return 0;
+  return parseFloat(
+    (healthStore.logs[0]?.weight / heightInMeters ** 2).toFixed(1)
+  );
 });
 
 const bmiStatus = computed(() => {
   const userBmi = bmi.value;
-  if (userBmi < 18.5) return "저체중";
+  if (userBmi === 0) return "기록없음";
+  else if (userBmi < 18.5) return "저체중";
   else if (userBmi < 25) return "정상체중";
   else if (userBmi < 30) return "과체중";
   else if (userBmi < 35) return "비만";
   else return "고도비만";
 });
-
-const minBmi = 15;
-const maxBmi = 40;
 </script>
 
 <template>
@@ -44,8 +68,17 @@ const maxBmi = 40;
         >
           <v-carousel-item class="sheet" v-for="(item, i) in subtitle" :key="i">
             <v-sheet :color="colors[i]" height="100%">
-              <div class="d-flex fill-height justify-center pa-3">
-                <div class="text-h6">{{ item }}</div>
+              <div class="d-flex justify-center align-center flex-column pa-3">
+                <div class="text-h6 pa-3">{{ item }}</div>
+                <div
+                  v-if="!todayLog || todayLog.length === 0"
+                  class="fill-height"
+                >
+                  기록없음
+                </div>
+                <div v-else class="text-h3 pa-3 fill-height">
+                  {{ state[i] }}
+                </div>
               </div>
             </v-sheet>
           </v-carousel-item>
@@ -55,16 +88,24 @@ const maxBmi = 40;
     <v-col class="content_right" cols="6">
       <div class="small_box">
         <span>weight</span>
-        <span class="value">{{ healthlog.weight }}kg</span>
+        <span class="value">
+          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.weight }}
+          kg
+        </span>
       </div>
       <div class="small_box">
         <span>height</span>
-        <span class="value">{{ healthlog.height }}cm</span>
+        <span class="value">
+          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.height }}
+          cm
+        </span>
       </div>
       <div class="medium-box">
         <span class="subtitle"> BMI </span>
         <div class="d-flex justify-space-between">
-          <span class="value">{{ bmi }} </span>
+          <span class="value">
+            {{ bmi }}
+          </span>
           <v-btn
             variant="flat"
             size="x-small"

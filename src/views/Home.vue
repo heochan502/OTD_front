@@ -1,7 +1,7 @@
 <script setup>
-import Weather from '@/views/weather/weather.vue';
-import ReportCard from '@/components/health/ReportCard.vue';
-import ReminderHome from '@/components/reminder/ReminderHome.vue';
+import Weather from "@/views/weather/weather.vue";
+import ReportCard from "@/components/health/ReportCard.vue";
+import ReminderHome from "@/components/reminder/ReminderHome.vue";
 </script>
 
 <template>

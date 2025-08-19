@@ -1,57 +1,121 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useHealthStore } from "@/stores/healthStore";
+import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
 
-const exhale = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const checking = ref(false);
-const heartbeats = ref([]);
-const avg = computed(() => {
-  const sum = heartbeats.value.reduce((acc, cur) => acc + cur, 0);
-  const length = heartbeats.value.length;
-  if (!sum && !length) return 0;
-  return Math.ceil(sum / length);
+dayjs.extend(isoWeek);
+
+const props = defineProps({
+  selectedDate: {
+    type: String,
+    required: true,
+  },
+  selectedField: String,
 });
-function heartbeat() {
-  return Math.ceil(Math.random() * (120 - 80) + 80);
-}
-async function takePulse(inhale = true) {
-  checking.value = true;
-  inhale && (await exhale(1000));
-  heartbeats.value = Array.from({ length: 20 }, heartbeat);
-  checking.value = false;
-}
-takePulse(false);
+
+const healthStore = useHealthStore();
+
+onMounted(async () => {
+  await healthStore.fetchHealthlogs();
+});
+
+// 해당 주차 범위
+const weekRange = computed(() => {
+  const base = dayjs(props.selectedDate);
+  return {
+    start: base.startOf("isoWeek"), // 월요일
+    end: base.endOf("isoWeek"), // 일요일
+  };
+});
+
+// weekRange에 해당하는 데이터만 필터링
+const weeklyLogs = computed(() => {
+  return healthStore.logs.filter((log) => {
+    const day = dayjs(log.healthlogDatetime);
+    return (
+      day.isAfter(weekRange.value.start.subtract(1, "day")) &&
+      day.isBefore(weekRange.value.end.add(1, "day"))
+    );
+  });
+});
+
+// 요일별 체중 배열 (월~일, 1~7)
+const weeklyData = computed(() => {
+  const days = Array(7).fill(null);
+  weeklyLogs.value.forEach((log) => {
+    const day = dayjs(log.healthlogDatetime);
+    const weekday = day.isoWeekday();
+    let value = log[props.selectedField]; // selectedField에 따라 값 선택
+
+    days[weekday - 1] = value;
+  });
+
+  return days;
+});
+
+const labels = ["월", "화", "수", "목", "금", "토", "일"];
+// const weightDatum = healthStore.logs.map((item) => item.weight);
 </script>
 
 <template>
-  <v-card class="mx-auto ma-10">
-    <template v-slot:prepend>
-      <v-icon
-        class="me-8"
-        icon="mdi-weight-kilogram"
-        size="64"
-        @click="takePulse"
-      ></v-icon>
-    </template>
-
-    <template v-slot:title>
-      <div class="text-caption text-grey text-uppercase">평균 체중</div>
-
-      <span class="text-h3 font-weight-black" v-text="avg || '—'"></span>
-      <strong v-if="avg">Kg</strong>
-    </template>
-
-    <v-sheet color="transparent">
+  <div v-if="props.selectedField === sleepQuality">
+    <v-card class="chart">
       <v-sparkline
-        :key="String(avg)"
-        :gradient="['#D4FFEC', '#3BBEFF', '#4596FB']"
-        :line-width="3"
-        :model-value="heartbeats"
-        :smooth="16"
-        stroke-linecap="round"
+        :model-value="weeklyData"
+        :auto-line-width="true"
+        :gradient="['#3BBEFF', '#ffffff']"
+        :gradient-direction="top"
+        fill
+        :line-width="2"
+        :lineCap="round"
+        :smooth="true"
+        :radius="10"
+        :padding="8"
+        :stroke-linecap="lineCap"
+        :type="bar"
         auto-draw
+        :labels="labels"
       ></v-sparkline>
-    </v-sheet>
-  </v-card>
+    </v-card>
+  </div>
+  <div v-else>
+    <v-card class="chart">
+      <v-sparkline
+        :model-value="weeklyData"
+        :auto-line-width="true"
+        :gradient="['#3BBEFF', '#ffffff']"
+        :gradient-direction="top"
+        fill
+        :line-width="2"
+        :lineCap="round"
+        :smooth="true"
+        :radius="10"
+        :padding="8"
+        :stroke-linecap="lineCap"
+        :type="trend"
+        auto-draw
+        :labels="labels"
+      ></v-sparkline>
+    </v-card>
+  </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.chart {
+  display: flex;
+  height: 350px;
+}
+.week-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #aaa;
+}
+.week-labels .selected {
+  color: #3bbeff;
+  font-weight: 600;
+}
+</style>
