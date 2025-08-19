@@ -66,13 +66,18 @@ class DiaryHttpService {
 
   _handleError(err, contextMessage) {
     const status = err.response?.status;
+    let message = `❌ ${contextMessage} 중 오류가 발생했습니다.`;
+
     if (status === 401) {
-      console.error(`🔒 401: 인증 필요 - ${contextMessage}`);
+      message = '🔒 로그인 후 이용해주세요.';
     } else if (status === 403) {
-      console.error(`⛔ 403: 권한 없음 - ${contextMessage}`);
-    } else {
-      console.error(`📔 ${contextMessage} 실패:`, err);
+      message = '⛔ 권한이 없습니다.';
+    } else if (status === 500) {
+      message = '💥 서버 내부 오류가 발생했습니다.';
     }
+
+    alert(message);
+    console.error(`❌ ${contextMessage} 실패:`, err);
   }
 }
 
