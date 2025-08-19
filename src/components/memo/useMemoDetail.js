@@ -12,7 +12,7 @@ export function useMemoDetail(props, emit) {
     memoId: null,
     memoName: '',
     memoContent: '',
-    memoImage: null,
+    memoImage: '',
     createdAt: null,
   });
 
