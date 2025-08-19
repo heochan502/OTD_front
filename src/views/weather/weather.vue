@@ -1,15 +1,22 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import {
-  getWeather,
-  getNickName,
-  getDailyWeather,
-} from '@/services/weather/weatherHomeService';
+import { ref, onMounted, computed, watch } from 'vue';
+import { getWeather, getNickName } from '@/services/weather/weatherHomeService';
+import DailyWeather from '@/components/weather/DailyWeather.vue';
+import Location from '@/components/weather/Location.vue';
+import { useWeatherStore } from '@/stores/weatherStore';
 
+const weatherStore = useWeatherStore();
 const weather = ref(null);
 const open = ref(false);
 const nickName = ref('');
-const dayWeather = ref(null);
+const dialog = ref({
+  daily: false,
+  location: false,
+});
+
+const openDialog = (type) => {
+  dialog.value[type] = true;
+};
 
 const LocalWeather = async () => {
   const res = await getWeather();
@@ -20,12 +27,6 @@ const LocalWeather = async () => {
   }
 };
 
-const DayWeather = async () => {
-  const res = await getDailyWeather();
-  console.log('daily :', res.data);
-  dayWeather.value = res.data;
-};
-
 // 한줄 알림
 const memberNickName = async () => {
   const res = await getNickName();
@@ -33,7 +34,7 @@ const memberNickName = async () => {
 };
 const popMessage = computed(() => {
   const pop = weather.value.villagePop;
-  const per = '오늘은 비올 확률이' + weather.value.villagePop + ' % !!';
+  const per = '오늘은 비올 확률이 ' + weather.value.villagePop + '% !!';
   const sky = weather.value.villageSky;
   if ((pop < 10 && sky === '맑음') || (pop < 10 && sky === '구름 많음')) {
     return '오늘의 날씨는 ' + sky + '이네요! 즐거운 하루 보내세요.';
@@ -102,8 +103,15 @@ const weatherBackground = computed(() => {
 
 onMounted(async () => {
   memberNickName();
-  LocalWeather();
+  await LocalWeather();
 });
+
+watch(
+  () => weatherStore.refresh,
+  async () => {
+    await LocalWeather();
+  }
+);
 </script>
 
 <template>
@@ -114,18 +122,34 @@ onMounted(async () => {
     >{{ popMessage }}
   </div>
   <div class="header flex justify-between items-center w-full px-4 pt-2">
-    <span
-      class="live px-4 py-1 text-white font-semibold text-sm"
-      @click="DayWeather"
-    >
+    <span class="live px-4 py-1 text-white font-semibold text-sm">
       실시간 날씨 정보
     </span>
     <button @click="toggleMenu" class="menu px-2 py-1 text-sm font-bold">
       ☰ 날씨 메뉴
     </button>
-    <router-link v-if="open" to="/location" class="menu-list">
+    <button v-if="open" class="menu-list" @click="openDialog('daily')">
+      시간별 날씨
+      <v-dialog v-model="dialog.daily" max-width="1000" min-height="100">
+        <v-card>
+          <v-card-title class="text-h8">오늘 날씨</v-card-title>
+          <v-card-text>
+            <DailyWeather />
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </button>
+    <button v-if="open" class="menu-list" @click="openDialog('location')">
       지역 변경
-    </router-link>
+      <v-dialog v-model="dialog.location" max-width="1000" min-height="200">
+        <v-card>
+          <v-card-title class="text-h8">지역 저장</v-card-title>
+          <v-card-text>
+            <Location />
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </button>
   </div>
   <div>
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">

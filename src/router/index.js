@@ -25,9 +25,8 @@ import Join from '@/views/member/Join.vue';
 import Login from '@/views/member/Login.vue';
 import Profile from '@/views/member/Profile.vue';
 import ProfileDetail from '@/views/member/ProfileDetail.vue';
-import ProfilePassword from '@/views/member/Password.vue'
+import ProfilePassword from '@/views/member/Password.vue';
 
-import Location from '@/components/location/Location.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -116,7 +115,7 @@ const router = createRouter({
       component: Profile,
       meta: { requiresAuth: true },
     },
-     {
+    {
       path: '/profile/detail',
       name: 'profile_detail',
       component: ProfileDetail,
@@ -126,12 +125,6 @@ const router = createRouter({
       path: '/profile/password',
       name: 'profile_password',
       component: ProfilePassword,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/location',
-      name: 'location',
-      component: Location,
       meta: { requiresAuth: true },
     },
     {
