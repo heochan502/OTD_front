@@ -67,7 +67,7 @@ const weeklyLogs = computed(() => {
 
 // 주차 데이터 매핑 (월~일, 빈 값은 null)
 const weeklyData = computed(() => {
-  const days = Array(7).fill(null);
+  const days = Array(7).fill(0);
   let lastValue = null;
   weeklyLogs.value.forEach((log) => {
     const day = dayjs(log.healthlogDatetime);
@@ -107,9 +107,6 @@ const chartOptions = {
   plugins: {
     legend: {
       display: false,
-      labels: {
-        color: "#333",
-      },
     },
     // 툴팁
     tooltip: {
@@ -117,8 +114,10 @@ const chartOptions = {
         label: (context) => {
           const field = props.fields.find((f) => f.key === props.selectedField);
           const unit = field?.unit || "";
-
-          return `${context.parsed.y ?? 0} ${unit}`;
+          if (context.parsed.y === 0) {
+            return "기록없음";
+          }
+          return `${context.parsed.y} ${unit}`;
         },
       },
     },
