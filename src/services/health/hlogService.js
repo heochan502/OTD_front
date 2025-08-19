@@ -9,8 +9,8 @@ export const saveHlog = (args) => {
 };
 
 // 건강기록 목록 조회
-export const getHlogs = () => {
-  return axios.get(path).catch((e) => e.response);
+export const getHlogs = (weekly) => {
+  return axios.get(path,weekly).catch((e) => e.response);
 };
 
 // 건강기록 상세 조회
