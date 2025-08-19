@@ -32,7 +32,7 @@ export const getFoodCalorie = async (foodInfo)=>{
 }
 
 export const getMealData = async (getlist) => {
-  // console.log('json 음식정보', foodInfo);
+  // console.log("json 음식정보", getlist);
   const res = await axios.get("meal/getMeal", {params :getlist});
   // console.log("json이겟지? :", res.data);
   // const data = res.data;
@@ -73,7 +73,7 @@ export const inputMealData = async (mealData)=>{
 ///수정
 
 export const modifyMealdata = async (mealData) => {
-  // console.log('json 음식정보', foodInfo);
+  // console.log("json 음식정보", mealData);
   const res = await axios.put("meal/modifyMeal", mealData);
   // console.log('json이겟지? :', res.data);
   // const data = res.data;
