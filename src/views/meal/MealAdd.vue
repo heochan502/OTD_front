@@ -19,6 +19,7 @@ import {
 const dayStore = useDayDefine();
 const weeklyData = useWeeklyStore();
 const weekDay = useBaseDate();
+const calorieData = useCalorieCalcul();
 
 const router = useRouter();
 
@@ -115,21 +116,7 @@ const changeText = debounce((type) => {
   searchFoodName(type);
 }, 50);
 
-// 아래 value 나 append뒤에 적힌건 함수화해서 값넘겨서 값보고 그떄별로 다르게 표시되는거
 
-// 현재 시간
-// const currentTime = ref('');
-// const updateTime = () => {
-//   const now = new Date();
-//   const year = now.getFullYear();
-//   const month = String(now.getMonth() + 1).padStart(2, '0');
-//   const day = String(now.getDate()).padStart(2, '0');
-//   const ampm = String(now.getHours() - 12 <= 0 ? '오전' : '오후');
-//   const hours = String(now.getHours()).padStart(2, '0');
-//   const minutes = String(now.getMinutes()).padStart(2, '0');
-//   const seconds = String(now.getSeconds()).padStart(2, '0');
-//   currentTime.value = `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-// };
 
 // 목록 추가
 const onItemClick = (item) => {
@@ -151,6 +138,7 @@ const onItemClick = (item) => {
 
 // 배열 데이터 삭제
 const removeItem = (index) => {
+  console.log('삭제할 인덱스:', index);
   itemList.value.splice(index, 1);
 };
 //칼로리 계산
@@ -167,15 +155,7 @@ const inputData = useAlldayMeal();
 
 
 
-const saveClick =()=> {
-  if (window.confirm("저장 하시겠습니까?")) {
-    saveMeal();
-  } else {
-    console.log("취소되었습니다.");
-  }
-}
 const setItem = () => {
-
   
   inputData.dayMealCategory.foodDbId = itemList.value.map(
     (info) => info.foodDbId
@@ -187,8 +167,8 @@ const setItem = () => {
     }, 0)
     .toFixed(0);
   inputData.dayMealCategory.mealBrLuDi = dayStore.dayDefine;
-  //현재 시간 기점이라 생각해야함
-  inputData.dayMealCategory.mealDay = dayStore.currentTime.slice(3, 13);
+  //선택한 시간 기점이라 생각해야함
+  inputData.dayMealCategory.mealDay = calorieData.itemInfo.mealDay;
 };
 
 const saveMeal = async () => {
@@ -207,7 +187,7 @@ const saveMeal = async () => {
     saveText.value = '수정하기';
   }
   if (res.status !== 200) {
-    console.log('입력 ', res);
+    // console.log('입력 ', res);
     // 주간 뿌려주는 데이터 변경
     const result = await getWeekTotal(weekDay.getWeekDate);
     console.log("수정하고 주간 데이터 변경 ", result.data);
@@ -215,14 +195,6 @@ const saveMeal = async () => {
   }
 };
 
-//수정 하는곳
-function updateClick() {
-  if (window.confirm("수정 하시겠습니까?")) {
-    updateMeal();
-  } else {
-    console.log("취소되었습니다.");
-  }
-}
 
 const updateMeal = async () => {
   setItem();
@@ -230,34 +202,57 @@ const updateMeal = async () => {
   //현재 시간 기점이라 생각해야함
   // inputData.dayMealCategory.mealDay = currentTime.value.slice(3, 13);
 
-  // console.log(" 수정데이터들/ : ", inputData.dayMealCategory);
+  console.log(" 수정데이터들/ : ", inputData.dayMealCategory);
 
-  const res = await modifyMealdata(inputData.dayMealCategory);
+  const resultModify = await modifyMealdata(inputData.dayMealCategory);
 
   if (itemList.value.length > 0) {
     saveText.value = '수정하기';
 
     // 주간 뿌려주는 데이터 변경
     const res = await getWeekTotal(weekDay.getWeekDate);
-    console.log("수정하고 주간 데이터 변경 ", res.data);
+    // console.log("수정하고 주간 데이터 변경 ", res.data);
     weeklyData.weeklyRawData = res.data;   
     
   } else {
     saveText.value = '저장하기';
    
   }
-  console.log('값:::', res);
+  // console.log('값:::', res);
 };
 
 const saveText = ref('저장하기');
+
+// 모달 상태
+const dialog = ref({
+  visible: false,
+  type: 'save', // 'save' or 'update'
+})
+// 모달 열기
+const openDialog = (type) => {
+  dialog.value.type = type;
+  dialog.value.visible = true;
+}
+
+// 확인 버튼 클릭 시 실행
+const confirmAction = () => {
+  if (dialog.value.type === 'save') {
+    saveMeal();
+  } else {
+    updateMeal();
+  }
+  dialog.value.visible = false
+}
 // 화면 뿌리기
 
-const getData = useAlldayMeal();
+
 
 const getMeal = async () => {
   const getlist = {
+  // 아침: Br  점심: Lu 저녁: Di
     mealBrLuDi: dayStore.dayDefine,
-    mealDay: dayStore.currentTime.slice(3, 13),
+    mealDay: calorieData.itemInfo.mealDay,
+    
   };
   // console.log(" data들 : ",  getlist);
   const lisData = await getMealData(getlist);
@@ -283,8 +278,8 @@ const getMeal = async () => {
     mealDay: item.mealDay,
   }));
 
-  console.log(' data들 : ', itemList.value);
-  // console.log("아이디 데이터", inputData.dayMealCategory);
+  // console.log(' data들 : ', dayStore.currentTime.slice(3, 13));
+  // console.log(" 데이터", calorieData.itemInfo.mealDay);
   // 데이터 넣는곳
   // itemList.value.push({
   //   foodDbId: foodInfo.foodDbId,
@@ -322,7 +317,7 @@ onMounted(() => {
           }}
           kcal</span
         >
-        <span class="ml-10"> {{ dayStore.currentTime }} </span>
+        <span class="ml-10"> 현재 시간 : {{ dayStore.currentTime }} </span>
       </div>
       <v-row dense class="justify-center">
         <v-col cols="12" md="5">
@@ -438,7 +433,7 @@ onMounted(() => {
                   </div>
                   <div>
                     <v-card-actions>
-                      <v-btn icon color="blue" @click="removeItem(i)">
+                      <v-btn icon color="blue" @click="removeItem(itemList.indexOf(item))">
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
                     </v-card-actions>
@@ -460,10 +455,26 @@ onMounted(() => {
 
     <v-btn
       class="mealsaday text-center ml-5 text-body-3"
-      @click="saveText === '저장하기' ? saveClick() : updateClick()"
+      @click="openDialog(saveText === '저장하기' ? 'save' : 'update')"
       >{{ saveText }}</v-btn
     >
   </div>
+
+  <v-dialog v-model="dialog.visible" max-width="500px">
+    <v-card>
+      <v-card-title class="text-h5">
+        {{ dialog.type === 'save' ? '저장' : '수정' }} 확인
+      </v-card-title>
+      <v-card-text>
+        {{ dialog.type === 'save' ? '저장하시겠습니까?' : '수정하시겠습니까?' }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text @click="dialog.visible = false">취소</v-btn>
+        <v-btn color="primary" @click="confirmAction">확인</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   <!-- <v-btn class="mealsaday text-center " @click="modifyMeal">수정</v-btn> -->
 </template>
 

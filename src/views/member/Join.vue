@@ -1,12 +1,23 @@
 <script setup>
-import { reactive, computed, watch } from 'vue';
+import { reactive, computed, watch , shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   join,
   checkMemberId,
   checkEmail,
   checkNickname,
-} from '@/services/accountService';
+} from '@/services/member/accountService';
+
+
+  // import { shallowRef } from 'vue'
+
+  const gender = shallowRef({ state: '성별', abbr: 'gender' });
+
+  const genders = [
+    { state: '남자', abbr: 'male' },
+    { state: '여자', abbr: 'Female' },
+  ];
+
 
 const router = useRouter();
 
@@ -18,6 +29,7 @@ const state = reactive({
     email: '',
     name: '',
     birthDate: '',
+    gender : '',
     memberNick: '',
   },
   validation: {
@@ -50,7 +62,17 @@ const state = reactive({
       message: '',
       touched: false,
     },
+    gender: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
     birthDate: {
+      isValid: true,
+      message: '',
+      touched: false,
+    },
+    gender: {
       isValid: true,
       message: '',
       touched: false,
@@ -82,7 +104,6 @@ const state = reactive({
   generalError: '',
 });
 
-
 const validateMemberId = (memberId) => {
   if (!memberId.trim()) {
     return { isValid: false, message: '아이디를 입력해주세요.' };
@@ -91,11 +112,17 @@ const validateMemberId = (memberId) => {
     return { isValid: false, message: '아이디는 4자 이상이어야 합니다.' };
   }
   if (memberId.trim().length > 20) {
-    return { isValid: false, message: '아이디는 최대 20자까지 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '아이디는 최대 20자까지 입력 가능합니다.',
+    };
   }
   const idRegex = /^[a-zA-Z0-9_]+$/;
   if (!idRegex.test(memberId.trim())) {
-    return { isValid: false, message: '아이디는 영문, 숫자, 언더스코어(_)만 사용 가능합니다.' };
+    return {
+      isValid: false,
+      message: '아이디는 영문, 숫자, 언더스코어(_)만 사용 가능합니다.',
+    };
   }
   return { isValid: true, message: '' };
 };
@@ -108,7 +135,10 @@ const validatePassword = (password) => {
     return { isValid: false, message: '비밀번호는 2자 이상이어야 합니다.' };
   }
   if (password.length > 20) {
-    return { isValid: false, message: '비밀번호는 최대 20자까지 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '비밀번호는 최대 20자까지 입력 가능합니다.',
+    };
   }
   return { isValid: true, message: '' };
 };
@@ -132,7 +162,10 @@ const validateEmail = (email) => {
     return { isValid: false, message: '올바른 이메일 형식을 입력해주세요.' };
   }
   if (email.length > 50) {
-    return { isValid: false, message: '이메일은 최대 50자까지 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '이메일은 최대 50자까지 입력 가능합니다.',
+    };
   }
   return { isValid: true, message: '' };
 };
@@ -145,11 +178,17 @@ const validateName = (name) => {
     return { isValid: false, message: '이름은 최소 2글자 이상이어야 합니다.' };
   }
   if (name.trim().length > 20) {
-    return { isValid: false, message: '이름은 최대 20글자까지 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '이름은 최대 20글자까지 입력 가능합니다.',
+    };
   }
   const nameRegex = /^[가-힣a-zA-Z\s]+$/;
   if (!nameRegex.test(name.trim())) {
-    return { isValid: false, message: '이름은 한글 또는 영문만 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '이름은 한글 또는 영문만 입력 가능합니다.',
+    };
   }
   return { isValid: true, message: '' };
 };
@@ -158,7 +197,7 @@ const validateBirthDate = (birthDate) => {
   if (!birthDate.trim()) {
     return { isValid: false, message: '생년월일을 입력해주세요.' };
   }
-  const dateRegex = /^\d{8}$/;
+const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(birthDate.replace(/-/g, ''))) {
     return { isValid: false, message: 'YYYYMMDD 형식으로 입력해주세요.' };
   }
@@ -195,20 +234,43 @@ const validateBirthDate = (birthDate) => {
 
   return { isValid: true, message: '' };
 };
+//성별 제약 조건 
+
+const validateGender = (inGender) => {
+  if (inGender==="성별") {
+    return { isValid: false, message: '성별을 입력해주세요.' };
+  }
+  state.gender = inGender.state;
+  console.log("state.gender",   state.gender );
+  return { isValid: true, message: '' };
+}
+
+// 성별 제약 조건
+
+
 
 const validateNickname = (nickname) => {
   if (!nickname.trim()) {
     return { isValid: false, message: '닉네임을 입력해주세요.' };
   }
   if (nickname.trim().length < 2) {
-    return { isValid: false, message: '닉네임은 최소 2글자 이상이어야 합니다.' };
+    return {
+      isValid: false,
+      message: '닉네임은 최소 2글자 이상이어야 합니다.',
+    };
   }
   if (nickname.trim().length > 15) {
-    return { isValid: false, message: '닉네임은 최대 15글자까지 입력 가능합니다.' };
+    return {
+      isValid: false,
+      message: '닉네임은 최대 15글자까지 입력 가능합니다.',
+    };
   }
   const nicknameRegex = /^[가-힣a-zA-Z0-9_]+$/;
   if (!nicknameRegex.test(nickname.trim())) {
-    return { isValid: false, message: '닉네임은 한글, 영문, 숫자, 언더스코어(_)만 사용 가능합니다.' };
+    return {
+      isValid: false,
+      message: '닉네임은 한글, 영문, 숫자, 언더스코어(_)만 사용 가능합니다.',
+    };
   }
   return { isValid: true, message: '' };
 };
@@ -235,6 +297,9 @@ const validateField = (field, value) => {
     case 'birthDate':
       result = validateBirthDate(value);
       break;
+    case 'gender':
+      result = validateGender(value);
+      break;
     case 'memberNick':
       result = validateNickname(value);
       break;
@@ -254,7 +319,6 @@ const handleFieldTouch = (field) => {
   validateField(field, state.form[field]);
 };
 
-
 const isPasswordMatch = computed(() => {
   return state.form.memberPw && state.form.memberPw === state.form.memberPw2;
 });
@@ -263,15 +327,16 @@ const passwordMatchStatus = computed(() => {
   if (!state.form.memberPw || !state.form.memberPw2) {
     return { show: false, isMatch: false, message: '' };
   }
-  
+
   const isMatch = state.form.memberPw === state.form.memberPw2;
   return {
     show: true,
     isMatch,
-    message: isMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'
+    message: isMatch
+      ? '비밀번호가 일치합니다.'
+      : '비밀번호가 일치하지 않습니다.',
   };
 });
-
 
 watch(
   () => state.form.memberId,
@@ -289,7 +354,7 @@ watch(
     if (state.validation.memberPw.touched) {
       validateField('memberPw', newValue);
     }
- 
+
     if (state.validation.memberPw2.touched) {
       validateField('memberPw2', state.form.memberPw2);
     }
@@ -299,7 +364,6 @@ watch(
 watch(
   () => state.form.memberPw2,
   (newValue) => {
-
     if (newValue) {
       state.validation.memberPw2.touched = true;
     }
@@ -338,6 +402,17 @@ watch(
 );
 
 watch(
+  () => gender.value,
+  (newValue) => {
+    if (newValue) {      
+    // console.log(newValue);
+      validateField('gender', newValue);
+    }
+  }
+);
+
+
+watch(
   () => state.form.memberNick,
   (newValue) => {
     if (state.validation.memberNick.touched) {
@@ -368,10 +443,8 @@ const toggleTerms = (termKey) => {
   state.termsExpanded[termKey] = !state.termsExpanded[termKey];
 };
 
-
 const checkDuplicateId = async () => {
   const trimmedId = state.form.memberId.trim();
-
 
   if (!trimmedId) {
     return;
@@ -379,7 +452,6 @@ const checkDuplicateId = async () => {
 
   const validation = validateMemberId(trimmedId);
   if (!validation.isValid) {
-
     state.validation.memberId.touched = true;
     state.validation.memberId.isValid = false;
     state.validation.memberId.message = validation.message;
@@ -392,7 +464,7 @@ const checkDuplicateId = async () => {
     if (res.status === 200) {
       state.validation.memberId.checked = true;
       state.validation.memberId.available = res.data.available;
-      
+
       if (res.data.available) {
         state.validation.memberId.message = '사용 가능한 아이디입니다.';
         state.validation.memberId.isValid = true;
@@ -414,14 +486,12 @@ const checkDuplicateId = async () => {
 const checkDuplicateEmail = async () => {
   const trimmedEmail = state.form.email.trim();
 
-
   if (!trimmedEmail) {
     return;
   }
 
   const validation = validateEmail(trimmedEmail);
   if (!validation.isValid) {
-
     state.validation.email.touched = true;
     state.validation.email.isValid = false;
     state.validation.email.message = validation.message;
@@ -434,7 +504,7 @@ const checkDuplicateEmail = async () => {
     if (res.status === 200) {
       state.validation.email.checked = true;
       state.validation.email.available = res.data.available;
-      
+
       if (res.data.available) {
         state.validation.email.message = '사용 가능한 이메일입니다.';
         state.validation.email.isValid = true;
@@ -456,14 +526,12 @@ const checkDuplicateEmail = async () => {
 const checkDuplicateNickname = async () => {
   const trimmedNick = state.form.memberNick.trim();
 
-
   if (!trimmedNick) {
     return;
   }
 
   const validation = validateNickname(trimmedNick);
   if (!validation.isValid) {
-
     state.validation.memberNick.touched = true;
     state.validation.memberNick.isValid = false;
     state.validation.memberNick.message = validation.message;
@@ -476,7 +544,7 @@ const checkDuplicateNickname = async () => {
     if (res.status === 200) {
       state.validation.memberNick.checked = true;
       state.validation.memberNick.available = res.data.available;
-      
+
       if (res.data.available) {
         state.validation.memberNick.message = '사용 가능한 닉네임입니다.';
         state.validation.memberNick.isValid = true;
@@ -495,11 +563,13 @@ const checkDuplicateNickname = async () => {
   }
 };
 
-
 const resetIdValidation = () => {
   state.validation.memberId.checked = false;
   state.validation.memberId.available = false;
-  if (state.validation.memberId.touched && state.validation.memberId.message.includes('사용')) {
+  if (
+    state.validation.memberId.touched &&
+    state.validation.memberId.message.includes('사용')
+  ) {
     state.validation.memberId.message = '';
   }
 };
@@ -507,7 +577,10 @@ const resetIdValidation = () => {
 const resetEmailValidation = () => {
   state.validation.email.checked = false;
   state.validation.email.available = false;
-  if (state.validation.email.touched && state.validation.email.message.includes('사용')) {
+  if (
+    state.validation.email.touched &&
+    state.validation.email.message.includes('사용')
+  ) {
     state.validation.email.message = '';
   }
 };
@@ -515,17 +588,24 @@ const resetEmailValidation = () => {
 const resetNickValidation = () => {
   state.validation.memberNick.checked = false;
   state.validation.memberNick.available = false;
-  if (state.validation.memberNick.touched && state.validation.memberNick.message.includes('사용')) {
+  if (
+    state.validation.memberNick.touched &&
+    state.validation.memberNick.message.includes('사용')
+  ) {
     state.validation.memberNick.message = '';
   }
 };
 
-
 const isFormValid = () => {
-  return Object.values(state.validation).every((field) => field.isValid) &&
-         state.validation.memberId.checked && state.validation.memberId.available &&
-         state.validation.email.checked && state.validation.email.available &&
-         state.validation.memberNick.checked && state.validation.memberNick.available;
+  return (
+    Object.values(state.validation).every((field) => field.isValid) &&
+    state.validation.memberId.checked &&
+    state.validation.memberId.available &&
+    state.validation.email.checked &&
+    state.validation.email.available &&
+    state.validation.memberNick.checked &&
+    state.validation.memberNick.available
+  );
 };
 
 const submit = async () => {
@@ -534,7 +614,10 @@ const submit = async () => {
     validateField(field, state.form[field]);
   });
 
-  if (!state.validation.memberId.checked || !state.validation.memberId.available) {
+  if (
+    !state.validation.memberId.checked ||
+    !state.validation.memberId.available
+  ) {
     state.generalError = '아이디 중복 확인을 해주세요.';
     setTimeout(() => (state.generalError = ''), 3000);
     return;
@@ -546,7 +629,10 @@ const submit = async () => {
     return;
   }
 
-  if (!state.validation.memberNick.checked || !state.validation.memberNick.available) {
+  if (
+    !state.validation.memberNick.checked ||
+    !state.validation.memberNick.available
+  ) {
     state.generalError = '닉네임 중복 확인을 해주세요.';
     setTimeout(() => (state.generalError = ''), 3000);
     return;
@@ -594,7 +680,7 @@ const submit = async () => {
   <div class="join-page">
     <div class="form-container">
       <h2 class="title">회원가입</h2>
-      
+
       <div v-if="state.showSuccess" class="success-message">
         <div class="message-icon">✓</div>
         <div>회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.</div>
@@ -616,15 +702,23 @@ const submit = async () => {
                 placeholder="아이디를 입력해 주세요 (4자 이상)"
                 v-model="state.form.memberId"
                 :class="{
-                  error: state.validation.memberId.touched && !state.validation.memberId.isValid,
-                  success: state.validation.memberId.touched && state.validation.memberId.isValid && state.validation.memberId.available,
+                  error:
+                    state.validation.memberId.touched &&
+                    !state.validation.memberId.isValid,
+                  success:
+                    state.validation.memberId.touched &&
+                    state.validation.memberId.isValid &&
+                    state.validation.memberId.available,
                 }"
                 @blur="handleFieldTouch('memberId')"
-                @input="state.validation.memberId.touched && validateField('memberId', state.form.memberId)"
+                @input="
+                  state.validation.memberId.touched &&
+                    validateField('memberId', state.form.memberId)
+                "
               />
-              <button 
-                type="button" 
-                class="btn-small" 
+              <button
+                type="button"
+                class="btn-small"
                 @click="checkDuplicateId"
                 :disabled="state.loading"
               >
@@ -633,10 +727,16 @@ const submit = async () => {
               </button>
             </div>
             <div
-              v-if="state.validation.memberId.touched && state.validation.memberId.message"
+              v-if="
+                state.validation.memberId.touched &&
+                state.validation.memberId.message
+              "
               :class="[
                 'field-message',
-                (state.validation.memberId.isValid && state.validation.memberId.available) ? 'field-success' : 'field-error'
+                state.validation.memberId.isValid &&
+                state.validation.memberId.available
+                  ? 'field-success'
+                  : 'field-error',
               ]"
             >
               {{ state.validation.memberId.message }}
@@ -651,17 +751,30 @@ const submit = async () => {
               placeholder="비밀번호를 입력해주세요(2자 이상)"
               v-model="state.form.memberPw"
               :class="{
-                error: state.validation.memberPw.touched && !state.validation.memberPw.isValid,
-                success: state.validation.memberPw.touched && state.validation.memberPw.isValid && state.form.memberPw,
+                error:
+                  state.validation.memberPw.touched &&
+                  !state.validation.memberPw.isValid,
+                success:
+                  state.validation.memberPw.touched &&
+                  state.validation.memberPw.isValid &&
+                  state.form.memberPw,
               }"
               @blur="handleFieldTouch('memberPw')"
-              @input="state.validation.memberPw.touched && validateField('memberPw', state.form.memberPw)"
+              @input="
+                state.validation.memberPw.touched &&
+                  validateField('memberPw', state.form.memberPw)
+              "
             />
             <div
-              v-if="state.validation.memberPw.touched && state.validation.memberPw.message"
+              v-if="
+                state.validation.memberPw.touched &&
+                state.validation.memberPw.message
+              "
               :class="[
                 'field-message',
-                state.validation.memberPw.isValid ? 'field-success' : 'field-error'
+                state.validation.memberPw.isValid
+                  ? 'field-success'
+                  : 'field-error',
               ]"
             >
               {{ state.validation.memberPw.message }}
@@ -678,24 +791,27 @@ const submit = async () => {
                 v-model="state.form.memberPw2"
                 :class="{
                   error: state.form.memberPw2 && !passwordMatchStatus.isMatch,
-                  success: passwordMatchStatus.show && passwordMatchStatus.isMatch,
+                  success:
+                    passwordMatchStatus.show && passwordMatchStatus.isMatch,
                 }"
                 @blur="handleFieldTouch('memberPw2')"
-                @input="() => {
-                  if (state.form.memberPw2) {
-                    state.validation.memberPw2.touched = true;
-                    validateField('memberPw2', state.form.memberPw2);
+                @input="
+                  () => {
+                    if (state.form.memberPw2) {
+                      state.validation.memberPw2.touched = true;
+                      validateField('memberPw2', state.form.memberPw2);
+                    }
                   }
-                }"
+                "
               />
             </div>
-          
+
             <div
               v-if="passwordMatchStatus.show"
               :class="[
                 'field-message',
                 'password-match-message',
-                passwordMatchStatus.isMatch ? 'field-success' : 'field-error'
+                passwordMatchStatus.isMatch ? 'field-success' : 'field-error',
               ]"
             >
               {{ passwordMatchStatus.message }}
@@ -711,11 +827,19 @@ const submit = async () => {
                 placeholder="이메일을 입력해 주세요"
                 v-model="state.form.email"
                 :class="{
-                  error: state.validation.email.touched && !state.validation.email.isValid,
-                  success: state.validation.email.touched && state.validation.email.isValid && state.validation.email.available,
+                  error:
+                    state.validation.email.touched &&
+                    !state.validation.email.isValid,
+                  success:
+                    state.validation.email.touched &&
+                    state.validation.email.isValid &&
+                    state.validation.email.available,
                 }"
                 @blur="handleFieldTouch('email')"
-                @input="state.validation.email.touched && validateField('email', state.form.email)"
+                @input="
+                  state.validation.email.touched &&
+                    validateField('email', state.form.email)
+                "
               />
               <button
                 type="button"
@@ -728,10 +852,15 @@ const submit = async () => {
               </button>
             </div>
             <div
-              v-if="state.validation.email.touched && state.validation.email.message"
+              v-if="
+                state.validation.email.touched && state.validation.email.message
+              "
               :class="[
                 'field-message',
-                (state.validation.email.isValid && state.validation.email.available) ? 'field-success' : 'field-error'
+                state.validation.email.isValid &&
+                state.validation.email.available
+                  ? 'field-success'
+                  : 'field-error',
               ]"
             >
               {{ state.validation.email.message }}
@@ -746,31 +875,47 @@ const submit = async () => {
               placeholder="이름을 입력해 주세요(한글, 영문 2자 이상)"
               v-model="state.form.name"
               :class="{
-                error: state.validation.name.touched && !state.validation.name.isValid,
-                success: state.validation.name.touched && state.validation.name.isValid && state.form.name,
+                error:
+                  state.validation.name.touched &&
+                  !state.validation.name.isValid,
+                success:
+                  state.validation.name.touched &&
+                  state.validation.name.isValid &&
+                  state.form.name,
               }"
               @blur="handleFieldTouch('name')"
-              @input="state.validation.name.touched && validateField('name', state.form.name)"
+              @input="
+                state.validation.name.touched &&
+                  validateField('name', state.form.name)
+              "
             />
             <div
-              v-if="state.validation.name.touched && state.validation.name.message"
+              v-if="
+                state.validation.name.touched && state.validation.name.message
+              "
               :class="[
                 'field-message',
-                state.validation.name.isValid ? 'field-success' : 'field-error'
+                state.validation.name.isValid ? 'field-success' : 'field-error',
               ]"
             >
               {{ state.validation.name.message }}
             </div>
             <div
-              v-else-if="state.validation.name.touched && state.validation.name.isValid && state.form.name"
+              v-else-if="
+                state.validation.name.touched &&
+                state.validation.name.isValid &&
+                state.form.name
+              "
               class="field-success"
             >
               올바른 이름입니다.
             </div>
           </div>
-
-          <div class="form-group">
-            <label for="birthDate">생년월일 *</label>
+          <!-- 생년 월일  -->
+          <label for="birthDate">생년월일 *</label>
+          <div id= "" class="form-group gender">
+         
+            <div class = "brithDateValide  w-75">
             <input
               type="text"
               id="birthDate"
@@ -778,29 +923,148 @@ const submit = async () => {
               maxlength="8"
               v-model="state.form.birthDate"
               :class="{
-                error: state.validation.birthDate.touched && !state.validation.birthDate.isValid,
-                success: state.validation.birthDate.touched && state.validation.birthDate.isValid && state.form.birthDate,
-              }"
+                error:
+                  state.validation.birthDate.touched &&
+                  !state.validation.birthDate.isValid,
+                success:
+                  state.validation.birthDate.touched &&
+                  state.validation.birthDate.isValid &&
+                  state.form.birthDate,
+              } "
               @blur="handleFieldTouch('birthDate')"
-              @input="state.validation.birthDate.touched && validateField('birthDate', state.form.birthDate)"
+              @input="
+                state.validation.birthDate.touched &&
+                  validateField('birthDate', state.form.birthDate)
+              "             
             />
-            <div
-              v-if="state.validation.birthDate.touched && state.validation.birthDate.message"
+            <div 
+              v-if="
+                state.validation.birthDate.touched &&
+                state.validation.birthDate.message
+              "
               :class="[
                 'field-message',
-                state.validation.birthDate.isValid ? 'field-success' : 'field-error'
+                state.validation.birthDate.isValid
+                  ? 'field-success'
+                  : 'field-error',
               ]"
             >
               {{ state.validation.birthDate.message }}
-            </div>
-            <div
-              v-else-if="state.validation.birthDate.touched && state.validation.birthDate.isValid && state.form.birthDate"
-              class="field-success"
+            </div>   
+            <div 
+              v-else-if="
+                state.validation.birthDate.touched &&
+                state.validation.birthDate.isValid &&
+                state.form.birthDate
+              "             
             >
-              올바른 날짜 형식입니다.
+              올바른 날짜 형식입니다.   
             </div>
           </div>
+            <v-select 
+         
+    v-model="gender"
+    :hint="`${gender.abbr}`"
+    :items="genders"
+    item-title="state"
+    item-value="abbr"
+    label="Select"
+    variant="underlined"
+    persistent-hint
+    return-object
+    single-line       
+    :class="['w-25', 'h-25', 'ma-0'] ,{
+                error:
+                  state.validation.gender.touched &&
+                  !state.validation.gender.isValid,
+                success:
+                  state.validation.gender.touched &&
+                  state.validation.gender.isValid &&
+                  state.form.gender,
+              } "
+              @blur="handleFieldTouch('gender')"
+              @input="
+                state.validation.gender.touched &&
+                  validateField('gender', gender.title)
+              "               ></v-select>   
+  <div 
+              v-if="
+                state.validation.gender.touched &&
+                state.validation.gender.message
+              "
+              :class="[
+                'field-message',
+                state.validation.gender.isValid
+                  ? 'field-success'
+                  : 'field-error',
+              ]"
+            >
+              {{ state.validation.gender.message }}
+            </div>   
+            <div 
+              v-else-if="
+                state.validation.gender.touched &&
+                state.validation.gender.isValid &&
+                state.form.gender
+              "             
+            >
+              성별 선택 완료.   
+            </div>
+          </div>
+<!-- 여기 어디 넣어보자  -->
+          <!-- <div class="form-group">
+            <label for="gender">성별 *</label>
+            <input
+              type="text"
+              id="gender"
+              placeholder="남/여"
+              maxlength="8"
+              v-model="state.form.gender"
+              :class="{
+                error:
+                  state.validation.gender.touched &&
+                  !state.validation.gender.isValid,
+                success:
+                  state.validation.gender.touched &&
+                  state.validation.gender.isValid &&
+                  state.form.gender,
+              }"
+              @blur="handleFieldTouch('gender')"
+              @input="
+                state.validation.gender.touched &&
+                  validateField('gender', state.form.gender)
+              "
+            />
+            <div
+              v-if="
+                state.validation.gender.touched &&
+                state.validation.gender.message
+              "
+              :class="[
+                'field-message',
+                state.validation.gender.isValid
+                  ? 'field-success'
+                  : 'field-error',
+              ]"
+            >
+              {{ state.validation.gender.message }}
+            </div>
+            <div
+              v-else-if="
+                state.validation.gender.touched &&
+                state.validation.gender.isValid &&
+                state.form.gender
+              "
+              class="field-success"
+            >
+              올바른 성별 형식입니다.
+            </div>
+          </div> -->
+          <div class="form-group">
+        
 
+</div>
+          <!-- 수정 -->
           <div class="form-group">
             <label for="memberNick">닉네임 *</label>
             <div class="input-wrapper">
@@ -810,11 +1074,19 @@ const submit = async () => {
                 placeholder="닉네임을 입력해 주세요(한글, 영문, 숫자, _만 사용 가능)"
                 v-model="state.form.memberNick"
                 :class="{
-                  error: state.validation.memberNick.touched && !state.validation.memberNick.isValid,
-                  success: state.validation.memberNick.touched && state.validation.memberNick.isValid && state.validation.memberNick.available,
+                  error:
+                    state.validation.memberNick.touched &&
+                    !state.validation.memberNick.isValid,
+                  success:
+                    state.validation.memberNick.touched &&
+                    state.validation.memberNick.isValid &&
+                    state.validation.memberNick.available,
                 }"
                 @blur="handleFieldTouch('memberNick')"
-                @input="state.validation.memberNick.touched && validateField('memberNick', state.form.memberNick)"
+                @input="
+                  state.validation.memberNick.touched &&
+                    validateField('memberNick', state.form.memberNick)
+                "
               />
               <button
                 type="button"
@@ -827,10 +1099,16 @@ const submit = async () => {
               </button>
             </div>
             <div
-              v-if="state.validation.memberNick.touched && state.validation.memberNick.message"
+              v-if="
+                state.validation.memberNick.touched &&
+                state.validation.memberNick.message
+              "
               :class="[
                 'field-message',
-                (state.validation.memberNick.isValid && state.validation.memberNick.available) ? 'field-success' : 'field-error'
+                state.validation.memberNick.isValid &&
+                state.validation.memberNick.available
+                  ? 'field-success'
+                  : 'field-error',
               ]"
             >
               {{ state.validation.memberNick.message }}
@@ -1051,16 +1329,16 @@ const submit = async () => {
             </div>
           </div>
         </div>
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           class="btn-submit"
           :disabled="state.saving || !isFormValid()"
         >
           <span v-if="state.saving">가입 처리중...</span>
           <span v-else>회원가입</span>
         </button>
-        
+
         <div class="bottom-links">
           <div class="already">
             <p class="log">이미 계정이 있으신가요?</p>
@@ -1133,6 +1411,23 @@ const submit = async () => {
 .form-group {
   margin-bottom: 18px;
 }
+/* 허찬 수정 부분 */
+.gender{
+  display: flex;
+  flex-direction: row;
+}
+
+.brithDateValide
+{
+  display: flex;
+  flex-direction: column;
+}
+.joininput .v-field__input
+{
+  padding: 0;
+  font-size: inherit;
+}
+/* 허찬 수정 부분 */
 
 .join-form label {
   display: block;
@@ -1142,7 +1437,8 @@ const submit = async () => {
   margin-bottom: 6px;
 }
 
-.joininput input {
+.joininput input,
+.joininput .v-select {
   width: 100%;
   padding: 12px 14px;
   font-size: 14px;
@@ -1153,39 +1449,47 @@ const submit = async () => {
   background-color: white;
 }
 
-.joininput input:focus {
+.joininput input:focus,
+.joininput .v-field__input {
   border-color: #2a9df4;
   box-shadow: 0 0 0 3px rgba(42, 157, 244, 0.1);
 }
 
-.joininput input.error {
+.joininput input.error,
+.joininput .v-field__input {
   border-color: #dc2626;
   background-color: #fef2f2;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-.joininput input.success {
+.joininput input.success,
+.joininput .v-field__input {
   border-color: #16a34a;
   background-color: #f0fdf4;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
-.joininput input:focus.error {
+.joininput input:focus.error
+.joininput .v-field__input {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
 }
 
-.joininput input:focus.success {
+.joininput input:focus.success
+.joininput .v-field__input {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
 }
 
-.field-message {
+.field-message ,
+.v-field__input{
   font-size: 12px;
   margin-top: 4px;
   display: flex;
   align-items: center;
 }
 
-.field-error {
+.field-error
+, .v-field__input
+{
   color: #dc2626;
   font-size: 12px;
   margin-top: 4px;
@@ -1193,7 +1497,8 @@ const submit = async () => {
   align-items: center;
 }
 
-.field-success {
+.field-success
+, .v-field__input{
   color: #16a34a;
   font-size: 12px;
   margin-top: 4px;

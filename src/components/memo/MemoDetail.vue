@@ -1,9 +1,9 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
-import { useMemoDetail } from '@/components/memo/useMemoDetail.js';
-import { defineEmits, defineProps } from 'vue';
+import { computed, ref, watch } from "vue";
+import { useMemoDetail } from "@/components/memo/useMemoDetail.js";
+import { defineEmits, defineProps } from "vue";
 
-const emit = defineEmits(['created', 'updated', 'deleted', 'cancel']);
+const emit = defineEmits(["created", "updated", "deleted", "cancel"]);
 const props = defineProps({
   memoProp: {
     type: Object,
@@ -31,9 +31,9 @@ const {
 } = useMemoDetail(props, emit);
 
 const titleText = computed(() => {
-  if (isCreateMode.value) return '메모 등록';
-  if (isEditMode.value) return '메모 수정';
-  return '메모 보기';
+  if (isCreateMode.value) return "메모 등록";
+  if (isEditMode.value) return "메모 수정";
+  return "메모 보기";
 });
 
 watch(
@@ -41,7 +41,7 @@ watch(
   (newMemo) => {
     if (newMemo) {
       memo.value = { ...newMemo };
-      setMode('view');
+      setMode("view");
       clearPreviewImages();
     }
   },
@@ -60,23 +60,40 @@ watch(
     </p>
 
     <label for="memoContent" class="memo-label">내용</label>
-    <textarea id="memoContent" v-model="memo.memoContent" class="memo-textarea" />
+    <textarea
+      id="memoContent"
+      v-model="memo.memoContent"
+      class="memo-textarea"
+    />
     <p v-if="memo.memoContent.length > 0 && !isContentValid" class="memo-error">
       내용은 10자 이상 입력해주세요.
     </p>
 
     <label class="memo-label">이미지</label>
 
-    <div v-if="memo.imageFileName && previewImages.length === 0" class="memo-preview-list">
+    <div
+      v-if="memo.imageFileName && previewImages.length === 0"
+      class="memo-preview-list"
+    >
       <div class="memo-preview-item">
         <img :src="`/pic/${memo.imageFileName}`" alt="등록된 이미지" />
       </div>
     </div>
 
     <div v-if="previewImages.length > 0" class="memo-preview-list">
-      <div v-for="(img, idx) in previewImages" :key="idx" class="memo-preview-item">
+      <div
+        v-for="(img, idx) in previewImages"
+        :key="idx"
+        class="memo-preview-item"
+      >
         <img :src="img" alt="미리보기 이미지" />
-        <button v-if="!isViewMode" @click="removeImage(idx)" class="memo-remove-btn">삭제</button>
+        <button
+          v-if="!isViewMode"
+          @click="removeImage(idx)"
+          class="memo-remove-btn"
+        >
+          삭제
+        </button>
       </div>
     </div>
 
@@ -99,7 +116,12 @@ watch(
       </button>
 
       <template v-else-if="isEditMode">
-        <button :disabled="!isTitleValid || !isContentValid" @click="updateMemo">수정 완료</button>
+        <button
+          :disabled="!isTitleValid || !isContentValid"
+          @click="updateMemo"
+        >
+          수정 완료
+        </button>
         <button @click="cancelEdit">취소</button>
       </template>
 
@@ -213,7 +235,7 @@ watch(
   font-size: 1rem;
   border-radius: 8px;
   border: none;
-  background-color: #50C3F7;
+  background-color: #50c3f7;
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
