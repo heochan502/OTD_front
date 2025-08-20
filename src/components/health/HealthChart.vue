@@ -14,6 +14,7 @@ import {
   PointElement,
   CategoryScale,
   LinearScale,
+  Filler,
 } from "chart.js";
 import { Line } from "vue-chartjs";
 
@@ -27,7 +28,8 @@ ChartJS.register(
   LineElement,
   PointElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  Filler
 );
 
 const props = defineProps({
