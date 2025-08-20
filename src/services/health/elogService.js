@@ -9,8 +9,8 @@ export const saveElog = (args) => {
 };
 
 // 운동기록 목록
-export const getElogs = (params) => {
-  return axios.get(path, { params }).catch((e) => e.response);
+export const getElogs = () => {
+  return axios.get(path).catch((e) => e.response);
 };
 
 // 운동기록상세 목록
@@ -28,4 +28,9 @@ export const deleteElog = (exerciselogId) => {
   return axios
     .delete(`${path}?exerciselog_id=${exerciselogId}`)
     .catch((e) => e.response);
+};
+
+// 운동기록 달력 날짜
+export const getEexerciselogCalendar = (params) => {
+  return axios.get(`${path}/calendar`, { params }).catch((e) => e.response);
 };

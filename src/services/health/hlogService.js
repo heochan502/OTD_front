@@ -24,3 +24,8 @@ export const deleteHlog = (healthlogId) => {
     .delete(`${path}?healthlog_id=${healthlogId}`)
     .catch((e) => e.response);
 };
+
+// 건강기록달력 날짜
+export const getHealthlogCalendar = (params) => {
+  return axios.get(`${path}/calendar`, { params }).catch((e) => e.response);
+};
