@@ -10,6 +10,8 @@ import MemoDetail from '@/components/memo/MemoDetail.vue';
 import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 import CommunityView from '@/views/community/CommunityView.vue';
+// 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
+import { usecommunityStore } from '@/stores/communityStore';
 
 import MealForm from '@/views/meal/MealForm.vue';
 import MealAdd from '@/views/meal/MealAdd.vue';
@@ -166,6 +168,12 @@ router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
     return '/login';
+  }
+  // 커뮤니티 진입 시 항상 리스트 모드로 강제
+  if (to.path === '/community') {
+    const cstore = usecommunityStore();
+    cstore.clearSelectedPost?.(); // 선택 글 초기화
+    cstore.goList?.();            // viewMode = 'list'
   }
 });
 export default router;
