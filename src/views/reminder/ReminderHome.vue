@@ -30,6 +30,7 @@ const state = reactive({
 
 onMounted(async () => {
   getReminderList({ year: todayYear, month: todayMonth });
+  reminderStore.setSelectedDate(formatDate(today));
 });
 
 watch(
@@ -84,9 +85,8 @@ const getRepeatDate = (fullReminder, year, month) => {
   return result;
 };
 
-// 일정 미리보기 영역 클릭시 리스트 페이지로 라우팅 처리 될 때의 피니아 값 주입
+// 캘린더 날짜 클릭시 해당 날짜의 리마인더 정보 업데이트
 const setTodayReminder = (date) => {
-  console.log('date11', date);
   const todayDow = today.getDay();
   const todayReminder = reminderStore.state.fullReminder.filter((item) => {
     return (
@@ -96,14 +96,13 @@ const setTodayReminder = (date) => {
   });
   if (date.month === todayMonth && date.year === todayYear)
     state.todayReminder = todayReminder;
-  reminderStore.setDayReminder(todayReminder);
+  // reminderStore.setDayReminder(todayReminder);
 };
 
 // 캘린더 날짜 선택시의 홈, 폼 router 분기문
 const routerDate = (date) => {
   const formattedDate = formatDate(date);
   const dow = date.getDay();
-
   const dayReminder = reminderStore.state.fullReminder.filter((item) => {
     const isFixed = item.date === formattedDate;
 
@@ -115,12 +114,18 @@ const routerDate = (date) => {
     return isFixed || isRepeat;
   });
 
-  if (dayReminder.length > 0) {
-    reminderStore.setSelectedDate(formattedDate);
-    router.push('/reminder/list');
-  } else {
-    router.push('/reminder/form');
-  }
+  state.todayReminder = dayReminder;
+
+  // if (dayReminder.length > 0) {
+  reminderStore.setSelectedDate(date);
+  //   router.push('/reminder/list');
+  // } else {
+  //   router.push('/reminder/form');
+  // }
+};
+
+const toForm = (id) => {
+  router.push({ path: '/reminder/form', query: { id } });
 };
 </script>
 
@@ -140,7 +145,8 @@ const routerDate = (date) => {
       </div>
       <div class="preview">
         <div class="block">
-          <router-link
+          <div class="link">
+            <!-- <router-link
             :to="
               state.todayReminder.length === 0
                 ? '/reminder/form'
@@ -148,22 +154,28 @@ const routerDate = (date) => {
             "
             @click="setTodayReminder"
             class="link"
-          >
-            <span class="list-title">오늘의 일정</span>
+          > -->
+            <span class="list-title">리마인더</span>
             <span class="list-date">
-              {{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
+              {{ new Date(reminderStore.state.selectedDate).getFullYear() }}년
+              {{ new Date(reminderStore.state.selectedDate).getMonth() + 1 }}월
+              {{ new Date(reminderStore.state.selectedDate).getDate() }}일</span
             >
             <ul v-if="state.todayReminder.length > 0" class="list">
               <li
                 v-for="item in state.todayReminder"
                 :key="item.id"
                 class="list-card"
+                @click="toForm(item.id)"
               >
                 <span class="reminder-title">• {{ item.title }}</span>
               </li>
             </ul>
-            <span v-else class="empty-comment">"오늘은 한가한 하루네요!"</span>
-          </router-link>
+            <div v-else class="empty-comment" @click="toForm()">
+              "등록된 일정이 없어요!"
+            </div>
+          </div>
+          <!-- </router-link> -->
         </div>
       </div>
     </div>
@@ -214,49 +226,43 @@ const routerDate = (date) => {
         margin: 35px;
         height: 418px;
         position: relative;
+        max-height: 418px;
+        overflow-y: auto;
 
-        a {
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        .list-title {
+          color: #fff;
+          font-weight: bold;
+          font-size: 20px;
+        }
+
+        .list-date {
+          margin: -3px 0 25px 1px;
           display: block;
-          max-height: 418px;
-          overflow-y: auto;
-          &::-webkit-scrollbar {
-            display: none;
-          }
-          &:hover {
-            background-color: #bfeaff;
-          }
+          color: #fff;
+          font-size: 13px;
+        }
 
-          .list-title {
-            color: #fff;
-            font-weight: bold;
-            font-size: 20px;
-          }
+        .list {
+          list-style: none;
+          padding: 0;
 
-          .list-date {
-            margin: -3px 0 25px 1px;
-            display: block;
-            color: #fff;
-            font-size: 13px;
-          }
+          .list-card {
+            width: 100%;
+            height: 45px;
+            background-color: #fff;
+            margin-bottom: 8px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
 
-          .list {
-            list-style: none;
-            padding: 0;
-
-            .list-card {
-              width: 100%;
-              height: 45px;
-              background-color: #fff;
-              margin-bottom: 8px;
-              border-radius: 25px;
-              display: flex;
-              align-items: center;
-
-              .reminder-title {
-                color: #575757;
-                margin-left: 15px;
-                font-weight: bold;
-              }
+            .reminder-title {
+              color: #575757;
+              margin-left: 15px;
+              font-weight: bold;
             }
           }
         }
