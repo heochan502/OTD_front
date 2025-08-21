@@ -28,7 +28,7 @@ export const useHealthStore = defineStore("health", {
         this.logs = res.data;     
      let count =0;
       // 데이터 못가져왔을때
-      while (this.logs.length === 0 || count <52) {
+      while (this.logs.length === 0 && count <52) {
         weekly.startDate = dayjs(weekly.startDate)
           .subtract(7, "day")
           .format("YYYY-MM-DD");
