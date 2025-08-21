@@ -179,10 +179,10 @@ onMounted(() => {
               <v-card-text>{{ confirmMessage }}</v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn color="success" text @click="confirmYes">예</v-btn>
                 <v-btn color="dark" text @click="confirmDialog = false"
-                  >아니오</v-btn
+                  >취소</v-btn
                 >
+                <v-btn color="primary" text @click="confirmYes">확인</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
