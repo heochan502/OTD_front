@@ -21,10 +21,10 @@ import ElogForm from '@/views/health/ElogForm.vue';
 import HlogDetail from '@/views/health/HlogDetail.vue';
 import HlogForm from '@/views/health/HlogForm.vue';
 
-import Join from '@/views/Join.vue';
-import Login from '@/views/Login.vue';
-import Profile from '@/views/Profile.vue';
-import ProfileDetail from '@/views/ProfileDetail.vue';
+import Join from '@/views/member/Join.vue';
+import Login from '@/views/member/Login.vue';
+import Profile from '@/views/member/Profile.vue';
+import ProfileDetail from '@/views/member/ProfileDetail.vue';
 
 import Location from '@/components/location/Location.vue';
 const router = createRouter({

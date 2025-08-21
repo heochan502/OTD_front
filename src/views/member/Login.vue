@@ -56,6 +56,13 @@ const submit = async () => {
           </div>
         </div>
         <button type="submit" class="btn-submit">로그인</button>
+        <!-- kakao button -->
+<div class="text-center kakao">
+    <a href="https://kauth.kakao.com/oauth/authorize"
+       th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
+        <img src="/public/image/kakao_login_medium_wide.png">
+    </a>
+</div>
         <div class="already">
            <p class="log">아직 가입하지 않으셨다면</p>
            <router-link to="/signup" class="go-join">회원가입</router-link>
@@ -160,5 +167,11 @@ const submit = async () => {
   color: #2a9df4;
   text-decoration: none;
   font-weight: 500;
+}
+.kakao {
+  
+  background-size: cover;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 </style>
