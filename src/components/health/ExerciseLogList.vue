@@ -6,25 +6,15 @@ import { useExerciseStore } from "@/stores/exerciseStore";
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
-// 응답받은 기록들
-const state = reactive({
-  logs: [],
-});
-
-// 운동기록불러오기
-// const load = async () => {
-//   const res = await getElogs();
-//   if (res === undefined || res.status !== 200) {
-//     alert(res.status + "오류발생!");
-//     return;
-//   }
-//   state.logs = res.data;
-// };
+const params = {
+  page: 1,
+  row_per_page: 7,
+};
 
 onMounted(async () => {
   await exerciseStore.fetchExercises();
   await exerciseStore.fetchExerciselogs();
-  state.logs = exerciseStore.logs;
+  console.log("확인", exerciseStore.logs);
 });
 
 // 날짜 형식 변경
@@ -51,9 +41,11 @@ const add = () => {
   </div>
   <div class="list-wrap">
     <ul>
-      <li v-if="state.logs.length < 1" class="title">운동 기록을 추가하세요</li>
+      <li v-if="exerciseStore.logs.length < 1" class="title">
+        운동 기록을 추가하세요
+      </li>
       <li
-        v-for="item in state.logs"
+        v-for="item in exerciseStore.logs"
         :key="item.exerciselogId"
         @click="detail(item.exerciselogId)"
       >

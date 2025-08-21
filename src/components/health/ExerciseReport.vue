@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import effortLevels from "@/assets/health/effortLevels.json";
 import { getFeedbackMessage } from "@/utils/getFeedbackMessage";
@@ -14,7 +14,9 @@ import {
 
 const exerciseStore = useExerciseStore();
 
-// console.log(exerciseStore.logs);
+onMounted(async () => {
+  await exerciseStore.fetchExerciselogs();
+});
 
 // YYYY-MM-DD
 const todayStr = getDateString();
