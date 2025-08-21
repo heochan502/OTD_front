@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Calendar from '@/components/reminder/Calendar.vue';
+import MiniCalendar from '@/components/reminder/MiniCalendar.vue';
 import { save } from '@/services/reminder/reminderService';
 import { modify } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
@@ -191,11 +191,12 @@ const submit = async () => {
             class="calendar-button"
         /></span>
         <div class="calendar">
-          <calendar
+          <mini-calendar
             v-if="showCalendar"
             @selected-date="selectedDone"
             use-page="form"
-          ></calendar>
+            class="mini-calendar"
+          ></mini-calendar>
         </div>
       </div>
       <span
@@ -319,6 +320,7 @@ const submit = async () => {
         position: absolute;
         z-index: 99999999999;
         margin-top: 10px;
+
       }
     }
     .alarm-box {
