@@ -29,3 +29,8 @@ export const deleteElog = (exerciselogId) => {
     .delete(`${path}?exerciselog_id=${exerciselogId}`)
     .catch((e) => e.response);
 };
+
+// 운동기록 달력 날짜
+export const getEexerciselogCalendar = (params) => {
+  return axios.get(`${path}/calendar`, { params }).catch((e) => e.response);
+};

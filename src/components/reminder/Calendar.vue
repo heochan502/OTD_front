@@ -16,7 +16,7 @@ const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 
-// 캘린더 날짜 선택시의 홈, 폼 emit 분기문
+// 캘린더 날짜 선택시의 emit
 const pickDate = (day) => {
   if (!day) return;
   const selectedDate = new Date(

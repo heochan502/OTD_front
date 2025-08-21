@@ -41,8 +41,8 @@ onMounted(async () => {
   if (selectedDate) {
     await getReminderList(year, month);
   } else {
-    state.reminder = reminderStore.state.dayReminder;
-    reminderStore.setDayReminder([]);
+    // state.reminder = reminderStore.state.dayReminder;
+    // reminderStore.setDayReminder([]);
   }
 });
 

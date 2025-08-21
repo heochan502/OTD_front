@@ -21,13 +21,14 @@ const weekDates = ref([]);
 const getWeekDates = (dateString) => {
   // 오늘 날짜 까져옴
   const date = new Date(dateString);
+
   //0 일요일 ~
   const dayOfWeek = date.getDay();
 
   // console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
-
-
+  
   // 현재 나 선택한 날짜 
+
   const startDate = new Date(date);
 
   // console.log(dayOfWeek + 1, typeof dateString);
@@ -41,7 +42,6 @@ const getWeekDates = (dateString) => {
   // console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
   const result = [];
   for (let i = 0; i < 7; i++) {
-   
     // console.log(startDate, typeof startDate);
     const weekDate =  new Date(startDate.toISOString().slice(0,10));
     weekDate.setDate(weekDate.getDate() + i);

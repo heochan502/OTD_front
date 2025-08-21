@@ -1,29 +1,56 @@
-import axios from 'axios';
+// 역할:
+// - 이미지/용량 간단 검증
+// - FormData 생성 (키 이름 'files' 유지: 백엔드 DTO MultipartFile[] files 와 매핑)
+// - communityService.createPost(FormData) 호출
 
-// 파일 업로드 (formData로 사용해야 함)
-export const uploadFile = (formData) => {
-  return axios.post('/community/file/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
+import { createPost } from './communityService';
 
-// 파일 다운로드 (filePath는 저장된 상대 경로 또는 파일명)
-export const downloadFile = (filePath) => {
-  return axios
-    .get('/community/file/download', {
-      params: { path: filePath },
-      responseType: 'blob', // binary 파일로 받기
-    })
-    .then((response) => {
-      // 브라우저에서 다운로드 처리
-      const blob = new Blob([response.data]);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = decodeURIComponent(filePath.split('/').pop()); // 파일명 추출
-      link.click();
-      window.URL.revokeObjectURL(url);
-    });
-};
+const BYTES_MB = 1024 * 1024;
+
+/**
+ * 파일 검증
+ * - 이미지 파일만 허용
+ * - 파일당 최대 perFileMB MB
+ * - 전체 합계 최대 totalMB MB
+ */
+export function validateFiles(files, perFileMB = 10, totalMB = 30) {
+  const perLimit = perFileMB * BYTES_MB;
+  const totalLimit = totalMB * BYTES_MB;
+
+  let sum = 0;
+  for (const f of files) {
+    if (!f.type?.startsWith('image/')) {
+      return { ok: false, msg: '이미지 파일만 업로드할 수 있습니다.' };
+    }
+    if (f.size > perLimit) {
+      return { ok: false, msg: `파일당 최대 ${perFileMB}MB까지 가능합니다: ${f.name}` };
+    }
+    sum += f.size;
+    if (sum > totalLimit) {
+      return { ok: false, msg: `총 업로드 용량은 ${totalMB}MB를 초과할 수 없습니다.` };
+    }
+  }
+  return { ok: true, msg: '' };
+}
+
+/** 게시글 작성용 FormData 생성 */
+export function buildPostForm({ title, content, files = [] }) {
+  const fd = new FormData();
+  fd.append('title', title);
+  fd.append('content', content);
+  // ⚠️ 키 이름은 반드시 'files' (백엔드 DTO: MultipartFile[] files)
+  for (const f of files) fd.append('files', f);
+  return fd;
+}
+
+/**
+ * 업로드 호출 (필요 최소만)
+ * - 진행률은 최소 수정 원칙 때문에 넣지 않음
+ */
+export function uploadPost({ title, content, files = [] }) {
+  const { ok, msg } = validateFiles(files);
+  if (!ok) return Promise.reject(new Error(msg));
+
+  const formData = buildPostForm({ title, content, files });
+  return createPost(formData);
+}

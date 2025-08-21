@@ -117,9 +117,10 @@ const deleteLog = async () => {
     </v-item-group>
     <!-- 통계 그래프 -->
     <HealthChart
-      :selectedDate="state.hlog.healthlogDatetime"
+      :selected-date="state.hlog.healthlogDatetime"
       :selectedField="selectedField"
       :fields="fields"
+      :logs="healthStore.logs"
     />
   </v-container>
 </template>

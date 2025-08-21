@@ -4,12 +4,16 @@ import ReminderHome from "@/views/reminder/ReminderHome.vue";
 import ReminderForm from "@/views/reminder/ReminderForm.vue";
 import ReminderList from "@/views/reminder/ReminderList.vue";
 
-import MemoList from "@/components/memo/MemoList.vue";
-import DiaryList from "@/components/memo/DiaryList.vue";
-import MemoDetail from "@/components/memo/MemoDetail.vue";
-import DiaryDetail from "@/components/memo/DiaryDetail.vue";
-import MemoAndDiary from "@/views/memo/MemoAndDiary.vue";
-import CommunityView from "@/views/community/CommunityView.vue";
+
+import MemoList from '@/components/memo/MemoList.vue';
+import DiaryList from '@/components/memo/DiaryList.vue';
+import MemoDetail from '@/components/memo/MemoDetail.vue';
+import DiaryDetail from '@/components/memo/DiaryDetail.vue';
+import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
+import CommunityView from '@/views/community/CommunityView.vue';
+// 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
+import { usecommunityStore } from '@/stores/communityStore';
+
 
 import MealForm from "@/views/meal/MealForm.vue";
 import MealAdd from "@/views/meal/MealAdd.vue";
@@ -27,7 +31,6 @@ import Profile from "@/views/member/Profile.vue";
 import ProfileDetail from "@/views/member/ProfileDetail.vue";
 import ProfilePassword from "@/views/member/Password.vue";
 
-import Location from "@/components/location/Location.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -117,8 +120,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/profile/detail",
-      name: "profile_detail",
+      path: '/profile/detail',
+      name: 'profile_detail',
       component: ProfileDetail,
       meta: { requiresAuth: true },
     },
@@ -129,14 +132,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/location",
-      name: "location",
-      component: Location,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/memoAndDiary",
-      name: "memoAndDiary",
+      path: '/memoAndDiary',
+      name: 'memoAndDiary',
       component: MemoAndDiary,
       props: true,
       meta: { requiresAuth: true },
@@ -156,14 +153,14 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/memoAndDiary/memolist",
-      name: "MemoList",
+      path: '/memoAndDiary/memo/list',
+      name: 'MemoList',
       component: MemoList,
       props: true,
     },
     {
-      path: "/memoAndDiary/diarylist",
-      name: "DiaryList",
+      path: '/memoAndDiary/diary/list',
+      name: 'DiaryList',
       component: DiaryList,
       props: true,
     },
@@ -173,6 +170,12 @@ router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
     return "/login";
+  }
+  // 커뮤니티 진입 시 항상 리스트 모드로 강제
+  if (to.path === '/community') {
+    const cstore = usecommunityStore();
+    cstore.clearSelectedPost?.(); // 선택 글 초기화
+    cstore.goList?.();            // viewMode = 'list'
   }
 });
 export default router;

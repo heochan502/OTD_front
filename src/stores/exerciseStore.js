@@ -9,6 +9,7 @@ export const useExerciseStore = defineStore("exercise", {
       loaded: false,
       logs: [],
     }),
+
   actions: {
     async fetchExercises() {
       if (this.loaded) return;
@@ -18,7 +19,11 @@ export const useExerciseStore = defineStore("exercise", {
     },
     async fetchExerciselogs() {
       const res = await getElogs();
+
       this.logs = res.data;
+    },
+    clearLogs() {
+      this.logs = [];
     },
   },
 });

@@ -156,7 +156,7 @@ const submit = async () => {
       return;
     }
     alert('일정을 수정했어요!');
-    router.push('/reminder/list');
+    router.push('/reminder');
   } else {
     res = await save(jsonBody);
     if (res === undefined || res.status !== 200) {
@@ -177,7 +177,7 @@ const submit = async () => {
     </h2>
     <div class="form-card">
       <span>
-        <router-link :to="state.reminder.id ? '/reminder/list' : '/reminder'">
+        <router-link to="/reminder">
           <img src="/image/cancel.png" alt="취소" class="cancel" />
         </router-link>
       </span>
@@ -234,6 +234,7 @@ const submit = async () => {
           class="title"
           placeholder="어떤 일정이 있으신가요?"
           v-model="state.reminder.title"
+          @keyup.enter="submit"
         />
       </div>
       <div>
@@ -242,6 +243,7 @@ const submit = async () => {
           class="content"
           placeholder="내용을 추가해주세요!"
           v-model="state.reminder.content"
+          @keyup.enter="submit"
         ></textarea>
       </div>
       <button @click="submit" class="button">
