@@ -1,16 +1,17 @@
 <script setup>
-import { onMounted, ref, reactive } from "vue";
-import { useHealthStore } from "@/stores/healthStore";
-import { useExerciseStore } from "@/stores/exerciseStore";
-
-const healthStore = useHealthStore();
-const exerciseStore = useExerciseStore();
+import { onMounted, ref, watch, computed } from "vue";
+import { getEexerciselogCalendar } from "@/services/health/elogService";
+import { getHealthlogCalendar } from "@/services/health/hlogService";
 
 const healthLogDate = ref([]);
 const exerciseLogDate = ref([]);
 
 const calendarAttributes = ref([]);
 
+// 오늘날짜
+const selectedDate = ref(new Date());
+
+// 날짜 형변환
 function formatDate(date) {
   if (!date) return "";
   const d = new Date(date);
@@ -20,8 +21,7 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-const selectedDate = ref(new Date());
-
+// 달력 title 날짜
 function formatYearMonth(date) {
   // if (!date) return "";
   const year = date.getFullYear();
@@ -29,17 +29,66 @@ function formatYearMonth(date) {
   return `${year}년 ${month}월`;
 }
 
-onMounted(async () => {
-  await healthStore.fetchHealthlogs();
-  await exerciseStore.fetchExerciselogs();
+// const params = {
+//   start: "2025-04-01",
+//   end: "2025-04-29",
+// };
 
-  healthLogDate.value = healthStore.logs.map((item) =>
-    formatDate(item.healthlogDatetime)
-  );
+function getParamsFromDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const start = `${year}-${month}-01`;
+  const end = `${year}-${month}-${new Date(
+    year,
+    date.getMonth() + 1,
+    0
+  ).getDate()}`;
+  return { start, end };
+}
 
-  exerciseLogDate.value = exerciseStore.logs.map((item) =>
+// 날짜 받아오기(원래 코드)
+// const getData = async () => {
+//   let res = null;
+//   res = await getEexerciselogCalendar(params);
+//   // console.log("운동기록날짜", res.data);
+//   exerciseLogDate.value = res.data.map((item) =>
+//     formatDate(item.exerciseDatetime)
+//   );
+
+//   res = await getHealthlogCalendar(params);
+//   healthLogDate.value = res.data.map((item) =>
+//     formatDate(item.healthlogDatetime)
+//   );
+// };
+
+// 날짜 받아오기(수정된 코드)
+const getData = async (date) => {
+  // params 생성
+  const params = getParamsFromDate(date);
+  console.log("파람즈", params);
+  let res = await getEexerciselogCalendar(params);
+  exerciseLogDate.value = res.data.map((item) =>
     formatDate(item.exerciseDatetime)
   );
+
+  res = await getHealthlogCalendar(params);
+  healthLogDate.value = res.data.map((item) =>
+    formatDate(item.healthlogDatetime)
+  );
+};
+
+// 점 찍을 때 해당 일자에 데이터 있는지 확인하기 위함
+const healthLogSet = computed(() => new Set(healthLogDate.value));
+const exerciseLogSet = computed(() => new Set(exerciseLogDate.value));
+
+onMounted(async () => {
+  // await healthStore.fetchHealthlogs();
+  // await exerciseStore.fetchExerciselogs();
+  getData(selectedDate.value);
+});
+
+watch(exerciseLogDate, (newVal) => {
+  console.log("저장된 날짜들", newVal);
 });
 </script>
 
@@ -69,7 +118,16 @@ onMounted(async () => {
           <div class="text-subtitle-1" v-if="start">
             {{ formatYearMonth(start) }}
           </div>
-          <v-btn icon variant="text" @click="next">
+          <v-btn
+            icon
+            variant="text"
+            @click="
+              () => {
+                next();
+                getData(new Date(start.getFullYear(), start.getMonth() + 1, 1));
+              }
+            "
+          >
             <v-icon>mdi-menu-right</v-icon>
           </v-btn>
         </div>
@@ -83,12 +141,16 @@ onMounted(async () => {
             {{ day.day }}
           </div>
           <div class="dot-wrapper">
-            <span
+            <!-- <span
               v-if="healthLogDate.includes(formatDate(day.date))"
+              class="dot dot-health"
+            ></span> -->
+            <span
+              v-if="healthLogSet.has(formatDate(day.date))"
               class="dot dot-health"
             ></span>
             <span
-              v-if="exerciseLogDate.includes(formatDate(day.date))"
+              v-if="exerciseLogSet.has(formatDate(day.date))"
               class="dot dot-exercise"
             ></span>
           </div>
