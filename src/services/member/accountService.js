@@ -43,7 +43,7 @@ export const checkNickname = (nickname) => {
 
 
 export const changePassword = (params) => {
-  return axios.put('/user/password', params).catch((e) => e.response);
+  return axios.put('/user/profile/password', params).catch((e) => e.response);
 };
 
 export const deleteMember = (memberNoLogin) => {

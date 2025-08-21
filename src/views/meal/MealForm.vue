@@ -1,53 +1,69 @@
 <script setup>
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
-import { ref, reactive, onMounted,computed ,watch} from 'vue';
-import {useRouter} from "vue-router";
-import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate } from "@/stores/mealStore";
+import { ref, reactive, onMounted, computed, watch, nextTick, watchEffect } from 'vue';
+import { useRouter } from "vue-router";
+import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate, useClickProgressBar } from "@/stores/mealStore";
+import dayjs from 'dayjs';
 
+import 'dayjs/locale/ko';
 
+dayjs.locale('ko');
 
 const dayStore = useDayDefine();
 const ondayMealData = useCalorieCalcul();
 const weeklyData = useWeeklyStore();
 const baseDate = useBaseDate();
+const clickProgress = useClickProgressBar();
 
 const maxKcal = ref(2500);
 
 const router = useRouter();
 
-const  mealadd = (day)=>{
+const mealadd = (day) => {
   dayStore.dayDefine = day;
-  router.push({name : 'MealAdd'});
+  router.push({ name: 'MealAdd' });
   // itemInfo
 };
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
+// 여기서 과거 데이터 보여주는거 고쳐야함
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
+
   // null, undefined, 배열 길이 체크
-  if (Array.isArray(info) && info.length > 0 && info[0]?.allDayCalorie !== undefined) {
-    return info[0];
+  if (info) {
+    // console.log("칼로리 데이터:", info);
+    return info;
   }
   return {
     allDayCalorie: 0,
-    mealDay: '',
+    mealDay: new dayjs().format('YYYY년 MM월 DD일 dddd'),
     totalFat: 0,
     totalCarbohydrate: 0,
     totalProtein: 0,
   };
 });
-const total = ref(0);
-const avg =ref(0);
-onMounted(async() => {
-  // console.log('totalKcal:', totalKcal.value);
-  // console.log('maxKcal:', maxKcal.value);  
-   await ondayMealData.mealFormData();
-   
-  console.log("정보 데이터 :", weeklyData.weeklyRawData);
-  
 
+
+const total = ref(0);
+const avg = ref(0);
+onMounted(async () => {
+
+  // console.log('totalKcal:', ondayMealData.itemInfo.mealDay);
+  // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
+  // 초기 데이터 없으면 현재 시간으로 설정/ 있으면 그전 데이터로 출력
+  await nextTick();
+  if (!ondayMealData.itemInfo.mealDay || ondayMealData.itemInfo.mealDay === '') {
+    await ondayMealData.mealFormData(new dayjs().format('YYYY-MM-DD'));
+  }
+  else {
+    await ondayMealData.mealFormData(ondayMealData.itemInfo.mealDay);
+  }
+ 
 });
+
+
 
 watch(
   () => weeklyData.weeklyRawData,
@@ -58,10 +74,20 @@ watch(
     } else {
       avg.value = 0;
     }
+
   },
   { immediate: true, deep: true }
 );
-const formatNumber = (num) => num.toLocaleString();
+const formatNumber = (num) => {
+  if (num === null || num === undefined) return 0;
+  return Number(num).toLocaleString();
+};
+
+const clickProgressBar = category => {
+  clickProgress.nowProgress(category);
+  // console.log(clickProgress.nowCategory);
+}
+
 </script>
 
 <template>
@@ -69,20 +95,21 @@ const formatNumber = (num) => num.toLocaleString();
     <div class="meal-layout">
       <div class="left">
         <div class="progress-container w-full">
-            <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
-              :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
-            :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie )}kcal 더 먹을 수 있어요!`" :max="maxKcal"
-            customsize="totalcal" />
+          <span class="totalkcal text-h6 font-weight-black">{{ calorieData.mealDay }} 칼로리</span>
+          <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
+            :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
+            :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie)}kcal 더 먹을 수 있어요!`" :max="maxKcal"
+            customsize="totalcal" @click="clickProgressBar(0)" />
           <div class="inprogressbar">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
-              :rightString="`${(calorieData.totalCarbohydrate/ ((maxKcal * 0.6)/4) * 100).toFixed(1)}%`"
-              :max="(maxKcal * 0.6)/4" customsize="tansu" />
+              :rightString="`${(calorieData.totalCarbohydrate / ((maxKcal * 0.6) / 4) * 100).toFixed(1)}%`"
+              :max="(maxKcal * 0.6) / 4" customsize="tansu" @click="clickProgressBar(1)" />
             <ProgressBar class="protein" :value="calorieData.totalProtein" :leftString="`단백질`"
-              :rightString="`${(calorieData.totalProtein/ ((maxKcal * 0.15)/4) * 100).toFixed(1)}%`"
-              customsize="protein" :max="(maxKcal * 0.15)/4" />
+              :rightString="`${(calorieData.totalProtein / ((maxKcal * 0.15) / 4) * 100).toFixed(1)}%`"
+              customsize="protein" :max="(maxKcal * 0.15) / 4" @click="clickProgressBar(2)" />
             <ProgressBar class="jibang" :value="calorieData.totalFat" :leftString="`지방`"
-              :rightString="`${(calorieData.totalFat/ ((maxKcal * 0.25) / 9) * 100).toFixed(1)}%`" customsize="jibang"
-              :max="(maxKcal * 0.25)/9" />
+              :rightString="`${(calorieData.totalFat / ((maxKcal * 0.25) / 9) * 100).toFixed(1)}%`" customsize="jibang"
+              :max="(maxKcal * 0.25) / 9" @click="clickProgressBar(3)" />
           </div>
         </div>
       </div>
@@ -103,11 +130,12 @@ const formatNumber = (num) => num.toLocaleString();
     </div>
     <div class="weeky-title">
       <span class="main-title text-h6"> 주간 기록 </span>
-      <span class="sub-title text-subtitle-1">{{baseDate.getWeekDate.startDate}} 부터 {{baseDate.getWeekDate.endDate}} 평균 {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
-      
+      <span class="sub-title text-subtitle-1">{{ baseDate.getWeekDate.startDate }} 부터 {{ baseDate.getWeekDate.endDate }} 평균
+        {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
+
       <div class=" d-flex  justify-content-end ">
-      <WeeklyCalorie class="" />
-    </div>
+        <WeeklyCalorie />
+      </div>
     </div>
     <div class="bottom ">
 
@@ -142,6 +170,7 @@ const formatNumber = (num) => num.toLocaleString();
   width: 50%;
   /* float: right; */
 }
+
 #mealForm .bottom {
   width: 100%;
   /* height: auto; */
@@ -164,6 +193,7 @@ const formatNumber = (num) => num.toLocaleString();
   margin-top: 40px;
   margin-left: 100px;
 }
+
 .mealsaday {
   width: 350px;
   height: 70px;
@@ -213,6 +243,7 @@ const formatNumber = (num) => num.toLocaleString();
   font-weight: bold;
   /* font-size: 30px; */
 }
+
 .sub-title {
   margin-left: 10px;
   /* font-size: 16px; */

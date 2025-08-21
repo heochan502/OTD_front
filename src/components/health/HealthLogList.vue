@@ -13,7 +13,7 @@ const state = reactive({
 onMounted(async () => {
   await healthStore.fetchHealthlogs();
   state.logs = healthStore.logs;
-  console.log(state.logs);
+  // console.log(state.logs);
 });
 
 const formatDate = (dateStr) => {
@@ -75,6 +75,7 @@ const detail = (healthlogId) => {
 .list-wrap {
   height: 300px;
   overflow: auto;
+  overflow-x: hidden;
 }
 ul {
   display: flex;

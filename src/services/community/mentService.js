@@ -1,9 +1,19 @@
+// src/services/community/mentService.js
 import axios from 'axios';
 
-export const fetchMents = (postId) => axios.get(`/api/OTD/comment/${postId}`);
+const COMMENT_BASE = 'community/comment/';
 
-export const createMent = (postId, content) =>
-  axios.post(`/api/OTD/comment/${postId}`, { content });
+// 댓글 목록 조회
+export const fetchMents = (postId) => {
+  return axios.get(`${COMMENT_BASE}${postId}`);
+};
 
-export const deleteMent = (commentId) =>
-  axios.delete(`/api/OTD/comment/${commentId}`);
+// 댓글 등록
+export const createMent = (payload) => {
+  return axios.post(`${COMMENT_BASE}create`, payload);
+};
+
+// 댓글 삭제
+export const deleteMent = (commentId) => {
+  return axios.delete(`${COMMENT_BASE}delete/${commentId}`);
+};

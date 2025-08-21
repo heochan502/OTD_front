@@ -1,14 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useAccountStore } from '@/stores/counter';
-import MemoHttpService from '@/services/memo/MemoHttpService';
+import { ref, onMounted } from "vue";
+import { useAccountStore } from "@/stores/counter";
+import MemoHttpService from "@/services/memo/MemoHttpService";
 
 const memoList = ref([]);
-const emit = defineEmits(['select']);
+const emit = defineEmits(["select"]);
 const accountStore = useAccountStore();
 
 const fetchMemoList = async () => {
-  console.log('[memoList] 로그인된 유저 ID:', accountStore.loggedInId);
+  console.log("[memoList] 로그인된 유저 ID:", accountStore.loggedInId);
   const params = {
     currentPage: 1,
     pageSize: 100,
@@ -16,10 +16,10 @@ const fetchMemoList = async () => {
   };
   try {
     const result = await MemoHttpService.findAll(params);
-    console.log('[memoList] 서버 응답:', result);
+    console.log("[memoList] 서버 응답:", result);
     memoList.value = result.memoList || result.memolist || [];
   } catch (e) {
-    console.error('❌ 메모 목록 조회 중 오류:', e);
+    console.error("❌ 메모 목록 조회 중 오류:", e);
     memoList.value = [];
   }
 };
@@ -62,7 +62,7 @@ const formatDate = (dateStr) => {
 
 <style scoped>
 :root {
-  --color-primary: #50C3F7;
+  --color-primary: #50c3f7;
   --color-text-dark: #000;
   --color-gray-ccc: #ccc;
   --color-gray-eee: #eee;
@@ -281,36 +281,35 @@ input[type="file"] {
   .text-input,
   .textarea,
   input[type="file"],
-  
   .preview-list {
     width: 100%;
   }
 
   .memo-item,
   .diary-item {
-  flex-direction: column;
-  align-items: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
+
   .diary-item-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .diary-text {
-  flex: 1;
-  padding-right: 16px;
+    flex: 1;
+    padding-right: 16px;
   }
 
   .diary-image-wrapper {
-  flex-shrink: 0;
+    flex-shrink: 0;
   }
   .preview-image {
-  width: 100px;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
   }
 
   .mood-options {
@@ -339,7 +338,7 @@ input[type="file"] {
     display: none;
   }
 
-  .mood-button:has(input[value='']) {
+  .mood-button:has(input[value=""]) {
     font-style: italic;
     color: var(--color-gray-ccc);
   }

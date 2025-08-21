@@ -51,7 +51,7 @@ onMounted(async () => {
       <span class="dot dot-exercise"> </span>
       <span>운동</span>
     </div>
-    <v-calendar
+    <vc-calendar
       is-expanded
       v-model="selectedDate"
       :attributes="calendarAttributes"
@@ -94,7 +94,7 @@ onMounted(async () => {
           </div>
         </div>
       </template>
-    </v-calendar>
+    </vc-calendar>
   </v-card>
 </template>
 

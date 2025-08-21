@@ -1,14 +1,18 @@
+// 오늘 날짜
 export function getDateString(date = new Date()) {
-  return date.toISOString().split("T")[0];
+  const offset = date.getTimezoneOffset() * 60000; // 분 → ms
+  const localDate = new Date(date.getTime() - offset);
+  return localDate.toISOString().split("T")[0];
 }
-
+// 어제날짜
 export function getYesterdayDateString(date = new Date()) {
   const yesterday = new Date(date);
   yesterday.setDate(date.getDate() - 1);
   return yesterday.toISOString().split("T")[0];
 }
 
-export function filterLogsByDate(logs, dateStr) {
+// 운동 리포트 관련 함수
+export function filterExerciseLogsByDate(logs, dateStr) {
   return logs.filter((log) => log.exerciseDatetime.startsWith(dateStr));
 }
 
@@ -23,4 +27,9 @@ export function calcDuration(logs) {
 export function calcEffortAvg(logs) {
   const sum = logs.reduce((acc, log) => acc + (log.effortLevel || 0), 0);
   return Math.round(sum / (logs.length || 1));
+}
+
+//  건강 리포트 관련 함수
+export function filterHealthLogsByDate(logs, dateStr) {
+  return logs.filter((log) => log.healthlogDatetime.startsWith(dateStr));
 }

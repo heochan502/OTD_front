@@ -16,7 +16,7 @@ function startCycle() {
       const currentIndex = tabs.indexOf(tab.value);
       tab.value = tabs[(currentIndex + 1) % tabs.length];
     }
-  }, 6000);
+  }, 8000);
 }
 function stopCycle() {
   if (intervalId) {
@@ -24,8 +24,8 @@ function stopCycle() {
     intervalId = null;
   }
 }
-onMounted(startCycle);
-onUnmounted(stopCycle);
+// onMounted(startCycle);
+// onUnmounted(stopCycle);
 </script>
 
 <template>
