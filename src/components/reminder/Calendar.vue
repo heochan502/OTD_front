@@ -2,7 +2,6 @@
 import { ref, onMounted, watch } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
 
-
 const reminderStore = useReminderStore();
 
 const props = defineProps({
@@ -171,14 +170,16 @@ const todayColor = (day) => {
   <div class="calendar">
     <h3 class="calendar_title">
       <a href="#" @click.prevent="prevMonth"
-        ><img
-          src="/image/button.png"
-          alt="이전 달 보기"
-          class="rotate"
+        ><img src="/image/button.png" alt="이전 달 보기" class="rotate"
       /></a>
-      <b>{{ currentYear }}</b
-      >년 <b>{{ currentMonth }}</b
-      >월
+      <span
+        ><b>{{ currentYear }}</b
+        >년</span
+      >
+      <span>
+        <b>{{ currentMonth }}</b
+        >월</span
+      >
       <a href="#" @click.prevent="nextMonth"
         ><img src="/image/button.png" alt="다음 달 보기"
       /></a>
@@ -225,13 +226,13 @@ const todayColor = (day) => {
   background-color: #fff;
   padding: 35px 45px 25px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
   .calendar_title {
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
-    gap: 5px;
+    gap: 10px;
+    cursor: pointer;
     a {
       display: flex;
       align-items: center;
