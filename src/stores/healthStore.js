@@ -26,9 +26,9 @@ export const useHealthStore = defineStore("health", {
       // let res = null;
       let res = await getHlogs(weekly);
         this.logs = res.data;     
-     
+     let count =0;
       // 데이터 못가져왔을때
-      while (this.logs.length === 0) {
+      while (this.logs.length === 0 || count <52) {
         weekly.startDate = dayjs(weekly.startDate)
           .subtract(7, "day")
           .format("YYYY-MM-DD");
@@ -38,8 +38,12 @@ export const useHealthStore = defineStore("health", {
         res = await getHlogs(weekly);
         this.logs = res.data;
         console.log("건강기록 가져온 값", this.logs);
+        count++;
       }
-
+      if(count<52)
+      {
+        console.log("최근 1년동안의 데이터가 없습니다.");
+      }
       
     },
     
