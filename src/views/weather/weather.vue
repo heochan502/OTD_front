@@ -97,7 +97,6 @@ const backgroundImg = {
 const weatherBackground = computed(() => {
   const sky = weather.value?.villageSky || '';
   const time = dayTimes.value;
-  console.log('time', time);
   return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
 });
 
