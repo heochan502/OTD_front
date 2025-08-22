@@ -2,23 +2,21 @@
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
+import { ref } from 'vue';
 
 const router = useRouter();
 const route = useRoute();
 const counter = useAccountStore();
+const dialog = ref(false); // 모바일 모달 제어
 
 function goHome() {
-  router.push({ name: 'home' }); // 라우트에 name 설정이 되어 있어야 함
+  router.push({ name: 'home' });
 }
 
 const logoutAccount = async () => {
-  if (!confirm('로그아웃 하시겠습니까?')) {
-    return;
-  }
+  if (!confirm('로그아웃 하시겠습니까?')) return;
   const res = await logout();
-  if (res === undefined || res.status !== 200) {
-    return;
-  }
+  if (res === undefined || res.status !== 200) return;
   counter.setLoggedIn(false);
   router.push('/login');
 };
@@ -30,6 +28,9 @@ const logoutAccount = async () => {
     <div class="inner">
       <!-- 왼쪽 로고 -->
       <div class="logo" @click="goHome" style="cursor: pointer">
+        <div class="d-flex flex-row d-md-none">
+          <button @click="dialog = true">☰</button>
+        </div>
         <div>
           <span class="logo-one">One</span>
           <span class="logo-today">ToDay</span>
@@ -37,69 +38,99 @@ const logoutAccount = async () => {
         <div class="logo-sub">하루이틀</div>
       </div>
 
-      <!-- 가운데 메뉴 -->
-      <nav class="nav">
+      <!-- ✅ PC 전용 메뉴 -->
+      <nav class="nav d-none d-md-flex">
         <router-link to="/" class="nav-menu" active-class="active"
           >홈</router-link
         >
         <router-link
           to="/reminder"
-          href="#"
           class="nav-menu"
           :class="{ active: route.path.startsWith('/reminder') }"
           >리마인더</router-link
         >
         <router-link
           to="/meal"
-          href="#"
           class="nav-menu"
           :class="{ active: route.path.startsWith('/meal') }"
           >식단</router-link
         >
         <router-link
           to="/health"
-          href="#"
           class="nav-menu"
-          active-class="active"
           :class="{
             active:
-              route.path.startsWith('/elog') + route.path.startsWith('/hlog'),
+              route.path.startsWith('/elog') || route.path.startsWith('/hlog'),
           }"
           >건강</router-link
         >
         <router-link
           to="/memoAndDiary"
-          href="#"
           class="nav-menu"
           :class="{ active: route.path.startsWith('/memoAndDiary') }"
           >기록</router-link
         >
         <router-link
           to="/community"
-          href="#"
           class="nav-menu"
           :class="{ active: route.path.startsWith('/community') }"
           >커뮤니티</router-link
         >
       </nav>
-
-      <!-- 오른쪽 로그인 -->
-      <div class="member">
+      <!-- 오른쪽 로그인 (PC 전용) -->
+      <div class="member d-none d-md-flex">
         <div class="auth">
           <template v-if="counter.state.loggedIn">
             <a class="auth" @click="logoutAccount">로그아웃</a>
             <router-link to="/profile" class="auth">회원정보</router-link>
           </template>
           <template v-else>
-            <router-link to="/login" href="#" class="auth">로그인</router-link>
-            <router-link to="/signup" href="#" class="auth"
-              >회원가입</router-link
-            >
+            <router-link to="/login" class="auth">로그인</router-link>
+            <router-link to="/signup" class="auth">회원가입</router-link>
           </template>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- 모바일 햄버거 모달 메뉴 -->
+  <v-dialog
+    v-model="dialog"
+    fullscreen
+    hide-overlay
+    transition="dialog-bottom-transition"
+  >
+    <v-card>
+      <v-toolbar dense flat color="primary" dark>
+        <v-toolbar-title>메뉴</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="dialog = false"><v-icon>mdi-close</v-icon></v-btn>
+      </v-toolbar>
+
+      <v-list>
+        <v-list-item to="/" @click="dialog = false"
+          ><v-list-item-title>홈</v-list-item-title></v-list-item
+        >
+        <v-list-item to="/reminder" @click="dialog = false"
+          ><v-list-item-title>리마인더</v-list-item-title></v-list-item
+        >
+        <v-list-item to="/meal" @click="dialog = false"
+          ><v-list-item-title>식단</v-list-item-title></v-list-item
+        >
+        <v-list-item to="/health" @click="dialog = false"
+          ><v-list-item-title>건강</v-list-item-title></v-list-item
+        >
+        <v-list-item to="/memoAndDiary" @click="dialog = false"
+          ><v-list-item-title>기록</v-list-item-title></v-list-item
+        >
+        <v-list-item to="/community" @click="dialog = false"
+          ><v-list-item-title>커뮤니티</v-list-item-title></v-list-item
+        >
+      </v-list>
+
+      <v-divider></v-divider>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>
