@@ -15,7 +15,7 @@ import Footer from './Footer.vue';
       <Content />
     </div>
     <div class="footer">
-       <Footer />
+      <Footer />
     </div>
   </div>
 </template>
@@ -37,5 +37,8 @@ import Footer from './Footer.vue';
   background-color: white;
   display: flex;
   flex-direction: column;
+}
+.footer {
+  width: 100%;
 }
 </style>

@@ -25,12 +25,9 @@ const logoutAccount = async () => {
 <template>
   <!-- 상단바 컴포넌트 -->
   <header class="breadcrumb">
-    <div class="inner">
-      <!-- 왼쪽 로고 -->
+    <div class="inner m-inner">
+      <!-- 왼쪽 로고 (모바일 화면용) -->
       <div class="logo" @click="goHome" style="cursor: pointer">
-        <div class="d-flex flex-row d-md-none">
-          <button @click="dialog = true">☰</button>
-        </div>
         <div>
           <span class="logo-one">One</span>
           <span class="logo-today">ToDay</span>
@@ -38,7 +35,18 @@ const logoutAccount = async () => {
         <div class="logo-sub">하루이틀</div>
       </div>
 
-      <!-- ✅ PC 전용 메뉴 -->
+      <!-- 오른쪽 사용자 메뉴(모바일 화면용) -->
+      <div class="d-flex flex-row d-md-none">
+        <button>
+          <img
+            class="photo-wrapper"
+            src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIwIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yMCA5NUMyMCA4MCA0MCA2NyA2MCA2N0M4MCA2NyAxMDAgODAgMTAwIDk1IiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo="
+            alt="프로필"
+          />
+        </button>
+      </div>
+
+      <!-- PC 전용 메뉴 -->
       <nav class="nav d-none d-md-flex">
         <router-link to="/" class="nav-menu" active-class="active"
           >홈</router-link
@@ -108,9 +116,6 @@ const logoutAccount = async () => {
       </v-toolbar>
 
       <v-list>
-        <v-list-item to="/" @click="dialog = false"
-          ><v-list-item-title>홈</v-list-item-title></v-list-item
-        >
         <v-list-item to="/reminder" @click="dialog = false"
           ><v-list-item-title>리마인더</v-list-item-title></v-list-item
         >
@@ -138,9 +143,9 @@ const logoutAccount = async () => {
   width: 100%;
   background-color: white;
 }
-
 .inner {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 16px 32px 0px;
   display: flex;
@@ -148,14 +153,18 @@ const logoutAccount = async () => {
   align-items: center;
   font-size: 30px;
 }
-
 .logo {
-  padding: 0 70px 0 0;
+  padding: 0 40px 0 0;
   display: flex;
   flex-direction: column;
   line-height: 1.1;
 }
-
+.photo-wrapper {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 .logo-one {
   // font-size: 20px;
   font-weight: bold;
@@ -177,10 +186,10 @@ const logoutAccount = async () => {
 }
 
 .nav {
-  padding: 0 70px;
+  padding: 0 40px;
   display: flex;
-  gap: 20px;
-  font-size: 18px;
+  gap: 24px;
+  font-size: 16px;
   color: #222;
   .nav-menu {
     color: black;
@@ -200,7 +209,7 @@ const logoutAccount = async () => {
 }
 
 .member {
-  padding: 0 0 0 70px;
+  padding: 0 0 0 40px;
 }
 .auth {
   display: flex;
@@ -210,6 +219,31 @@ const logoutAccount = async () => {
   cursor: pointer;
   &:hover {
     background-color: white;
+  }
+}
+.photo-wrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #e2e8f0;
+  transition: border-color 0.3s ease;
+  size: 15px;
+}
+@media (max-width: 976px) {
+  .inner {
+    margin: 18px;
+    .logo {
+      padding: 0 10px 0 0;
+    }
+    .nav {
+      padding: 0 10px;
+    }
+    .member {
+      padding: 0 0 0 10px;
+    }
   }
 }
 </style>
