@@ -29,6 +29,25 @@ function formatYearMonth(date) {
   return `${year}년 ${month}월`;
 }
 
+// 달력 이동 시 실행되는 함수
+const onDidMove = (pages) => {
+  // 현재 보여지는 달력의 첫 페이지 정보
+  const page = pages[0];
+  const year = page.year;
+  const month = page.month + 1;
+  const startDay = page.days[0];
+  const start = `${year}-${month}-${startDay}`; // 월 시작일
+  const end = pages[0].end; // 월 마지막일
+  console.log(start);
+  // params 생성
+  const params = {
+    start: formatDate(start),
+    end: formatDate(end),
+  };
+  console.log("params:", params);
+  getData(params);
+};
+
 // const params = {
 //   start: "2025-04-01",
 //   end: "2025-04-29",
@@ -87,7 +106,7 @@ onMounted(async () => {
   getData(selectedDate.value);
 });
 
-watch(exerciseLogDate, (newVal) => {
+watch(selectedDate, (newVal) => {
   console.log("저장된 날짜들", newVal);
 });
 </script>
@@ -108,6 +127,7 @@ watch(exerciseLogDate, (newVal) => {
       :show-adjacent-months="false"
       style="width: 100%; height: 100%; border: none"
       class="calendar"
+      @did-move="onDidMove"
     >
       <!-- 타이틀 디자인 수정 -->
       <template #title="{ start, prev, next }">
@@ -118,16 +138,7 @@ watch(exerciseLogDate, (newVal) => {
           <div class="text-subtitle-1" v-if="start">
             {{ formatYearMonth(start) }}
           </div>
-          <v-btn
-            icon
-            variant="text"
-            @click="
-              () => {
-                next();
-                getData(new Date(start.getFullYear(), start.getMonth() + 1, 1));
-              }
-            "
-          >
+          <v-btn icon variant="text" @click="next">
             <v-icon>mdi-menu-right</v-icon>
           </v-btn>
         </div>
