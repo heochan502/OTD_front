@@ -50,7 +50,9 @@ export const useHealthStore = defineStore("health", {
       this.calendarDate = [];
     },
   },
+  persist: true,
 });
+
 export const makeWeekly = () => {
   // 현재 날짜로 지정
   const date = new Date();

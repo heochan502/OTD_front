@@ -3,19 +3,19 @@ import { getExercise, getElogs } from "@/services/health/elogService";
 import { reactive } from "vue";
 
 export const useExerciseStore = defineStore("exercise", {
-  state: () =>
-    reactive({
-      list: [],
-      loaded: false,
-      logs: [],
-      calendarDate: [],
-    }),
+  state: () => ({
+    exerciseList: [],
+    loaded: false,
+    logs: [],
+    calendarDate: [],
+    logList: [],
+  }),
 
   actions: {
     async fetchExercises() {
       if (this.loaded) return;
       const res = await getExercise();
-      this.list = res.data;
+      this.exerciseList = res.data;
       this.loaded = true;
     },
     async fetchExerciselogs() {
@@ -29,5 +29,13 @@ export const useExerciseStore = defineStore("exercise", {
     clearCalendarDate() {
       this.calendarDate = [];
     },
+    addLogList(list) {
+      this.logList.push(...list);
+    },
+    clearLogList() {
+      this.logList = [];
+    },
   },
+
+  persist: true,
 });

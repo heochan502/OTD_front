@@ -45,7 +45,6 @@ const getData = async (params) => {
   if (res.status === 200 && res2.status === 200) {
     const result = res.data;
     const result2 = res2.data;
-    console.log("결과", result);
     exerciseStore.addCalendarDate(
       result.map((item) => formatDate(item.exerciseDatetime))
     );
@@ -91,6 +90,7 @@ onMounted(async () => {
   const params = getParamsFromDate(selectedDate.value);
   getData(params);
 });
+
 onUnmounted(() => {
   exerciseStore.clearCalendarDate();
   healthStore.clearCalendarDate();

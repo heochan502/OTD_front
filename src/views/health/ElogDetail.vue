@@ -32,6 +32,7 @@ const formatTime = (dateStr) => {
 
 onMounted(async () => {
   exerciseStore.fetchExercises();
+  console.log(exerciseStore.$state);
   state.elog.exerciselogId = route.params.exerciselogId;
   const res = await getElog(state.elog.exerciselogId);
   if (res === undefined || res.status !== 200) {
@@ -77,7 +78,10 @@ const deleteLog = async () => {
       <v-col class="col_left">
         <div class="exercise">
           <span>
-            {{ exerciseStore.list[state.elog.exerciseId - 1]?.exerciseName }}
+            {{
+              exerciseStore.exerciseList[state.elog.exerciseId - 1]
+                ?.exerciseName
+            }}
           </span>
         </div>
       </v-col>

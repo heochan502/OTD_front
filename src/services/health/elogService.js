@@ -13,6 +13,11 @@ export const getElogs = () => {
   return axios.get(path).catch((e) => e.response);
 };
 
+// 운동기록 리스트 페이징
+export const getElogList = (params) => {
+  return axios.get(`${path}/list`, { params }).catch((e) => e.response);
+};
+
 // 운동기록상세 목록
 export const getElog = (exerciselogId) => {
   return axios.get(`${path}/${exerciselogId}`).catch((e) => e.response);
