@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Calendar from '@/components/reminder/Calendar.vue';
+import MiniCalendar from '@/components/reminder/MiniCalendar.vue';
 import { save } from '@/services/reminder/reminderService';
 import { modify } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
@@ -15,7 +15,7 @@ const state = reactive({
     id: 0,
     title: '',
     content: '',
-    date: '',
+    startDate: '',
     alarm: false,
     repeat: false,
     repeatDow: [],
@@ -33,7 +33,7 @@ const selectedDone = (day) => {
   const y = day.getFullYear();
   const m = String(day.getMonth() + 1).padStart(2, '0');
   const d = String(day.getDate()).padStart(2, '0');
-  state.reminder.date = `${y}-${m}-${d}`; // 넘길 데이터 저장
+  state.reminder.startDate = `${y}-${m}-${d}`; // 넘길 데이터 저장
 
   if (state.reminder.repeat) {
     state.reminder.repeat = false; // 요일 반복 비활성화
@@ -81,12 +81,12 @@ const imageToggle = (index) => {
   state.reminder.repeat = activeIndex.length > 0;
 
   if (state.reminder.repeat) {
-    state.reminder.date = '';
+    state.reminder.startDate = '';
   }
 };
 
 // 날짜-요일 활성화 비활성화 처리
-const isDateMode = computed(() => state.reminder.date !== '');
+const isDateMode = computed(() => state.reminder.startDate !== '');
 const isRepeatMode = computed(() => state.reminder.repeat);
 
 // 쿼리스트링으로 id가 있으면 해당 리마인더 내용 띄우기
@@ -103,15 +103,15 @@ onMounted(() => {
         id: modifyReminder.id,
         title: modifyReminder.title,
         content: modifyReminder.content,
-        date: modifyReminder.date,
+        startDate: modifyReminder.startDate,
         alarm: modifyReminder.alarm,
         repeat: modifyReminder.repeat,
         repeatDow: [...(modifyReminder.repeatDow || [])],
       });
     }
 
-    if (state.reminder.date) {
-      const [y, m, d] = state.reminder.date.split('-');
+    if (state.reminder.startDate) {
+      const [y, m, d] = state.reminder.startDate.split('-');
       selectedDate.value = new Date(`${y}-${m}-${d}`);
     } else if (state.reminder.repeat) {
       dowImage.value.forEach((item, index) => {
@@ -142,7 +142,7 @@ const submit = async () => {
   const jsonBody = {
     title: state.reminder.title,
     content: state.reminder.content,
-    date: state.reminder.date,
+    startDate: state.reminder.startDate,
     repeat: state.reminder.repeat,
     repeatDow: state.reminder.repeatDow,
     alarm: state.reminder.alarm,
@@ -156,7 +156,7 @@ const submit = async () => {
       return;
     }
     alert('일정을 수정했어요!');
-    router.push('/reminder/list');
+    router.push('/reminder');
   } else {
     res = await save(jsonBody);
     if (res === undefined || res.status !== 200) {
@@ -177,7 +177,7 @@ const submit = async () => {
     </h2>
     <div class="form-card">
       <span>
-        <router-link :to="state.reminder.id ? '/reminder/list' : '/reminder'">
+        <router-link to="/reminder">
           <img src="/image/cancel.png" alt="취소" class="cancel" />
         </router-link>
       </span>
@@ -191,11 +191,12 @@ const submit = async () => {
             class="calendar-button"
         /></span>
         <div class="calendar">
-          <calendar
+          <mini-calendar
             v-if="showCalendar"
             @selected-date="selectedDone"
             use-page="form"
-          ></calendar>
+            class="mini-calendar"
+          ></mini-calendar>
         </div>
       </div>
       <span
@@ -234,6 +235,7 @@ const submit = async () => {
           class="title"
           placeholder="어떤 일정이 있으신가요?"
           v-model="state.reminder.title"
+          @keyup.enter="submit"
         />
       </div>
       <div>
@@ -242,6 +244,7 @@ const submit = async () => {
           class="content"
           placeholder="내용을 추가해주세요!"
           v-model="state.reminder.content"
+          @keyup.enter="submit"
         ></textarea>
       </div>
       <button @click="submit" class="button">
@@ -317,6 +320,10 @@ const submit = async () => {
         position: absolute;
         z-index: 99999999999;
         margin-top: 10px;
+
+        .mini-calendar{
+          margin-top: -5px;
+        }
       }
     }
     .alarm-box {
