@@ -93,7 +93,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
       <label for="memoName" class="memo-label">제목</label>
       <input id="memoName" v-model="memo.memoName" class="memo-input" />
       <p v-if="memo.memoName.length > 0 && !isTitleValid" class="memo-error">
-        제목은 10자 이상 입력해주세요.
+        제목은 5자 이상 입력해주세요.
       </p>
 
       <label for="memoContent" class="memo-label">내용</label>

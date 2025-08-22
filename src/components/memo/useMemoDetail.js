@@ -24,7 +24,7 @@ export function useMemoDetail(props, emit) {
   const isEditMode = computed(() => mode.value === 'edit');
   const isViewMode = computed(() => mode.value === 'view');
 
-  const isTitleValid = computed(() => memo.value.memoName.trim().length >= 10);
+  const isTitleValid = computed(() => memo.value.memoName.trim().length >= 5);
   const isContentValid = computed(() => memo.value.memoContent.length >= 10);
 
   const setMode = (value) => { mode.value = value; };

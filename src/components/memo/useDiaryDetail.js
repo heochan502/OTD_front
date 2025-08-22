@@ -34,8 +34,8 @@ export function useDiaryDetail(emit) {
   const previewImages = ref([]);
   const fileInputRef = ref(null);
 
-  const isTitleValid = computed(() => diary.value.diaryName?.trim().length > 0);
-  const isContentValid = computed(() => diary.value.diaryContent?.trim().length > 0);
+  const isTitleValid = computed(() => diary.value.diaryName?.trim().length >= 5);
+  const isContentValid = computed(() => diary.value.diaryContent?.trim().length >= 10);
 
   const clearForm = () => {
     diary.value = {
@@ -91,13 +91,13 @@ export function useDiaryDetail(emit) {
     emit('cancel');
   };
 
-const removeImage = (index) => {
-  previewImages.value.splice(index, 1);
-  diary.value.diaryImage = null;
-  if (fileInputRef.value) {
-    fileInputRef.value.value = null;
-  }
-};
+  const removeImage = (index) => {
+    previewImages.value.splice(index, 1);
+    diary.value.diaryImage = null;
+    if (fileInputRef.value) {
+      fileInputRef.value.value = null;
+    }
+  };
 
   const setDiaryProp = (incomingDiary) => {
     if (incomingDiary) {
@@ -117,21 +117,22 @@ const removeImage = (index) => {
       console.error('📔 다이어리 조회 실패:', error);
     }
   };
-  const handleImageChange = (event) => {
-  const files = event.target.files;
-  previewImages.value = [];
 
-  if (files && files.length > 0) {
-    for (const file of files) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previewImages.value.push(e.target.result);
-      };
-      reader.readAsDataURL(file);
+  const handleImageChange = (event) => {
+    const files = event.target.files;
+    previewImages.value = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImages.value.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+      // diary.value.diaryImage = files[0].name;
     }
-    // diary.value.diaryImage = files[0].name;
-  }
-};
+  };
 
   onMounted(() => {
     if (!accountStore.state.loggedIn) {
@@ -162,7 +163,6 @@ const removeImage = (index) => {
     updateDiary,
     deleteDiary,
     cancelEdit,
-    removeImage,
     clearForm,
     setDiaryProp,
     fetchDiary,
