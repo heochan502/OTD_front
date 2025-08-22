@@ -83,37 +83,6 @@ const getParamsFromDate = (date) => {
   return { start, end };
 };
 
-// 날짜 받아오기(원래 코드)
-// const getData = async () => {
-//   let res = null;
-//   res = await getEexerciselogCalendar(params);
-//   // console.log("운동기록날짜", res.data);
-//   exerciseLogDate.value = res.data.map((item) =>
-//     formatDate(item.exerciseDatetime)
-//   );
-
-//   res = await getHealthlogCalendar(params);
-//   healthLogDate.value = res.data.map((item) =>
-//     formatDate(item.healthlogDatetime)
-//   );
-// };
-
-// 날짜 받아오기(수정된 코드)
-// const getData = async (date) => {
-//   // params 생성
-//   const params = getParamsFromDate(date);
-//   console.log("파람즈", date);
-//   let res = await getEexerciselogCalendar(params);
-//   exerciseLogDate.value = res.data.map((item) =>
-//     formatDate(item.exerciseDatetime)
-//   );
-
-//   res = await getHealthlogCalendar(params);
-//   healthLogDate.value = res.data.map((item) =>
-//     formatDate(item.healthlogDatetime)
-//   );
-// };
-
 // 점 찍을 때 해당 일자에 데이터 있는지 확인하기 위함
 const healthLogSet = computed(() => new Set(healthStore.calendarDate));
 const exerciseLogSet = computed(() => new Set(exerciseStore.calendarDate));
@@ -169,10 +138,6 @@ onUnmounted(() => {
             {{ day.day }}
           </div>
           <div class="dot-wrapper">
-            <!-- <span
-              v-if="healthLogDate.includes(formatDate(day.date))"
-              class="dot dot-health"
-            ></span> -->
             <span
               v-if="healthLogSet.has(formatDate(day.date))"
               class="dot dot-health"
