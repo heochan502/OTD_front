@@ -13,17 +13,18 @@ const healthStore = useHealthStore();
 const route = useRoute();
 
 const state = reactive({
-  hlog: {
-    healthlogId: null,
-    weight: null,
-    height: null,
-    systolicBp: null,
-    diastolicBp: null,
-    sugarLevel: null,
-    moodLevel: null,
-    sleepQuality: null,
-    healthlogDatetime: "",
-  },
+  // hlog: {
+  //   healthlogId: null,
+  //   weight: null,
+  //   height: null,
+  //   systolicBp: null,
+  //   diastolicBp: null,
+  //   sugarLevel: null,
+  //   moodLevel: null,
+  //   sleepQuality: null,
+  //   healthlogDatetime: "",
+  // },
+  hlog: [],
 });
 
 const healthlogId = route.params.healthlogId;

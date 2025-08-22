@@ -16,6 +16,8 @@ const exerciseStore = useExerciseStore();
 
 onMounted(async () => {
   await exerciseStore.fetchExerciselogs();
+  console.log("여기");
+  console.log("운동", exerciseStore.logs);
 });
 
 // YYYY-MM-DD

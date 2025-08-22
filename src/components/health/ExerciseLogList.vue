@@ -11,17 +11,20 @@ const exerciseStore = useExerciseStore();
 
 const data = {
   page: 1,
-  rowPerPage: 20,
+  rowPerPage: 7,
 };
 const state = reactive({
   isLoading: false,
   isFinish: false,
 });
 
-const handleScroll = () => {
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  const nearBottom = scrollTop + clientHeight >= scrollHeight - 100; // 바닥 근처
+const handleScroll = (e) => {
+  const target = e.target; // list-wrap
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
 
+  const nearBottom = scrollTop + clientHeight >= scrollHeight - 100; // 바닥 근처
   if (nearBottom) {
     getData();
   }
@@ -30,7 +33,6 @@ const handleScroll = () => {
 onMounted(() => {
   exerciseStore.fetchExercises();
   getData();
-  scroll();
 });
 
 onUnmounted(() => {
@@ -67,11 +69,6 @@ const detail = (exerciselogId) => {
 const add = () => {
   router.push("/elog/form");
 };
-
-// scoll event
-const scroll = () => {
-  window.addEventListener("scroll", handleScroll);
-};
 </script>
 
 <template>
@@ -81,7 +78,7 @@ const scroll = () => {
       <i class="bi bi-plus-circle btn-plus" @click="add"></i>
     </div>
   </div>
-  <div class="list-wrap" @scroll="scroll">
+  <div class="list-wrap" @scroll="handleScroll">
     <ul>
       <li v-if="exerciseStore.logList.length < 1" class="title">
         운동 기록을 추가하세요
