@@ -904,7 +904,8 @@ const submit = async () => {
               올바른 이름입니다.
             </div>
           </div>
-          <div class="form-row">
+
+        <div class="form-row">
           <div class="form-group">
             <label for="birthDate">생년월일 *</label>
             <input
