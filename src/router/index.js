@@ -164,12 +164,6 @@ const router = createRouter({
       component: DiaryList,
       props: true,
     },
-    {
-      path: "/detail",
-      name: "profile_detail",
-      component: ProfileDetail,
-      meta: { requiresAuth: true },
-    },
   ],
 });
 router.beforeEach((to) => {
