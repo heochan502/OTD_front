@@ -25,7 +25,7 @@ const makeTotalCalorie = async ()=>{
 // 회원의 몸무게 키 나이를 가져와서 칼로리 계산을 하는 거
   const res = await getProfile();
   // 피니아에 health 관련 정보 가져옴
-  console.log( "헹스데이타 로그 : ", healthData.logs);
+  console.log( "헬스데이타 로그 : ", healthData.logs);
 
 //   const totalPrice = items.reduce((sum, item) => {
 //   return sum + item.price; // 각 item의 price 값을 sum에 더함
@@ -106,6 +106,7 @@ const calorieData = computed(() => {
 
 const total = ref(0);
 const avg = ref(0);
+
 onMounted(async () => {
   // console.log('totalKcal:', ondayMealData.itemInfo.mealDay);
   // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
@@ -117,6 +118,7 @@ onMounted(async () => {
   else {
     await ondayMealData.mealFormData(ondayMealData.itemInfo.mealDay);
   }
+  await healthData.fetchHealthlogs();
   maxKcal.value = await makeTotalCalorie();
   console.log("맥스 칼로리", maxKcal);
 });
