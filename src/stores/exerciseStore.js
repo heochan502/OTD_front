@@ -8,6 +8,7 @@ export const useExerciseStore = defineStore("exercise", {
       list: [],
       loaded: false,
       logs: [],
+      calendarDate: [],
     }),
 
   actions: {
@@ -22,8 +23,11 @@ export const useExerciseStore = defineStore("exercise", {
 
       this.logs = res.data;
     },
-    clearLogs() {
-      this.logs = [];
+    addCalendarDate(list) {
+      this.calendarDate.push(...list);
+    },
+    clearCalendarDate() {
+      this.calendarDate = [];
     },
   },
 });

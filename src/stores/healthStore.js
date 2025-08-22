@@ -1,16 +1,24 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { getHlogs } from "@/services/health/hlogService";
 
 export const useHealthStore = defineStore("health", {
   state: () =>
-    reactive({
+    ref({
       logs: [],
+      calendarDate: [],
     }),
   actions: {
     async fetchHealthlogs() {
       const res = await getHlogs();
       this.logs = res.data;
+    },
+
+    addCalendarDate(list) {
+      this.calendarDate.push(...list);
+    },
+    clearCalendarDate() {
+      this.calendarDate = [];
     },
   },
 });

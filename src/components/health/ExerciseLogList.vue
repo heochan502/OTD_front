@@ -2,6 +2,7 @@
 import { onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useExerciseStore } from "@/stores/exerciseStore";
+import { formatDate } from "@/utils/reportUtils";
 
 const router = useRouter();
 const exerciseStore = useExerciseStore();
@@ -13,15 +14,7 @@ const params = {
 
 onMounted(async () => {
   await exerciseStore.fetchExercises();
-  await exerciseStore.fetchExerciselogs();
-  console.log("확인", exerciseStore.logs);
 });
-
-// 날짜 형식 변경
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 // click event
 const detail = (exerciselogId) => {

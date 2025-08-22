@@ -5,6 +5,7 @@ import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRoute, useRouter } from "vue-router";
 import HealthChart from "@/components/health/HealthChart.vue";
+import { formatDate } from "@/utils/reportUtils";
 
 const exerciseStore = useExerciseStore();
 const route = useRoute();
@@ -20,11 +21,6 @@ const state = reactive({
     effortLevel: 1,
   },
 });
-
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 const formatTime = (dateStr) => {
   const date = new Date(dateStr);

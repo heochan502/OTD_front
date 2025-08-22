@@ -2,23 +2,10 @@
 import { onMounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useHealthStore } from "@/stores/healthStore";
+import { formatDate } from "@/utils/reportUtils";
 
 const router = useRouter();
 const healthStore = useHealthStore();
-
-const state = reactive({
-  logs: [],
-});
-
-onMounted(async () => {
-  await healthStore.fetchHealthlogs();
-  state.logs = healthStore.logs;
-});
-
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 // @click
 const add = () => {
@@ -38,9 +25,11 @@ const detail = (healthlogId) => {
   </div>
   <div class="list-wrap">
     <ul>
-      <li v-if="state.logs.length < 1" class="title">건강 기록을 추가하세요</li>
+      <li v-if="healthStore.logs.length < 1" class="title">
+        건강 기록을 추가하세요
+      </li>
       <li
-        v-for="item in state.logs"
+        v-for="item in healthStore.logs"
         :key="item.healthlogId"
         @click="detail(item.healthlogId)"
       >
