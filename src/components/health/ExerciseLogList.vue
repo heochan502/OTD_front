@@ -37,7 +37,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   exerciseStore.clearLogList();
-  handleScroll();
 });
 
 const getData = async () => {
@@ -130,7 +129,6 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow: auto;
 
   li {
     display: flex;
