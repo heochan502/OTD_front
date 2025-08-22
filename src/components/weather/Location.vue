@@ -8,7 +8,9 @@ import {
   removeLocation,
 } from '@/services/weather/locationService';
 import { useRouter } from 'vue-router';
+import { useWeatherStore } from '@/stores/weatherStore';
 
+const weatherStore = useWeatherStore();
 const router = useRouter();
 const keyword = ref('');
 const selectedLocation = ref(null);
@@ -18,9 +20,23 @@ const state = reactive({
   list: [],
 });
 
+// 모달 통일
+const confirmDialog = ref(false);
+const alertDialog = ref({ visible: false, message: '' });
+const confirmMessage = ref('');
+
+const openConfirm = (message) => {
+  confirmDialog.value = true;
+  confirmMessage.value = message;
+};
+const openAlert = (message) => {
+  alertDialog.value.message = message;
+  alertDialog.value.visible = true;
+};
+
 const searchLocation = async () => {
   if (!keyword.value.trim()) {
-    alert('지역명을 입력하세요');
+    openAlert('지역명을 입력하세요');
     return;
   }
   const res = await getLocalName(keyword.value);
@@ -41,10 +57,11 @@ const selectWeatherLocation = async (localId, locationName) => {
   const res = await selectLocation(localId);
   if (res && res.status === 200) {
     if (
-      confirm(
+      openConfirm(
         `${locationName}이(가) 선택 되었습니다. \n홈 화면으로 이동하시겠습니까?`
       )
     ) {
+      weatherStore.triggerRefresh();
       router.push('/');
     }
   }
@@ -52,19 +69,19 @@ const selectWeatherLocation = async (localId, locationName) => {
 
 const saveSearchedLocation = async () => {
   if (!selectedLocation.value || !selectedLocation.value.localId) {
-    alert('지역 정보가 일치하지 않습니다');
+    openAlert('지역 정보가 일치하지 않습니다.');
     return;
   }
   await saveLocation(selectedLocation.value.localId);
-  alert('지역이 저장되었습니다');
+  openAlert('지역이 저장되었습니다.');
   await LocalList();
 };
 
 const removeLocal = async (localId) => {
-  if (confirm('선택한 지역을 삭제하시겠습니까?')) {
+  if (openConfirm('선택한 지역을 삭제하시겠습니까?')) {
     const res = await removeLocation(localId);
     if (res.status === 200) {
-      alert('삭제되었습니다.');
+      openAlert('삭제되었습니다.');
       await LocalList();
     }
   }
@@ -101,6 +118,18 @@ onMounted(() => {
       <button class="btn btn-primary" @click="saveSearchedLocation">
         + 검색한 지역 저장 +
       </button>
+      <!-- alert -->
+      <v-dialog v-model="alertDialog.visible" max-width="300" max-height="150">
+        <v-card>
+          <v-card-text>{{ alertDialog.message }}</v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn class="primary" text @click="alertDialog.visible = false"
+              >확인</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 
@@ -133,6 +162,20 @@ onMounted(() => {
           >
             삭제
           </button>
+          <!-- confirm -->
+          <v-dialog v-model="confirmDialog" max-width="400">
+            <v-card>
+              <v-card-title>확인</v-card-title>
+              <v-card-text>{{ confirmMessage }}</v-card-text>
+              <v-card-actions>
+                <v-spacer />
+                <v-btn color="success" text @click="handleConfirmYes">예</v-btn>
+                <v-btn color="dark" text @click="confirmDialog = false"
+                  >아니오</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </div>
       </li>
     </ul>

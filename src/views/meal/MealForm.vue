@@ -2,6 +2,7 @@
 import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted, computed, watch, nextTick, watchEffect } from 'vue';
+import { useHealthStore } from '@/stores/healthStore'
 import { useRouter } from "vue-router";
 import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate, useClickProgressBar } from "@/stores/mealStore";
 import dayjs from 'dayjs';
@@ -10,6 +11,7 @@ import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 
+const healthData= useHealthStore();
 const dayStore = useDayDefine();
 const ondayMealData = useCalorieCalcul();
 const weeklyData = useWeeklyStore();
@@ -60,7 +62,7 @@ onMounted(async () => {
   else {
     await ondayMealData.mealFormData(ondayMealData.itemInfo.mealDay);
   }
- 
+  console.log(healthData.logs);
 });
 
 
