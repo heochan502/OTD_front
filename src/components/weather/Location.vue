@@ -134,7 +134,6 @@ onMounted(() => {
       </v-dialog>
     </div>
   </div>
-
   <div class="list card p-4 shadow-sm">
     <h2>저장한 지역 목록</h2>
     <ul class="list-group list-group-flush">
@@ -195,6 +194,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 .list {
   color: black;
+  height: 40vh;
+  overflow-y: scroll;
 }
 .location-name {
   font-size: 25px;
