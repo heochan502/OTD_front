@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, watch , shallowRef } from 'vue';
+import { reactive, computed, watch, shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   join,
@@ -8,16 +8,14 @@ import {
   checkNickname,
 } from '@/services/member/accountService';
 
+// import { shallowRef } from 'vue'
 
-  // import { shallowRef } from 'vue'
+const gender = shallowRef({ state: '성별', abbr: 'gender' });
 
-  const gender = shallowRef({ state: '성별', abbr: 'gender' });
-
-  const genders = [
-    { state: '남자', abbr: 'male' },
-    { state: '여자', abbr: 'Female' },
-  ];
-
+const genders = [
+  { state: '남자', abbr: 'male' },
+  { state: '여자', abbr: 'Female' },
+];
 
 const router = useRouter();
 
@@ -29,7 +27,7 @@ const state = reactive({
     email: '',
     name: '',
     birthDate: '',
-    gender : '',
+    gender: '',
     memberNick: '',
   },
   validation: {
@@ -197,7 +195,7 @@ const validateBirthDate = (birthDate) => {
   if (!birthDate.trim()) {
     return { isValid: false, message: '생년월일을 입력해주세요.' };
   }
-const dateRegex = /^\d{8}$/;
+  const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(birthDate.replace(/-/g, ''))) {
     return { isValid: false, message: 'YYYYMMDD 형식으로 입력해주세요.' };
   }
@@ -234,20 +232,18 @@ const dateRegex = /^\d{8}$/;
 
   return { isValid: true, message: '' };
 };
-//성별 제약 조건 
+//성별 제약 조건
 
 const validateGender = (inGender) => {
-  if (inGender==="성별") {
+  if (inGender === '성별') {
     return { isValid: false, message: '성별을 입력해주세요.' };
   }
   state.gender = inGender.state;
-  console.log("state.gender",   state.gender );
+  console.log('state.gender', state.gender);
   return { isValid: true, message: '' };
-}
+};
 
 // 성별 제약 조건
-
-
 
 const validateNickname = (nickname) => {
   if (!nickname.trim()) {
@@ -404,13 +400,12 @@ watch(
 watch(
   () => gender.value,
   (newValue) => {
-    if (newValue) {      
-    // console.log(newValue);
+    if (newValue) {
+      // console.log(newValue);
       validateField('gender', newValue);
     }
   }
 );
-
 
 watch(
   () => state.form.memberNick,
@@ -913,81 +908,85 @@ const submit = async () => {
           </div>
           <!-- 생년 월일  -->
           <label for="birthDate">생년월일 *</label>
-          <div id= "" class="form-group gender">
-         
-            <div class = "brithDateValide  w-75">
-            <input
-              type="text"
-              id="birthDate"
-              placeholder="YYYYMMDD"
-              maxlength="8"
-              v-model="state.form.birthDate"
-              :class="{
-                error:
+          <div id="" class="form-group gender">
+            <div class="brithDateValide w-75">
+              <input
+                type="text"
+                id="birthDate"
+                placeholder="YYYYMMDD"
+                maxlength="8"
+                v-model="state.form.birthDate"
+                :class="{
+                  error:
+                    state.validation.birthDate.touched &&
+                    !state.validation.birthDate.isValid,
+                  success:
+                    state.validation.birthDate.touched &&
+                    state.validation.birthDate.isValid &&
+                    state.form.birthDate,
+                }"
+                @blur="handleFieldTouch('birthDate')"
+                @input="
                   state.validation.birthDate.touched &&
-                  !state.validation.birthDate.isValid,
-                success:
+                    validateField('birthDate', state.form.birthDate)
+                "
+              />
+              <div
+                v-if="
+                  state.validation.birthDate.touched &&
+                  state.validation.birthDate.message
+                "
+                :class="[
+                  'field-message',
+                  state.validation.birthDate.isValid
+                    ? 'field-success'
+                    : 'field-error',
+                ]"
+              >
+                {{ state.validation.birthDate.message }}
+              </div>
+              <div
+                v-else-if="
                   state.validation.birthDate.touched &&
                   state.validation.birthDate.isValid &&
-                  state.form.birthDate,
-              } "
-              @blur="handleFieldTouch('birthDate')"
-              @input="
-                state.validation.birthDate.touched &&
-                  validateField('birthDate', state.form.birthDate)
-              "             
-            />
-            <div 
-              v-if="
-                state.validation.birthDate.touched &&
-                state.validation.birthDate.message
-              "
-              :class="[
-                'field-message',
-                state.validation.birthDate.isValid
-                  ? 'field-success'
-                  : 'field-error',
-              ]"
-            >
-              {{ state.validation.birthDate.message }}
-            </div>   
-            <div 
-              v-else-if="
-                state.validation.birthDate.touched &&
-                state.validation.birthDate.isValid &&
-                state.form.birthDate
-              "             
-            >
-              올바른 날짜 형식입니다.   
+                  state.form.birthDate
+                "
+              >
+                올바른 날짜 형식입니다.
+              </div>
             </div>
-          </div>
-            <v-select 
-         
-    v-model="gender"
-    :hint="`${gender.abbr}`"
-    :items="genders"
-    item-title="state"
-    item-value="abbr"
-    label="Select"
-    variant="underlined"
-    persistent-hint
-    return-object
-    single-line       
-    :class="['w-25', 'h-25', 'ma-0'] ,{
-                error:
-                  state.validation.gender.touched &&
-                  !state.validation.gender.isValid,
-                success:
-                  state.validation.gender.touched &&
-                  state.validation.gender.isValid &&
-                  state.form.gender,
-              } "
+            <!-- <v-select
+              id="genderDetail"
+              v-model="gender"
+              :hint="`${gender.abbr}`"
+              :items="genders"
+              item-title="state"
+              item-value="abbr"
+              
+              density="compact"
+              variant="underlined"
+              persistent-hint
+              return-object
+              single-line
+              :class="
+                (['w-25', 'h-25', 'ma-0'],
+                {
+                  error:
+                    state.validation.gender.touched &&
+                    !state.validation.gender.isValid,
+                  success:
+                    state.validation.gender.touched &&
+                    state.validation.gender.isValid &&
+                    state.form.gender,
+                })
+              "
               @blur="handleFieldTouch('gender')"
               @input="
                 state.validation.gender.touched &&
                   validateField('gender', gender.title)
-              "               ></v-select>   
-  <div 
+              "
+            ></v-select>
+            <div
               v-if="
                 state.validation.gender.touched &&
                 state.validation.gender.message
@@ -1000,18 +999,18 @@ const submit = async () => {
               ]"
             >
               {{ state.validation.gender.message }}
-            </div>   
-            <div 
+            </div>
+            <div
               v-else-if="
                 state.validation.gender.touched &&
                 state.validation.gender.isValid &&
                 state.form.gender
-              "             
+              "
             >
-              성별 선택 완료.   
-            </div>
+              성별 선택 완료.
+            </div> -->
           </div>
-<!-- 여기 어디 넣어보자  -->
+          <!-- 여기 어디 넣어보자  -->
           <!-- <div class="form-group">
             <label for="gender">성별 *</label>
             <input
@@ -1060,10 +1059,7 @@ const submit = async () => {
               올바른 성별 형식입니다.
             </div>
           </div> -->
-          <div class="form-group">
-        
-
-</div>
+          <div class="form-group"></div>
           <!-- 수정 -->
           <div class="form-group">
             <label for="memberNick">닉네임 *</label>
@@ -1412,21 +1408,30 @@ const submit = async () => {
   margin-bottom: 18px;
 }
 /* 허찬 수정 부분 */
-.gender{
+
+/* .gender {
   display: flex;
   flex-direction: row;
+  
 }
 
-.brithDateValide
-{
+
+.brithDateValide {
   display: flex;
   flex-direction: column;
 }
-.joininput .v-field__input
-{
-  padding: 0;
-  font-size: inherit;
-}
+
+.joininput .v-select {
+  width: 15%;
+  padding: 12px 14px;
+  font-size: 14px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: white;
+  margin-left: 3px;
+} */
 /* 허찬 수정 부분 */
 
 .join-form label {
@@ -1437,8 +1442,8 @@ const submit = async () => {
   margin-bottom: 6px;
 }
 
-.joininput input,
-.joininput .v-select {
+.joininput input
+{
   width: 100%;
   padding: 12px 14px;
   font-size: 14px;
@@ -1469,27 +1474,24 @@ const submit = async () => {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
-.joininput input:focus.error
-.joininput .v-field__input {
+.joininput input:focus.error .joininput .v-field__input {
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
 }
 
-.joininput input:focus.success
-.joininput .v-field__input {
+.joininput input:focus.success .joininput .v-field__input {
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
 }
 
-.field-message ,
-.v-field__input{
+.field-message,
+.v-field__input {
   font-size: 12px;
   margin-top: 4px;
   display: flex;
   align-items: center;
 }
 
-.field-error
-, .v-field__input
-{
+.field-error,
+.v-field__input {
   color: #dc2626;
   font-size: 12px;
   margin-top: 4px;
@@ -1497,8 +1499,8 @@ const submit = async () => {
   align-items: center;
 }
 
-.field-success
-, .v-field__input{
+.field-success,
+.v-field__input {
   color: #16a34a;
   font-size: 12px;
   margin-top: 4px;
