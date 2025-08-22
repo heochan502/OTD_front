@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue';
+import { ref, onMounted, nextTick, computed, reactive } from 'vue';
 import { useAccountStore } from '@/stores/counter';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 import { useDiaryDetail, MOOD_OPTIONS } from './useDiaryDetail';
 
 const accountStore = useAccountStore();
+
+const props = reactive({ diaryProp: null });
 
 // 훅 사용 (기존 로직 유지: emit 이벤트만 받아서 페이지에서 처리)
 const emit = async (event) => {
@@ -21,6 +23,7 @@ const {
   fileInputRef,
   isCreateMode,
   isEditMode,
+  isViewMode,
   isTitleValid,
   isContentValid,
   setMode,
@@ -32,9 +35,8 @@ const {
   cancelEdit,
   clearForm,
   fetchDiary,
-  // setDiaryProp 은 필요 시 사용할 수 있음
   setDiaryProp,
-} = useDiaryDetail(emit);
+} = useDiaryDetail(props, emit);
 
 // 목록 상태
 const diaryList = ref([]);
@@ -47,7 +49,7 @@ const fetchDiaryList = async () => {
     const params = {
       currentPage: 1,
       pageSize: 5,
-      memberNoLogin: accountStore.loggedInId,
+      memberNoLogin: accountStore.state.memberNoLogin,
     };
     const result = await DiaryHttpService.findAll(params);
     diaryList.value = result?.diaryList || [];
@@ -66,32 +68,27 @@ const afterMutate = async () => {
   await nextTick();
 };
 
-// 리스트 항목 선택 → edit 모드 + 상세 로드
+// 리스트 항목 선택 → view 모드 + 훅에서 props.watch로 반영
 const handleSelect = async (item) => {
-  setMode('edit');
-  // 필요 시 초깃값 세팅
-  setDiaryProp?.(item);
-  // 최신 데이터 보장
-  if (item?.diaryId) {
-    await fetchDiary(item.diaryId);
-  }
+  props.diaryProp = item;
+  setMode('view');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 // 취소/목록 버튼
 const handleClear = () => {
+  props.diaryProp = null;
   clearForm();
   setMode('create');
 };
 
 onMounted(fetchDiaryList);
 
-// 제목 텍스트 (기존 룰 그대로)
+// 제목 텍스트
 const titleText = computed(() =>
-  isCreateMode.value ? '다이어리 등록' : '다이어리 수정'
+  isCreateMode.value ? '다이어리 등록' : (isEditMode.value ? '다이어리 수정' : '다이어리 보기')
 );
 
-// 날짜 포맷 (기존 코드 유지)
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -101,7 +98,7 @@ const formatDate = (dateStr) => {
 
 <template>
   <div class="diary-list-page">
-    <!-- 상단: 폼 (기존 diaryDetail.vue UI/검증 그대로) -->
+    <!-- 상단 폼 -->
     <div class="diary-detail">
       <h2 class="diary-title">{{ titleText }}</h2>
 
@@ -133,11 +130,18 @@ const formatDate = (dateStr) => {
 
       <label class="diary-label">이미지</label>
       <div class="image-section">
-        <input ref="fileInputRef" type="file" accept="image/*" @change="handleImageChange" class="diary-file-input" />
+        <input
+          v-if="!isViewMode"
+          ref="fileInputRef"
+          type="file"
+          accept="image/*"
+          @change="handleImageChange"
+          class="diary-file-input"
+        />
         <div class="diary-preview-list">
           <div v-for="(img, idx) in previewImages" :key="idx" class="diary-preview-container">
             <img :src="img" class="diary-preview-image" />
-            <button @click="removeImage(idx)" class="diary-remove-btn">X</button>
+            <button v-if="!isViewMode" @click="removeImage(idx)" class="diary-remove-btn">X</button>
           </div>
           <p v-if="previewImages.length === 0" class="diary-empty-message">선택된 이미지가 없습니다.</p>
         </div>
@@ -145,13 +149,21 @@ const formatDate = (dateStr) => {
 
       <div class="diary-button-group">
         <button v-if="isCreateMode" @click="createDiary" :disabled="!isTitleValid || !isContentValid">등록</button>
-        <button v-else-if="isEditMode" @click="updateDiary" :disabled="!isTitleValid || !isContentValid">수정 완료</button>
-        <button v-if="isEditMode" @click="cancelEdit">취소</button>
-        <button v-if="isEditMode" @click="deleteDiary" class="diary-delete-btn">삭제</button>
+
+        <template v-else-if="isEditMode">
+          <button @click="updateDiary" :disabled="!isTitleValid || !isContentValid">수정 완료</button>
+          <button @click="cancelEdit">취소</button>
+          <button @click="deleteDiary" class="diary-delete-btn">삭제</button>
+        </template>
+
+        <template v-else>
+          <button @click="setMode('edit')">수정</button>
+          <button @click="cancelEdit">목록</button>
+        </template>
       </div>
     </div>
 
-    <!-- 하단: 목록 (기존 diaryList.vue 그대로) -->
+    <!-- 하단: 목록 -->
     <div class="diary-list">
       <div v-if="Array.isArray(diaryList) && diaryList.length > 0">
         <div
@@ -168,7 +180,7 @@ const formatDate = (dateStr) => {
             </div>
             <div class="diary-image-wrapper" v-if="diary.diaryImage">
               <img
-                :src="`http://localhost:8080/pic/${diary.diaryImage}`"
+                :src="`/pic/${diary.diaryImage}`"
                 class="diary-preview-image"
                 alt="다이어리 이미지"
                 @error="e => console.error('❌ 이미지 로딩 실패:', e.target.src)"
@@ -187,7 +199,7 @@ const formatDate = (dateStr) => {
 <style scoped>
 .diary-list-page { max-width: 900px; margin: 20px auto; }
 
-/* ===== 상단 폼 (기존 diaryDetail.vue 스타일 유지) ===== */
+/* ===== 상단 폼 ===== */
 .diary-detail {
   max-width: 800px;
   margin: 20px auto;
@@ -218,7 +230,7 @@ const formatDate = (dateStr) => {
 .diary-button-group .diary-delete-btn { background-color: #dc3545; }
 .diary-error { color: #dc3545; font-size: 0.9rem; margin-top: -16px; margin-bottom: 12px; }
 
-/* ===== 하단 목록 (기존 diaryList.vue 스타일 유지) ===== */
+/* ===== 하단 목록 ===== */
 .diary-list {
   max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f9f9f9;
   border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); color: #000;

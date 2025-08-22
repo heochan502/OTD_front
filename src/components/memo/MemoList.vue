@@ -16,7 +16,7 @@ const memoListLoading = ref(false);
 const fetchMemoList = async () => {
   memoListLoading.value = true;
   try {
-    const params = { currentPage: 1, pageSize: 100, memberNoLogin: accountStore.loggedInId };
+    const params = { currentPage: 1, pageSize: 100, memberNoLogin: accountStore.state.memberNoLogin };
     const result = await MemoHttpService.findAll(params);
     memoList.value = result.memoList || result.memolist || [];
   } catch (e) {
@@ -86,7 +86,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 
 <template>
   <div class="memo-list-page">
-    <!-- 상단: 폼 (기존 MemoDetail UI 그대로) -->
+    <!-- 상단: 폼 -->
     <div class="memo-detail">
       <h2 class="memo-title">{{ titleText }}</h2>
 
@@ -150,7 +150,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
       </div>
     </div>
 
-    <!-- 하단: 목록 (기존 MemoList UI 그대로) -->
+    <!-- 하단: 목록 -->
     <div class="memo-list-wrapper">
       <h3 class="memo-list-heading">메모 목록</h3>
 
@@ -188,7 +188,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 <style scoped>
 .memo-list-page { max-width: 900px; margin: 20px auto; }
 
-/* 상단 폼 스타일 (기존 MemoDetail.vue 그대로) */
+/* 상단 폼 스타일 */
 .memo-detail {
   max-width: 800px;
   margin: 20px auto;
@@ -213,7 +213,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 }
 .memo-error { color: #dc3545; font-size: 0.9rem; margin-top: -16px; margin-bottom: 12px; }
 
-/* 하단 목록 스타일 (기존 MemoList.vue 그대로) */
+/* 하단 목록 스타일 */
 .memo-list-wrapper {
   margin-top: 24px; padding: 20px; background-color: #f9f9f9;
   border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); color: #000;

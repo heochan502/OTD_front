@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import DiaryHttpService from '@/services/memo/DiaryHttpService';
 import { useAccountStore } from '@/stores/counter';
@@ -11,7 +11,7 @@ export const MOOD_OPTIONS = [
   { value: 'neutral', label: '😐 보통' },
 ];
 
-export function useDiaryDetail(emit) {
+export function useDiaryDetail(props, emit) {
   const router = useRouter();
   const accountStore = useAccountStore();
 
@@ -24,12 +24,13 @@ export function useDiaryDetail(emit) {
     mood: '',
   });
 
-  const mode = ref('create');
+  const mode = ref('view');
   const setMode = (value) => {
     mode.value = value;
   };
   const isCreateMode = computed(() => mode.value === 'create');
   const isEditMode = computed(() => mode.value === 'edit');
+  const isViewMode = computed(() => mode.value === 'view');
 
   const previewImages = ref([]);
   const fileInputRef = ref(null);
@@ -50,32 +51,29 @@ export function useDiaryDetail(emit) {
     fileInputRef.value && (fileInputRef.value.value = null);
   };
 
-  const createDiary = async (e) => {
-    e.preventDefault();
-    if (!isTitleValid.value || !isContentValid.value) return;
+  const buildFormData = (dataKey, obj, fileKey, inputEl) => {
+    const fd = new FormData();
+    const { diaryImage, createdAt, ...rest } = obj;
+    fd.append(dataKey, new Blob([JSON.stringify(rest)], { type: 'application/json' }));
+    const file = inputEl?.files?.[0];
+    if (file) fd.append(fileKey, file);
+    return fd;
+  };
 
-    const formData = new FormData();
-    const diaryData = { ...diary.value, memberNoLogin: accountStore.state.memberNoLogin };
-    formData.append('diaryData', new Blob([JSON.stringify(diaryData)], { type: 'application/json' }));
-    
-    const files = fileInputRef.value?.files;
-    if (files?.length) {
-      formData.append('diaryImage', files[0]);
-    }
+  const createDiary = async (e) => {
+    e?.preventDefault?.();
+    if (!isTitleValid.value || !isContentValid.value) return;
+    const payload = { ...diary.value, memberNoLogin: accountStore.state.memberNoLogin };
+    const formData = buildFormData('diaryData', payload, 'diaryImage', fileInputRef.value);
     await DiaryHttpService.create(formData);
     emit('created');
   };
-
+  
   const updateDiary = async (e) => {
-    e.preventDefault();
+    e?.preventDefault?.();
     if (!isTitleValid.value || !isContentValid.value) return;
-
-    const formData = new FormData();
-    const diaryData = { ...diary.value, memberNoLogin: accountStore.state.memberNoLogin };
-    formData.append('diaryData', new Blob([JSON.stringify(diaryData)], { type: 'application/json' }));
-    const files = fileInputRef.value?.files;
-    if (files?.length) formData.append('diaryImage', files[0]);
-
+    const payload = { ...diary.value, memberNoLogin: accountStore.state.memberNoLogin };
+    const formData = buildFormData('diaryData', payload, 'diaryImage', fileInputRef.value);
     await DiaryHttpService.modify(formData);
     emit('updated');
   };
@@ -105,14 +103,34 @@ export function useDiaryDetail(emit) {
       previewImages.value = incomingDiary.diaryImage ? [`/pic/${incomingDiary.diaryImage}`] : [];
     }
   };
+  
+  watch(
+    () => props.diaryProp,
+    (incoming) => {
+      if (incoming) {
+        diary.value = {
+          diaryId: incoming.diaryId ?? null,
+          diaryName: incoming.diaryName ?? '',
+          diaryContent: incoming.diaryContent ?? '',
+          diaryImage: incoming.diaryImage ?? null,
+          createdAt: incoming.createdAt ?? null,
+          mood: incoming.mood ?? '',
+        };
+        setMode('view');
+        previewImages.value = diary.value.diaryImage ? [`/pic/${diary.value.diaryImage}`] : [];
+      } else {
+        clearForm();
+        setMode('create');
+      }
+    },
+    { immediate: true }
+  );
 
   const fetchDiary = async (id) => {
     try {
       const data = await DiaryHttpService.findById(id);
       diary.value = data;
-      previewImages.value = data.diaryImage
-      ? [`http://localhost:8080/api/OTD/memoAndDiary/diary/image/${data.diaryImage}`]
-      : [];
+      previewImages.value = data.diaryImage ? [`/pic/${data.diaryImage}`] : [];
     } catch (error) {
       console.error('📔 다이어리 조회 실패:', error);
     }
@@ -149,12 +167,15 @@ export function useDiaryDetail(emit) {
     clearForm();
   });
 
+  
+
   return {
     diary,
     mode,
     setMode,
     isCreateMode,
     isEditMode,
+    isViewMode,
     isTitleValid,
     isContentValid,
     previewImages,

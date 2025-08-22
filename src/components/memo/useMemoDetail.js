@@ -21,24 +21,22 @@ export function useMemoDetail(props, emit) {
   const mode = ref('view');
 
   const isCreateMode = computed(() => mode.value === 'create');
-  const isEditMode = computed(() => mode.value === 'edit');
-  const isViewMode = computed(() => mode.value === 'view');
+  const isEditMode   = computed(() => mode.value === 'edit');
+  const isViewMode   = computed(() => mode.value === 'view');
 
-  const isTitleValid = computed(() => memo.value.memoName.trim().length >= 5);
-  const isContentValid = computed(() => memo.value.memoContent.length >= 10);
+  const isTitleValid   = computed(() => memo.value.memoName.trim().length >= 5);
+  const isContentValid = computed(() => memo.value.memoContent.trim().length >= 10);
 
   const setMode = (value) => { mode.value = value; };
 
   const handleImageChange = (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
     const file = files[0];
     if (!file.type.startsWith('image/')) {
       alert('이미지 파일만 업로드 가능합니다.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = () => { previewImages.value = [reader.result]; };
     reader.readAsDataURL(file);
@@ -54,6 +52,7 @@ export function useMemoDetail(props, emit) {
     if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
+  // FormData 통일 헬퍼
   const buildFormData = (memoDataKey, memoObj, fileKey, inputEl) => {
     const fd = new FormData();
     const { memoImage, createdAt, ...rest } = memoObj;
@@ -65,7 +64,8 @@ export function useMemoDetail(props, emit) {
 
   const createMemo = async () => {
     try {
-      const formData = buildFormData('memoData', memo.value, 'memoImage', fileInputRef.value);
+      const payload = { ...memo.value, memberNoLogin: accountStore.state.memberNoLogin };
+      const formData = buildFormData('memoData', payload, 'memoImage', fileInputRef.value);
       await MemoHttpService.create(formData);
       emit('created');
       clearPreviewImages();
@@ -76,7 +76,8 @@ export function useMemoDetail(props, emit) {
 
   const updateMemo = async () => {
     try {
-      const formData = buildFormData('memoData', memo.value, 'memoImage', fileInputRef.value);
+      const payload = { ...memo.value, memberNoLogin: accountStore.state.memberNoLogin };
+      const formData = buildFormData('memoData', payload, 'memoImage', fileInputRef.value);
       await MemoHttpService.modify(formData);
       emit('updated');
       setMode('view');
@@ -89,7 +90,6 @@ export function useMemoDetail(props, emit) {
   const deleteMemo = async () => {
     try {
       if (confirm('정말 삭제하시겠습니까?')) {
-        // 필요 시 한 줄로 통일: await MemoHttpService.remove(memo.value.memoId);
         await MemoHttpService.deleteById(memo.value.memoId) ?? MemoHttpService.remove(memo.value.memoId);
         emit('deleted');
       }
@@ -128,7 +128,8 @@ export function useMemoDetail(props, emit) {
           createdAt: newMemo.createdAt ?? null,
         };
         setMode('view');
-        clearPreviewImages();
+        // 기존 이미지 프리뷰
+        previewImages.value = memo.value.memoImage ? [`/pic/${memo.value.memoImage}`] : [];
       }
     },
     { immediate: true }
