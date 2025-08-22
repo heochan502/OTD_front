@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch, computed, reactive } from "vue";
+import { onMounted, ref, computed, reactive, onUnmounted } from "vue";
 import { getEexerciselogCalendar } from "@/services/health/elogService";
 import { getHealthlogCalendar } from "@/services/health/hlogService";
 import { end } from "@popperjs/core";
@@ -42,7 +42,7 @@ const getData = async (params) => {
   const res = await getEexerciselogCalendar(params);
   const res2 = await getHealthlogCalendar(params);
 
-  if (res.status === 200 && res2.status) {
+  if (res.status === 200 && res2.status === 200) {
     const result = res.data;
     const result2 = res2.data;
     console.log("결과", result);
@@ -121,6 +121,10 @@ const exerciseLogSet = computed(() => new Set(exerciseStore.calendarDate));
 onMounted(async () => {
   const params = getParamsFromDate(selectedDate.value);
   getData(params);
+});
+onUnmounted(() => {
+  exerciseStore.clearCalendarDate();
+  healthStore.clearCalendarDate();
 });
 </script>
 
