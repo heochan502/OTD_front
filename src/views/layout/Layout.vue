@@ -22,7 +22,8 @@ import Footer from './Footer.vue';
 
 <style scoped>
 .headerlayout {
-  min-width: 90vw;
+  width: 100%;
+  margin: 0 auto;
   background-color: white;
   display: flex;
   flex-direction: column;
