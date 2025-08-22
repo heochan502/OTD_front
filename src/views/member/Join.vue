@@ -905,6 +905,8 @@ const submit = async () => {
             </div>
           </div>
 
+
+          <div class="form-row">
           <div class="form-group">
             <label for="birthDate">생년월일 *</label>
             <input
@@ -1006,6 +1008,7 @@ const submit = async () => {
   >
     {{ state.validation.gender.message }}
   </div>
+</div>
 </div>
 
           <div class="form-group">
@@ -1723,12 +1726,12 @@ const submit = async () => {
 }
 
 .checkbox-container input[type="checkbox"].success + .checkmark {
-  border-color: #4fc3f7;
+  border-color: #2a9df4;
 }
 
 .checkbox-container input[type="checkbox"]:checked.success + .checkmark {
-  background-color: #4fc3f7;
-  border-color: #4fc3f7;
+  background-color: #2a9df4;
+  border-color: #2a9df4;
 }
 
 .check-icon {
@@ -1752,5 +1755,19 @@ const submit = async () => {
 .checkbox-container input[type="checkbox"]:checked ~ .checkbox-text {
   color: #2a9df4;
   font-weight: 600;
+}
+.form-row {
+  display: flex;
+  gap: 30px; 
+  align-items: center;
+}
+
+.form-row .form-group {
+  flex: 1; 
+}
+
+.gender-checkbox-container{
+  padding-left: 30px;
+  
 }
 </style>
