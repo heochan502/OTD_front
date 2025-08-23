@@ -72,6 +72,14 @@ const option = {
   // 차트 옵션 설정
   //마우스 올렸을때 나오는 정보값
   tooltip: {
+
+
+    dataZoom: [
+            {
+              show: false, // DataZoom 기능 비활성화
+                // 또는 show: false 로 설정 가능
+            }
+        ],
     trigger: 'axis',
     // 마우스 오버 했을때 나오는 정보
     formatter: function (params) {

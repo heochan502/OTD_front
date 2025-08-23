@@ -13,7 +13,7 @@ const params = {
 
 onMounted(async () => {
   await exerciseStore.fetchExercises();
-  await exerciseStore.fetchExerciselogs();
+  // await exerciseStore.fetchExerciselogs();/
   console.log("확인", exerciseStore.logs);
 });
 
