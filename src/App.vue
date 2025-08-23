@@ -34,20 +34,17 @@ const checkAccount = async () => {
 };
 
 onMounted(async () => {
+  const isLoggedIn = await checkAccount();
   isInitializing.value = false;
   if (!isLoggedIn) {
     router.replace('/login');
   }
-
 });
 
 watch(
   () => route.path,
-  async () => {
-    const isLoggedIn = checkAccount();
-    if (!isLoggedIn) {
-      router.replace('/login');
-    }
+  () => {
+    checkAccount();
   }
 );
 </script>
