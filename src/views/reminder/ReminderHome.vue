@@ -1,9 +1,11 @@
 <script setup>
-import { reactive, onMounted, watch } from 'vue';
+import { reactive, onMounted, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getByMonth } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 import Calendar from '@/components/reminder/Calendar.vue';
+import Form from '@/components/reminder/ReminderForm.vue';
+import Detail from '@/components/reminder/ReminderDetail.vue';
 
 const reminderStore = useReminderStore();
 
@@ -17,6 +19,12 @@ const formatDate = (date) => {
   return `${y}-${m}-${d}`;
 };
 
+const selectedDate = () => {
+  const y = new Date(reminderStore.state.selectedDate).getFullYear();
+  const m = new Date(reminderStore.state.selectedDate).getMonth() + 1;
+  const d = new Date(reminderStore.state.selectedDate).getDate();
+  return `${y}년 ${m}월 ${d}일`;
+};
 const today = new Date();
 
 const todayYear = today.getFullYear();
@@ -53,8 +61,8 @@ const getReminderList = async (date) => {
   reminderStore.setFullReminder(res.data);
 
   const fixedDateList = res.data
-    .filter((item) => item.date)
-    .map((item) => item.date);
+    .filter((item) => item.startDate)
+    .map((item) => item.startDate);
 
   const repeatDateList = getRepeatDate(res.data, date.year, date.month);
 
@@ -90,12 +98,13 @@ const setTodayReminder = (date) => {
   const todayDow = today.getDay();
   const todayReminder = reminderStore.state.fullReminder.filter((item) => {
     return (
-      item.date === formatDate(new Date()) ||
+      item.startDate === formatDate(new Date()) ||
       (item.repeat && item.repeatDow?.includes(todayDow))
     );
   });
-  if (date.month === todayMonth && date.year === todayYear)
+  if (date.month === todayMonth && date.year === todayYear) {
     state.todayReminder = todayReminder;
+  }
   // reminderStore.setDayReminder(todayReminder);
 };
 
@@ -104,7 +113,7 @@ const routerDate = (date) => {
   const formattedDate = formatDate(date);
   const dow = date.getDay();
   const dayReminder = reminderStore.state.fullReminder.filter((item) => {
-    const isFixed = item.date === formattedDate;
+    const isFixed = item.startDate === formattedDate;
 
     const isRepeat =
       item.repeat &&
@@ -115,17 +124,21 @@ const routerDate = (date) => {
   });
 
   state.todayReminder = dayReminder;
-
-  // if (dayReminder.length > 0) {
   reminderStore.setSelectedDate(date);
-  //   router.push('/reminder/list');
-  // } else {
-  //   router.push('/reminder/form');
-  // }
 };
 
-const toForm = (id) => {
-  router.push({ path: '/reminder/form', query: { id } });
+const toForm = (param) => {
+  if (typeof param === 'number') {
+    router.push({ path: '/reminder/detail', query: { id } });
+  } else if (typeof param === 'string') {
+    router.push({ path: '/reminder/form', query: { id } });
+  }
+};
+
+const modal = ref({ form: false, detail: false });
+const openModal = (type) => {
+  console.log('type', type);
+  modal.value[type] = true;
 };
 </script>
 
@@ -141,34 +154,34 @@ const toForm = (id) => {
     </div>
     <div class="right">
       <div class="add">
-        <router-link to="/reminder/form">일정 추가하기</router-link>
+        <button @click="openModal('form')" class="add-button">
+          일정 추가하기
+          <v-dialog v-model="modal.form" max-width="300px">
+            <Form></Form>
+          </v-dialog>
+        </button>
       </div>
+
       <div class="preview">
         <div class="block">
           <div class="link">
-            <!-- <router-link
-            :to="
-              state.todayReminder.length === 0
-                ? '/reminder/form'
-                : '/reminder/list'
-            "
-            @click="setTodayReminder"
-            class="link"
-          > -->
             <span class="list-title">리마인더</span>
-            <span class="list-date">
-              {{ new Date(reminderStore.state.selectedDate).getFullYear() }}년
-              {{ new Date(reminderStore.state.selectedDate).getMonth() + 1 }}월
-              {{ new Date(reminderStore.state.selectedDate).getDate() }}일</span
-            >
+            <span class="list-date"> {{ selectedDate() }}</span>
             <ul v-if="state.todayReminder.length > 0" class="list">
               <li
                 v-for="item in state.todayReminder"
                 :key="item.id"
                 class="list-card"
-                @click="toForm(item.id)"
+                @click="openModal('detail')"
               >
                 <span class="reminder-title">• {{ item.title }}</span>
+                <v-dialog v-model="modal.detail">
+                  <Detail
+                    :date="reminderStore.state.selectedDate"
+                    :id="item.id"
+                  >
+                  </Detail>
+                </v-dialog>
               </li>
             </ul>
             <div v-else class="empty-comment" @click="toForm()">
@@ -205,14 +218,35 @@ const toForm = (id) => {
       justify-content: center;
       border-radius: 25px;
       margin-right: 13px;
-      a {
+      .add-button {
         color: #fff;
         outline: none;
         font-weight: bold;
         font-size: 17px;
       }
-      a:hover {
+      .add-button:hover {
         background-color: #3bbeff;
+      }
+    }
+    .modal-wrap {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+
+      .modal-container {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 550px;
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-sizing: border-box;
+        z-index: 99999999;
       }
     }
     .preview {

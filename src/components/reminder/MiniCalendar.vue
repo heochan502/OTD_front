@@ -11,7 +11,7 @@ const props = defineProps({
   },
   usePage: { type: String, default: 'home' },
 });
-const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
+const emit = defineEmits(['selected-date', 'reminder-date']);
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 
@@ -23,11 +23,8 @@ const pickDate = (day) => {
       day
     )}`
   );
-  if (props.usePage === 'form') {
-    emit('selected-date', selectedDate);
-  } else if (props.usePage === 'home') {
-    emit('click-date', selectedDate);
-  }
+    emit('selected-fix-date', selectedDate);
+    emit('selected-repeat-date', selectedDate);
 };
 
 const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'];

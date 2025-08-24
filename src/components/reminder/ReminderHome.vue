@@ -29,7 +29,7 @@ onMounted(async () => {
   const dow = today.getDay();
 
   state.todayReminder = reminderStore.state.fullReminder.filter((item) => {
-    const isFixed = item.date === formattedToday;
+    const isFixed = item.startDate === formattedToday;
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
