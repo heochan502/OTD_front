@@ -26,6 +26,7 @@ const makeTotalCalorie = async ()=>{
   const res = await getProfile();
   // 피니아에 health 관련 정보 가져옴
   console.log( "헬스데이타 로그 : ", healthData.logs);
+  console.log( "회워정보 로그 : ", res.data);
 
 //   const totalPrice = items.reduce((sum, item) => {
 //   return sum + item.price; // 각 item의 price 값을 sum에 더함
@@ -56,11 +57,11 @@ const makeTotalCalorie = async ()=>{
       weight: weightSum/healthData.logs.length,
       height: heightSum/healthData.logs.length,
       age : resultAge(),
-      gender : 1, // 1은 남자 2 는 여자
+      gender : res.data.gender, // 1은 남자 2 는 여자
     }    
 
     let result=0;
-    if (avgHelth.gender === 1 )
+    if (avgHelth.gender === "M" )
     {
     // 권장 칼로리 계산 법 남자: 66.47 + (13.75 × 체중) + (5 × 키) - (6.76 × 나이)
        result = 66.47+(13.75 * avgHelth.weight) + (5 * avgHelth.height) - (6.76 * avgHelth.age);
