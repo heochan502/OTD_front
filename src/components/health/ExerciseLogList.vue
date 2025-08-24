@@ -45,7 +45,6 @@ const getData = async () => {
     page: data.page++,
     row_per_page: data.rowPerPage,
   };
-  console.log(params);
   const res = await getElogList(params);
 
   if (res.status === 200) {

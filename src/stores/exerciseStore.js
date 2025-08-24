@@ -1,15 +1,16 @@
 import { defineStore } from "pinia";
 import { getExercise, getElogs } from "@/services/health/elogService";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 
 export const useExerciseStore = defineStore("exercise", {
-  state: () => ({
-    exerciseList: [],
-    loaded: false,
-    logs: [],
-    calendarDate: [],
-    logList: [],
-  }),
+  state: () =>
+    ref({
+      exerciseList: [],
+      loaded: false,
+      logs: [],
+      calendarDate: [],
+      logList: [],
+    }),
 
   actions: {
     async fetchExercises() {
@@ -20,7 +21,6 @@ export const useExerciseStore = defineStore("exercise", {
     },
     async fetchExerciselogs() {
       const res = await getElogs();
-
       this.logs = res.data;
     },
     addCalendarDate(list) {
@@ -37,5 +37,5 @@ export const useExerciseStore = defineStore("exercise", {
     },
   },
 
-  persist: true,
+  // persist: true,
 });

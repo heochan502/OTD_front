@@ -16,8 +16,8 @@ const state = reactive({
   hlog: [],
 });
 
+const healthlogId = route.params.healthlogId;
 onMounted(async () => {
-  const healthlogId = route.params.healthlogId;
   if (!healthlogId) return;
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {

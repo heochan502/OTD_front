@@ -18,6 +18,19 @@ const state = reactive({
   isFinish: false,
 });
 
+// @scroll
+const handleScroll = (e) => {
+  const target = e.target; // .list-wrap
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
+
+  const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+  if (nearBottom) {
+    getData();
+  }
+};
+
 onMounted(() => {
   getData();
 });
@@ -34,6 +47,7 @@ const getData = async () => {
     row_per_page: data.rowPerPage,
   };
   const res = await getHlogList(params);
+
   if (res.status === 200) {
     const result = res.data;
     if (result && result.length > 0) {
@@ -44,19 +58,6 @@ const getData = async () => {
     }
   }
   state.isLoading = false;
-};
-
-// @scroll
-const handleScroll = (e) => {
-  const target = e.target; // .list-wrap
-  const scrollTop = target.scrollTop;
-  const scrollHeight = target.scrollHeight;
-  const clientHeight = target.clientHeight;
-
-  const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
-  if (nearBottom) {
-    getData();
-  }
 };
 
 // @click
