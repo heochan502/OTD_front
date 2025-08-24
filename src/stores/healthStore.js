@@ -1,14 +1,10 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 import { getHlogs } from "@/services/health/hlogService";
-
-//day js 사용하기위한거
-import dayjs from "dayjs";
-
+import dayjs from "dayjs"; // dayjs 사용
 import "dayjs/locale/ko";
 
-dayjs.locale("ko");
-// 한글로 월화수 이렇게 나오게 하는거
+dayjs.locale("ko"); // 한글로 월화수 이렇게 나오게 하는거
 
 export const useHealthStore = defineStore("health", {
   // res: () => reactive({
@@ -18,6 +14,7 @@ export const useHealthStore = defineStore("health", {
     ref({
       logs: [],
       calendarDate: [],
+      logList: [],
     }),
   actions: {
     async fetchHealthlogs() {
@@ -48,6 +45,12 @@ export const useHealthStore = defineStore("health", {
     },
     clearCalendarDate() {
       this.calendarDate = [];
+    },
+    addLogList(list) {
+      this.logList.push(...list);
+    },
+    clearLogList() {
+      this.logList = [];
     },
   },
   persist: true,

@@ -13,6 +13,11 @@ export const getHlogs = (weekly) => {
   return axios.get(path, { params: weekly }).catch((e) => e.response);
 };
 
+// 건강기록 리스트 페이징
+export const getHlogList = (params) => {
+  return axios.get(`${path}/list`, { params }).catch((e) => e.response);
+};
+
 // 건강기록 상세 조회
 export const getHlog = (healthlogId) => {
   return axios.get(`${path}/${healthlogId}`).catch((e) => e.response);

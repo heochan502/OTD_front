@@ -4,14 +4,13 @@ import { useRouter } from "vue-router";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { formatDate } from "@/utils/reportUtils";
 import { getElogList } from "@/services/health/elogService";
-import { bindEvent } from "@/utils/commonUtils";
 
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
 const data = {
   page: 1,
-  rowPerPage: 7,
+  rowPerPage: 4,
 };
 const state = reactive({
   isLoading: false,
