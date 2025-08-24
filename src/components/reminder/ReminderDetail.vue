@@ -1,22 +1,19 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
-import { useRoute } from 'vue-router';
+import { deleteById } from '@/services/reminder/reminderService';
+import Form from '@/components/reminder/ReminderForm.vue';
 
-const route = useRoute();
 const reminderStore = useReminderStore();
+const emit = defineEmits('datail-close');
+
+const props = defineProps({
+  id: { type: Number },
+});
 
 const state = reactive({
   reminderDetail: [],
 });
-
-const reminderId = Number(route.query.id);
-
-const reminderDetail = reminderStore.state.fullReminder.find(
-  (item) => item.id === reminderId
-);
-state.reminderDetail = reminderDetail;
-console.log('detail', state.reminderDetail);
 
 const dowImage = ref([
   { name: '일', key: 'sun', isOn: false },
@@ -29,24 +26,60 @@ const dowImage = ref([
 ]);
 
 onMounted(() => {
+  const reminderDetail = reminderStore.state.fullReminder.find(
+    (item) => item.id === props.id
+  );
+  state.reminderDetail = reminderDetail;
+  console.log('detail', state.reminderDetail);
   if (state.reminderDetail.repeat) {
     dowImage.value.forEach((item, index) => {
       item.isOn = state.reminderDetail.repeatDow.includes(index);
-      console.log('isOn', dowImage.value);
     });
+    console.log('isOn', dowImage.value);
   }
 });
+
+
+const modal = ref({ form: false, delete: false });
+
+const openModal = (type) => {
+  console.log('type', type);
+  modal.value[type] = true;
+};
+
+const close = (type) => {
+  modal.value[type] = false;
+  if(type === 'modify' || type === 'detail'){
+    emit('detail-close');
+  }
+};
+
+const deleteScope = ref('one');
+
+const remove = async (id) => {
+  if (state.reminderDetail.repeat) {
+  }
+  if (!confirm('이 일정을 삭제할까요?')) {
+    return;
+  }
+  const res = await deleteById(id);
+  if (res === undefined || res.status !== 200) {
+    alert('오류발생');
+    return;
+  }
+  alert('일정을 삭제했어요!');
+};
 </script>
 
 <template>
   <div class="detail">
     <h2 class="detail-title">리마인더 자세히 보기</h2>
     <div class="detail-card">
-      <span>
-        <router-link to="/reminder">
-          <img src="/image/cancel.png" alt="취소" class="cancel" />
-        </router-link>
-      </span>
+      <div class="cancel">
+        <span class="cancel-button" @click="close('detail')">
+          <img src="/image/cancel.png" alt="취소" class="cancel-img" />
+        </span>
+      </div>
       <div>
         <span class="date-box">날짜</span>
         <span class="date">
@@ -55,7 +88,13 @@ onMounted(() => {
           {{ new Date(reminderStore.state.selectedDate).getDate() }}일</span
         >
       </div>
-      <span class="alarm-box">
+      <span
+        class="alarm-box"
+        :class="{
+          on: state.reminderDetail.alarm,
+          off: !state.reminderDetail.alarm,
+        }"
+      >
         <img
           :src="
             state.reminderDetail.alarm
@@ -66,17 +105,19 @@ onMounted(() => {
           class="alarm-img"
         />알람 설정</span
       >
-      <span :class="{ disabled: isDateMode }">
+      <span>
         <span
-          :class="{ on: isRepeatMode }"
+          :class="{ on: state.reminderDetail.repeat }"
           class="off toggle-box"
-          >요일 반복 |
-          {{
-            state.reminderDetail.endDate
-              ? state.reminderDetail.endDate
-              : '종료일 없음'
-          }}</span
-        >
+          >{{ !state.reminderDetail.repeat ? '반복 없음' : '요일 반복' }}
+          <span v-if="state.reminderDetail.repeat">
+            {{
+              state.reminderDetail.endDate
+                ? ` | 종료일 : ${state.reminderDetail.endDate}`
+                : ' | 종료일 없음'
+            }}</span
+          >
+        </span>
         <div class="calendar-popup">
           <mini-calendar
             v-if="showRepeatCalendar"
@@ -97,10 +138,50 @@ onMounted(() => {
         </div>
       </span>
       <div>
-        {{ state.reminderDetail.title }}
+        <div>제목</div>
+        <div>{{ state.reminderDetail.title }}</div>
+      </div>
+      <div v-if="state.reminderDetail.content">
+        <div>내용</div>
+        <div>{{ state.reminderDetail.content }}</div>
       </div>
       <div>
-        {{ state.reminderDetail.content }}
+        <button @click="openModal('form')">
+          수정하기
+          <v-dialog v-model="modal.form" max-width="300px">
+            <Form
+              @form-close="close"
+              :id="state.reminderDetail.id"
+            ></Form>
+          </v-dialog></button
+        ><button
+          @click="
+            state.reminderDetail.repeat
+              ? openModal('dalete')
+              : remove(state.reminderDetail.id)
+          "
+        >
+          삭제하기
+          <v-dialog v-model="modal.delete" max-width="360">
+            <v-card>
+              <v-card-title>반복 일정 삭제</v-card-title>
+              <v-card-text>
+                <v-radio-group v-model="deleteScope" density="compact">
+                  <v-radio label="이 일정" value="one" />
+                  <v-radio label="이 일정 및 향후 일정" value="future" />
+                  <v-radio label="모든 일정" value="all" />
+                </v-radio-group>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer />
+                <v-btn variant="text" @click="modal.delete = false">취소</v-btn>
+                <v-btn color="primary" @click="remove(state.reminderDetail.id)"
+                  >확인</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </button>
       </div>
     </div>
   </div>
@@ -110,13 +191,13 @@ onMounted(() => {
 .detail {
   width: 400px;
   margin: 80px auto;
-  background-color: #fff;
+  background-color: transparent;
 
   .detail-title {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
-    color: #5d5d5d;
+    color: #000;
     margin-bottom: 25px;
   }
 
@@ -124,23 +205,28 @@ onMounted(() => {
     cursor: pointer;
     position: relative;
     border-radius: 10px;
+    background-color: #fff;
     padding: 20px 30px 30px 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     height: 500px;
 
-    a {
-      &:hover {
-        background-color: #fff;
-      }
-    }
     .cancel {
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
+      display: flex;
+
+      .cancel-button {
+        display: inline-flex;
+        margin-left: auto;
+
+        .cancel-img {
+          display: block;
+          width: 24px;
+          height: 24px;
+          top: 10px;
+          right: 10px;
+          cursor: pointer;
+        }
+      }
     }
     .date-box {
       margin-right: 173px;

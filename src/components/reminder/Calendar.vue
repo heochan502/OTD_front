@@ -18,10 +18,7 @@ const formatNumber = (n) => String(n).padStart(2, '0');
 // 캘린더 날짜 선택시의 emit
 const pickDate = (day) => {
   if (!day) return;
-  const selectedDate = new Date(
-    `${currentYear.value}-${formatNumber(currentMonth.value)}-${formatNumber(
-      day
-    )}`
+  const selectedDate = new Date(currentYear.value, currentMonth.value -1, day
   );
   emit('click-date', selectedDate);
 };
@@ -264,11 +261,11 @@ const todayColor = (day) => {
         background-color: #bfeaff;
       }
     }
-    .today_color {
-      color: steelblue;
-    }
     .sunday_color {
       color: tomato;
+    }
+    .today_color {
+      color: steelblue;
     }
     td {
       height: 70px;

@@ -59,15 +59,20 @@ const getReminderList = async (date) => {
     return;
   }
   reminderStore.setFullReminder(res.data);
-
+  console.log('d', res.data);
   const fixedDateList = res.data
-    .filter((item) => item.startDate)
+    .filter((item) => {
+      if (!item.repeat) {
+        return item.startDate;
+      }
+    })
     .map((item) => item.startDate);
 
   const repeatDateList = getRepeatDate(res.data, date.year, date.month);
 
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
+  console.log('테', state.reminderDate);
   setTodayReminder(date);
 };
 
@@ -81,59 +86,63 @@ const getRepeatDate = (fullReminder, year, month) => {
     const dow = date.getDay();
     for (const item of fullReminder) {
       if (item.repeat && item.repeatDow?.includes(dow)) {
-        const created = new Date(item.created);
-        if (date >= created) {
+        if (item.startDate <= formatDate(date)) {
           result.push(formatDate(date));
           break;
         }
       }
     }
   }
-  // console.log('result', result);
   return result;
 };
 
-// 캘린더 날짜 클릭시 해당 날짜의 리마인더 정보 업데이트
+// mounted될 때 마다 리셋될 초기 리마인더(오늘 날짜) 정보 업데이트
 const setTodayReminder = (date) => {
   const todayDow = today.getDay();
   const todayReminder = reminderStore.state.fullReminder.filter((item) => {
     return (
-      item.startDate === formatDate(new Date()) ||
-      (item.repeat && item.repeatDow?.includes(todayDow))
+      (item.startDate === formatDate(new Date()) && item.repeat === false) ||
+      (item.repeat &&
+        item.repeatDow?.includes(todayDow) &&
+        new Date(item.startDate) <= new Date())
     );
   });
   if (date.month === todayMonth && date.year === todayYear) {
     state.todayReminder = todayReminder;
   }
-  // reminderStore.setDayReminder(todayReminder);
 };
 
-// 캘린더 날짜 선택시의 홈, 폼 router 분기문
+// 캘린더 날짜 선택시의 표출할 리마인더 날짜 정보 피니아 업데이트, 리마인더 내용 업데이트
 const routerDate = (date) => {
-  const formattedDate = formatDate(date);
+  console.log('date', date);
+  console.log('full', reminderStore.state.fullReminder);
   const dow = date.getDay();
+  console.log('dydlf', dow);
   const dayReminder = reminderStore.state.fullReminder.filter((item) => {
-    const isFixed = item.startDate === formattedDate;
+    const isFixed =
+      item.repeat === false && item.startDate === formatDate(date);
 
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
-      new Date(formattedDate) >= new Date(item.created);
+      item.startDate <= formatDate(date);
 
     return isFixed || isRepeat;
   });
+  console.log('dayReminder', dayReminder);
 
   state.todayReminder = dayReminder;
-  reminderStore.setSelectedDate(date);
+  reminderStore.setSelectedDate(formatDate(date));
+  // console.log('today', reminderStore.state.selectedDate);
 };
 
-const toForm = (param) => {
-  if (typeof param === 'number') {
-    router.push({ path: '/reminder/detail', query: { id } });
-  } else if (typeof param === 'string') {
-    router.push({ path: '/reminder/form', query: { id } });
-  }
-};
+// const toForm = (param) => {
+//   if (typeof param === 'number') {
+//     router.push({ path: '/reminder/detail', query: { id } });
+//   } else if (typeof param === 'string') {
+//     router.push({ path: '/reminder/form', query: { id } });
+//   }
+// };
 
 const modal = ref({ form: false, detail: false });
 const openModal = (type) => {
@@ -157,38 +166,39 @@ const openModal = (type) => {
         <button @click="openModal('form')" class="add-button">
           일정 추가하기
           <v-dialog v-model="modal.form" max-width="300px">
-            <Form></Form>
+            <Form @form-close="modal.form = false"></Form>
           </v-dialog>
         </button>
       </div>
 
       <div class="preview">
         <div class="block">
-          <div class="link">
-            <span class="list-title">리마인더</span>
-            <span class="list-date"> {{ selectedDate() }}</span>
-            <ul v-if="state.todayReminder.length > 0" class="list">
-              <li
-                v-for="item in state.todayReminder"
-                :key="item.id"
-                class="list-card"
-                @click="openModal('detail')"
-              >
-                <span class="reminder-title">• {{ item.title }}</span>
-                <v-dialog v-model="modal.detail">
-                  <Detail
-                    :date="reminderStore.state.selectedDate"
-                    :id="item.id"
-                  >
-                  </Detail>
-                </v-dialog>
-              </li>
-            </ul>
-            <div v-else class="empty-comment" @click="toForm()">
-              "등록된 일정이 없어요!"
-            </div>
+          <span class="list-title">리마인더</span>
+          <span class="list-date"> {{ selectedDate() }}</span>
+          <ul v-if="state.todayReminder.length > 0" class="list">
+            <li
+              v-for="item in state.todayReminder"
+              :key="item.id"
+              class="list-card"
+              @click="openModal('detail')"
+            >
+              <span class="reminder-title">• {{ item.title }}</span>
+              <v-dialog v-model="modal.detail" max-width="300px">
+                <Detail
+                  :date="reminderStore.state.selectedDate"
+                  :id="item.id"
+                  @detail-close="modal.detail = false"
+                >
+                </Detail>
+              </v-dialog>
+            </li>
+          </ul>
+          <div v-else class="empty-block" @click="openModal('form')">
+            <span class="empty-comment"> "등록된 일정이 없어요!"</span>
+            <v-dialog v-model="modal.form" max-width="300px">
+              <Form @form-close="modal.form = false"></Form>
+            </v-dialog>
           </div>
-          <!-- </router-link> -->
         </div>
       </div>
     </div>
@@ -302,18 +312,23 @@ const openModal = (type) => {
             }
           }
         }
-      }
+        .empty-block {
+          position: relative;
+          width: 100%;
+          height: 80%;
 
-      .empty-comment {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: inline-block;
-        color: #575757;
-        font-weight: bold;
-        font-size: 20px;
-        white-space: nowrap;
+          .empty-comment {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: inline-block;
+            color: #575757;
+            font-weight: bold;
+            font-size: 20px;
+            white-space: nowrap;
+          }
+        }
       }
     }
   }
