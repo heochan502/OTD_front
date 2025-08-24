@@ -31,10 +31,9 @@ const formatTime = (dateStr) => {
 };
 
 onMounted(async () => {
-  exerciseStore.fetchExercises();
-  console.log(exerciseStore.$state);
-  state.elog.exerciselogId = route.params.exerciselogId;
-  const res = await getElog(state.elog.exerciselogId);
+  const exerciseLogId = route.params.exerciselogId;
+  if (!exerciseLogId) return;
+  const res = await getElog(exerciseLogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;

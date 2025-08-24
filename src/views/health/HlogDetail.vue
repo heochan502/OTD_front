@@ -13,24 +13,12 @@ const healthStore = useHealthStore();
 const route = useRoute();
 
 const state = reactive({
-  // hlog: {
-  //   healthlogId: null,
-  //   weight: null,
-  //   height: null,
-  //   systolicBp: null,
-  //   diastolicBp: null,
-  //   sugarLevel: null,
-  //   moodLevel: null,
-  //   sleepQuality: null,
-  //   healthlogDatetime: "",
-  // },
   hlog: [],
 });
 
-const healthlogId = route.params.healthlogId;
-
 onMounted(async () => {
-  await healthStore.fetchHealthlogs();
+  const healthlogId = route.params.healthlogId;
+  if (!healthlogId) return;
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
