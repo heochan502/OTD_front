@@ -53,8 +53,6 @@ script.async = true; script.defer = true; document.head.appendChild(script); scr
 </template>
 
 <style scoped>
-#map{
-  
-}
+
 
 </style>

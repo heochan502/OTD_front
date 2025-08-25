@@ -59,18 +59,24 @@ const search = async () => {
 <script setup>
 import axios from "axios";
 import { ref } from "vue";
+axios.defaults.baseURL = '/api/OTD/';
 
 const results = ref([]);
 
 const searchLocal = async (keyword) => {
-  try {
-    const res = await axios.get(`/api/search/local`, {
-      params: { query: keyword }
+ 
+    const res = await axios.get(`search/local`, {
+      params: { inputSearchText: keyword }
     });
+    if(res.data && res.data.items){
     results.value = res.data.items;
-  } catch (err) {
-    console.error(err);
   }
+  else
+  {
+    console.error("No results found");
+  }
+  console.log(results.value);
+ 
 };
 </script>
 
@@ -78,6 +84,7 @@ const searchLocal = async (keyword) => {
   <div>
     <input type="text" @keyup.enter="searchLocal($event.target.value)" placeholder="검색어 입력" />
     <ul>
+    <span>여기부터</span>
       <li v-for="item in results" :key="item.title">{{ item.title }}</li>
     </ul>
   </div>
