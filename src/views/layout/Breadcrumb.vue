@@ -81,6 +81,13 @@ const logoutAccount = async () => {
           :class="{ active: route.path.startsWith('/community') }"
           >커뮤니티</router-link
         >
+        <router-link
+          to="/navermaps"
+          href="#"
+          class="nav-menu"
+          :class="{ active: route.path.startsWith('/navermaps') }"
+          >지도</router-link
+        >
       </nav>
 
       <!-- 오른쪽 로그인 -->
