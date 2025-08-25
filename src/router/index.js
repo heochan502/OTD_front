@@ -75,11 +75,13 @@ const router = createRouter({
       path: '/meal/add',
       name: 'MealAdd',
       component: MealAdd,
+      meta: { requiresAuth: true },
     },
     {
       path: '/meal/MealStatistic',
       name: 'MealStatistic',
       component: MealStatistic,
+      meta: { requiresAuth: true },
     },
     {
       path: '/health',
@@ -177,9 +179,9 @@ const router = createRouter({
   ],
 });
 router.beforeEach((to) => {
-  const accountStore = useAccountStore();
+  const accountStore = useAccountStore();  
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-    return '/login';
+    return "/login";
   }
   // 커뮤니티 진입 시 항상 리스트 모드로 강제
   if (to.path === '/community') {

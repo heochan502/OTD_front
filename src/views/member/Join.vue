@@ -258,15 +258,15 @@ const validateGender = (gender) => {
   return { isValid: true, message: '' };
 };
 const handleGenderChange = (selectedGender) => {
-if (selectedGender === 'M') {
-  state.genderCheckbox.male = true;      
-  state.genderCheckbox.female = false;    
-  state.form.gender = 'M';                
-} else if (selectedGender === 'F') {
-  state.genderCheckbox.female = true;
-  state.genderCheckbox.male = false;
-  state.form.gender = 'F';
-}
+  if (selectedGender === 'M') {
+    state.genderCheckbox.male = true;
+    state.genderCheckbox.female = false;
+    state.form.gender = 'M';
+  } else if (selectedGender === 'F') {
+    state.genderCheckbox.female = true;
+    state.genderCheckbox.male = false;
+    state.form.gender = 'F';
+  }
   state.validation.gender.touched = true;
   validateField('gender', state.form.gender);
 };
@@ -689,87 +689,60 @@ const submit = async () => {
           <div class="form-group">
             <label for="memberId">아이디 *</label>
             <div class="input-wrapper">
-              <input
-                type="text"
-                id="memberId"
-                placeholder="아이디를 입력해 주세요 (4자 이상)"
-                v-model="state.form.memberId"
-                :class="{
-                  error:
-                    state.validation.memberId.touched &&
-                    !state.validation.memberId.isValid,
-                  success:
-                    state.validation.memberId.touched &&
-                    state.validation.memberId.isValid &&
-                    state.validation.memberId.available,
-                }"
-                @blur="handleFieldTouch('memberId')"
-                @input="
+              <input type="text" id="memberId" placeholder="아이디를 입력해 주세요 (4자 이상)" v-model="state.form.memberId" :class="{
+                error:
                   state.validation.memberId.touched &&
-                    validateField('memberId', state.form.memberId)
-                "
-              />
-              <button
-                type="button"
-                class="btn-small"
-                @click="checkDuplicateId"
-                :disabled="state.loading"
-              >
+                  !state.validation.memberId.isValid,
+                success:
+                  state.validation.memberId.touched &&
+                  state.validation.memberId.isValid &&
+                  state.validation.memberId.available,
+              }" @blur="handleFieldTouch('memberId')" @input="
+                  state.validation.memberId.touched &&
+                  validateField('memberId', state.form.memberId)
+                  " />
+              <button type="button" class="btn-small" @click="checkDuplicateId" :disabled="state.loading">
                 <span v-if="state.loading">확인중...</span>
                 <span v-else>중복확인</span>
               </button>
             </div>
-            <div
-              v-if="
-                state.validation.memberId.touched &&
-                state.validation.memberId.message
-              "
-              :class="[
+            <div v-if="
+              state.validation.memberId.touched &&
+              state.validation.memberId.message
+            " :class="[
                 'field-message',
                 state.validation.memberId.isValid &&
-                state.validation.memberId.available
+                  state.validation.memberId.available
                   ? 'field-success'
                   : 'field-error',
-              ]"
-            >
+              ]">
               {{ state.validation.memberId.message }}
             </div>
           </div>
 
           <div class="form-group">
             <label for="memberPw">비밀번호 *</label>
-            <input
-              type="password"
-              id="memberPw"
-              placeholder="비밀번호를 입력해주세요(2자 이상)"
-              v-model="state.form.memberPw"
-              :class="{
-                error:
-                  state.validation.memberPw.touched &&
-                  !state.validation.memberPw.isValid,
-                success:
-                  state.validation.memberPw.touched &&
-                  state.validation.memberPw.isValid &&
-                  state.form.memberPw,
-              }"
-              @blur="handleFieldTouch('memberPw')"
-              @input="
+            <input type="password" id="memberPw" placeholder="비밀번호를 입력해주세요(2자 이상)" v-model="state.form.memberPw" :class="{
+              error:
                 state.validation.memberPw.touched &&
-                  validateField('memberPw', state.form.memberPw)
-              "
-            />
-            <div
-              v-if="
+                !state.validation.memberPw.isValid,
+              success:
                 state.validation.memberPw.touched &&
-                state.validation.memberPw.message
-              "
-              :class="[
+                state.validation.memberPw.isValid &&
+                state.form.memberPw,
+            }" @blur="handleFieldTouch('memberPw')" @input="
+                state.validation.memberPw.touched &&
+                validateField('memberPw', state.form.memberPw)
+                " />
+            <div v-if="
+              state.validation.memberPw.touched &&
+              state.validation.memberPw.message
+            " :class="[
                 'field-message',
                 state.validation.memberPw.isValid
                   ? 'field-success'
                   : 'field-error',
-              ]"
-            >
+              ]">
               {{ state.validation.memberPw.message }}
             </div>
           </div>
@@ -777,36 +750,26 @@ const submit = async () => {
           <div class="form-group">
             <label for="memberPw2">비밀번호 확인 *</label>
             <div class="password-confirm-wrapper">
-              <input
-                type="password"
-                id="memberPw2"
-                placeholder="비밀번호를 한번더 확인해주세요"
-                v-model="state.form.memberPw2"
+              <input type="password" id="memberPw2" placeholder="비밀번호를 한번더 확인해주세요" v-model="state.form.memberPw2"
                 :class="{
                   error: state.form.memberPw2 && !passwordMatchStatus.isMatch,
                   success:
                     passwordMatchStatus.show && passwordMatchStatus.isMatch,
-                }"
-                @blur="handleFieldTouch('memberPw2')"
-                @input="
+                }" @blur="handleFieldTouch('memberPw2')" @input="
                   () => {
                     if (state.form.memberPw2) {
                       state.validation.memberPw2.touched = true;
                       validateField('memberPw2', state.form.memberPw2);
                     }
                   }
-                "
-              />
+                " />
             </div>
 
-            <div
-              v-if="passwordMatchStatus.show"
-              :class="[
-                'field-message',
-                'password-match-message',
-                passwordMatchStatus.isMatch ? 'field-success' : 'field-error',
-              ]"
-            >
+            <div v-if="passwordMatchStatus.show" :class="[
+              'field-message',
+              'password-match-message',
+              passwordMatchStatus.isMatch ? 'field-success' : 'field-error',
+            ]">
               {{ passwordMatchStatus.message }}
             </div>
           </div>
@@ -814,211 +777,155 @@ const submit = async () => {
           <div class="form-group">
             <label for="email">이메일 *</label>
             <div class="input-wrapper">
-              <input
-                type="email"
-                id="email"
-                placeholder="이메일을 입력해 주세요"
-                v-model="state.form.email"
-                :class="{
-                  error:
-                    state.validation.email.touched &&
-                    !state.validation.email.isValid,
-                  success:
-                    state.validation.email.touched &&
-                    state.validation.email.isValid &&
-                    state.validation.email.available,
-                }"
-                @blur="handleFieldTouch('email')"
-                @input="
+              <input type="email" id="email" placeholder="이메일을 입력해 주세요" v-model="state.form.email" :class="{
+                error:
                   state.validation.email.touched &&
-                    validateField('email', state.form.email)
-                "
-              />
-              <button
-                type="button"
-                class="btn-small"
-                @click="checkDuplicateEmail"
-                :disabled="state.loading"
-              >
+                  !state.validation.email.isValid,
+                success:
+                  state.validation.email.touched &&
+                  state.validation.email.isValid &&
+                  state.validation.email.available,
+              }" @blur="handleFieldTouch('email')" @input="
+                  state.validation.email.touched &&
+                  validateField('email', state.form.email)
+                  " />
+              <button type="button" class="btn-small" @click="checkDuplicateEmail" :disabled="state.loading">
                 <span v-if="state.loading">확인중...</span>
                 <span v-else>중복확인</span>
               </button>
             </div>
-            <div
-              v-if="
-                state.validation.email.touched && state.validation.email.message
-              "
-              :class="[
+            <div v-if="
+              state.validation.email.touched && state.validation.email.message
+            " :class="[
                 'field-message',
                 state.validation.email.isValid &&
-                state.validation.email.available
+                  state.validation.email.available
                   ? 'field-success'
                   : 'field-error',
-              ]"
-            >
+              ]">
               {{ state.validation.email.message }}
             </div>
           </div>
 
           <div class="form-group">
             <label for="name">이름 *</label>
-            <input
-              type="text"
-              id="name"
-              placeholder="이름을 입력해 주세요(한글, 영문 2자 이상)"
-              v-model="state.form.name"
-              :class="{
-                error:
-                  state.validation.name.touched &&
-                  !state.validation.name.isValid,
-                success:
-                  state.validation.name.touched &&
-                  state.validation.name.isValid &&
-                  state.form.name,
-              }"
-              @blur="handleFieldTouch('name')"
-              @input="
+            <input type="text" id="name" placeholder="이름을 입력해 주세요(한글, 영문 2자 이상)" v-model="state.form.name" :class="{
+              error:
                 state.validation.name.touched &&
-                  validateField('name', state.form.name)
-              "
-            />
-            <div
-              v-if="
-                state.validation.name.touched && state.validation.name.message
-              "
-              :class="[
-                'field-message',
-                state.validation.name.isValid ? 'field-success' : 'field-error',
-              ]"
-            >
-              {{ state.validation.name.message }}
-            </div>
-            <div
-              v-else-if="
+                !state.validation.name.isValid,
+              success:
                 state.validation.name.touched &&
                 state.validation.name.isValid &&
-                state.form.name
-              "
-              class="field-success"
-            >
+                state.form.name,
+            }" @blur="handleFieldTouch('name')" @input="
+                state.validation.name.touched &&
+                validateField('name', state.form.name)
+                " />
+            <div v-if="
+              state.validation.name.touched && state.validation.name.message
+            " :class="[
+                'field-message',
+                state.validation.name.isValid ? 'field-success' : 'field-error',
+              ]">
+              {{ state.validation.name.message }}
+            </div>
+            <div v-else-if="
+              state.validation.name.touched &&
+              state.validation.name.isValid &&
+              state.form.name
+            " class="field-success">
               올바른 이름입니다.
             </div>
           </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="birthDate">생년월일 *</label>
-            <input
-              type="text"
-              id="birthDate"
-              placeholder="YYYYMMDD"
-              maxlength="8"
-              v-model="state.form.birthDate"
-              :class="{
-                error:
-                  state.validation.birthDate.touched &&
-                  !state.validation.birthDate.isValid,
-                success:
-                  state.validation.birthDate.touched &&
-                  state.validation.birthDate.isValid &&
-                  state.form.birthDate,
-              }"
-              @blur="handleFieldTouch('birthDate')"
-              @input="
+          <div class="form-row">
+            <div class="form-group">
+              <label for="birthDate">생년월일 *</label>
+              <input type="text" id="birthDate" placeholder="YYYYMMDD" maxlength="8" v-model="state.form.birthDate"
+                :class="{
+                  error:
+                    state.validation.birthDate.touched &&
+                    !state.validation.birthDate.isValid,
+                  success:
+                    state.validation.birthDate.touched &&
+                    state.validation.birthDate.isValid &&
+                    state.form.birthDate,
+                }" @blur="handleFieldTouch('birthDate')" @input="
                 state.validation.birthDate.touched &&
-                  validateField('birthDate', state.form.birthDate)
-              "
-            />
-            <div
-              v-if="
+                validateField('birthDate', state.form.birthDate)
+                " />
+              <div v-if="
                 state.validation.birthDate.touched &&
                 state.validation.birthDate.message
-              "
-              :class="[
+              " :class="[
                 'field-message',
                 state.validation.birthDate.isValid
                   ? 'field-success'
                   : 'field-error',
-              ]"
-            >
-              {{ state.validation.birthDate.message }}
-            </div>
-            <div
-              v-else-if="
+              ]">
+                {{ state.validation.birthDate.message }}
+              </div>
+              <div v-else-if="
                 state.validation.birthDate.touched &&
                 state.validation.birthDate.isValid &&
                 state.form.birthDate
-              "
-              class="field-success"
-            >
-              올바른 날짜 형식입니다.
+              " class="field-success">
+                올바른 날짜 형식입니다.
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="gender">성별 *</label>
+              <div class="gender-checkbox-container">
+                <label class="checkbox-wrapper" @click.prevent="handleGenderChange('M')">
+                  <div class="checkbox-container">
+                    <input type="checkbox" :checked="state.genderCheckbox.male" :class="{
+                      error: state.validation.gender.touched && !state.validation.gender.isValid,
+                      success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
+                    }" readonly />
+                    <div class="checkmark">
+                      <svg v-if="state.genderCheckbox.male" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <span class="checkbox-text">남자</span>
+                </label>
+
+                <label class="checkbox-wrapper" @click.prevent="handleGenderChange('F')">
+                  <div class="checkbox-container">
+                    <input type="checkbox" :checked="state.genderCheckbox.female" :class="{
+                      error: state.validation.gender.touched && !state.validation.gender.isValid,
+                      success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
+                    }" readonly />
+                    <div class="checkmark">
+                      <svg v-if="state.genderCheckbox.female" class="check-icon" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <span class="checkbox-text">여자</span>
+                </label>
+              </div>
+
+              <div v-if="state.validation.gender.touched && state.validation.gender.message" :class="[
+                'field-message',
+                state.validation.gender.isValid ? 'field-success' : 'field-error',
+              ]">
+                {{ state.validation.gender.message }}
+              </div>
             </div>
           </div>
-          <div class="form-group">
-  <label for="gender">성별 *</label>
-  <div class="gender-checkbox-container">
-    <label class="checkbox-wrapper" @click.prevent="handleGenderChange('M')">
-      <div class="checkbox-container">
-        <input
-          type="checkbox"
-          :checked="state.genderCheckbox.male"
-          :class="{
-            error: state.validation.gender.touched && !state.validation.gender.isValid,
-            success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
-          }"
-          readonly
-        />
-        <div class="checkmark">
-          <svg v-if="state.genderCheckbox.male" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-          </svg>
-        </div>
-      </div>
-      <span class="checkbox-text">남자</span>
-    </label>
-    
-    <label class="checkbox-wrapper" @click.prevent="handleGenderChange('F')">
-      <div class="checkbox-container">
-        <input
-          type="checkbox"
-          :checked="state.genderCheckbox.female"
-          :class="{
-            error: state.validation.gender.touched && !state.validation.gender.isValid,
-            success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
-          }"
-          readonly
-        />
-        <div class="checkmark">
-          <svg v-if="state.genderCheckbox.female" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-          </svg>
-        </div>
-      </div>
-      <span class="checkbox-text">여자</span>
-    </label>
-  </div>
-  
-  <div
-    v-if="state.validation.gender.touched && state.validation.gender.message"
-    :class="[
-      'field-message',
-      state.validation.gender.isValid ? 'field-success' : 'field-error',
-    ]"
-  >
-    {{ state.validation.gender.message }}
-  </div>
-</div>
-</div>
 
           <div class="form-group">
             <label for="memberNick">닉네임 *</label>
             <div class="input-wrapper">
-              <input
-                type="text"
-                id="memberNick"
-                placeholder="닉네임을 입력해 주세요(한글, 영문, 숫자, _만 사용 가능)"
-                v-model="state.form.memberNick"
-                :class="{
+              <input type="text" id="memberNick" placeholder="닉네임을 입력해 주세요(한글, 영문, 숫자, _만 사용 가능)"
+                v-model="state.form.memberNick" :class="{
                   error:
                     state.validation.memberNick.touched &&
                     !state.validation.memberNick.isValid,
@@ -1026,36 +933,25 @@ const submit = async () => {
                     state.validation.memberNick.touched &&
                     state.validation.memberNick.isValid &&
                     state.validation.memberNick.available,
-                }"
-                @blur="handleFieldTouch('memberNick')"
-                @input="
+                }" @blur="handleFieldTouch('memberNick')" @input="
                   state.validation.memberNick.touched &&
-                    validateField('memberNick', state.form.memberNick)
-                "
-              />
-              <button
-                type="button"
-                class="btn-small"
-                @click="checkDuplicateNickname"
-                :disabled="state.loading"
-              >
+                  validateField('memberNick', state.form.memberNick)
+                  " />
+              <button type="button" class="btn-small" @click="checkDuplicateNickname" :disabled="state.loading">
                 <span v-if="state.loading">확인중...</span>
                 <span v-else>중복확인</span>
               </button>
             </div>
-            <div
-              v-if="
-                state.validation.memberNick.touched &&
-                state.validation.memberNick.message
-              "
-              :class="[
+            <div v-if="
+              state.validation.memberNick.touched &&
+              state.validation.memberNick.message
+            " :class="[
                 'field-message',
                 state.validation.memberNick.isValid &&
-                state.validation.memberNick.available
+                  state.validation.memberNick.available
                   ? 'field-success'
                   : 'field-error',
-              ]"
-            >
+              ]">
               {{ state.validation.memberNick.message }}
             </div>
           </div>
@@ -1064,28 +960,12 @@ const submit = async () => {
         <div class="terms">
           <div class="terms-accordion">
             <div class="terms-item">
-              <div
-                class="terms-header"
-                :class="{ active: state.termsExpanded.terms1 }"
-                @click="toggleTerms('terms1')"
-              >
-                <input
-                  type="checkbox"
-                  v-model="state.terms.terms1"
-                  @change="updateAllCheck('terms1')"
-                  @click.stop
-                />
+              <div class="terms-header" :class="{ active: state.termsExpanded.terms1 }" @click="toggleTerms('terms1')">
+                <input type="checkbox" v-model="state.terms.terms1" @change="updateAllCheck('terms1')" @click.stop />
                 <span class="terms-title">[필수] 이용약관에 동의합니다.</span>
-                <span
-                  class="terms-arrow"
-                  :class="{ active: state.termsExpanded.terms1 }"
-                  >▼</span
-                >
+                <span class="terms-arrow" :class="{ active: state.termsExpanded.terms1 }">▼</span>
               </div>
-              <div
-                class="terms-content"
-                :class="{ active: state.termsExpanded.terms1 }"
-              >
+              <div class="terms-content" :class="{ active: state.termsExpanded.terms1 }">
                 <div class="terms-text">
                   <h4>제1조 (목적)</h4>
                   <p>
@@ -1120,30 +1000,12 @@ const submit = async () => {
               </div>
             </div>
             <div class="terms-item">
-              <div
-                class="terms-header"
-                :class="{ active: state.termsExpanded.terms2 }"
-                @click="toggleTerms('terms2')"
-              >
-                <input
-                  type="checkbox"
-                  v-model="state.terms.terms2"
-                  @change="updateAllCheck('terms2')"
-                  @click.stop
-                />
-                <span class="terms-title"
-                  >[필수] 개인정보 수집 이용에 동의합니다.</span
-                >
-                <span
-                  class="terms-arrow"
-                  :class="{ active: state.termsExpanded.terms2 }"
-                  >▼</span
-                >
+              <div class="terms-header" :class="{ active: state.termsExpanded.terms2 }" @click="toggleTerms('terms2')">
+                <input type="checkbox" v-model="state.terms.terms2" @change="updateAllCheck('terms2')" @click.stop />
+                <span class="terms-title">[필수] 개인정보 수집 이용에 동의합니다.</span>
+                <span class="terms-arrow" :class="{ active: state.termsExpanded.terms2 }">▼</span>
               </div>
-              <div
-                class="terms-content"
-                :class="{ active: state.termsExpanded.terms2 }"
-              >
+              <div class="terms-content" :class="{ active: state.termsExpanded.terms2 }">
                 <div class="terms-text">
                   <h4>1. 개인정보의 처리목적</h4>
                   <p>
@@ -1168,28 +1030,12 @@ const submit = async () => {
               </div>
             </div>
             <div class="terms-item">
-              <div
-                class="terms-header"
-                :class="{ active: state.termsExpanded.terms3 }"
-                @click="toggleTerms('terms3')"
-              >
-                <input
-                  type="checkbox"
-                  v-model="state.terms.terms3"
-                  @change="updateAllCheck('terms3')"
-                  @click.stop
-                />
+              <div class="terms-header" :class="{ active: state.termsExpanded.terms3 }" @click="toggleTerms('terms3')">
+                <input type="checkbox" v-model="state.terms.terms3" @change="updateAllCheck('terms3')" @click.stop />
                 <span class="terms-title">[필수] 서비스 이용 동의</span>
-                <span
-                  class="terms-arrow"
-                  :class="{ active: state.termsExpanded.terms3 }"
-                  >▼</span
-                >
+                <span class="terms-arrow" :class="{ active: state.termsExpanded.terms3 }">▼</span>
               </div>
-              <div
-                class="terms-content"
-                :class="{ active: state.termsExpanded.terms3 }"
-              >
+              <div class="terms-content" :class="{ active: state.termsExpanded.terms3 }">
                 <div class="terms-text">
                   <h4>서비스 이용 약관</h4>
                   <p>본 서비스를 이용함에 있어 다음 사항에 동의합니다.</p>
@@ -1216,28 +1062,12 @@ const submit = async () => {
               </div>
             </div>
             <div class="terms-item">
-              <div
-                class="terms-header"
-                :class="{ active: state.termsExpanded.terms4 }"
-                @click="toggleTerms('terms4')"
-              >
-                <input
-                  type="checkbox"
-                  v-model="state.terms.terms4"
-                  @change="updateAllCheck('terms4')"
-                  @click.stop
-                />
+              <div class="terms-header" :class="{ active: state.termsExpanded.terms4 }" @click="toggleTerms('terms4')">
+                <input type="checkbox" v-model="state.terms.terms4" @change="updateAllCheck('terms4')" @click.stop />
                 <span class="terms-title">[선택] 이벤트 및 알림 동의</span>
-                <span
-                  class="terms-arrow"
-                  :class="{ active: state.termsExpanded.terms4 }"
-                  >▼</span
-                >
+                <span class="terms-arrow" :class="{ active: state.termsExpanded.terms4 }">▼</span>
               </div>
-              <div
-                class="terms-content"
-                :class="{ active: state.termsExpanded.terms4 }"
-              >
+              <div class="terms-content" :class="{ active: state.termsExpanded.terms4 }">
                 <div class="terms-text">
                   <h4>이벤트 및 알림 수신 동의</h4>
                   <p>
@@ -1262,24 +1092,13 @@ const submit = async () => {
               </div>
             </div>
             <div class="agree-all-box">
-              <input
-                type="checkbox"
-                id="allTerms"
-                v-model="state.terms.all"
-                @change="allCheck"
-              />
-              <label for="allTerms" class="agree-all-label"
-                >약관 전체 동의</label
-              >
+              <input type="checkbox" id="allTerms" v-model="state.terms.all" @change="allCheck" />
+              <label for="allTerms" class="agree-all-label">약관 전체 동의</label>
             </div>
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="btn-submit"
-          :disabled="state.saving || !isFormValid()"
-        >
+        <button type="submit" class="btn-submit" :disabled="state.saving || !isFormValid()">
           <span v-if="state.saving">가입 처리중...</span>
           <span v-else>회원가입</span>
         </button>
@@ -1714,21 +1533,21 @@ const submit = async () => {
   border-color: #2a9df4;
 }
 
-.checkbox-container input[type="checkbox"]:checked + .checkmark {
+.checkbox-container input[type="checkbox"]:checked+.checkmark {
   background-color: #2a9df4;
   border-color: #2a9df4;
 }
 
-.checkbox-container input[type="checkbox"].error + .checkmark {
+.checkbox-container input[type="checkbox"].error+.checkmark {
   border-color: #dc2626;
   background-color: #fef2f2;
 }
 
-.checkbox-container input[type="checkbox"].success + .checkmark {
+.checkbox-container input[type="checkbox"].success+.checkmark {
   border-color: #2a9df4;
 }
 
-.checkbox-container input[type="checkbox"]:checked.success + .checkmark {
+.checkbox-container input[type="checkbox"]:checked.success+.checkmark {
   background-color: #2a9df4;
   border-color: #2a9df4;
 }
@@ -1751,21 +1570,22 @@ const submit = async () => {
   color: #2a9df4;
 }
 
-.checkbox-container input[type="checkbox"]:checked ~ .checkbox-text {
+.checkbox-container input[type="checkbox"]:checked~.checkbox-text {
   color: #2a9df4;
   font-weight: 600;
 }
+
 .form-row {
   display: flex;
-  gap: 30px; 
+  gap: 30px;
   align-items: center;
 }
 
 .form-row .form-group {
-  flex: 1; 
+  flex: 1;
 }
 
-.gender-checkbox-container{
+.gender-checkbox-container {
   padding-left: 30px;
 }
 </style>
