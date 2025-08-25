@@ -39,7 +39,6 @@ onMounted(() => {
   }
 });
 
-
 const modal = ref({ form: false, delete: false });
 
 const openModal = (type) => {
@@ -49,7 +48,7 @@ const openModal = (type) => {
 
 const close = (type) => {
   modal.value[type] = false;
-  if(type === 'modify' || type === 'detail'){
+  if (type === 'modify' || type === 'detail') {
     emit('detail-close');
   }
 };
@@ -73,8 +72,8 @@ const remove = async (id) => {
 
 <template>
   <div class="detail">
-    <h2 class="detail-title">리마인더 자세히 보기</h2>
     <div class="detail-card">
+      <h2 class="detail-title">리마인더 자세히 보기</h2>
       <div class="cancel">
         <span class="cancel-button" @click="close('detail')">
           <img src="/image/cancel.png" alt="취소" class="cancel-img" />
@@ -149,10 +148,7 @@ const remove = async (id) => {
         <button @click="openModal('form')">
           수정하기
           <v-dialog v-model="modal.form" max-width="300px">
-            <Form
-              @form-close="close"
-              :id="state.reminderDetail.id"
-            ></Form>
+            <Form @form-close="close" :id="state.reminderDetail.id"></Form>
           </v-dialog></button
         ><button
           @click="

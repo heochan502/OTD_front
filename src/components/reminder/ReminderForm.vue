@@ -199,10 +199,10 @@ const close = () => {
 
 <template>
   <div class="form">
-    <h2 class="form-title">
-      {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
-    </h2>
     <div class="form-card">
+      <h2 class="form-title">
+        {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
+      </h2>
       <div class="cancel">
         <span class="cancel-button" @click="close">
           <img src="/image/cancel.png" alt="취소" class="cancel-img" />
