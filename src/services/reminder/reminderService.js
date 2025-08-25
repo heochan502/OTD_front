@@ -8,6 +8,7 @@ export const save = (jsonBody) => {
 };
 
 export const modify = (jsonBody) => {
+  console.log('json', jsonBody);
   return axios.put('reminder', jsonBody).catch((e) => e.response);
 };
 
