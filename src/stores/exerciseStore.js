@@ -7,7 +7,7 @@ export const useExerciseStore = defineStore("exercise", {
     ref({
       exerciseList: [],
       loaded: false,
-      logs: [],
+      todayLog: [],
       calendarDate: [],
       logList: [],
     }),
@@ -34,6 +34,9 @@ export const useExerciseStore = defineStore("exercise", {
     },
     clearLogList() {
       this.logList = [];
+    },
+    addTodayLog(list) {
+      this.todayLog.push(...list);
     },
   },
 

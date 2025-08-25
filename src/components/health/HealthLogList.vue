@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useHealthStore } from "@/stores/healthStore";
 import { formatDate } from "@/utils/reportUtils";
 import { getHlogList } from "@/services/health/hlogService";
+import { getDateString } from "@/utils/reportUtils";
 
 const router = useRouter();
 const healthStore = useHealthStore();

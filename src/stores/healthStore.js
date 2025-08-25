@@ -15,6 +15,7 @@ export const useHealthStore = defineStore("health", {
       logs: [],
       calendarDate: [],
       logList: [],
+      todayLog: [],
     }),
   actions: {
     async fetchHealthlogs() {
