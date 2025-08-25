@@ -3,11 +3,13 @@ import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
 import { ref } from 'vue';
+import MobileFooter from '@/components/MobileFooter.vue';
 
 const router = useRouter();
 const route = useRoute();
 const counter = useAccountStore();
 const dialog = ref(false); // 모바일 모달 제어
+const toggle = ref(false);
 
 function goHome() {
   router.push({ name: 'home' });
@@ -37,14 +39,29 @@ const logoutAccount = async () => {
 
       <!-- 오른쪽 사용자 메뉴(모바일 화면용) -->
       <div class="d-flex flex-row d-md-none">
-        <div class="photo-wrapper">
+        <button class="photo-wrapper" @click="toggle = !toggle">
           <img
             class="profile"
             src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjNGNEY2Ii8+CjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIwIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0yMCA5NUMyMCA4MCA0MCA2NyA2MCA2N0M4MCA2NyAxMDAgODAgMTAwIDk1IiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPgo="
             alt="프로필사진"
           />
+        </button>
+
+        <!-- 토글된 멤버 메뉴 (모바일용) -->
+        <div v-if="toggle" class="mobile-member">
+          <template v-if="counter.state.loggedIn">
+            <a class="mobile-auth" @click="logoutAccount">로그아웃</a>
+            <router-link to="/profile" class="mobile-auth"
+              >회원정보</router-link
+            >
+          </template>
+          <template v-else>
+            <router-link to="/login" class="mobile-auth">로그인</router-link>
+            <router-link to="/signup" class="mobile-auth">회원가입</router-link>
+          </template>
         </div>
       </div>
+
       <!-- PC 전용 메뉴 -->
       <nav class="nav d-none d-md-flex">
         <router-link to="/" class="nav-menu" active-class="active"
@@ -99,42 +116,6 @@ const logoutAccount = async () => {
       </div>
     </div>
   </header>
-
-  <!-- 모바일 햄버거 모달 메뉴 -->
-  <v-dialog
-    v-model="dialog"
-    fullscreen
-    hide-overlay
-    transition="dialog-bottom-transition"
-  >
-    <v-card>
-      <v-toolbar dense flat color="primary" dark>
-        <v-toolbar-title>메뉴</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon @click="dialog = false"><v-icon>mdi-close</v-icon></v-btn>
-      </v-toolbar>
-
-      <v-list>
-        <v-list-item to="/reminder" @click="dialog = false"
-          ><v-list-item-title>리마인더</v-list-item-title></v-list-item
-        >
-        <v-list-item to="/meal" @click="dialog = false"
-          ><v-list-item-title>식단</v-list-item-title></v-list-item
-        >
-        <v-list-item to="/health" @click="dialog = false"
-          ><v-list-item-title>건강</v-list-item-title></v-list-item
-        >
-        <v-list-item to="/memoAndDiary" @click="dialog = false"
-          ><v-list-item-title>기록</v-list-item-title></v-list-item
-        >
-        <v-list-item to="/community" @click="dialog = false"
-          ><v-list-item-title>커뮤니티</v-list-item-title></v-list-item
-        >
-      </v-list>
-
-      <v-divider></v-divider>
-    </v-card>
-  </v-dialog>
 </template>
 
 <style lang="scss" scoped>
@@ -212,6 +193,30 @@ const logoutAccount = async () => {
   cursor: pointer;
   &:hover {
     background-color: white;
+    font-weight: bold;
+  }
+}
+.mobile-member {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.mobile-auth {
+  font-size: 16px;
+  color: black;
+  padding: 8px 12px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f5f5f5;
   }
 }
 .photo-wrapper {

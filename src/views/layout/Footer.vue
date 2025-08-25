@@ -1,7 +1,9 @@
-<script setup></script>
+<script setup>
+import MobileFooter from '@/components/MobileFooter.vue';
+</script>
 
 <template>
-  <div class="footer-container d-md-none d-lg-flex">
+  <div class="footer-container d-none d-md-flex">
     <div class="footer-wrapper">
       <div class="footer-content">
         <!-- Logo and Name -->
@@ -112,6 +114,9 @@
         <div class="copyright">© 2025 ONETODAY. All rights reserved.</div>
       </div>
     </div>
+  </div>
+  <div class="d-lg-none">
+    <MobileFooter />
   </div>
 </template>
 
