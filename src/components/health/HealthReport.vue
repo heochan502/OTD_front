@@ -12,7 +12,7 @@ const healthStore = useHealthStore();
 
 const todayStr = getDateString();
 const todayLog = computed(() =>
-  filterHealthLogsByDate(healthStore.logs, todayStr)
+  filterHealthLogsByDate(healthStore.logList, todayStr)
 );
 
 const state = computed(() => {
@@ -41,12 +41,12 @@ const minBmi = 15;
 const maxBmi = 40;
 
 const bmi = computed(() => {
-  if (!healthStore.logs.length) return 0;
-  const heightInMeters = (healthStore.logs[0]?.height || 0) / 100;
+  if (!healthStore.logList.length) return 0;
+  const heightInMeters = (healthStore.logList[0]?.height || 0) / 100;
 
-  if (!heightInMeters || !healthStore.logs[0]?.weight) return 0;
+  if (!heightInMeters || !healthStore.logList[0]?.weight) return 0;
   return parseFloat(
-    (healthStore.logs[0]?.weight / heightInMeters ** 2).toFixed(1)
+    (healthStore.logList[0]?.weight / heightInMeters ** 2).toFixed(1)
   );
 });
 
@@ -104,14 +104,22 @@ const bmiStatus = computed(() => {
       <div class="small_box">
         <span>weight</span>
         <span class="value">
-          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.weight }}
+          {{
+            healthStore.logList.length === 0
+              ? 0
+              : healthStore.logList[0]?.weight
+          }}
           kg
         </span>
       </div>
       <div class="small_box">
         <span>height</span>
         <span class="value">
-          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.height }}
+          {{
+            healthStore.logList.length === 0
+              ? 0
+              : healthStore.logList[0]?.height
+          }}
           cm
         </span>
       </div>

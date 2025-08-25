@@ -37,5 +37,5 @@ export const useExerciseStore = defineStore("exercise", {
     },
   },
 
-  // persist: true,
+  persist: true,
 });
