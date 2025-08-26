@@ -5,6 +5,7 @@ import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRoute, useRouter } from "vue-router";
 import HealthChart from "@/components/health/HealthChart.vue";
+import { formatDate } from "@/utils/reportUtils";
 
 const exerciseStore = useExerciseStore();
 const route = useRoute();
@@ -21,11 +22,6 @@ const state = reactive({
   },
 });
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
-
 const formatTime = (dateStr) => {
   const date = new Date(dateStr);
   // const hour = String(date.getHours().padStart(2, "0"));
@@ -35,9 +31,11 @@ const formatTime = (dateStr) => {
 };
 
 onMounted(async () => {
-  // exerciseStore.fetchExercises();
-  state.elog.exerciselogId = route.params.exerciselogId;
-  const res = await getElog(state.elog.exerciselogId);
+
+  const exerciseLogId = route.params.exerciselogId;
+  if (!exerciseLogId) {return;}
+  const res = await getElog(exerciseLogId);
+
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
@@ -81,7 +79,10 @@ const deleteLog = async () => {
       <v-col class="col_left">
         <div class="exercise">
           <span>
-            {{ exerciseStore.list[state.elog.exerciseId - 1]?.exerciseName }}
+            {{
+              exerciseStore.exerciseList[state.elog.exerciseId - 1]
+                ?.exerciseName
+            }}
           </span>
         </div>
       </v-col>

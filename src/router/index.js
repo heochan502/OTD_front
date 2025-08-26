@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { useAccountStore } from '@/stores/counter';
-import ReminderHome from '@/views/reminder/ReminderHome.vue';
-import ReminderForm from '@/components/reminder/ReminderForm.vue';
-import ReminderList from '@/views/reminder/ReminderList.vue';
-import ReminderDetail from '@/components/reminder/ReminderDetail.vue';
+import { createRouter, createWebHistory } from "vue-router";
+import { useAccountStore } from "@/stores/counter";
+import ReminderHome from "@/views/reminder/ReminderHome.vue";
+import ReminderForm from "@/views/reminder/ReminderForm.vue";
+import ReminderList from "@/views/reminder/ReminderList.vue";
+
 
 import MemoList from '@/components/memo/MemoList.vue';
 import DiaryList from '@/components/memo/DiaryList.vue';
@@ -14,9 +14,10 @@ import CommunityView from '@/views/community/CommunityView.vue';
 // 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
 import { usecommunityStore } from '@/stores/communityStore';
 
-import MealForm from '@/views/meal/MealForm.vue';
-import MealAdd from '@/views/meal/MealAdd.vue';
-import MealStatistic from '@/components/meal/MealStatistic.vue';
+
+import MealForm from "@/views/meal/MealForm.vue";
+import MealAdd from "@/views/meal/MealAdd.vue";
+import MealStatistic from "@/components/meal/MealStatistic.vue";
 
 import HealthMain from '@/views/health/HealthMain.vue';
 import ElogDetail from '@/views/health/ElogDetail.vue';
@@ -56,13 +57,8 @@ const router = createRouter({
       component: ReminderForm,
     },
     {
-      path: '/reminder/detail',
-      name: 'reminderdetail',
-      component: ReminderDetail,
-    },
-    {
-      path: '/reminder/list',
-      name: 'reminderlist',
+      path: "/reminder/list",
+      name: "reminderlist",
       component: ReminderList,
     },
     {
@@ -170,17 +166,12 @@ const router = createRouter({
       component: DiaryList,
       props: true,
     },
-    {
-      path: '/detail',
-      name: 'profile_detail',
-      component: ProfileDetail,
-      meta: { requiresAuth: true },
-    },
   ],
 });
 router.beforeEach((to) => {
   const accountStore = useAccountStore();  
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
+    
     return "/login";
   }
   // 커뮤니티 진입 시 항상 리스트 모드로 강제
