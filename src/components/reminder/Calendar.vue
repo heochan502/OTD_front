@@ -32,37 +32,9 @@ const today = new Date();
 const currentYear = ref(today.getFullYear());
 
 const currentMonth = ref(today.getMonth() + 1);
-// getMonth는 0부터 시작함
 
-// const startYear = 2003;
-// const startDowIdx = new Date(startYear, 0, 1).getDay();
-
-// 원하는 년, 월의 마지막 날짜 구하기(윤년처리까지)
-// const lastDayOfMonth = (year, month) => {
-//   if (month === 2) {
-//     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
-//   } else {
-//     const month30 = [1, 3, 5, 7, 8, 10, 12];
-//     return month30.includes(month) ? 31 : 30;
-//   }
-// };
 const lastDayOfMonth = (year, month) => new Date(year, month, 0).getDate();
-// console.log('last', lastDayOfMonth(2025, 7));
-
-// 원하는 년,월의 시작 요일 구하기
-// const startIdxOfMonth = (thisYear, thisMonth) => {
-//   let totalDay = startDowIdx;
-//   for (let year = startYear; year < thisYear; year++) {
-//     totalDay +=
-//       (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
-//   }
-//   for (let month = 1; month < thisMonth; month++) {
-//     totalDay += lastDayOfMonth(thisYear, month);
-//   }
-//   return totalDay % 7;
-// };
 const startIdxOfMonth = (year, month) => new Date(year, month - 1, 1).getDay();
-// console.log('idx', startIdxOfMonth(2025, 7));
 
 // 캘린더 그리기 로직
 const makeCalendar = () => {

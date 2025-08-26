@@ -170,10 +170,9 @@ const submit = async () => {
     alarm: state.reminder.alarm,
   };
   console.log('body', jsonBody);
-  let res = null;
   if (state.reminder.id > 0) {
     jsonBody.id = state.reminder.id;
-    res = await modify(jsonBody);
+    const res = await modify(jsonBody);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;
@@ -181,7 +180,7 @@ const submit = async () => {
     alert('일정을 수정했어요!');
     emit('form-close', 'modify');
   } else {
-    res = await save(jsonBody);
+    const res = await save(jsonBody);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;
@@ -199,10 +198,10 @@ const close = () => {
 
 <template>
   <div class="form">
-    <h2 class="form-title">
-      {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
-    </h2>
     <div class="form-card">
+      <h2 class="form-title">
+        {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
+      </h2>
       <div class="cancel">
         <span class="cancel-button" @click="close">
           <img src="/image/cancel.png" alt="취소" class="cancel-img" />
