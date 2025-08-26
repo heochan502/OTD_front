@@ -65,7 +65,7 @@ const chartRef = ref(null); // 차트 DOM 요소 참조
 let myChart = null; // ECharts 인스턴스
 
 const option = {
- 
+
   title: {
     text: `주간 총 ${clickProgress.nowCategory} 통계`,
   },
@@ -123,18 +123,19 @@ const option = {
     triggerEvent: true,
   },
   yAxis: {
-    type: 'value',
+    type: 'value',             
     axisLabel: {
       color: '#000000',
       fontSize: 12,
       fontWeight: 'bold',
-      formatter: '{value} kcal'
-
-    },
+      formatter: '{value} kcal',
+      show:false, // y축 숨기 표시
+    },   
     splitLine: {
       lineStyle: {
         color: '#cccccc', // 눈금선 색상
         type: 'dashed', // 점선으로 표시
+        
       },
     },
     triggerEvent: true,
@@ -148,7 +149,7 @@ const option = {
      // y축 데이터와 x축 날짜를 결합
     // 막대그래프 스타일 설정
     data: xData.totalCalorie,
-    barWidth: '50%',
+    barWidth: '50%',     
     itemStyle: {
       borderRadius: [30, 30, 0, 0],
       color: '#D9D9D9',
@@ -170,9 +171,13 @@ const option = {
       text: 'Kcal',
       fontSize: '25px Noto Sans KR sans-serif',
       fill: '#ffffff',
+   
     },
+    
   },
 };
+
+
 const getStatistic = async (weeky) => {
   const res = await getWeekTotal(weeky);
   // console.log("weeky:", weeky);
@@ -263,16 +268,19 @@ onMounted(async () => {
 
   });
   // console.log("주시작 : ", weekDay.getWeekDate);
-  window.addEventListener('resize', resizeHandler); 
-
+   // resize 이벤트 등록
+   window.addEventListener('resize', handleResize)
 });
 
-const resizeHandler = () => {
-    if (chartInstance.current) {
-      chartInstance.current.resize(); // ECharts 인스턴스 크기 조절
-    }
-  };
+// onBeforeUnmount(() => {
+//   // 컴포넌트 unmount 시 이벤트 해제
+//   window.removeEventListener('resize', handleResize)
+//   myChart?.dispose()
+// })
 
+function handleResize() {
+  myChart?.resize()
+}
 
 
 watch(weekDay.getWeekDate, (newVal) => {
@@ -323,12 +331,15 @@ watch (
 </script>
 
 <template>
-
-  <div  ref="chartRef" class="weekly-calorie border h-100 w-100  ">
-    <div class="main-container  border   "></div>
+  <div  ref="chartRef" class="weekly-calorie  h-100 w-100  ">
+    <div class="main-container  border   ">
+      
+    </div>
+    
   </div>
+ 
 
-  <MealStatistic />
+
 </template>
 
 <style scoped>
