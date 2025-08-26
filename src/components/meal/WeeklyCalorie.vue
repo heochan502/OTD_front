@@ -229,6 +229,12 @@ const getStatistic = async (weeky) => {
   // console.log("yData:", yData);
 }
 
+const init= () =>{
+
+
+  
+};
+
 onMounted(async () => {
 
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
@@ -245,8 +251,6 @@ onMounted(async () => {
     if (params.componentType === "series") {
       const dataIndex = params.dataIndex;
       const dayName = xData.dates[dataIndex];
-      // console.log("Clicked on:", params);
-      // console.log("Clicked on day:", dayName);
       ondayMealData.mealFormData(dayName);
     }
     // 요일을 클릭해도 해당 요일에 대한 값이 나옴 
@@ -255,16 +259,21 @@ onMounted(async () => {
       const dataIndex = params.dataIndex;
       const dayName = xData.dates[dataIndex];
       ondayMealData.mealFormData(dayName);
-      // alert('xAxis 클릭하였습니다.');
     }
-    // else if (params.componentType === 'yAxis') {
-    //   alert('yAxis 클릭하였습니다.');
-    // }
-    // console.log("Clicked on non-series component:", params);
+
   });
   // console.log("주시작 : ", weekDay.getWeekDate);
+  window.addEventListener('resize', resizeHandler); 
 
 });
+
+const resizeHandler = () => {
+    if (chartInstance.current) {
+      chartInstance.current.resize(); // ECharts 인스턴스 크기 조절
+    }
+  };
+
+
 
 watch(weekDay.getWeekDate, (newVal) => {
   newWeekFunc(newVal);
@@ -314,20 +323,20 @@ watch (
 </script>
 
 <template>
-  <div class="weekly-calorie   ">
-    <div ref="chartRef" class="main-container  " style="height: 500px; width: 100%"></div>
+
+  <div  ref="chartRef" class="weekly-calorie border h-100 w-100  ">
+    <div class="main-container  border   "></div>
   </div>
 
   <MealStatistic />
 </template>
 
 <style scoped>
-.weekly-calorie {
-  width: 80%;
-  height: 100%;
+.main-container 
+{
+  
 }
 
-.main-container {
-  width: 80%;
-}
+
+
 </style>

@@ -152,16 +152,16 @@ const clickProgressBar = category => {
 </script>
 
 <template>
-  <div id="mealForm" class="main-container flex-column">
-    <div class="meal-layout">
-      <div class="left">
-        <div class="progress-container w-full">
+  <div id="mealForm" class="main-container flex-column  ">
+    <div class="meal-layout  mt-0 pt-0 gt-0">
+      <div class="left_progress " >
+        <div class="progress-container w-full ">
           <span class="totalkcal text-h6 font-weight-black">{{ calorieData.mealDay }} 칼로리</span>
           <ProgressBar class="totalcal" :value='calorieData.allDayCalorie'
             :leftString="`${formatNumber(calorieData.allDayCalorie)}/${formatNumber(maxKcal)}kcal`"
             :rightString="`${formatNumber(maxKcal - calorieData.allDayCalorie)}kcal 더 먹을 수 있어요!`" :max="maxKcal"
             customsize="totalcal" @click="clickProgressBar(0)" />
-          <div class="inprogressbar">
+          <div class="inprogressbar  d-flex justify-content-between">
             <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`"
               :rightString="`${(calorieData.totalCarbohydrate / ((maxKcal * 0.6) / 4) * 100).toFixed(1)}%`"
               :max="(maxKcal * 0.6) / 4" customsize="tansu" @click="clickProgressBar(1)" />
@@ -175,8 +175,8 @@ const clickProgressBar = category => {
         </div>
       </div>
 
-      <div class="right">
-        <div class="dailymeal">
+      <div class="right_button    ">
+        <!-- <div class="dailymeal border"> -->
           <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('아침')">
             <span>아침</span> <span>✚</span>
           </button>
@@ -186,15 +186,14 @@ const clickProgressBar = category => {
           <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('저녁')">
             <span>저녁</span> <span>✚</span>
           </button>
-        </div>
+        <!-- </div> -->
       </div>
     </div>
-    <div class="weeky-title">
+    <div class="weeky-title border h-100 ">
       <span class="main-title text-h6"> 주간 기록 </span>
       <span class="sub-title text-subtitle-1">{{ baseDate.getWeekDate.startDate }} 부터 {{ baseDate.getWeekDate.endDate }} 평균
         {{ Math.round(avg).toLocaleString() }}kcal 먹었어요</span>
-
-      <div class=" d-flex  justify-content-end ">
+      <div class="e_chart d-flex  justify-content-end h-100    ">
         <WeeklyCalorie />
       </div>
     </div>
@@ -218,17 +217,23 @@ const clickProgressBar = category => {
   position: relative;
 }
 
-#mealForm .left {
-  width: 50%;
+.left_progress {
+  width: 70%;
   /* height: 50%; */
   /* float: left; */
 
   margin-top: 5px;
 }
 
-#mealForm .right {
+ .right_button {
   /* height: 50%; */
-  width: 50%;
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  align-items: center;
+  margin-top: 40px;
+  margin-left: 100px;
   /* float: right; */
 }
 
@@ -244,19 +249,13 @@ const clickProgressBar = category => {
   flex-direction: row;
   flex: none;
   width: 100%;
+  justify-content: space-between;
 }
 
-.dailymeal {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  align-items: center;
-  margin-top: 40px;
-  margin-left: 100px;
-}
+
 
 .mealsaday {
-  width: 350px;
+  width: 100%;
   height: 70px;
   background-color: #3bbeff;
   color: white;
@@ -274,7 +273,7 @@ const clickProgressBar = category => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 30px;
+  gap: 10px;
   margin-top: 20px;
 }
 
@@ -282,8 +281,7 @@ const clickProgressBar = category => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
-  gap: 10px;
+  margin-left: 10px;
   /* ← 항목 사이 간격 조절 */
   margin-top: 0px;
   margin-left: 0px;

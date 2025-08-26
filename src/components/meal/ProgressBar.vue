@@ -41,7 +41,7 @@ defineProps({
     font-size: 16px;
     margin-top: 5px;
     color: #ff6b6b ;
-    width: 200px;
+    width:  100%;
 
     .progress {
     appearance: none;
@@ -65,12 +65,15 @@ defineProps({
     font-size: 16px;
     margin-top: 5px;
     color: #4dabf7;
-    width: 200px;
+    width:  100%;
+    margin-left: 15px;
 
     .progress {
     appearance: none;
     border-radius: 15px;
     height: 25px;
+
+    
     }
     
     
@@ -90,7 +93,8 @@ defineProps({
     font-size: 16px;
     color: #ffd43b;
     margin-top: 5px;
-    width: 200px;
+    width:  100%;
+    margin-left: 40px;
 
     .progress {
     appearance: none;
@@ -113,7 +117,7 @@ defineProps({
 }
 .totalcal {    
     margin-left: 10px;
-    inline-size: 650px;
+    inline-size: 100%;
     font-size: 20px;  
     top: 0px;
     font-weight: 500;
