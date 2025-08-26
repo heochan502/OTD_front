@@ -14,19 +14,15 @@ import {
 
 const exerciseStore = useExerciseStore();
 
-onMounted(async () => {
-  await exerciseStore.fetchExerciselogs();
-});
-
 // YYYY-MM-DD
 const todayStr = getDateString();
 const yesterdayStr = getYesterdayDateString();
 
 const todayLogs = computed(() =>
-  filterExerciseLogsByDate(exerciseStore.logs, todayStr)
+  filterExerciseLogsByDate(exerciseStore.logList, todayStr)
 );
 const yesterdayLogs = computed(() =>
-  filterExerciseLogsByDate(exerciseStore.logs, yesterdayStr)
+  filterExerciseLogsByDate(exerciseStore.logList, yesterdayStr)
 );
 
 const todayKcal = computed(() => calcKcal(todayLogs.value));

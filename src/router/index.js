@@ -12,7 +12,7 @@ import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 import CommunityView from '@/views/community/CommunityView.vue';
 // 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/community/communityStore';
 
 import MealForm from '@/views/meal/MealForm.vue';
 import MealAdd from '@/views/meal/MealAdd.vue';

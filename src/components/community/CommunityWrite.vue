@@ -1,35 +1,37 @@
 <script setup>
 import { ref, computed, onBeforeUnmount } from 'vue';
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/community/communityStore';
+import { useDialogStore } from '@/stores/community/dialogStore';
 import { createPost } from '@/services/community/communityService';
 import ImageLightbox from '@/components/community/ImageLightbox.vue';
 
 const store = usecommunityStore();
+const dialog = useDialogStore();
 
 // 상태
 const title = ref('');
-const content = ref('');        // ← 내용 textarea 유지
-const files = ref([]);          // File[]
-const previews = ref([]);       // [{ url, name, size }]
-const selectedIndex = ref(0);   // 대표(커버) 인덱스(미리보기용)
+const content = ref(''); // ← 내용 textarea 유지
+const files = ref([]); // File[]
+const previews = ref([]); // [{ url, name, size }]
+const selectedIndex = ref(0); // 대표(커버) 인덱스(미리보기용)
 const lightboxOpen = ref(false);
 const loading = ref(false);
-const errMsg = ref('');
 const fileInput = ref(null);
 
 // 제한
 const TITLE_MAX = 200;
 const CONTENT_MAX = 3000;
-const MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10MB
-const MAX_TOTAL_SIZE = 30 * 1024 * 1024;  // 30MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_TOTAL_SIZE = 30 * 1024 * 1024; // 30MB
 
 const titleRules = [
-  v => !!v || '제목을 입력하세요.',
-  v => (v?.length || 0) <= TITLE_MAX || `최대 ${TITLE_MAX}자까지 가능합니다.`
+  (v) => !!v || '제목을 입력하세요.',
+  (v) => (v?.length || 0) <= TITLE_MAX || `최대 ${TITLE_MAX}자까지 가능합니다.`,
 ];
 const contentRules = [
-  v => !!v || '내용을 입력하세요.',
-  v => (v?.length || 0) <= CONTENT_MAX || `최대 ${CONTENT_MAX}자까지 가능합니다.`
+  (v) => !!v || '내용을 입력하세요.',
+  (v) =>
+    (v?.length || 0) <= CONTENT_MAX || `최대 ${CONTENT_MAX}자까지 가능합니다.`,
 ];
 
 // 대표 미리보기
@@ -43,51 +45,68 @@ const humanSize = (n) => {
   return n + ' B';
 };
 const revokeAll = () => {
-  previews.value.forEach(p => URL.revokeObjectURL(p.url));
+  previews.value.forEach((p) => URL.revokeObjectURL(p.url));
   previews.value = [];
   selectedIndex.value = 0;
 };
 
-function acceptFiles(listOrArray) {
+async function acceptFiles(listOrArray) {
   const incoming = toArray(listOrArray);
   let total = files.value.reduce((s, f) => s + f.size, 0);
   const accepted = [];
 
   for (const f of incoming) {
     if (!f?.type?.startsWith?.('image/')) {
-      errMsg.value = '이미지 파일만 업로드할 수 있습니다.';
+      await dialog.alert({
+        title: '안내',
+        message: '이미지 파일만 업로드할 수 있습니다.',
+      });
       return;
     }
     if (f.size > MAX_FILE_SIZE) {
-      errMsg.value = `파일당 최대 10MB까지 가능합니다: ${f.name}`;
+      await dialog.alert({
+        title: '용량 초과',
+        message: `파일당 최대 10MB까지 가능합니다: ${f.name}`,
+      });
       return;
     }
     total += f.size;
     if (total > MAX_TOTAL_SIZE) {
-      errMsg.value = '총 업로드 용량은 30MB를 초과할 수 없습니다.';
+      await dialog.alert({
+        title: '총 용량 초과',
+        message: '총 업로드 용량은 30MB를 초과할 수 없습니다.',
+      });
       return;
     }
-    const dup = files.value.find(ff => ff.name === f.name && ff.size === f.size && ff.lastModified === f.lastModified);
+    const dup = files.value.find(
+      (ff) =>
+        ff.name === f.name &&
+        ff.size === f.size &&
+        ff.lastModified === f.lastModified
+    );
     if (!dup) accepted.push(f);
   }
 
   for (const f of accepted) {
     files.value.push(f);
-    previews.value.push({ url: URL.createObjectURL(f), name: f.name, size: f.size });
+    previews.value.push({
+      url: URL.createObjectURL(f),
+      name: f.name,
+      size: f.size,
+    });
   }
   if (previews.value.length && selectedIndex.value >= previews.value.length) {
     selectedIndex.value = previews.value.length - 1;
   }
-  errMsg.value = '';
 }
 
-function onNativePicked(e) {
-  acceptFiles(e.target?.files);
+async function onNativePicked(e) {
+  await acceptFiles(e.target?.files);
   if (e.target) e.target.value = ''; // 같은 파일 재선택 허용
 }
-function onDrop(e) {
+async function onDrop(e) {
   e.preventDefault();
-  acceptFiles(e.dataTransfer?.files);
+  await acceptFiles(e.dataTransfer?.files);
 }
 function openPicker() {
   fileInput.value?.click();
@@ -95,7 +114,10 @@ function openPicker() {
 
 // 썸네일 동작
 function setAsCover(i) {
-  if (i === 0) { selectedIndex.value = 0; return; }
+  if (i === 0) {
+    selectedIndex.value = 0;
+    return;
+  }
   // i번째를 맨 앞으로 이동(대표로) → 백엔드에서 첫 파일을 대표 이미지로 사용
   const f = files.value.splice(i, 1)[0];
   const p = previews.value.splice(i, 1)[0];
@@ -114,16 +136,18 @@ function removeAt(i) {
 function clearAll() {
   revokeAll();
   files.value = [];
-  errMsg.value = '';
 }
 
 // 제출/취소
 async function submitPost() {
-  errMsg.value = '';
   if (!title.value.trim() || !content.value.trim()) {
-    errMsg.value = '제목과 내용을 모두 입력하세요.';
+    await dialog.alert({
+      title: '입력 필요',
+      message: '제목과 내용을 모두 입력하세요.',
+    });
     return;
   }
+
   const fd = new FormData();
   fd.append('title', title.value.trim());
   fd.append('content', content.value.trim()); // ← textarea 내용 사용
@@ -135,10 +159,14 @@ async function submitPost() {
     title.value = '';
     content.value = '';
     clearAll();
+    await dialog.alert({
+      title: '등록 완료',
+      message: '게시글이 등록되었습니다.',
+    });
     store.goList();
   } catch (e) {
     console.error(e);
-    errMsg.value = '글 등록에 실패했습니다.';
+    await dialog.alert({ title: '오류', message: '글 등록에 실패했습니다.' });
   } finally {
     loading.value = false;
   }
@@ -160,7 +188,9 @@ onBeforeUnmount(revokeAll);
       <v-col cols="12" md="8" lg="7">
         <v-card elevation="2" rounded="xl">
           <v-toolbar flat color="transparent" density="comfortable">
-            <v-toolbar-title class="text-h6 font-weight-bold">게시글 작성</v-toolbar-title>
+            <v-toolbar-title class="text-h6 font-weight-bold"
+              >게시글 작성</v-toolbar-title
+            >
           </v-toolbar>
           <v-divider />
 
@@ -207,9 +237,7 @@ onBeforeUnmount(revokeAll);
                   <div class="text-body-2">
                     이미지를 드래그하거나 클릭하여 선택하세요
                   </div>
-                  <div class="text-caption mt-1">
-                    파일당 최대 10MB, 총 30MB
-                  </div>
+                  <div class="text-caption mt-1">파일당 최대 10MB, 총 30MB</div>
                 </div>
               </v-sheet>
 
@@ -243,7 +271,8 @@ onBeforeUnmount(revokeAll);
                     </template>
                   </v-img>
                   <v-card-text class="py-2 text-caption text-medium-emphasis">
-                    위 이미지가 대표사진으로 표시됩니다. 아래 미리보기에서 <strong>대표사진</strong>을 눌러 변경하세요.
+                    위 이미지가 대표사진으로 표시됩니다. 아래 미리보기에서
+                    <strong>대표사진</strong>을 눌러 변경하세요.
                   </v-card-text>
                 </v-card>
               </div>
@@ -251,61 +280,72 @@ onBeforeUnmount(revokeAll);
 
             <!-- 썸네일 그리드 -->
             <v-row v-if="previews.length" dense class="mt-3">
-              <v-col
-                v-for="(p, i) in previews"
-                :key="i"
-                cols="6" sm="4" md="3"
-              >
+              <v-col v-for="(p, i) in previews" :key="i" cols="6" sm="4" md="3">
                 <v-card
                   :elevation="selectedIndex === i ? 3 : 1"
-                  :class="['overflow-hidden', 'rounded-lg', 'thumb-card', selectedIndex === i ? 'is-cover' : '']"
+                  :class="[
+                    'overflow-hidden',
+                    'rounded-lg',
+                    'thumb-card',
+                    selectedIndex === i ? 'is-cover' : '',
+                  ]"
                 >
-                  <v-img :src="p.url" aspect-ratio="1" cover @click="selectedIndex = i">
+                  <v-img
+                    :src="p.url"
+                    aspect-ratio="1"
+                    cover
+                    @click="selectedIndex = i"
+                  >
                     <template #error>
-                      <div class="thumb-fallback d-flex align-center justify-center">
+                      <div
+                        class="thumb-fallback d-flex align-center justify-center"
+                      >
                         <v-icon size="24" icon="mdi-image-off-outline" />
                       </div>
                     </template>
                   </v-img>
-                  <div class="d-flex justify-space-between align-center px-2 py-1">
-                    <span class="text-truncate text-caption" :title="p.name">{{ p.name }}</span>
+                  <div
+                    class="d-flex justify-space-between align-center px-2 py-1"
+                  >
+                    <span class="text-truncate text-caption" :title="p.name">{{
+                      p.name
+                    }}</span>
                   </div>
-                  <div class="d-flex justify-space-between align-center px-2 pb-2">
+                  <div
+                    class="d-flex justify-space-between align-center px-2 pb-2"
+                  >
                     <v-btn
                       size="x-small"
                       variant="text"
                       color="primary"
                       @click.stop="setAsCover(i)"
-                    >대표사진</v-btn>
+                      >대표사진</v-btn
+                    >
                     <v-btn
                       size="x-small"
                       variant="text"
                       color="grey"
                       @click.stop="removeAt(i)"
-                    >삭제</v-btn>
+                      >삭제</v-btn
+                    >
                   </div>
                 </v-card>
               </v-col>
             </v-row>
 
-            <!-- 정보/에러 & 액션 -->
-            <div v-if="previews.length" class="d-flex justify-space-between align-center mt-2">
-              <div class="text-caption text-medium-emphasis">
-                선택한 이미지 {{ files.length }}개,
-                총 {{ humanSize(files.reduce((s,f)=>s+f.size,0)) }}
-              </div>
-              <v-btn size="small" variant="text" color="error" @click="clearAll">전부 비우기</v-btn>
-            </div>
-
-            <v-alert
-              v-if="errMsg"
-              type="error"
-              variant="tonal"
-              class="mt-4"
-              density="comfortable"
+            <!-- 정보 & 액션 -->
+            <div
+              v-if="previews.length"
+              class="d-flex justify-space-between align-center mt-2"
             >
-              {{ errMsg }}
-            </v-alert>
+              <div class="text-caption text-medium-emphasis">
+                선택한 이미지 {{ files.length }}개, 총
+                {{ humanSize(files.reduce((s, f) => s + f.size, 0)) }}
+              </div>
+              <v-btn size="small" variant="text" color="error" @click="clearAll"
+                >전부 비우기</v-btn
+              >
+            </div>
 
             <div class="d-flex justify-end mt-6">
               <v-btn
@@ -318,7 +358,12 @@ onBeforeUnmount(revokeAll);
               >
                 등록
               </v-btn>
-              <v-btn color="grey" variant="outlined" :disabled="loading" @click="cancelWrite">
+              <v-btn
+                color="grey"
+                variant="outlined"
+                :disabled="loading"
+                @click="cancelWrite"
+              >
                 취소
               </v-btn>
             </div>
@@ -344,10 +389,27 @@ onBeforeUnmount(revokeAll);
   justify-content: center;
   cursor: pointer;
 }
-.text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.thumb-card { border: 2px solid transparent; cursor: pointer; }
-.thumb-card.is-cover { border-color: var(--v-theme-primary); }
-.thumb-fallback { width: 100%; height: 100%; background: rgba(160,160,160,0.15); }
-.cursor-pointer { cursor: pointer; }
-.d-none { display: none; }
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.thumb-card {
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.thumb-card.is-cover {
+  border-color: var(--v-theme-primary);
+}
+.thumb-fallback {
+  width: 100%;
+  height: 100%;
+  background: rgba(160, 160, 160, 0.15);
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.d-none {
+  display: none;
+}
 </style>
