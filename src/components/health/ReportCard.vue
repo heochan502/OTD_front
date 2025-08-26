@@ -2,7 +2,8 @@
 import ExerciseReport from "./ExerciseReport.vue";
 import HealthReport from "./HealthReport.vue";
 import { ref, onMounted, onUnmounted } from "vue";
-
+import { useExerciseStore } from "@/stores/exerciseStore";
+import { useHealthStore } from "@/stores/healthStore";
 const tabs = ["one", "two"];
 const tab = ref("one");
 
@@ -26,6 +27,11 @@ function stopCycle() {
 }
 // onMounted(startCycle);
 // onUnmounted(stopCycle);
+
+const exerciseStore = useExerciseStore();
+const healthStore = useHealthStore();
+
+onMounted(async () => {});
 </script>
 
 <template>

@@ -1,30 +1,46 @@
 import { defineStore } from "pinia";
 import { getExercise, getElogs } from "@/services/health/elogService";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 
 export const useExerciseStore = defineStore("exercise", {
   state: () =>
-    reactive({
-      list: [],
+    ref({
+      exerciseList: [],
       loaded: false,
-      logs: [],
+      todayLog: [],
+      calendarDate: [],
+      logList: [],
     }),
 
   actions: {
     async fetchExercises() {
       if (this.loaded) return;
       const res = await getExercise();
-      this.list = res.data;
+      this.exerciseList = res.data;
       this.loaded = true;
     },
     async fetchExerciselogs() {
       const res = await getElogs();
-
       this.logs = res.data;
     },
-    clearLogs() {
-      this.logs = [];
+    addCalendarDate(list) {
+      this.calendarDate.push(...list);
+    },
+    clearCalendarDate() {
+      this.calendarDate = [];
+    },
+    addLogList(list) {
+      this.logList.push(...list);
+    },
+    clearLogList() {
+      this.logList = [];
+    },
+    addTodayLog(list) {
+      this.todayLog.push(...list);
     },
   },
-  
+
+
+  persist: true,
+
 });
