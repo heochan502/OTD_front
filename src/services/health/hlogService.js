@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = "/api/OTD";
+axios.defaults.baseURL = '/api/OTD';
 
 const path = "/health/hlog";
 
@@ -9,8 +9,13 @@ export const saveHlog = (args) => {
 };
 
 // 건강기록 목록 조회
-export const getHlogs = () => {
-  return axios.get(path).catch((e) => e.response);
+export const getHlogs = (weekly) => {
+  return axios.get(path, { params: weekly }).catch((e) => e.response);
+};
+
+// 건강기록 리스트 페이징
+export const getHlogList = (params) => {
+  return axios.get(`${path}/list`, { params }).catch((e) => e.response);
 };
 
 // 건강기록 상세 조회
@@ -23,4 +28,9 @@ export const deleteHlog = (healthlogId) => {
   return axios
     .delete(`${path}?healthlog_id=${healthlogId}`)
     .catch((e) => e.response);
+};
+
+// 건강기록달력 날짜
+export const getHealthlogCalendar = (params) => {
+  return axios.get(`${path}/calendar`, { params }).catch((e) => e.response);
 };

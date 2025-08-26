@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import effortLevels from "@/assets/health/effortLevels.json";
 import { getFeedbackMessage } from "@/utils/getFeedbackMessage";
@@ -14,17 +14,15 @@ import {
 
 const exerciseStore = useExerciseStore();
 
-// console.log(exerciseStore.logs);
-
 // YYYY-MM-DD
 const todayStr = getDateString();
 const yesterdayStr = getYesterdayDateString();
 
 const todayLogs = computed(() =>
-  filterExerciseLogsByDate(exerciseStore.logs, todayStr)
+  filterExerciseLogsByDate(exerciseStore.logList, todayStr)
 );
 const yesterdayLogs = computed(() =>
-  filterExerciseLogsByDate(exerciseStore.logs, yesterdayStr)
+  filterExerciseLogsByDate(exerciseStore.logList, yesterdayStr)
 );
 
 const todayKcal = computed(() => calcKcal(todayLogs.value));

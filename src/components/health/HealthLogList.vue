@@ -1,30 +1,72 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, onUnmounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useHealthStore } from "@/stores/healthStore";
+import { formatDate } from "@/utils/reportUtils";
+import { getHlogList } from "@/services/health/hlogService";
+import { getDateString } from "@/utils/reportUtils";
 
 const router = useRouter();
 const healthStore = useHealthStore();
 
+const data = {
+  page: 1,
+  rowPerPage: 4,
+};
+
 const state = reactive({
-  logs: [],
+  isLoading: false,
+  isFinish: false,
 });
 
-onMounted(async () => {
-  await healthStore.fetchHealthlogs();
-  state.logs = healthStore.logs;
-  // console.log(state.logs);
+// @scroll
+const handleScroll = (e) => {
+  const target = e.target; // .list-wrap
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
+
+  const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+  if (nearBottom) {
+    getData();
+  }
+};
+
+onMounted(() => {
+  getData();
 });
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+onUnmounted(() => {
+  healthStore.clearLogList();
+});
+
+const getData = async () => {
+  if (state.isLoading || state.isFinish) return;
+  state.isLoading = true;
+  const params = {
+    page: data.page++,
+    row_per_page: data.rowPerPage,
+  };
+  const res = await getHlogList(params);
+
+  if (res.status === 200) {
+    const result = res.data;
+    if (result && result.length > 0) {
+      healthStore.addLogList(result);
+    }
+    if (result.length < data.rowPerPage) {
+      state.isFinish = true;
+    }
+  }
+  state.isLoading = false;
 };
 
 // @click
+// 건강기록 추가
 const add = () => {
   router.push("/hlog/add");
 };
+// 건강기록 상세페이지로 이동
 const detail = (healthlogId) => {
   router.push(`/hlog/${healthlogId}`);
 };
@@ -37,11 +79,13 @@ const detail = (healthlogId) => {
       <i class="bi bi-plus-circle btn-plus" @click="add"></i>
     </div>
   </div>
-  <div class="list-wrap">
+  <div class="list-wrap" @scroll="handleScroll">
     <ul>
-      <li v-if="state.logs.length < 1" class="title">건강 기록을 추가하세요</li>
+      <li v-if="healthStore.logs.length < 1" class="title">
+        건강 기록을 추가하세요
+      </li>
       <li
-        v-for="item in state.logs"
+        v-for="item in healthStore.logList"
         :key="item.healthlogId"
         @click="detail(item.healthlogId)"
       >

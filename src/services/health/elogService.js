@@ -1,5 +1,7 @@
 import axios from "axios";
-axios.defaults.baseURL = "api/OTD/";
+
+axios.defaults.baseURL = "/api/OTD";
+
 
 const path = "/health/elog";
 
@@ -11,6 +13,11 @@ export const saveElog = (args) => {
 // 운동기록 목록
 export const getElogs = () => {
   return axios.get(path).catch((e) => e.response);
+};
+
+// 운동기록 리스트 페이징
+export const getElogList = (params) => {
+  return axios.get(`${path}/list`, { params }).catch((e) => e.response);
 };
 
 // 운동기록상세 목록
@@ -28,4 +35,9 @@ export const deleteElog = (exerciselogId) => {
   return axios
     .delete(`${path}?exerciselog_id=${exerciselogId}`)
     .catch((e) => e.response);
+};
+
+// 운동기록 달력 날짜
+export const getEexerciselogCalendar = (params) => {
+  return axios.get(`${path}/calendar`, { params }).catch((e) => e.response);
 };

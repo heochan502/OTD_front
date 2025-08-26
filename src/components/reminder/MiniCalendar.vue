@@ -39,44 +39,15 @@ const today = new Date();
 const currentYear = ref(today.getFullYear());
 
 const currentMonth = ref(today.getMonth() + 1);
-// getMonth는 0부터 시작함
 
-// const startYear = 2003;
-// const startDowIdx = new Date(startYear, 0, 1).getDay();
-
-// 원하는 년, 월의 마지막 날짜 구하기(윤년처리까지)
-// const lastDayOfMonth = (year, month) => {
-//   if (month === 2) {
-//     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
-//   } else {
-//     const month30 = [1, 3, 5, 7, 8, 10, 12];
-//     return month30.includes(month) ? 31 : 30;
-//   }
-// };
 const lastDayOfMonth = (year, month) => new Date(year, month, 0).getDate();
-// console.log('last', lastDayOfMonth(2025, 7));
 
-// 원하는 년,월의 시작 요일 구하기
-// const startIdxOfMonth = (thisYear, thisMonth) => {
-//   let totalDay = startDowIdx;
-//   for (let year = startYear; year < thisYear; year++) {
-//     totalDay +=
-//       (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
-//   }
-//   for (let month = 1; month < thisMonth; month++) {
-//     totalDay += lastDayOfMonth(thisYear, month);
-//   }
-//   return totalDay % 7;
-// };
 const startIdxOfMonth = (year, month) => new Date(year, month - 1, 1).getDay();
-// console.log('idx', startIdxOfMonth(2025, 7));
 
 // 캘린더 그리기 로직
 const makeCalendar = () => {
   const startIdx = startIdxOfMonth(currentYear.value, currentMonth.value);
   const endDay = lastDayOfMonth(currentYear.value, currentMonth.value);
-  // console.log('startIdx', startIdx);
-  // console.log('endDay', endDay);
 
   const matrix = [];
   let day = 1;
@@ -85,18 +56,12 @@ const makeCalendar = () => {
     const row = [];
     for (let k = 0; k < 7; k++) {
       if (i === 0 && k < startIdx) {
-        row.push({ date: '', hasReminder: false });
+        row.push({ date: '' });
       } else if (day <= endDay) {
-        const fullDate = `${currentYear.value}-${formatNumber(
-          currentMonth.value
-        )}-${formatNumber(day)}`;
-
-        const hasReminder = props.reminderDate.includes(fullDate);
-
-        row.push({ date: day, hasReminder });
+        row.push({ date: day });
         day++;
       } else {
-        row.push({ date: '', hasReminder: false });
+        row.push({ date: '' });
       }
     }
     matrix.push(row);
@@ -206,7 +171,7 @@ const todayColor = (day) => {
           >
             <span
               class="date"
-              :class="{ reminder_color: dayOfMonth.hasReminder }"
+              :class="{ 'empty-date': dayOfMonth.date === '' }"
             >
               {{ dayOfMonth.date }}</span
             >
@@ -219,25 +184,26 @@ const todayColor = (day) => {
 
 <style lang="scss" scoped>
 .calendar {
-  border-radius: 20px;
+  border-radius: 10px;
   border: #dedede solid 1px;
-  margin-top: 70px;
-  width: 630px;
+  width: 220px;
+  height: auto;
+  padding: 10px 7px 0 7px;
   background-color: #fff;
-  padding: 35px 45px 25px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
   .calendar_title {
+    font-size: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
-    gap: 10px;
-    cursor: pointer;
+    gap: 5px;
     a {
       display: flex;
       align-items: center;
       img {
-        width: 25px;
+        width: 20px;
       }
       img.rotate {
         transform: rotate(180deg);
@@ -248,25 +214,32 @@ const todayColor = (day) => {
     }
   }
   .table {
-    font-size: 25px;
+    font-size: 15px;
+    padding: 0;
+    width: 100%;
+    table-layout: fixed;
     td {
       border-bottom: none;
-      cursor: pointer;
       text-align: center;
       vertical-align: middle;
-      height: 70px;
+      height: 20px;
+      padding: 0;
       .date {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 50px;
-        height: 50px;
+        width: 25px;
+        height: 25px;
         font-weight: bold;
         border-radius: 100%;
         margin: auto;
       }
-      .reminder_color {
-        background-color: #bfeaff;
+      .date:hover {
+        background-color: #d9d9d9;
+      }
+      .date.empty-date:hover {
+        background-color: transparent;
+        cursor: default;
       }
     }
     .today_color {
@@ -274,9 +247,6 @@ const todayColor = (day) => {
     }
     .sunday_color {
       color: tomato;
-    }
-    td {
-      height: 70px;
     }
   }
 }

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
+import { useExerciseStore } from "@/stores/exerciseStore";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 // Chart.js
@@ -13,6 +14,7 @@ import {
   PointElement,
   CategoryScale,
   LinearScale,
+  Filler,
 } from "chart.js";
 import { Line } from "vue-chartjs";
 
@@ -26,7 +28,8 @@ ChartJS.register(
   LineElement,
   PointElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  Filler
 );
 
 const props = defineProps({
@@ -35,14 +38,17 @@ const props = defineProps({
     required: true,
   },
   selectedField: String,
-  fields: Object,
+  fields: Array,
+  label: String,
+  logs: { type: Array, default: () => [] },
 });
-console.log(props.fields);
 
 const healthStore = useHealthStore();
+const exerciseStore = useExerciseStore();
 
 onMounted(async () => {
   await healthStore.fetchHealthlogs();
+  // await exerciseStore.fetchExerciselogs();
 });
 
 // 해당 주차 범위
@@ -55,9 +61,19 @@ const weekRange = computed(() => {
 });
 
 // 주차 데이터 필터링
+// const weeklyLogs = computed(() => {
+//   return healthStore.logs.filter((log) => {
+//     const day = dayjs(log.healthlogDatetime);
+//     return (
+//       day.isAfter(weekRange.value.start.subtract(1, "day")) &&
+//       day.isBefore(weekRange.value.end.add(1, "day"))
+//     );
+//   });
+// });
+
 const weeklyLogs = computed(() => {
-  return healthStore.logs.filter((log) => {
-    const day = dayjs(log.healthlogDatetime);
+  return props.logs.filter((log) => {
+    const day = dayjs(log.healthlogDatetime || log.exerciseDatetime);
     return (
       day.isAfter(weekRange.value.start.subtract(1, "day")) &&
       day.isBefore(weekRange.value.end.add(1, "day"))
@@ -65,14 +81,19 @@ const weeklyLogs = computed(() => {
   });
 });
 
+// 건강 차트
 // 주차 데이터 매핑 (월~일, 빈 값은 null)
 const weeklyData = computed(() => {
   const days = Array(7).fill(0);
   let lastValue = null;
+
   weeklyLogs.value.forEach((log) => {
-    const day = dayjs(log.healthlogDatetime);
+    const day = dayjs(log.healthlogDatetime || log.exerciseDatetime);
     const weekday = day.isoWeekday(); // 1=월 ~ 7=일
-    let value = log[props.selectedField];
+
+    const fieldKey = props.label || props.selectedField;
+    let value = log[fieldKey];
+
     if (value != null) {
       days[weekday - 1] = value;
       lastValue = days[weekday - 1];
@@ -82,6 +103,7 @@ const weeklyData = computed(() => {
   });
   return days;
 });
+
 // X축 라벨 (월 ~ 일)
 const labels = ref(["월", "화", "수", "목", "금", "토", "일"]);
 
@@ -133,7 +155,7 @@ const chartOptions = {
     },
     y: {
       type: "linear",
-      suggestedMin: 50,
+      suggestedMin: 0,
       title: {
         display: false,
       },

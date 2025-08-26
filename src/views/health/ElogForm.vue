@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import effortLevels from "@/assets/health/effortLevels.json";
 import { saveElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
@@ -7,6 +7,8 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const exerciseStore = useExerciseStore();
+
+const dialog = ref(false);
 
 const state = reactive({
   form: {
@@ -18,10 +20,10 @@ const state = reactive({
   },
 });
 
-// const formatDate = (dateStr) => {
-//   const date = new Date(dateStr);
-//   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-// };
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
 
 onMounted(() => {
   exerciseStore.fetchExercises();
@@ -100,7 +102,7 @@ const cancel = () => {
           <v-select
             v-model="state.form.exerciseId"
             :items="
-              exerciseStore.list.map((e) => ({
+              exerciseStore.exerciseList.map((e) => ({
                 title: e.exerciseName,
                 value: e.exerciseId,
               }))
@@ -146,10 +148,19 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn class="save" @click.prevent="submit">저장</v-btn>
+      <v-btn class="save" @click="dialog = true">저장</v-btn>
       <v-btn @click.prevent="cancel">취소</v-btn>
     </v-row>
   </v-container>
+
+  <v-dialog v-model="dialog" width="500px">
+    <v-card max-width="400px">
+      <v-card-title> 저장하시겠습니까? </v-card-title>
+
+      <v-btn @click.prevent="submit">저장</v-btn>
+      <v-btn @click.prevent="dialog = false">닫기</v-btn>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>

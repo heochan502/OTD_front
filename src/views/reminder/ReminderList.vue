@@ -28,7 +28,7 @@ const getReminderList = async (year, month) => {
   reminderStore.setFullReminder(res.data);
 
   state.reminder = res.data.filter((item) => {
-    const isFixed = item.date === selectedDate;
+    const isFixed = item.startDate === selectedDate;
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
@@ -41,8 +41,8 @@ onMounted(async () => {
   if (selectedDate) {
     await getReminderList(year, month);
   } else {
-    state.reminder = reminderStore.state.dayReminder;
-    reminderStore.setDayReminder([]);
+    // state.reminder = reminderStore.state.dayReminder;
+    // reminderStore.setDayReminder([]);
   }
 });
 
@@ -99,8 +99,8 @@ const modify = (id) => {
                     />
                   </div>
                   <div class="date-wrap">
-                    <span v-if="reminder.date" class="date">{{
-                      reminder.date
+                    <span v-if="reminder.startDate" class="date">{{
+                      reminder.startDate
                     }}</span>
                     <span v-else class="date">요일 반복</span>
                   </div>

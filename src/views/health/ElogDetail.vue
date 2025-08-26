@@ -4,6 +4,8 @@ import effortLevels from "@/assets/health/effortLevels.json";
 import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRoute, useRouter } from "vue-router";
+import HealthChart from "@/components/health/HealthChart.vue";
+import { formatDate } from "@/utils/reportUtils";
 
 const exerciseStore = useExerciseStore();
 const route = useRoute();
@@ -20,11 +22,6 @@ const state = reactive({
   },
 });
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
-
 const formatTime = (dateStr) => {
   const date = new Date(dateStr);
   // const hour = String(date.getHours().padStart(2, "0"));
@@ -34,9 +31,11 @@ const formatTime = (dateStr) => {
 };
 
 onMounted(async () => {
-  exerciseStore.fetchExercises();
-  state.elog.exerciselogId = route.params.exerciselogId;
-  const res = await getElog(state.elog.exerciselogId);
+
+  const exerciseLogId = route.params.exerciselogId;
+  if (!exerciseLogId) {return;}
+  const res = await getElog(exerciseLogId);
+
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
@@ -71,14 +70,19 @@ const deleteLog = async () => {
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
       <div class="btns">
-        <v-btn class="btn_home" @click="moveToMain">홈</v-btn>
+        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+        <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
       </div>
     </v-row>
-    <v-row class="align-center">
+
+    <v-row class="contents align-center">
       <v-col class="col_left">
         <div class="exercise">
           <span>
-            {{ exerciseStore.list[state.elog.exerciseId - 1]?.exerciseName }}
+            {{
+              exerciseStore.exerciseList[state.elog.exerciseId - 1]
+                ?.exerciseName
+            }}
           </span>
         </div>
       </v-col>
@@ -109,15 +113,34 @@ const deleteLog = async () => {
         </v-row>
       </v-col>
     </v-row>
-    <div class="btns">
-      <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
-    </div>
+  </v-container>
+  <v-container class="container mt-8">
+    <v-row>
+      <v-col cols="12" md="6">
+        <span class="text-subtitle-2">주간 활동 에너지</span>
+        <HealthChart
+          class="mt-3"
+          :selectedDate="state.elog.exerciseDatetime"
+          :logs="exerciseStore.logs"
+          label="exerciseKcal"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <span class="text-subtitle-2">주간 운동 시간</span>
+        <HealthChart
+          class="mt-3"
+          :selectedDate="state.elog.exerciseDatetime"
+          :logs="exerciseStore.logs"
+          label="exerciseDuration"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <style lang="scss" scoped>
 .container {
-  padding: 80px;
+  padding: 0 50px;
 }
 .top {
   display: flex;
@@ -166,8 +189,6 @@ const deleteLog = async () => {
 .btns {
   display: flex;
   gap: 5px;
-  justify-content: center;
-  align-items: center;
 
   .v-btn {
     height: 30px;
@@ -178,8 +199,12 @@ const deleteLog = async () => {
     background-color: #3bbeff;
   }
   .btn_delete {
-    margin-top: 50px;
     background-color: #838383;
   }
+}
+
+.chart {
+  display: flex;
+  gap: 10px;
 }
 </style>
