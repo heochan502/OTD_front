@@ -1,7 +1,11 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
-import { deleteById } from '@/services/reminder/reminderService';
+import {
+  deleteById,
+  modify,
+  saveException,
+} from '@/services/reminder/reminderService';
 import Form from '@/components/reminder/ReminderForm.vue';
 
 const reminderStore = useReminderStore();
@@ -42,7 +46,6 @@ onMounted(() => {
 const modal = ref({ form: false, delete: false });
 
 const openModal = (type) => {
-  console.log('type', type);
   modal.value[type] = true;
 };
 
@@ -54,20 +57,39 @@ const close = (type) => {
 };
 
 const deleteScope = ref('one');
+const deleteDate = ref(reminderStore.state.selectedDate);
 
 const remove = async (id) => {
-  if (state.reminderDetail.repeat) {
-  }
-  if (!confirm('이 일정을 삭제할까요?')) {
+  const res = null;
+  if (!confirm('일정을 삭제할까요?')) {
     return;
   }
-  const res = await deleteById(id);
+  if (!state.reminderDetail.repeat || deleteScope.value === 'all') {
+    res = await deleteById(id);
+  }
+  if (state.reminderDetail.repeat) {
+    if (deleteScope.value === 'one') {
+      const jsonbody = { id: id, exceptionDate: deleteDate };
+      res = await saveException(jsonbody);
+    }
+    if (deleteScope.value === 'future') {
+      const jsonBody = { id: id, endDate: deleteDate };
+      res = await modify(jsonBody);
+    }
+  }
   if (res === undefined || res.status !== 200) {
     alert('오류발생');
     return;
   }
   alert('일정을 삭제했어요!');
+  emit('detail-close');
 };
+
+// const params = { id };
+//   if (state.reminderDetail.repeat) {
+//     params.scope = deleteScope.value;
+
+//   }
 </script>
 
 <template>
@@ -81,11 +103,7 @@ const remove = async (id) => {
       </div>
       <div>
         <span class="date-box">날짜</span>
-        <span class="date">
-          {{ new Date(reminderStore.state.selectedDate).getFullYear() }}년
-          {{ new Date(reminderStore.state.selectedDate).getMonth() + 1 }}월
-          {{ new Date(reminderStore.state.selectedDate).getDate() }}일</span
-        >
+        <span class="date">{{ reminderStore.state.selectedDate }}</span>
       </div>
       <span
         class="alarm-box"
@@ -153,7 +171,7 @@ const remove = async (id) => {
         ><button
           @click="
             state.reminderDetail.repeat
-              ? openModal('dalete')
+              ? openModal('delete')
               : remove(state.reminderDetail.id)
           "
         >
@@ -172,7 +190,7 @@ const remove = async (id) => {
                 <v-spacer />
                 <v-btn variant="text" @click="modal.delete = false">취소</v-btn>
                 <v-btn color="primary" @click="remove(state.reminderDetail.id)"
-                  >확인</v-btn
+                  >삭제</v-btn
                 >
               </v-card-actions>
             </v-card>

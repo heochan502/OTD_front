@@ -29,7 +29,6 @@ const today = new Date();
 
 const todayYear = today.getFullYear();
 const todayMonth = today.getMonth() + 1;
-const todayDate = today.getDate();
 
 const state = reactive({
   reminderDate: [], // 한달치 리마인더 날짜
@@ -39,17 +38,21 @@ const state = reactive({
 onMounted(async () => {
   getReminderList({ year: todayYear, month: todayMonth });
   reminderStore.setSelectedDate(formatDate(today));
+  // mounted될 때 마다 리셋될 초기 리마인더(오늘 날짜) 정보 업데이트
+  const todayReminder = filterReminder(today);
+  console.log('dhsmf', todayReminder);
+  state.todayReminder = todayReminder;
 });
 
-watch(
-  () => reminderStore.reload,
-  (data) => {
-    if (data) {
-      getReminderList({ year: todayYear, month: todayMonth });
-      reminderStore.setReload(false);
-    }
-  }
-);
+// watch(
+//   () => reminderStore.reload,
+//   (data) => {
+//     if (data) {
+//       getReminderList({ year: todayYear, month: todayMonth });
+//       reminderStore.setReload(false);
+//     }
+//   }
+// );
 
 // 한달치 리마인더 목록(요일반복 포함) 조회
 const getReminderList = async (date) => {
@@ -73,76 +76,58 @@ const getReminderList = async (date) => {
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
   console.log('테', state.reminderDate);
-  setTodayReminder(date);
 };
 
 // 요일 반복 리마인더 해당 요일 날짜로 변환 로직
 const getRepeatDate = (fullReminder, year, month) => {
+  console.log('full', fullReminder);
   const result = [];
   const end = new Date(year, month, 0).getDate();
 
   for (let day = 1; day <= end; day++) {
     const date = new Date(year, month - 1, day);
+    const formattedDate = formatDate(date);
     const dow = date.getDay();
     for (const item of fullReminder) {
-      if (item.repeat && item.repeatDow?.includes(dow)) {
-        if (item.startDate <= formatDate(date)) {
-          result.push(formatDate(date));
-          break;
-        }
+      if (
+        item.repeat &&
+        item.repeatDow?.includes(dow) &&
+        item.startDate <= formattedDate &&
+        (!item.endDate || item.endDate >= formattedDate)
+      ) {
+        result.push(formattedDate);
       }
     }
   }
+  console.log('result', result);
   return result;
 };
 
-// mounted될 때 마다 리셋될 초기 리마인더(오늘 날짜) 정보 업데이트
-const setTodayReminder = (date) => {
-  const todayDow = today.getDay();
-  const todayReminder = reminderStore.state.fullReminder.filter((item) => {
-    return (
-      (item.startDate === formatDate(new Date()) && item.repeat === false) ||
-      (item.repeat &&
-        item.repeatDow?.includes(todayDow) &&
-        new Date(item.startDate) <= new Date())
-    );
-  });
-  if (date.month === todayMonth && date.year === todayYear) {
-    state.todayReminder = todayReminder;
-  }
-};
-
-// 캘린더 날짜 선택시의 표출할 리마인더 날짜 정보 피니아 업데이트, 리마인더 내용 업데이트
-const routerDate = (date) => {
-  console.log('date', date);
-  console.log('full', reminderStore.state.fullReminder);
+// 하루치 리마인더 정보 필터링 로직
+const filterReminder = (date) => {
   const dow = date.getDay();
-  console.log('dydlf', dow);
-  const dayReminder = reminderStore.state.fullReminder.filter((item) => {
+  const reminderList = reminderStore.state.fullReminder.filter((item) => {
     const isFixed =
       item.repeat === false && item.startDate === formatDate(date);
 
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
-      item.startDate <= formatDate(date);
+      item.startDate <= formatDate(date) &&
+      (!item.endDate || item.endDate >= formatDate(date));
 
     return isFixed || isRepeat;
   });
-  console.log('dayReminder', dayReminder);
-
-  state.todayReminder = dayReminder;
-  reminderStore.setSelectedDate(formatDate(date));
-  // console.log('today', reminderStore.state.selectedDate);
+  return reminderList;
 };
 
-// const toForm = (param) => {
-//   if (typeof param === 'number') {
-//     router.push({ path: '/reminder/detail', query: { id } });
-//   } else if (typeof param === 'string') {
-//     router.push({ path: '/reminder/form', query: { id } });
-//   }
-// };
+// 캘린더 날짜 선택시의 표출할 리마인더 날짜 정보 피니아 업데이트, 리마인더 내용 업데이트
+const routerDate = (date) => {
+  const dayReminder = filterReminder(date);
+  console.log('day', dayReminder);
+  state.todayReminder = dayReminder;
+  reminderStore.setSelectedDate(formatDate(date));
+};
 
 const modal = ref({ form: false, detail: false });
 const openModal = (type) => {
@@ -181,6 +166,7 @@ const openModal = (type) => {
               :key="item.id"
               class="list-card"
               @click="openModal('detail')"
+              @detail-close="modal.detail = false"
             >
               <span class="reminder-title">• {{ item.title }}</span>
               <v-dialog v-model="modal.detail" max-width="300px">
