@@ -1,7 +1,9 @@
-<script setup></script>
+<script setup>
+import MobileFooter from '@/components/MobileFooter.vue';
+</script>
 
 <template>
-  <div class="footer-container">
+  <div class="footer-container d-none d-md-flex">
     <div class="footer-wrapper">
       <div class="footer-content">
         <!-- Logo and Name -->
@@ -113,11 +115,13 @@
       </div>
     </div>
   </div>
+  <div class="d-lg-none">
+    <MobileFooter />
+  </div>
 </template>
 
 <style lang="scss" scoped>
 .footer-container {
-  width: 100%;
   background-color: #f9fafb;
 }
 
@@ -198,7 +202,6 @@
   width: 1.5rem;
 }
 
-
 .footer-links {
   display: flex;
   justify-content: center;
@@ -250,11 +253,11 @@ a {
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
-  pointer-events: none; 
+  pointer-events: none;
   transition: opacity 0.3s ease;
-  font-size: 0.875rem; 
+  font-size: 0.875rem;
   color: #6b7280;
-  white-space: nowrap; 
+  white-space: nowrap;
   background-color: rgba(255, 255, 255, 0.9);
   padding: 0.15rem 0.5rem;
   border-radius: 0.25rem;
@@ -273,7 +276,7 @@ a {
   background-color: rgba(37, 39, 49, 0.8);
 }
 .social-link {
-  position: relative; 
+  position: relative;
   text-decoration: none;
 }
 </style>

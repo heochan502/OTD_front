@@ -3,9 +3,11 @@ import ProgressBar from '@/components/meal/ProgressBar.vue';
 import WeeklyCalorie from '@/components/meal/WeeklyCalorie.vue';
 import { ref, reactive, onMounted, computed, watch, nextTick, watchEffect } from 'vue';
 import { useHealthStore } from '@/stores/healthStore'
+import { getProfile } from '@/services/member/accountService';
 import { useRouter } from "vue-router";
 import { useDayDefine, useCalorieCalcul, useWeeklyStore, useBaseDate, useClickProgressBar } from "@/stores/mealStore";
 import dayjs from 'dayjs';
+
 
 import 'dayjs/locale/ko';
 
@@ -18,7 +20,61 @@ const weeklyData = useWeeklyStore();
 const baseDate = useBaseDate();
 const clickProgress = useClickProgressBar();
 
-const maxKcal = ref(2500);
+// 권장 칼로리 일주일치 가져와서 평균치 냄
+const makeTotalCalorie = async ()=>{
+// 회원의 몸무게 키 나이를 가져와서 칼로리 계산을 하는 거
+  const res = await getProfile();
+  // 피니아에 health 관련 정보 가져옴
+  console.log( "헬스데이타 로그 : ", healthData.logs);
+
+//   const totalPrice = items.reduce((sum, item) => {
+//   return sum + item.price; // 각 item의 price 값을 sum에 더함
+// }, 0); // 초기값은 0
+
+  const weightSum = healthData.logs.reduce((acc, current) => acc + current.weight,0);
+  
+  const heightSum = healthData.logs.reduce((acc, current) => acc + current.height, 0 );
+
+  const currentDay = new dayjs();
+  const birthDate =  dayjs(res.data.birthDate, "YYYYMMDD");
+
+
+  const resultAge = ( ) => {
+  let age = currentDay.year() - birthDate.year();
+
+  if (
+    currentDay.month() < birthDate.month() ||
+    (currentDay.month() === birthDate.month() && currentDay.date() < birthDate.date())
+  ) {
+    age--;
+  }
+  return age;
+};
+
+
+    const avgHelth ={
+      weight: weightSum/healthData.logs.length,
+      height: heightSum/healthData.logs.length,
+      age : resultAge(),
+      gender : 1, // 1은 남자 2 는 여자
+    }    
+
+    let result=0;
+    if (avgHelth.gender === 1 )
+    {
+    // 권장 칼로리 계산 법 남자: 66.47 + (13.75 × 체중) + (5 × 키) - (6.76 × 나이)
+       result = 66.47+(13.75 * avgHelth.weight) + (5 * avgHelth.height) - (6.76 * avgHelth.age);
+     
+    }
+    else{
+    // 권장 칼로리 계산법 여자: 655.1 + (9.56 × 체중) + (1.85 × 키) - (4.68 × 나이)
+       result = 655.1+(9.56 * avgHelth.weight) + (1.85 * avgHelth.height) - (4.68 * avgHelth.age);
+      
+    }   
+    return  Math.trunc(result); 
+}
+
+const maxKcal =  ref(null);
 
 const router = useRouter();
 
@@ -50,8 +106,8 @@ const calorieData = computed(() => {
 
 const total = ref(0);
 const avg = ref(0);
-onMounted(async () => {
 
+onMounted(async () => {
   // console.log('totalKcal:', ondayMealData.itemInfo.mealDay);
   // console.log('지금 시간:', new dayjs().format('YYYY-MM-DD'));  
   // 초기 데이터 없으면 현재 시간으로 설정/ 있으면 그전 데이터로 출력
@@ -62,7 +118,9 @@ onMounted(async () => {
   else {
     await ondayMealData.mealFormData(ondayMealData.itemInfo.mealDay);
   }
-  console.log(healthData.logs);
+  await healthData.fetchHealthlogs();
+  maxKcal.value = await makeTotalCalorie();
+  console.log("맥스 칼로리", maxKcal);
 });
 
 

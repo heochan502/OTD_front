@@ -97,7 +97,6 @@ const backgroundImg = {
 const weatherBackground = computed(() => {
   const sky = weather.value?.villageSky || '';
   const time = dayTimes.value;
-  console.log('time', time);
   return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
 });
 
@@ -145,7 +144,7 @@ watch(
         <v-card>
           <v-card-title class="text-h8">지역 저장</v-card-title>
           <v-card-text>
-            <Location />
+            <Location @close="dialog.location = false" />
           </v-card-text>
         </v-card>
       </v-dialog>

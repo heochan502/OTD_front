@@ -26,4 +26,5 @@ export const useExerciseStore = defineStore("exercise", {
       this.logs = [];
     },
   },
+  
 });

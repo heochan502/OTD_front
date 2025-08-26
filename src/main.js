@@ -19,7 +19,7 @@ const pinia = createPinia();
 // persist 등록
 pinia.use(piniaPluginPersistedstate);
 
-app.use(createPinia());
+// app.use(createPinia());
 app.use(router);
 app.use(vuetify);
 // app.use(VCalendar, {});

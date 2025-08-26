@@ -12,8 +12,8 @@ export const login = (params) => {
   return axios.post('/user/login', params).catch((e) => e.response);
 };
 
-export const check = () => {
-  return axios.get('/user/check').catch((e) => e.response);
+export const check = async () => {
+  return await axios.get('/user/check').catch((e) => e.response);
 };
 export const logout = () => {
   return axios.post('/user/logout').catch((e) => e.response);
@@ -21,14 +21,16 @@ export const logout = () => {
 
 export const getProfile = () => {
   return axios.get('/user/profile').catch((e) => e.response);
-}
+};
 export const updateProfile = (params) => {
-  return axios.put('/user/profile/detail', params, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).catch((e) => e.response);
-}
+  return axios
+    .put('/user/profile/detail', params, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .catch((e) => e.response);
+};
 export const checkMemberId = (memberId) => {
   return axios.get(`/user/check/id/${memberId}`).catch((e) => e.response);
 };
@@ -41,11 +43,12 @@ export const checkNickname = (nickname) => {
   return axios.get(`/user/check/nickname/${nickname}`).catch((e) => e.response);
 };
 
-
 export const changePassword = (params) => {
   return axios.put('/user/profile/password', params).catch((e) => e.response);
 };
 
 export const deleteMember = (memberNoLogin) => {
-  return axios.delete('/user',{params: { memberNoLogin }}).catch((e) => e.response);
+  return axios
+    .delete('/user', { params: { memberNoLogin } })
+    .catch((e) => e.response);
 };

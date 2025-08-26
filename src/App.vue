@@ -14,17 +14,23 @@ const isInitializing = ref(true);
 
 const checkAccount = async () => {
   console.log('로그인 체크');
+  // await new Promise(resolve => setTimeout(resolve, 1000));
   const res = await check();
-  if (res === null || res.status != 200) {
+  console.log('로그인res :', res.data );
+  console.log('setcheck0000 ', counter.state);
+ 
+   if (res === null || res.status != 200 ) {
     counter.setChecked(false);
     counter.setLoggedIn(false);
     return false;
-  } else {
+  } else  {
+    
     counter.setChecked(true);
     counter.setLoggedIn(res.data > 0);
     counter.setLoggedInId(res.data);
     return res.data > 0;
   }
+  
 };
 
 onMounted(async () => {

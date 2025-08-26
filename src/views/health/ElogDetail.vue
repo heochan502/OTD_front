@@ -35,7 +35,7 @@ const formatTime = (dateStr) => {
 };
 
 onMounted(async () => {
-  exerciseStore.fetchExercises();
+  // exerciseStore.fetchExercises();
   state.elog.exerciselogId = route.params.exerciselogId;
   const res = await getElog(state.elog.exerciselogId);
   if (res === undefined || res.status !== 200) {

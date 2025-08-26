@@ -6,7 +6,6 @@ const dayWeather = ref([]);
 
 const DayWeather = async () => {
   const res = await getDailyWeather();
-  console.log('daily :', res.data);
   dayWeather.value = res.data;
 };
 

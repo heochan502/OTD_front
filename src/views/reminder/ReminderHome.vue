@@ -243,7 +243,8 @@ const toForm = (id) => {
           margin: -3px 0 25px 1px;
           display: block;
           color: #fff;
-          font-size: 13px;
+          font-size: 14px;
+          font-weight: bold;
         }
 
         .list {
@@ -258,6 +259,7 @@ const toForm = (id) => {
             border-radius: 25px;
             display: flex;
             align-items: center;
+            cursor: pointer;
 
             .reminder-title {
               color: #575757;
