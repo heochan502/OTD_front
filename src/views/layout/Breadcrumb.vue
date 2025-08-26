@@ -8,7 +8,6 @@ import MobileFooter from '@/components/MobileFooter.vue';
 const router = useRouter();
 const route = useRoute();
 const counter = useAccountStore();
-const dialog = ref(false); // 모바일 모달 제어
 const toggle = ref(false);
 
 function goHome() {
@@ -27,7 +26,7 @@ const logoutAccount = async () => {
 <template>
   <!-- 상단바 컴포넌트 -->
   <header class="breadcrumb">
-    <div class="inner m-inner">
+    <div class="inner">
       <!-- 왼쪽 로고 (모바일 화면용) -->
       <div class="logo" @click="goHome" style="cursor: pointer">
         <div>

@@ -18,7 +18,7 @@ const dayWeatherWithTime = computed(() =>
   dayWeather.value.map((item) => ({
     ...item,
     time: convertTime(item.fcstTime),
-    emoji: skyEmojiList[item.sky] || '',
+    emoji: skyEmojiList[item.pty] || skyEmojiList[item.sky] || '',
   }))
 );
 const skyEmojiList = {
