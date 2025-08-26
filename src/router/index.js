@@ -168,6 +168,7 @@ const router = createRouter({
 });
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
+  
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
     return "/login";
   }

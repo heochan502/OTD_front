@@ -905,8 +905,7 @@ const submit = async () => {
             </div>
           </div>
 
-
-          <div class="form-row">
+                    <div class="form-row">
           <div class="form-group">
             <label for="birthDate">생년월일 *</label>
             <input
@@ -962,7 +961,7 @@ const submit = async () => {
       <div class="checkbox-container">
         <input
           type="checkbox"
-          :checked="state.genderCheckbox.male"
+          :checked="state.genderCheckbox.M"
           :class="{
             error: state.validation.gender.touched && !state.validation.gender.isValid,
             success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
@@ -970,7 +969,7 @@ const submit = async () => {
           readonly
         />
         <div class="checkmark">
-          <svg v-if="state.genderCheckbox.male" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+          <svg v-if="state.genderCheckbox.F" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
           </svg>
         </div>
@@ -982,7 +981,7 @@ const submit = async () => {
       <div class="checkbox-container">
         <input
           type="checkbox"
-          :checked="state.genderCheckbox.female"
+          :checked="state.genderCheckbox.F"
           :class="{
             error: state.validation.gender.touched && !state.validation.gender.isValid,
             success: state.validation.gender.touched && state.validation.gender.isValid && state.form.gender,
@@ -990,7 +989,7 @@ const submit = async () => {
           readonly
         />
         <div class="checkmark">
-          <svg v-if="state.genderCheckbox.female" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+          <svg v-if="state.genderCheckbox.F" class="check-icon" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
           </svg>
         </div>
@@ -1726,12 +1725,12 @@ const submit = async () => {
 }
 
 .checkbox-container input[type="checkbox"].success + .checkmark {
-  border-color: #2a9df4;
+  border-color: #4fc3f7;
 }
 
 .checkbox-container input[type="checkbox"]:checked.success + .checkmark {
-  background-color: #2a9df4;
-  border-color: #2a9df4;
+  background-color: #4fc3f7;
+  border-color: #4fc3f7;
 }
 
 .check-icon {
@@ -1768,6 +1767,5 @@ const submit = async () => {
 
 .gender-checkbox-container{
   padding-left: 30px;
-  
 }
 </style>
