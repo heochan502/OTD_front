@@ -29,9 +29,11 @@ const handleScroll = (e) => {
   }
 };
 
+
 onMounted(() => {
   exerciseStore.fetchExercises();
   getData();
+
 });
 
 onUnmounted(() => {

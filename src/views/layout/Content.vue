@@ -13,9 +13,9 @@
 
 <style scoped>
 .content {
-  min-width: 100vh;
-  min-height: 100vh;
-  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
   padding: 30px 32px;
   background-color: white;
   display: flex;
@@ -24,10 +24,9 @@
 }
 
 .box {
-  min-width: 100vh;
-  min-height: 90vh;
   width: 100%;
   max-width: 1100px;
+  margin: 0 auto;
   border-radius: 8px;
 }
 </style>
