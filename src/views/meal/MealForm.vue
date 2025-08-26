@@ -176,87 +176,44 @@ const clickProgressBar = (category) => {
     <div class="meal-layout mt-0 pt-0 gt-0">
       <div class="left_progress">
         <div class="progress-container w-full">
-          <span class="totalkcal text-h6 font-weight-black"
-            >{{ calorieData.mealDay }} 칼로리</span
-          >
-          <ProgressBar
-            class="totalcal"
-            :value="calorieData.allDayCalorie"
-            :leftString="`${formatNumber(
+          <span class="totalkcal text-h6 font-weight-black">{{ calorieData.mealDay }} 칼로리</span>
+          <ProgressBar class="totalcal" :value="calorieData.allDayCalorie" :leftString="`${formatNumber(
               calorieData.allDayCalorie
-            )}/${formatNumber(maxKcal)}kcal`"
-            :rightString="`${formatNumber(
+            )}/${formatNumber(maxKcal)}kcal`" :rightString="`${formatNumber(
               maxKcal - calorieData.allDayCalorie
-            )}kcal 더 먹을 수 있어요!`"
-            :max="maxKcal"
-            customsize="totalcal"
-            @click="clickProgressBar(0)"
-          />
+            )}kcal 더 먹을 수 있어요!`" :max="maxKcal" customsize="totalcal" @click="clickProgressBar(0)" />
           <div class="inprogressbar d-flex justify-content-between">
-            <ProgressBar
-              class="tansu"
-              :value="calorieData.totalCarbohydrate"
-              :leftString="`탄수화물`"
-              :rightString="`${(
+            <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`" :rightString="`${(
                 (calorieData.totalCarbohydrate / ((maxKcal * 0.6) / 4)) *
                 100
-              ).toFixed(1)}%`"
-              :max="(maxKcal * 0.6) / 4"
-              customsize="tansu"
-              @click="clickProgressBar(1)"
-            />
-            <ProgressBar
-              class="protein"
-              :value="calorieData.totalProtein"
-              :leftString="`단백질`"
-              :rightString="`${(
+              ).toFixed(1)}%`" :max="(maxKcal * 0.6) / 4" customsize="tansu" @click="clickProgressBar(1)" />
+            <ProgressBar class="protein" :value="calorieData.totalProtein" :leftString="`단백질`" :rightString="`${(
                 (calorieData.totalProtein / ((maxKcal * 0.15) / 4)) *
                 100
-              ).toFixed(1)}%`"
-              customsize="protein"
-              :max="(maxKcal * 0.15) / 4"
-              @click="clickProgressBar(2)"
-            />
-            <ProgressBar
-              class="jibang"
-              :value="calorieData.totalFat"
-              :leftString="`지방`"
-              :rightString="`${(
+              ).toFixed(1)}%`" customsize="protein" :max="(maxKcal * 0.15) / 4" @click="clickProgressBar(2)" />
+            <ProgressBar class="jibang" :value="calorieData.totalFat" :leftString="`지방`" :rightString="`${(
                 (calorieData.totalFat / ((maxKcal * 0.25) / 9)) *
                 100
-              ).toFixed(1)}%`"
-              customsize="jibang"
-              :max="(maxKcal * 0.25) / 9"
-              @click="clickProgressBar(3)"
-            />
+              ).toFixed(1)}%`" customsize="jibang" :max="(maxKcal * 0.25) / 9" @click="clickProgressBar(3)" />
           </div>
         </div>
       </div>
 
       <div class="right_button">
         <!-- <div class="dailymeal border"> -->
-        <button
-          class="btn btn-primary mealsaday font-weight-black text-body-3"
-          @click="mealadd('아침')"
-        >
+        <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('아침')">
           <span>아침</span> <span>✚</span>
         </button>
-        <button
-          class="btn btn-primary mealsaday font-weight-black text-body-3"
-          @click="mealadd('점심')"
-        >
+        <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('점심')">
           <span>점심</span> <span>✚</span>
         </button>
-        <button
-          class="btn btn-primary mealsaday font-weight-black text-body-3"
-          @click="mealadd('저녁')"
-        >
+        <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('저녁')">
           <span>저녁</span> <span>✚</span>
         </button>
         <!-- </div> -->
       </div>
     </div>
-    <div class="weeky-title  h-100 ml-0 pl-0 ">
+    <!-- <div class="weeky-title  h-100 ml-0 pl-0 ">
       <div class="title d-flex justify-content-between ml-0 pl-0 position-relative">
         <div class="d-flex flex-column mb-0 pb-0">
           <span class="main-title text-h6"> 주간 기록 </span>
@@ -273,8 +230,29 @@ const clickProgressBar = (category) => {
       <div class="e_chart d-flex justify-content-end h-100">
         <WeeklyCalorie />
       </div>
+    </div> -->
+    <div class="weeky-title h-100 ml-0 pl-0">
+      <div class="title d-flex justify-content-between ml-0 pl-0 position-relative">
+        <div class="d-flex flex-column mb-0 pb-0">
+          <span class="main-title text-h6"> 주간 기록 </span>
+          <span class="sub-title text-subtitle-1">
+            {{ baseDate.getWeekDate.startDate }} 부터
+            {{ baseDate.getWeekDate.endDate }} 평균
+            {{ Math.round(avg).toLocaleString() }}kcal 먹었어요
+          </span>
+        </div>
+
+        <!-- 여기에 있는 MealStatistic -->
+        <div class="meal-stat">
+          <MealStatistic />
+        </div>
+      </div>
+
+      <div class="e_chart d-flex justify-content-end h-100">
+        <WeeklyCalorie />
+      </div>
     </div>
-    
+
   </div>
 
   <!-- </div> -->
@@ -294,7 +272,6 @@ const clickProgressBar = (category) => {
   width: 70%;
   /* height: 50%; */
   /* float: left; */
-
   margin-top: 5px;
 }
 
@@ -397,4 +374,75 @@ const clickProgressBar = (category) => {
   margin: 0px 0px 10px 0px;
   padding: 0px;
 }
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* 기본: 오른쪽 위 */
+.meal-stat {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.75rem;
+}
+
+/* 작은 화면: 글자 옆으로 */
+@media (max-width: 768px) {
+  .title {
+    flex-direction: row;
+    /* 옆으로 */
+    align-items: center;
+  }
+
+  .meal-stat {
+    position: static;
+    /* absolute 해제 */
+    padding: 0;
+    margin-left: 0.5rem;
+  }
+
+  .title .d-flex.flex-column {
+    flex: 1;
+  }
+.meal-layout{
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: 100%;
+  justify-content: space-between;
+}
+.right_button{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  align-items: center;
+  margin-top: 40px;
+  margin-left: 0px;
+}
+.left_progress {
+  width: 100%;
+  /* height: 50%; */
+  /* float: left; */
+  margin-top: 5px;
+  padding-right: 20px;
+}
+.inprogressbar {
+  /* display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 10px; */
+  /* ← 항목 사이 간격 조절 */
+  /* margin-top: 0px;
+  margin-left: 0px;
+  margin-right: 0px; */
+}
+
+}
+
+
+
+
 </style>

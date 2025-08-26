@@ -3,12 +3,16 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useBaseDate, useDayDefine, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
 
 import { getWeekTotal } from '@/services/meal/mealService'
+
+import { useDisplay } from 'vuetify'
+
 import dayjs from "dayjs";
 
 import "dayjs/locale/ko";
 
 dayjs.locale("ko");
 
+const { mdAndDown } = useDisplay() 
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
@@ -16,7 +20,7 @@ const weeklyStore = useWeeklyStore();
 const ondayMealData = useCalorieCalcul();
 
 const selectedDate = ref(ondayMealData.itemInfo.mealDay); // 초기화 및 선택하는 날짜 들어감
-const menu = ref(false);
+
 
 const weekDates = ref([]);
 
@@ -86,50 +90,29 @@ watch(
   },
   { immediate: true }
 );
+const dateInputRef = ref(null);
+const openDatePicker = () => {
+  if (dateInputRef.value) {
+    dateInputRef.value.showPicker   // 최신 브라우저 지원
+      ? dateInputRef.value.showPicker()
+      : dateInputRef.value.click()  // fallback
+  }
+}
 
-const krGetDay = (date)=> { 
- const day = date.split("-")[2]; 
- const day_num = Number(day); 
- return day_num; 
-};
 </script>
 
 <template>
   <div>
     <!-- 아래는 날짜 선택용 vuetify 입력 필드 -->
-    <!-- <v-text-field
-      v-model="selectedDate"
-      label="날짜 선택"
-      type="date"
-      class="mb-4 text-black d-print-flex "
-      variant="underlined"      
-      ></v-text-field>
-    -->
-    <v-menu
-  v-model="menu"
-  transition="scale-transition"
-  offset-y
-  :close-on-content-click="false"
->
-    <template #activator="{ props }">
-      <v-text-field
-        v-model="selectedDate"
-        label="날짜 선택"
-        locale="ko"
-        readonly
-        v-bind="props"
-        variant="underlined"
-      ></v-text-field>
-    </template>
+    <v-text-field v-if="!mdAndDown" v-model="selectedDate" label="날짜 선택" type="date" variant="underlined" />
+    <!-- 작은 화면일 때: 아이콘 -->
+    <div v-else>
+      <v-btn icon="mdi-calendar" variant="text" @click="openDatePicker" />
 
-    <v-date-picker show-adjacent-months       
-      v-model="selectedDate"
-      :day-format :krGetDay 
-      @update:model-value="menu = false"
-    ></v-date-picker>
-  </v-menu>
-
-
+      <!-- 숨겨진 date input (완전 hidden 금지, 투명 처리만) -->
+      <input ref="dateInputRef" type="date" v-model="selectedDate"
+        style="opacity: 0; position:absolute; left:-70px;" />
+    </div>
   </div>
 </template>
 

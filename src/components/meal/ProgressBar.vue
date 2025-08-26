@@ -23,12 +23,8 @@ defineProps({
         <span class="moreeat">{{ rightString }}</span>
       </div>
       <div>
-        <progress
-          :class="`progress ${customsize} `"
-          :value="value"
-          min="0"
-          :max="max"
-        ></progress>
+        <progress :class="`progress ${customsize} ${customsize !== 'totalcal' ? 'optional-progress' : ''}`"
+          :value="value" min="0" :max="max"></progress>
       </div>
     </div>
   </div>
@@ -157,5 +153,11 @@ defineProps({
   background: #ffffff;
   background: -webkit-linear-gradient(to right, #88a0ec, #305ff8);
   background: linear-gradient(to right, #88a0ec, #305ff8);
+}
+/* 반응형 */
+@media (max-width: 768px) {
+  .optional-progress {
+    display: none;
+  }
 }
 </style>

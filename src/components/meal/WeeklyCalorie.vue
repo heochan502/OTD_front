@@ -13,6 +13,9 @@ import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 
+
+const showHide = ref(true);
+
 const clickProgress = useClickProgressBar();
 const ondayMealData = useCalorieCalcul();
 const weeklyStore = useWeeklyStore();
@@ -28,6 +31,7 @@ const xData = {
   totalFat : Array(len).fill(0),
   totalCarbohydrate : Array(len).fill(0),
   totalProtein : Array(len).fill(0),
+  
 };
 
 
@@ -129,8 +133,8 @@ const option = {
       fontSize: 12,
       fontWeight: 'bold',
       formatter: '{value} kcal',
-      show:false, // y축 숨기 표시
-    },   
+      show: showHide.value, // y축 숨기 표시
+    },
     splitLine: {
       lineStyle: {
         color: '#cccccc', // 눈금선 색상
@@ -234,12 +238,6 @@ const getStatistic = async (weeky) => {
   // console.log("yData:", yData);
 }
 
-const init= () =>{
-
-
-  
-};
-
 onMounted(async () => {
 
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
@@ -279,7 +277,17 @@ onMounted(async () => {
 // })
 
 function handleResize() {
+
+  if (window.innerWidth <768){  
+    option.yAxis.axisLabel.show = false;
+    myChart.setOption(option, true);
+  } 
+  else{
+    option.yAxis.axisLabel.show = true;
+    myChart.setOption(option, true);
+  }  
   myChart?.resize()
+
 }
 
 
