@@ -47,8 +47,8 @@ const healthStore = useHealthStore();
 const exerciseStore = useExerciseStore();
 
 onMounted(async () => {
-  await healthStore.fetchHealthlogs();
-  await exerciseStore.fetchExerciselogs();
+  // await healthStore.fetchHealthlogs();
+  // await exerciseStore.fetchExerciselogs();
 });
 
 // 해당 주차 범위

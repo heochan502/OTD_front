@@ -11,7 +11,7 @@ const healthStore = useHealthStore();
 
 const data = {
   page: 1,
-  rowPerPage: 4,
+  rowPerPage: 7,
 };
 
 const state = reactive({
@@ -37,7 +37,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  healthStore.clearLogList();
+  // healthStore.clearLogList();
 });
 
 const getData = async () => {
@@ -81,7 +81,7 @@ const detail = (healthlogId) => {
   </div>
   <div class="list-wrap" @scroll="handleScroll">
     <ul>
-      <li v-if="healthStore.logs.length < 1" class="title">
+      <li v-if="healthStore.logList.length < 1" class="title">
         건강 기록을 추가하세요
       </li>
       <li
@@ -96,6 +96,8 @@ const detail = (healthlogId) => {
           <div>건강보기</div>
         </div>
       </li>
+      <li v-if="state.isLoading" class="title">로딩중...</li>
+      <li v-else-if="state.isFinish" class="title">마지막 기록입니다</li>
     </ul>
   </div>
 </template>

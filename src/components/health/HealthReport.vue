@@ -26,9 +26,8 @@ const state = computed(() => {
   ];
 });
 
+// 캐러셀에 사용할 옵션
 const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#0F73D2", "#44cab4"];
-const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
-
 const fields = [
   { key: "moodLevel", label: "오늘의 기분" },
   { key: "sleepQuality", label: "오늘의 수면" },
@@ -37,13 +36,13 @@ const fields = [
   { key: "sugarLevel", label: "오늘의 혈당", unit: "mg/dL" },
 ];
 
+// bmi 관련
 const minBmi = 15;
 const maxBmi = 40;
 
 const bmi = computed(() => {
   if (!healthStore.logList.length) return 0;
   const heightInMeters = (healthStore.logList[0]?.height || 0) / 100;
-
   if (!heightInMeters || !healthStore.logList[0]?.weight) return 0;
   return parseFloat(
     (healthStore.logList[0]?.weight / heightInMeters ** 2).toFixed(1)
@@ -250,7 +249,7 @@ const bmiStatus = computed(() => {
   }
 
   .value {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
   }
 }

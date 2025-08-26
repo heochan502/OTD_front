@@ -17,6 +17,7 @@ const state = reactive({
 });
 
 const healthlogId = route.params.healthlogId;
+
 onMounted(async () => {
   if (!healthlogId) return;
   const res = await getHlog(healthlogId);
@@ -106,7 +107,7 @@ const deleteLog = async () => {
       :selected-date="state.hlog.healthlogDatetime"
       :selectedField="selectedField"
       :fields="fields"
-      :logs="healthStore.logs"
+      :logs="healthStore.logList"
     />
   </v-container>
 </template>

@@ -10,7 +10,7 @@ const exerciseStore = useExerciseStore();
 
 const data = {
   page: 1,
-  rowPerPage: 4,
+  rowPerPage: 7,
 };
 const state = reactive({
   isLoading: false,
@@ -35,7 +35,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  exerciseStore.clearLogList();
+  // exerciseStore.clearLogList();
 });
 
 const getData = async () => {
