@@ -163,13 +163,7 @@ const router = createRouter({
       name: 'DiaryList',
       component: DiaryList,
       props: true,
-    },
-    {
-      path: '/detail',
-      name: 'profile_detail',
-      component: ProfileDetail,
-      meta: { requiresAuth: true },
-    },
+    },    
   ],
 });
 router.beforeEach((to) => {
