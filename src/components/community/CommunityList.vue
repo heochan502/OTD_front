@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/community/communityStore';
 
 const store = usecommunityStore();
 
@@ -74,7 +74,8 @@ const handlePostClick = (post) => {
             rounded
             height="40"
             @click="store.goWrite()"
-          >글쓰기</v-btn>
+            >글쓰기</v-btn
+          >
         </v-col>
       </v-row>
 
@@ -117,7 +118,8 @@ const handlePostClick = (post) => {
                     {{ post?.title }}
                   </div>
                   <div class="text-caption text-grey mt-1">
-                    ❤️ {{ post.like }} · 💬 {{ post.commentCount }} · 👁️ {{ post.viewCount }}
+                    ❤️ {{ post.like }} · 💬 {{ post.commentCount }} · 👁️
+                    {{ post.viewCount }}
                   </div>
                 </div>
               </div>
@@ -125,21 +127,15 @@ const handlePostClick = (post) => {
           </v-col>
 
           <!-- 썸네일(오른쪽) -->
-          <v-col
-            v-if="post.filePath"
-            cols="4" sm="3" md="3"
-            class="pl-3"
-          >
-            <v-img
-              :src="post.filePath"
-              class="thumb rounded-lg"
-              cover
-            >
+          <v-col v-if="post.filePath" cols="4" sm="3" md="3" class="pl-3">
+            <v-img :src="post.filePath" class="thumb rounded-lg" cover>
               <template #placeholder>
                 <v-skeleton-loader type="image"></v-skeleton-loader>
               </template>
               <template #error>
-                <div class="thumb-fallback d-flex align-center justify-center rounded-lg">
+                <div
+                  class="thumb-fallback d-flex align-center justify-center rounded-lg"
+                >
                   <v-icon size="28" icon="mdi-image-off-outline" />
                 </div>
               </template>
@@ -177,7 +173,7 @@ const handlePostClick = (post) => {
 
 /* [CHANGED] 카드 행 공통 높이(이미지 유무와 무관하게 동일) */
 .card-row {
-  --thumb-h: 104px;      /* 필요 시 96~120px로 조절 */
+  --thumb-h: 104px; /* 필요 시 96~120px로 조절 */
   min-height: var(--thumb-h);
 }
 
@@ -185,7 +181,7 @@ const handlePostClick = (post) => {
 .content-box {
   min-height: var(--thumb-h);
   display: flex;
-  align-items: center;   /* 수직 가운데 */
+  align-items: center; /* 수직 가운데 */
 }
 
 /* 썸네일은 행 높이에 딱 맞춤 */
