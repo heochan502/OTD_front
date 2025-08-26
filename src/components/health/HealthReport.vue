@@ -6,13 +6,13 @@ import moodLevels from "@/assets/health/moodLevels.json";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
 const healthStore = useHealthStore();
 
-onMounted(async () => {
-  await healthStore.fetchHealthlogs();
-});
+// onMounted(async () => {
+//   await healthStore.fetchHealthlogs();
+// });
 
 const todayStr = getDateString();
 const todayLog = computed(() =>
-  filterHealthLogsByDate(healthStore.logs, todayStr)
+  filterHealthLogsByDate(healthStore.logList, todayStr)
 );
 
 const state = computed(() => {
@@ -20,24 +20,33 @@ const state = computed(() => {
   return [
     moodLevels[log.moodLevel].label || 0,
     sleepQualitys[log.sleepQuality].label || 0,
+    log.systolicBp || 0,
     log.diastolicBp || 0,
     log.sugarLevel || 0,
   ];
 });
 
-const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#020f75"];
+const colors = ["#fcc5e4", "#ff7882", "#fda34b", "#0F73D2", "#44cab4"];
 const subtitle = ["오늘의 기분", "오늘의 수면", "오늘의 혈압", "오늘의 당수치"];
+
+const fields = [
+  { key: "moodLevel", label: "오늘의 기분" },
+  { key: "sleepQuality", label: "오늘의 수면" },
+  { key: "systolicBp", label: "오늘의 수축기 혈압", unit: "mmHg" },
+  { key: "diastolicBp", label: "오늘의 이완기 혈압", unit: "mmHg" },
+  { key: "sugarLevel", label: "오늘의 혈당", unit: "mg/dL" },
+];
 
 const minBmi = 15;
 const maxBmi = 40;
 
 const bmi = computed(() => {
-  if (!healthStore.logs.length) return 0;
-  const heightInMeters = (healthStore.logs[0]?.height || 0) / 100;
+  if (!healthStore.logList.length) return 0;
+  const heightInMeters = (healthStore.logList[0]?.height || 0) / 100;
 
-  if (!heightInMeters || !healthStore.logs[0]?.weight) return 0;
+  if (!heightInMeters || !healthStore.logList[0]?.weight) return 0;
   return parseFloat(
-    (healthStore.logs[0]?.weight / heightInMeters ** 2).toFixed(1)
+    (healthStore.logList[0]?.weight / heightInMeters ** 2).toFixed(1)
   );
 });
 
@@ -63,21 +72,27 @@ const bmiStatus = computed(() => {
           cycle
           hide-delimiter-background
           hide-delimiters
-          interval="3000"
+          interval="3500"
           class="report-carousel"
         >
-          <v-carousel-item class="sheet" v-for="(item, i) in subtitle" :key="i">
-            <v-sheet :color="colors[i]" height="100%">
-              <div class="d-flex justify-center align-center flex-column pa-3">
-                <div class="text-h6 pa-3">{{ item }}</div>
+          <v-carousel-item
+            class="sheet"
+            v-for="(item, idx) in fields"
+            :key="idx"
+          >
+            <v-sheet :color="colors[idx]" height="100%">
+              <div
+                class="d-flex justify-center align-center flex-column pa-3 text-center"
+              >
+                <div class="text-h6 pa-3">{{ item.label }}</div>
                 <div
                   v-if="!todayLog || todayLog.length === 0"
                   class="fill-height"
                 >
                   기록없음
                 </div>
-                <div v-else class="text-h3 pa-3 fill-height">
-                  {{ state[i] }}
+                <div v-else class="pa-3 fill-height">
+                  {{ state[idx] }} {{ item.unit }}
                 </div>
               </div>
             </v-sheet>
@@ -89,14 +104,22 @@ const bmiStatus = computed(() => {
       <div class="small_box">
         <span>weight</span>
         <span class="value">
-          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.weight }}
+          {{
+            healthStore.logList.length === 0
+              ? 0
+              : healthStore.logList[0]?.weight
+          }}
           kg
         </span>
       </div>
       <div class="small_box">
         <span>height</span>
         <span class="value">
-          {{ healthStore.logs.length === 0 ? 0 : healthStore.logs[0]?.height }}
+          {{
+            healthStore.logList.length === 0
+              ? 0
+              : healthStore.logList[0]?.height
+          }}
           cm
         </span>
       </div>

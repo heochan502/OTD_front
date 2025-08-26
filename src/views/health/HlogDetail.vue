@@ -7,29 +7,19 @@ import { useHealthStore } from "@/stores/healthStore";
 import { useRoute } from "vue-router";
 import { getHlog, deleteHlog } from "@/services/health/hlogService";
 import router from "@/router";
+import { formatDate } from "@/utils/reportUtils";
 
 const healthStore = useHealthStore();
 const route = useRoute();
 
 const state = reactive({
-  hlog: {
-    healthlogId: null,
-    weight: null,
-    height: null,
-    systolicBp: null,
-    diastolicBp: null,
-    sugarLevel: null,
-    moodLevel: null,
-    sleepQuality: null,
-    healthlogDatetime: "",
-  },
+  hlog: [],
 });
 
 const healthlogId = route.params.healthlogId;
-
 onMounted(async () => {
- 
-  await healthStore.fetchHealthlogs();
+  if (!healthlogId) {return;}
+  
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
@@ -49,10 +39,6 @@ const fields = [
   { key: "sugarLevel", label: "혈당", unit: "mg/dL" },
 ];
 const selectedField = ref(fields[0].key);
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 // @click
 const deleteLog = async () => {

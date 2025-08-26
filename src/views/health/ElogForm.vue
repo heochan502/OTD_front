@@ -102,7 +102,7 @@ const cancel = () => {
           <v-select
             v-model="state.form.exerciseId"
             :items="
-              exerciseStore.list.map((e) => ({
+              exerciseStore.exerciseList.map((e) => ({
                 title: e.exerciseName,
                 value: e.exerciseId,
               }))

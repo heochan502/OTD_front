@@ -33,3 +33,9 @@ export function calcEffortAvg(logs) {
 export function filterHealthLogsByDate(logs, dateStr) {
   return logs.filter((log) => log.healthlogDatetime.startsWith(dateStr));
 }
+
+// 날짜 포맷 함수 'YYYY년 MM월 DD일'
+export const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
