@@ -321,7 +321,7 @@ const submit = async () => {
         z-index: 99999999999;
         margin-top: 10px;
 
-        .mini-calendar{
+        .mini-calendar {
           margin-top: -5px;
         }
       }
