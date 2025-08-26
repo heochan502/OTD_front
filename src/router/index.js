@@ -1,14 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
-<<<<<<<<< Temporary merge branch 1
-import ReminderForm from '@/components/reminder/ReminderForm.vue';
-import ReminderList from '@/views/reminder/ReminderList.vue';
-import ReminderDetail from '@/components/reminder/ReminderDetail.vue';
-=========
-import ReminderForm from '@/views/reminder/ReminderForm.vue';
-import ReminderList from '@/views/reminder/ReminderList.vue';
->>>>>>>>> Temporary merge branch 2
+// import ReminderForm from '@/views/reminder/ReminderForm.vue';
+// import ReminderList from '@/views/reminder/ReminderList.vue';
+// import ReminderDetail from '@/components/reminder/ReminderDetail.vue';
 
 import MemoList from '@/components/memo/MemoList.vue';
 import DiaryList from '@/components/memo/DiaryList.vue';
@@ -17,12 +12,11 @@ import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 import CommunityView from '@/views/community/CommunityView.vue';
 // 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/community/communityStore';
 
-
-import MealForm from "@/views/meal/MealForm.vue";
-import MealAdd from "@/views/meal/MealAdd.vue";
-import MealStatistic from "@/components/meal/MealStatistic.vue";
+import MealForm from '@/views/meal/MealForm.vue';
+import MealAdd from '@/views/meal/MealAdd.vue';
+import MealStatistic from '@/components/meal/MealStatistic.vue';
 
 import HealthMain from '@/views/health/HealthMain.vue';
 import ElogDetail from '@/views/health/ElogDetail.vue';
@@ -56,24 +50,21 @@ const router = createRouter({
       component: ReminderHome,
       meta: { requiresAuth: true },
     },
-    {
-      path: '/reminder/form',
-      name: 'reminderform',
-      component: ReminderForm,
-    },
-    {
-<<<<<<<<< Temporary merge branch 1
-      path: '/reminder/detail',
-      name: 'reminderdetail',
-      component: ReminderDetail,
-    },
-    {
-=========
->>>>>>>>> Temporary merge branch 2
-      path: '/reminder/list',
-      name: 'reminderlist',
-      component: ReminderList,
-    },
+    // {
+    //   path: '/reminder/form',
+    //   name: 'reminderform',
+    //   component: ReminderForm,
+    // },
+    // {
+    //   path: '/reminder/list',
+    //   name: 'reminderlist',
+    //   component: ReminderList,
+    // },
+    // {
+    //   path: '/reminder/detail',
+    //   name: 'reminderdetail',
+    //   component: ReminderDetail,
+    // },
     {
       path: '/meal',
       name: 'MealForm',
@@ -178,24 +169,13 @@ const router = createRouter({
       name: 'DiaryList',
       component: DiaryList,
       props: true,
-<<<<<<<<< Temporary merge branch 1
     },
-    {
-      path: '/detail',
-      name: 'profile_detail',
-      component: ProfileDetail,
-      meta: { requiresAuth: true },
-    },
-=========
-    },    
->>>>>>>>> Temporary merge branch 2
   ],
 });
 router.beforeEach((to) => {
-  const accountStore = useAccountStore();  
+  const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
-<<<<<<<<< Temporary merge branch 1
-    return "/login";
+    return '/login';
   }
   // 커뮤니티 진입 시 항상 리스트 모드로 강제
   if (to.path === '/community') {

@@ -28,7 +28,7 @@ const props = defineProps({
 
 const showDateCalendar = ref(false);
 const showRepeatCalendar = ref(false);
-const selectedStartDate = ref(new Date());
+// const selectedStartDate = ref(new Date());
 
 // 캘린더에서 날짜 선택했을때 실행할 로직
 const selectedDate = (day) => {
@@ -62,10 +62,12 @@ const openCalendar = (use) => {
       showRepeatCalendar.value = false;
       state.reminder.repeat = false;
       state.reminder.repeatDow = [];
+      state.reminder.endDate = '';
       dowImage.value.forEach((item) => (item.isOn = false));
     }
     showDateCalendar.value = !showDateCalendar.value;
   } else if (use === 'repeat') {
+    state.reminder.repeat = true;
     showDateCalendar.value = false;
     showRepeatCalendar.value = !showRepeatCalendar.value;
   }
@@ -208,7 +210,12 @@ const close = () => {
         </span>
       </div>
       <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
-        <span :class="{ on: isDateMode }" class="off date-box">날짜</span>
+        <span
+          :class="{ on: isDateMode }"
+          class="off date-box"
+          @click="openCalendar('date')"
+          >날짜</span
+        >
         <span @click="openCalendar('date')">
           <span class="date">{{ state.reminder.startDate }}</span>
           <img

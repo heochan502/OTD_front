@@ -3,7 +3,7 @@ import { reactive, ref, onMounted } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
 import {
   deleteById,
-  modify,
+  modifyException,
   saveException,
 } from '@/services/reminder/reminderService';
 import Form from '@/components/reminder/ReminderForm.vue';
@@ -60,7 +60,7 @@ const deleteScope = ref('one');
 const deleteDate = ref(reminderStore.state.selectedDate);
 
 const remove = async (id) => {
-  const res = null;
+  let res = null;
   if (!confirm('일정을 삭제할까요?')) {
     return;
   }
@@ -69,12 +69,13 @@ const remove = async (id) => {
   }
   if (state.reminderDetail.repeat) {
     if (deleteScope.value === 'one') {
-      const jsonbody = { id: id, exceptionDate: deleteDate };
+      const jsonbody = { id: id, exceptionDate: deleteDate.value };
+      console.log(jsonbody)
       res = await saveException(jsonbody);
     }
     if (deleteScope.value === 'future') {
-      const jsonBody = { id: id, endDate: deleteDate };
-      res = await modify(jsonBody);
+      const jsonBody = { id: id, endDate: deleteDate.value };
+      res = await modifyException(jsonBody);
     }
   }
   if (res === undefined || res.status !== 200) {
@@ -85,11 +86,6 @@ const remove = async (id) => {
   emit('detail-close');
 };
 
-// const params = { id };
-//   if (state.reminderDetail.repeat) {
-//     params.scope = deleteScope.value;
-
-//   }
 </script>
 
 <template>

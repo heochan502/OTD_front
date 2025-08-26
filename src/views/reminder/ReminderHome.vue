@@ -1,6 +1,5 @@
 <script setup>
 import { reactive, onMounted, watch, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { getByMonth } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 import Calendar from '@/components/reminder/Calendar.vue';
@@ -8,8 +7,6 @@ import Form from '@/components/reminder/ReminderForm.vue';
 import Detail from '@/components/reminder/ReminderDetail.vue';
 
 const reminderStore = useReminderStore();
-
-const router = useRouter();
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 const formatDate = (date) => {
@@ -93,7 +90,8 @@ const getRepeatDate = (fullReminder, year, month) => {
         item.repeat &&
         item.repeatDow?.includes(dow) &&
         item.startDate <= formattedDate &&
-        (!item.endDate || item.endDate >= formattedDate)
+        (!item.endDate || item.endDate >= formattedDate)&&
+        !item.exceptionDate?.includes(formattedDate)
       ) {
         result.push(formattedDate);
       }
@@ -106,15 +104,17 @@ const getRepeatDate = (fullReminder, year, month) => {
 // 하루치 리마인더 정보 필터링 로직
 const filterReminder = (date) => {
   const dow = date.getDay();
+  const formattedDate = formatDate(date);
   const reminderList = reminderStore.state.fullReminder.filter((item) => {
     const isFixed =
-      item.repeat === false && item.startDate === formatDate(date);
+      item.repeat === false && item.startDate === formattedDate;
 
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
-      item.startDate <= formatDate(date) &&
-      (!item.endDate || item.endDate >= formatDate(date));
+      item.startDate <= formattedDate &&
+      (!item.endDate || item.endDate >= formattedDate)&&
+      !item.exceptionDate?.includes(formattedDate);
 
     return isFixed || isRepeat;
   });
