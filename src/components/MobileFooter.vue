@@ -28,15 +28,16 @@
 
 <style scoped>
 .mobile-footer {
-  position: sticky;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: white;
   border-top: 1px solid #ddd;
   z-index: 1000;
-  &:hover {
+  :hover {
     background-color: #fff;
+    cursor: pointer;
     :active {
       background-color: #4fc3f7;
     }
@@ -55,6 +56,7 @@
   align-items: center;
   font-size: 12px;
   flex: 1;
+
   border-right: 1px solid #ddd;
   text-decoration: none;
   color: #333;

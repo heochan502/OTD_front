@@ -116,6 +116,9 @@ const logoutAccount = async () => {
       </div>
     </div>
   </header>
+  <div class="d-lg-none">
+    <MobileFooter />
+  </div>
 </template>
 
 <style lang="scss" scoped>
