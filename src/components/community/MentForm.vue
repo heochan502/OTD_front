@@ -1,29 +1,31 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useDialogStore } from '@/stores/community/dialogStore';
 import { useAccountStore } from '@/stores/counter';
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/community/communityStore';
 import {
   fetchMents,
   createMent as apiCreateMent,
   deleteMent as apiDeleteMent,
 } from '@/services/community/mentService';
 
+const dialog = useDialogStore();
 const account = useAccountStore();
 const store = usecommunityStore();
 
-// ✅ 반응형으로 선택 게시글 추적 (기존: const post = store.selectedPost;)
 const post = computed(() => store.selectedPost);
 
 const ments = ref([]);
 const newMent = ref('');
 const loading = ref(false);
-const err = ref('');
 
 // 날짜 포맷
 function formatDate(dateStr) {
-  const date = new Date(dateStr);
-  if (isNaN(date)) return '날짜 오류';
-  return date.toLocaleString('ko-KR', {
+  const hasTz = /Z$|[+-]\d{2}:\d{2}$/.test(dateStr);
+  const iso = hasTz ? dateStr : dateStr.replace(' ', 'T') + '+09:00';
+  const d = new Date(iso);
+  if (isNaN(d)) return '날짜 오류';
+  return d.toLocaleString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -32,58 +34,63 @@ function formatDate(dateStr) {
   });
 }
 
-// ✅ 목록 로드 (postId 필요)
+// 목록 로드
 const loadMents = async () => {
   if (!post.value?.postId) return;
-  err.value = '';
   try {
     const res = await fetchMents(post.value.postId);
     ments.value = Array.isArray(res.data) ? res.data : [];
   } catch (e) {
-    err.value = '댓글 조회에 실패했습니다.';
     console.error('댓글 조회 실패:', e);
+    await dialog.alert({ title: '오류', message: '댓글 조회에 실패했습니다.' });
   }
 };
 
-// ✅ 등록 (세션 기반: memberNoLogin 안보내도 됨)
+// 등록
 const submitMent = async () => {
   if (!newMent.value.trim() || !post.value?.postId) return;
   loading.value = true;
-  err.value = '';
   try {
     await apiCreateMent({
       postId: post.value.postId,
       content: newMent.value.trim(),
     });
     newMent.value = '';
-    await loadMents(); // 갱신
+    await loadMents();
   } catch (e) {
-    err.value =
-      e?.response?.status === 401 ? '로그인이 필요합니다.' : '댓글 등록 실패';
     console.error('댓글 등록 실패:', e);
+    const msg =
+      e?.response?.status === 401
+        ? '로그인이 필요합니다.'
+        : '댓글 등록에 실패했습니다.';
+    await dialog.alert({ title: '오류', message: msg });
   } finally {
     loading.value = false;
   }
 };
 
-// ✅ 삭제
+// 삭제
 const onDeleteMent = async (commentId) => {
-  const confirmed = confirm('댓글을 삭제하시겠습니까?');
-  if (!confirmed) return;
+  const ok = await dialog.confirm({
+    title: '삭제 확인',
+    message: '댓글을 삭제하시겠습니까?',
+    confirmText: '삭제',
+    cancelText: '취소',
+  });
+  if (!ok) return;
   loading.value = true;
-  err.value = '';
   try {
     await apiDeleteMent(commentId);
-    await loadMents(); // 갱신
+    await loadMents();
   } catch (e) {
-    err.value = '댓글 삭제 실패';
     console.error('댓글 삭제 실패:', e);
+    await dialog.alert({ title: '오류', message: '댓글 삭제에 실패했습니다.' });
   } finally {
     loading.value = false;
   }
 };
 
-// ✅ postId가 준비/변경될 때마다 자동 로딩
+// postId 변경 시 자동 로딩
 watch(
   () => post.value?.postId,
   (v) => v && loadMents(),
@@ -97,16 +104,6 @@ onMounted(() => {
 
 <template>
   <div class="comment-section">
-    <v-alert
-      v-if="err"
-      type="error"
-      variant="tonal"
-      class="mb-3"
-      density="comfortable"
-    >
-      {{ err }}
-    </v-alert>
-
     <div class="text-subtitle-2 font-weight-medium mb-3">
       댓글 {{ ments.length }}개
     </div>
@@ -123,7 +120,9 @@ onMounted(() => {
               {{ ment.memberNick }}
             </span>
           </div>
-          <span class="text-caption text-grey">{{ formatDate(ment.updatedAt) }}</span>
+          <span class="text-caption text-grey">{{
+            formatDate(ment.updatedAt)
+          }}</span>
         </div>
 
         <div class="text-body-2 mt-1 pl-10 d-flex justify-space-between">

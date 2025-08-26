@@ -3,7 +3,7 @@ import axios from 'axios';
 // 백엔드 서버의 실제 도메인 주소 명시
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/OTD',
-  withCredentials: true, // ✅ 세션 쿠키 포함
+  withCredentials: true, // 세션 쿠키 포함
 });
 
 api.interceptors.response.use(
