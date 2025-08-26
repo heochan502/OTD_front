@@ -171,7 +171,6 @@ const submit = async () => {
     repeatDow: state.reminder.repeatDow,
     alarm: state.reminder.alarm,
   };
-  console.log('body', jsonBody);
   if (state.reminder.id > 0) {
     jsonBody.id = state.reminder.id;
     const res = await modify(jsonBody);
