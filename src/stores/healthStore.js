@@ -38,7 +38,8 @@ export const useHealthStore = defineStore("health", {
         console.log("건강기록 가져온 값", this.logs);
         count++;
       }
-      if (count < 52) {
+      if(count>52)
+      {
         console.log("최근 1년동안의 데이터가 없습니다.");
       }
     },

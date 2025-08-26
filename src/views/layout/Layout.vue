@@ -15,14 +15,15 @@ import Footer from './Footer.vue';
       <Content />
     </div>
     <div class="footer">
-       <Footer />
+      <Footer />
     </div>
   </div>
 </template>
 
 <style scoped>
 .headerlayout {
-  min-width: 90vw;
+  width: 100%;
+  margin: 0 auto;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -37,5 +38,8 @@ import Footer from './Footer.vue';
   background-color: white;
   display: flex;
   flex-direction: column;
+}
+.footer {
+  width: 100%;
 }
 </style>

@@ -26,6 +26,7 @@ onMounted(async () => {
     return;
   }
   state.hlog = res.data;
+  console.log("정보 : ", route);
 });
 
 const fields = [
