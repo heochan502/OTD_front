@@ -9,8 +9,6 @@ import { useHealthStore } from "@/stores/healthStore";
 const exerciseStore = useExerciseStore();
 const healthStore = useHealthStore();
 
-const healthLogDate = ref([]);
-const exerciseLogDate = ref([]);
 const calendarAttributes = ref([]);
 
 // 오늘날짜
@@ -98,7 +96,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-card class="calendar_card" width="400" height="300">
+  <v-card class="calendar_card w-100" min-width="350" height="300">
     <div class="caption d-flex align-center">
       <span class="dot dot-health"></span>
       <span>건강</span>
@@ -111,8 +109,8 @@ onUnmounted(() => {
       :attributes="calendarAttributes"
       :locale="'ko'"
       :show-adjacent-months="false"
-      style="width: 100%; height: 100%; border: none"
-      class="calendar"
+      style="border: none"
+      class="calendar w-100 h-100"
       @did-move="onDidMove"
     >
       <!-- 타이틀 디자인 수정 -->
@@ -154,6 +152,10 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.calendar_card {
+  padding: 0;
+}
+
 .today {
   background-color: #eaeaea;
   width: 25px;

@@ -13,11 +13,11 @@ import { onMounted } from "vue";
     <!-- 상단 -->
     <v-row class="top" justify="center" align="center">
       <!-- 리포트영역 -->
-      <v-col cols="auto">
+      <v-col class="d-flex" style="flex: 1">
         <ReportCard />
       </v-col>
       <!-- 달력 -->
-      <v-col cols="auto">
+      <v-col class="d-flex" style="flex: 1">
         <HealthLogCalendar />
       </v-col>
     </v-row>

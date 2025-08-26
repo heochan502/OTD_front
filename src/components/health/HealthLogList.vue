@@ -73,36 +73,44 @@ const detail = (healthlogId) => {
 </script>
 
 <template>
-  <div class="list_title">
-    <div>건강기록</div>
-    <div>
-      <i class="bi bi-plus-circle btn-plus" @click="add"></i>
+  <div class="wrap">
+    <div class="list_title">
+      <div>건강기록</div>
+      <div>
+        <i class="bi bi-plus-circle btn-plus" @click="add"></i>
+      </div>
     </div>
-  </div>
-  <div class="list-wrap" @scroll="handleScroll">
-    <ul>
-      <li v-if="healthStore.logList.length < 1" class="title">
-        건강 기록을 추가하세요
-      </li>
-      <li
-        v-for="item in healthStore.logList"
-        :key="item.healthlogId"
-        @click="detail(item.healthlogId)"
-      >
-        <div class="title">
-          {{ formatDate(item.healthlogDatetime) }}
-        </div>
-        <div class="content">
-          <div>건강보기</div>
-        </div>
-      </li>
-      <li v-if="state.isLoading" class="title">로딩중...</li>
-      <li v-else-if="state.isFinish" class="title">마지막 기록입니다</li>
-    </ul>
+    <div class="list-wrap" @scroll="handleScroll">
+      <ul>
+        <li v-if="healthStore.logList.length < 1" class="title">
+          건강 기록을 추가하세요
+        </li>
+        <li
+          v-for="item in healthStore.logList"
+          :key="item.healthlogId"
+          @click="detail(item.healthlogId)"
+          class="w-sm-100"
+        >
+          <div class="title text-sm-text-body-1">
+            {{ formatDate(item.healthlogDatetime) }}
+          </div>
+          <div class="content">
+            <div>건강보기</div>
+          </div>
+        </li>
+        <li v-if="state.isLoading" class="title">로딩중...</li>
+        <li v-else-if="state.isFinish" class="title">마지막 기록입니다</li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.wrap {
+  min-width: 350px;
+  max-width: 400px;
+}
+
 .list_title {
   display: flex;
   flex-direction: row;

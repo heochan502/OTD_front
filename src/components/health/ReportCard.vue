@@ -62,7 +62,8 @@ onMounted(async () => {});
 
 <style lang="scss" scoped>
 .card {
-  width: 400px;
+  max-width: 400px;
+  min-width: 350px;
   height: 300px;
   border-radius: 25px 25px 0 0;
 }
