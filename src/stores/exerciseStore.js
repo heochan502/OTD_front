@@ -41,5 +41,9 @@ export const useExerciseStore = defineStore("exercise", {
     },
   },
 
+
   persist: true,
+=========
+  
+>>>>>>>>> Temporary merge branch 2
 });

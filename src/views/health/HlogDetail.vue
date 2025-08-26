@@ -19,7 +19,10 @@ const state = reactive({
 const healthlogId = route.params.healthlogId;
 
 onMounted(async () => {
-  if (!healthlogId) return;
+  if (!healthlogId) {
+    return;
+  }
+
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");

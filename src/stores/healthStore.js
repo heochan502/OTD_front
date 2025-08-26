@@ -23,8 +23,13 @@ export const useHealthStore = defineStore("health", {
       const weekly = makeWeekly();
       // let res = null;
       let res = await getHlogs(weekly);
+<<<<<<<<< Temporary merge branch 1
       this.logs = res.data;
       let count = 0;
+=========
+        this.logs = res.data;     
+      let count =0;
+>>>>>>>>> Temporary merge branch 2
       // 데이터 못가져왔을때
       while (this.logs.length === 0 && count < 52) {
         weekly.startDate = dayjs(weekly.startDate)
@@ -38,6 +43,9 @@ export const useHealthStore = defineStore("health", {
         console.log("건강기록 가져온 값", this.logs);
         count++;
       }
+<<<<<<<<< Temporary merge branch 1
+      if (count < 52) {
+=========
       if(count>52)
       {
         console.log("최근 1년동안의 데이터가 없습니다.");
