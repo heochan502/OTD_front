@@ -47,7 +47,7 @@ const healthStore = useHealthStore();
 const exerciseStore = useExerciseStore();
 
 onMounted(async () => {
-  await healthStore.fetchHealthlogs();
+  // await healthStore.fetchHealthlogs();
   // await exerciseStore.fetchExerciselogs();
 });
 

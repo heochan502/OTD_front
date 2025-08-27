@@ -3,6 +3,7 @@ import { reactive, ref } from "vue";
 import { getHlogs } from "@/services/health/hlogService";
 import dayjs from "dayjs"; // dayjs 사용
 import "dayjs/locale/ko";
+import { add } from "lodash";
 
 dayjs.locale("ko"); // 한글로 월화수 이렇게 나오게 하는거
 
@@ -40,8 +41,7 @@ export const useHealthStore = defineStore("health", {
         count++;
       }
 
-      if(count>52)
-      {
+      if (count < 52) {
         console.log("최근 1년동안의 데이터가 없습니다.");
       }
     },
@@ -56,6 +56,9 @@ export const useHealthStore = defineStore("health", {
     },
     clearLogList() {
       this.logList = [];
+    },
+    addTodayLog(list) {
+      this.todayLog.push(...list);
     },
   },
   persist: true,

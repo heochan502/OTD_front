@@ -48,8 +48,8 @@ onMounted(async () => {});
       style="border-radius: 25px 25px 0 0"
       slider-color="#3bbeff"
     >
-      <v-tab value="one">운동 리포트</v-tab>
-      <v-tab value="two">건강 리포트</v-tab>
+      <v-tab value="one" class="text-subtitle-1 text-sm-h6">운동 리포트</v-tab>
+      <v-tab value="two" class="text-subtitle-1 text-sm-h6">건강 리포트</v-tab>
     </v-tabs>
     <v-card-text height="300">
       <v-tabs-window v-model="tab">
@@ -62,13 +62,14 @@ onMounted(async () => {});
 
 <style lang="scss" scoped>
 .card {
+  // max-width: 400px;
+
+  min-width: 310px;
   width: 400px;
   height: 300px;
   border-radius: 25px 25px 0 0;
 }
 .v-tab {
-  font-size: 18px;
-  font-weight: 700;
   color: #fff;
 }
 .v-tab.v-tab--selected {

@@ -30,25 +30,28 @@ const formatTime = (dateStr) => {
   return `${date.getHours()}시 ${date.getHours()}분`;
 };
 
-onMounted(async () => {
+const exerciseLogId = route.params.exerciselogId;
 
+onMounted(async () => {
   const exerciseLogId = route.params.exerciselogId;
-  if (!exerciseLogId) {return;}
+  if (!exerciseLogId) return;
   const res = await getElog(exerciseLogId);
 
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
+  console.log("운동기록", res.data);
   state.elog = res.data;
+  console.log("저장", state.elog.effortLevel);
 });
 
 // @click
-const moveToMain = () => {
-  router.push({
-    path: "/health",
-  });
-};
+// const moveToMain = () => {
+//   router.push({
+//     path: "/health",
+//   });
+// };
 
 const deleteLog = async () => {
   if (!confirm("삭제하시겠습니까?")) return;
@@ -70,7 +73,9 @@ const deleteLog = async () => {
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
       <div class="btns">
-        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+        <router-link to="/health">
+          <v-btn class="btn_home">홈</v-btn>
+        </router-link>
         <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
       </div>
     </v-row>
@@ -121,7 +126,7 @@ const deleteLog = async () => {
         <HealthChart
           class="mt-3"
           :selectedDate="state.elog.exerciseDatetime"
-          :logs="exerciseStore.logs"
+          :logs="exerciseStore.logList"
           label="exerciseKcal"
         />
       </v-col>
@@ -130,7 +135,7 @@ const deleteLog = async () => {
         <HealthChart
           class="mt-3"
           :selectedDate="state.elog.exerciseDatetime"
-          :logs="exerciseStore.logs"
+          :logs="exerciseStore.logList"
           label="exerciseDuration"
         />
       </v-col>
@@ -206,5 +211,9 @@ const deleteLog = async () => {
 .chart {
   display: flex;
   gap: 10px;
+}
+
+:hover {
+  background-color: #fff;
 }
 </style>

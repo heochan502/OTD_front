@@ -17,9 +17,12 @@ const state = reactive({
 });
 
 const healthlogId = route.params.healthlogId;
+
 onMounted(async () => {
-  if (!healthlogId) {return;}
-  
+  if (!healthlogId) {
+    return;
+  }
+
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
@@ -108,7 +111,7 @@ const deleteLog = async () => {
       :selected-date="state.hlog.healthlogDatetime"
       :selectedField="selectedField"
       :fields="fields"
-      :logs="healthStore.logs"
+      :logs="healthStore.logList"
     />
   </v-container>
 </template>
