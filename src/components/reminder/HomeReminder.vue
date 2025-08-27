@@ -14,30 +14,40 @@ const todayYear = today.getFullYear();
 const todayMonth = today.getMonth() + 1;
 const todayDate = today.getDate();
 
-onMounted(async () => {
-  if (reminderStore.state.fullReminder.length === 0) {
-    const res = await getByMonth(year, month);
-    if (res && res.status === 200) {
-      reminderStore.setFullReminder(res.data);
-    }
-  }
+const formattedToday = `${todayYear}-${String(todayMonth).padStart(
+  2,
+  '0'
+)}-${String(todayDate).padStart(2, '0')}`;
 
-  const formattedToday = `${todayYear}-${String(todayMonth).padStart(
-    2,
-    '0'
-  )}-${String(todayDate).padStart(2, '0')}`;
+onMounted(async () => {
+    const res = await getByMonth(todayYear, todayMonth);
+    if (res === undefined || res.status !== 200) {
+      alert('오류발생');
+      return;
+    }
+    reminderStore.setFullReminder(res.data);
+
   const dow = today.getDay();
 
   state.todayReminder = reminderStore.state.fullReminder.filter((item) => {
-    const isFixed = item.startDate === formattedToday;
+    const isFixed = item.repeat === false && item.startDate === formattedToday;
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
-      new Date(formattedToday) >= new Date(item.created);
+      item.startDate <= formattedToday &&
+      (!item.endDate || item.endDate >= formattedToday) &&
+      !item.exceptionDate?.includes(formattedToday);
 
     return isFixed || isRepeat;
   });
 });
+
+const resetDate = () => {
+  reminderStore.setCurrentYear(todayYear);
+  reminderStore.setCurrentMonth(todayMonth);
+  reminderStore.setSelectedDate(formattedToday);
+  console.log('format', formattedToday);
+};
 </script>
 
 <template>
@@ -51,7 +61,7 @@ onMounted(async () => {
       {{ todayYear }}년 {{ todayMonth }}월 {{ todayDate }}일</span
     >
     <ul class="list">
-      <router-link class="link" to="/reminder">
+      <router-link class="link" to="/reminder" @click="resetDate">
         <template v-if="state.todayReminder.length > 0">
           <li
             v-for="item in state.todayReminder"
