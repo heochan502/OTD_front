@@ -61,11 +61,11 @@ const cancel = () => {
 
 <template>
   <v-container class="container" fluid>
-    <v-row class="title">
+    <div class="title">
       <h4>운동 기록하기</h4>
-    </v-row>
-    <v-row class="content">
-      <v-col cols="6">
+    </div>
+    <v-row class="content d-flex justify-center">
+      <v-col cols="12" sm="6" class="d-flex flex-column">
         <div class="subtitle">운동일자</div>
         <input
           type="datetime-local"
@@ -93,7 +93,7 @@ const cancel = () => {
           ></v-number-input>
         </div>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <!-- 운동 종목 데이터 통신 필요 -->
         <v-row>
           <div class="subtitle">운동</div>
@@ -111,7 +111,7 @@ const cancel = () => {
             density="compact"
             placeholder="운동을 선택하세요"
             clearable
-            width="274px"
+            max-width="274px"
           ></v-select>
 
           <!-- <v-icon
@@ -122,7 +122,7 @@ const cancel = () => {
         </v-row>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
-          <div class="text-h3 font-weight-light">
+          <div class="text-h4 text-md-h3 font-weight-light">
             {{ state.form.effortLevel }}
           </div>
         </div>
@@ -134,6 +134,7 @@ const cancel = () => {
           :step="1"
           min="1"
           max="10"
+          max-width="274px"
         >
           <template v-slot:thumb-label="{ modelValue }">
             {{ effortLevels[modelValue - 1].emoji }}
@@ -170,8 +171,6 @@ const cancel = () => {
   align-items: center;
 
   flex-direction: column;
-
-  padding-top: 100px;
 
   .title {
     display: flex;
