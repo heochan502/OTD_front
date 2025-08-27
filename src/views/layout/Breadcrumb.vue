@@ -122,7 +122,7 @@ const logoutAccount = async () => {
       </div>
     </div>
   </header>
-  <div class="d-lg-none">
+  <div class="d-md-none">
     <MobileFooter />
   </div>
 </template>
@@ -275,6 +275,44 @@ const logoutAccount = async () => {
     border-radius: 50%;
     border: 1px solid #ecf0f1;
     vertical-align: top;
+  }
+}
+@media (max-width: 768px) {
+  .inner {
+    .logo {
+      padding: 0 10px 0 19px;
+    }
+    .nav {
+      padding: 0 4px;
+    }
+    .member {
+      padding: 0 0 0 0.2rem;
+    }
+  }
+}
+// vuetify 설정이 안되어 임의로 설정
+@media (min-width: 480px) {
+  .d-sm-flex {
+    display: flex !important;
+  }
+  .d-sm-none {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .d-md-flex {
+    display: flex !important;
+  }
+  .d-md-none {
+    display: none !important;
+  }
+}
+@media (min-width: 1024px) {
+  .d-lg-flex {
+    display: flex !important;
+  }
+  .d-lg-none {
+    display: none !important;
   }
 }
 </style>

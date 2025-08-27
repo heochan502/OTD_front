@@ -115,7 +115,7 @@ import MobileFooter from '@/components/MobileFooter.vue';
       </div>
     </div>
   </div>
-  <div class="d-lg-none">
+  <div class="d-md-none">
     <MobileFooter />
   </div>
 </template>
@@ -278,5 +278,30 @@ a {
 .social-link {
   position: relative;
   text-decoration: none;
+}
+// vuetify 설정이 안되어 임의로 설정
+@media (min-width: 480px) {
+  .d-sm-flex {
+    display: flex !important;
+  }
+  .d-sm-none {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .d-md-flex {
+    display: flex !important;
+  }
+  .d-md-none {
+    display: none !important;
+  }
+}
+@media (min-width: 1024px) {
+  .d-lg-flex {
+    display: flex !important;
+  }
+  .d-lg-none {
+    display: none !important;
+  }
 }
 </style>

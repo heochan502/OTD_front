@@ -90,7 +90,7 @@ const getRepeatDate = (fullReminder, year, month) => {
         item.repeat &&
         item.repeatDow?.includes(dow) &&
         item.startDate <= formattedDate &&
-        (!item.endDate || item.endDate >= formattedDate)&&
+        (!item.endDate || item.endDate >= formattedDate) &&
         !item.exceptionDate?.includes(formattedDate)
       ) {
         result.push(formattedDate);
@@ -106,14 +106,13 @@ const filterReminder = (date) => {
   const dow = date.getDay();
   const formattedDate = formatDate(date);
   const reminderList = reminderStore.state.fullReminder.filter((item) => {
-    const isFixed =
-      item.repeat === false && item.startDate === formattedDate;
+    const isFixed = item.repeat === false && item.startDate === formattedDate;
 
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
       item.startDate <= formattedDate &&
-      (!item.endDate || item.endDate >= formattedDate)&&
+      (!item.endDate || item.endDate >= formattedDate) &&
       !item.exceptionDate?.includes(formattedDate);
 
     return isFixed || isRepeat;
