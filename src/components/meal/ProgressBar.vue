@@ -169,6 +169,8 @@ defineProps({
   .totalcal_text {      
     display: grid;
     justify-content: center ;
+    margin-top: 0px;
+    padding-top: 0px;
     /* 자식 요소들을 수직 중앙에 정렬 */ 
     /* align-items: center;  */
     /* 자식 요소들을 수직 중앙에 정렬 */
@@ -188,6 +190,10 @@ defineProps({
   .totalcal
   {
     margin: 5px;
+  }
+  .progress-wrapper{
+    margin: 0px;
+    padding-top: 0px;
   }
   
 }

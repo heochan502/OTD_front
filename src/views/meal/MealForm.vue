@@ -45,16 +45,21 @@ const makeTotalCalorie = async () => {
   //   const totalPrice = items.reduce((sum, item) => {
   //   return sum + item.price; // 각 item의 price 값을 sum에 더함
   // }, 0); // 초기값은 0
+  if (!healthData.logs.length)
+    {
+      
+      
+      return router.push({ name: 'HlogForm' });}
 
-  const weightSum = healthData.logs.reduce(
-    (acc, current) => acc + current.weight,
-    0
-  );
 
-  const heightSum = healthData.logs.reduce(
-    (acc, current) => acc + current.height,
-    0
-  );
+
+  const weightSum = healthData.logs.length>0 ?healthData.logs.reduce(
+    (acc, current) => acc + current.weight, 0 ) : 0;
+
+  const heightSum = healthData.logs.length> 0 ? healthData.logs.reduce(
+    (acc, current) => acc + current.height, 0) : 0;
+
+    console.log('평균 값들 : ',weightSum + heightSum);
 
   const currentDay = new dayjs();
   const birthDate = dayjs(res.data.birthDate, 'YYYYMMDD');
@@ -114,8 +119,8 @@ const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
 
   // null, undefined, 배열 길이 체크
-  if (info) {
-    // console.log("칼로리 데이터:", info);
+  if (info.length) {
+    console.log("칼로리 데이터:", info);
     return info;
   }
   return {
@@ -145,7 +150,7 @@ onMounted(async () => {
   }
   await healthData.fetchHealthlogs();
   maxKcal.value = await makeTotalCalorie();
-  console.log('맥스 칼로리', maxKcal);
+   console.log('맥스 칼로리', maxKcal);
 });
 
 watch(
@@ -283,11 +288,18 @@ const clickProgressBar = (category) => {
             주간 기록
           </span>
           <span
-            class="sub-title text-sm-h6 text-subtitle-1 font-md-weight-medium"
+            class="sub-title text-sm-h6 text-subtitle-1 font-md-weight-light text-right  d-none d-sm-flex "
           >
             {{ baseDate.getWeekDate.startDate }} 부터
             {{ baseDate.getWeekDate.endDate }} 평균
             {{ Math.round(avg).toLocaleString() }}kcal 먹었어요
+          </span>
+          <span
+            class="sub-title text-sm-h6 text-subtitle-1 font-md-weight-light text-right  d-md-none "
+          >
+            {{ baseDate.getWeekDate.startDate }} 부터
+            {{ baseDate.getWeekDate.endDate }} 평균
+            {{ Math.round(avg).toLocaleString() }}kcal 
           </span>
         </div>
 
@@ -389,10 +401,7 @@ const clickProgressBar = (category) => {
   margin-top: 10px;
 }
 
-.main-title {
-  /* font-weight: bold; */
-  /* font-size: 30px; */
-}
+
 
 .sub-title {
   margin-left: 10px;
@@ -464,15 +473,6 @@ const clickProgressBar = (category) => {
     width: 100%;
     justify-content: space-between;
   }
-  .right_button {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
- 
-    align-items: center;
-    margin-top: 40px;
-    margin-left: 0px;
-  }
   .left_progress {
     width: 100%;
     /* height: 50%; */
@@ -503,15 +503,43 @@ const clickProgressBar = (category) => {
   }
 }
 
+@media (max-width:425) {
+  .sub-title{
+    white-space: pre-line;
+  }
+  
+}
+
+
+
 @media (max-width: 768px) {
-  .right_button {
-    width: 100%;
+  .right_button {    width: 100%;
+   
     display: flex;
-    flex-direction: row;
- 
+    gap:10px;
+    flex-direction: row; 
     align-items: center;
-    margin-top: 40px;
+    margin-top: 10px;
     margin-left: 0px;
   } 
+  .mealsaday {
+  
+  height: 100%;
+  background-color: #3bbeff;
+  color: white;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Noto Sans KR', sans-serif;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 50px;
+}
+.progress-container {
+  gap: 5px
+}
+
+
 }
 </style>

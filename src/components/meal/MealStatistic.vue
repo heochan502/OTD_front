@@ -12,7 +12,7 @@ import "dayjs/locale/ko";
 
 dayjs.locale("ko");
 
-const { mdAndDown } = useDisplay() 
+const { mdAndDown } = useDisplay(); 
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();

@@ -181,12 +181,12 @@ const option = {
   },
 };
 
+//차트 날짜 변화할때 그래프 그리는 데이터 초기화
 const resetWeeklyData = ()=>{
   xData.totalCalorie = Array(xData.dayName.length).fill(0);
   xData.totalFat = Array(xData.dayName.length).fill(0);
   xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
   xData.totalProtein = Array(xData.dayName.length).fill(0);
-
 }
 
 
@@ -360,10 +360,7 @@ watch (
 </template>
 
 <style scoped>
-.main-container 
-{
-  
-}
+
 
 
 
