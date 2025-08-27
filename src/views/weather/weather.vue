@@ -67,7 +67,10 @@ const skyEmojiList = {
 };
 
 const skyEmoji = computed(() => {
-  return skyEmojiList[weather.value?.villageSky] || skyEmojiList.default;
+  return (
+    skyEmojiList[weather.value?.ncstPty] ||
+    skyEmojiList[weather.value?.villageSky]
+  );
 });
 
 const dayTimes = computed(() => {
@@ -91,7 +94,7 @@ const backgroundImg = {
   '비-morning': 'url(/image/weather/rain.jpg)',
   '비-evening': 'url(/image/weather/rain.jpg)',
   '비-night': 'url(/image/weather/rain.jpg)',
-  default: 'url(/image/weather/default.png)',
+  default: 'url(/image/loading.gif)',
 };
 
 const weatherBackground = computed(() => {
@@ -114,11 +117,14 @@ watch(
 </script>
 
 <template>
-  <div class="weather-alert" v-if="weather">
-    <strong>{{
-      nickName === '' || nickName === undefined ? '' : nickName + '님~'
-    }}</strong
-    >{{ popMessage }}
+  <div class="weather-alert">
+    <div v-if="weather">
+      <strong>{{
+        nickName === '' || nickName === undefined ? '' : nickName + '님~'
+      }}</strong
+      >{{ popMessage }}
+    </div>
+    <div v-else>로딩중. . .</div>
   </div>
   <div class="header flex justify-between items-center w-full px-4 pt-2">
     <span class="live px-4 py-1 text-white font-semibold text-sm">
@@ -167,11 +173,7 @@ watch(
           <div class="warp">
             <div class="weather-icon">{{ skyEmoji }}</div>
             <div class="temperature">
-              {{
-                weather.ncstTem === undefined
-                  ? '날씨를 불러오지 못하였습니다....'
-                  : weather.ncstTem + '℃'
-              }}
+              {{ weather.ncstTem === undefined ? '' : weather.ncstTem + '℃' }}
             </div>
           </div>
           <div class="max_min_temperature">
@@ -204,8 +206,8 @@ watch(
   justify-content: center;
   align-items: center;
   padding: 0.6rem 1rem;
-  margin: 1rem auto;
-  max-width: 97%;
+  margin: 1rem;
+  max-width: 100%;
   font-size: 1.2rem;
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -254,7 +256,6 @@ watch(
   margin: 0px 1rem;
   color: white;
   max-width: 100%;
-  height: 11rem;
   box-shadow: 1px 1px 4px #838383;
   box-sizing: border-box;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
@@ -308,6 +309,85 @@ watch(
     .humidity {
       font-size: 1rem;
     }
+  }
+}
+
+@media (max-width: 790px) {
+  .weather-location {
+    font-size: 2rem !important;
+  }
+  .condition {
+    font-size: 1.2rem !important;
+  }
+  .weather-icon {
+    font-size: 2.8rem !important;
+  }
+
+  .temperature {
+    font-size: 1.8rem !important;
+  }
+  .weather-alert {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 686px) {
+  .weather-location {
+    font-size: 1.6rem !important;
+  }
+  .condition {
+    font-size: 1rem !important;
+  }
+}
+@media (max-width: 679px) {
+  //   .weather-alert {
+  //     font-size: 0.8rem;
+  //   }
+  // }
+  // @media (max-width: 612px) {
+  .weather-location {
+    font-size: 1.4rem !important;
+  }
+  .condition {
+    font-size: 1rem !important;
+  }
+  .weather-icon {
+    font-size: 2.6rem !important;
+  }
+
+  .temperature {
+    font-size: 1.6rem !important;
+  }
+  .weather-alert {
+    font-size: 0.7rem;
+  }
+}
+@media (max-width: 573px) {
+  .weather-location {
+    font-size: 1rem !important;
+  }
+  .weather-right {
+    .weather-icon {
+      font-size: 1.8rem !important;
+    }
+    .temperature {
+      font-size: 1.2rem !important;
+    }
+    .weather-alert {
+      font-size: 0.6rem;
+    }
+  }
+}
+@media (max-width: 522px) {
+  .header {
+    font-size: 10px;
+  }
+  .weather-alert {
+    font-size: 10px;
+  }
+}
+@media (max-width: 498px) {
+  .weather-content {
+    gap: 0 !important;
   }
 }
 </style>
