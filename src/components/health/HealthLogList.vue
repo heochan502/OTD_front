@@ -82,19 +82,19 @@ const detail = (healthlogId) => {
     </div>
     <div class="list-wrap" @scroll="handleScroll">
       <ul>
-        <li v-if="healthStore.logList.length < 1" class="title">
+        <li v-if="healthStore.logList.length < 1" class="title w-0 sm:w-100">
           건강 기록을 추가하세요
         </li>
         <li
           v-for="item in healthStore.logList"
           :key="item.healthlogId"
           @click="detail(item.healthlogId)"
-          class="w-sm-100"
+          class="w-100"
         >
-          <div class="title text-sm-text-body-1">
+          <div class="title text-subtitle-1 w-50">
             {{ formatDate(item.healthlogDatetime) }}
           </div>
-          <div class="content">
+          <div class="content text-caption">
             <div>건강보기</div>
           </div>
         </li>
@@ -107,8 +107,9 @@ const detail = (healthlogId) => {
 
 <style lang="scss" scoped>
 .wrap {
-  min-width: 350px;
+  min-width: 310px;
   max-width: 400px;
+  width: 400px;
 }
 
 .list_title {
@@ -143,18 +144,18 @@ ul {
     align-items: center;
     justify-content: space-between;
 
-    width: 400px;
+    // max-width: 400px;
+
+    min-width: 310px;
     height: 80px;
     margin: 9px 0;
-    padding: 5px 40px;
+    padding: 5px 35px;
     border-radius: 40px;
     background-color: #3bbeff;
     cursor: pointer;
   }
 }
 .title {
-  font-size: 18px;
-  font-weight: 600;
   color: #fff;
 }
 

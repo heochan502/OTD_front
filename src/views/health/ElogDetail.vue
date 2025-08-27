@@ -33,15 +33,10 @@ const formatTime = (dateStr) => {
 const exerciseLogId = route.params.exerciselogId;
 
 onMounted(async () => {
-<<<<<<<<< Temporary merge branch 1
   const exerciseLogId = route.params.exerciselogId;
   if (!exerciseLogId) return;
   const res = await getElog(exerciseLogId);
-=========
-  // exerciseStore.fetchExercises();
-  state.elog.exerciselogId = route.params.exerciselogId;
-  const res = await getElog(state.elog.exerciselogId);
->>>>>>>>> Temporary merge branch 2
+
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;

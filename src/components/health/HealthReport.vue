@@ -63,7 +63,7 @@ const bmiStatus = computed(() => {
 <template>
   <v-tabs-window-item value="two" class="health_report">
     <v-col class="content_left" cols="6">
-      <div class="large-box">
+      <div class="large-box w-100">
         <v-carousel
           height="200"
           width="170"
@@ -83,14 +83,19 @@ const bmiStatus = computed(() => {
               <div
                 class="d-flex justify-center align-center flex-column pa-3 text-center"
               >
-                <div class="text-h6 pa-3">{{ item.label }}</div>
+                <div class="text-subtitle-2 text-sm-h6 pa-3">
+                  {{ item.label }}
+                </div>
                 <div
                   v-if="!todayLog || todayLog.length === 0"
-                  class="fill-height"
+                  class="fill-height text-caption text-sm-body-1"
                 >
                   기록없음
                 </div>
-                <div v-else class="pa-3 fill-height">
+                <div
+                  v-else
+                  class="pa-3 fill-height text-caption text-sm-body-1"
+                >
                   {{ state[idx] }} {{ item.unit }}
                 </div>
               </div>
@@ -100,9 +105,10 @@ const bmiStatus = computed(() => {
       </div>
     </v-col>
     <v-col class="content_right" cols="6">
-      <div class="small_box">
-        <span>weight</span>
-        <span class="value">
+      <!-- weight -->
+      <div class="small_box w-100">
+        <span class="text-caption text-sm-body-2">weight</span>
+        <span class="value text-caption text-sm-text-body-2">
           {{
             healthStore.logList.length === 0
               ? 0
@@ -111,9 +117,10 @@ const bmiStatus = computed(() => {
           kg
         </span>
       </div>
-      <div class="small_box">
-        <span>height</span>
-        <span class="value">
+      <!-- height -->
+      <div class="small_box w-100">
+        <span class="text-caption text-sm-body-2">height</span>
+        <span class="value text-caption text-sm-text-body-2">
           {{
             healthStore.logList.length === 0
               ? 0
@@ -122,7 +129,7 @@ const bmiStatus = computed(() => {
           cm
         </span>
       </div>
-      <div class="medium-box">
+      <div class="medium-box w-100">
         <span class="subtitle"> BMI </span>
         <div class="d-flex justify-space-between">
           <span class="value">
@@ -139,7 +146,7 @@ const bmiStatus = computed(() => {
         <div>
           <!-- 슬라이더로 현재 유저 bmi 보여주기 -->
           <div class="bmi-slider-wrapper">
-            <div class="gradient-bar"></div>
+            <div class="gradient-bar w-100"></div>
             <v-slider
               :model-value="bmi"
               :min="minBmi"
@@ -180,7 +187,6 @@ const bmiStatus = computed(() => {
 
     .large-box {
       background-color: #bfeaff;
-      width: 170px;
       height: 200px;
       border-radius: 10px;
     }
@@ -198,7 +204,7 @@ const bmiStatus = computed(() => {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 20px;
+
       padding: 5px 15px;
       width: 180px;
       height: 40px;
@@ -223,7 +229,7 @@ const bmiStatus = computed(() => {
         top: 50%;
         transform: translateY(-50%);
         height: 8px;
-        width: 100%;
+        // width: 100%;
         border-radius: 6px;
         background: linear-gradient(
           to right,
@@ -246,11 +252,6 @@ const bmiStatus = computed(() => {
       //   color: #ececec;
       font-size: 9px;
     }
-  }
-
-  .value {
-    font-size: 16px;
-    font-weight: 600;
   }
 }
 </style>
