@@ -40,7 +40,7 @@ export const useHealthStore = defineStore("health", {
           .format("YYYY-MM-DD");
         res = await getHlogs(weekly);
         this.logs = res.data;
-        console.log("건강기록 가져온 값", this.logs);
+        // console.log("건강기록 가져온 값", this.logs);
         count++;
       }
 <<<<<<<<< Temporary merge branch 1

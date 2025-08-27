@@ -3,12 +3,16 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useBaseDate, useDayDefine, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
 
 import { getWeekTotal } from '@/services/meal/mealService'
+
+import { useDisplay } from 'vuetify'
+
 import dayjs from "dayjs";
 
 import "dayjs/locale/ko";
 
 dayjs.locale("ko");
 
+const { mdAndDown } = useDisplay() 
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
@@ -16,6 +20,8 @@ const weeklyStore = useWeeklyStore();
 const ondayMealData = useCalorieCalcul();
 
 const selectedDate = ref(ondayMealData.itemInfo.mealDay); // 초기화 및 선택하는 날짜 들어감
+
+
 const weekDates = ref([]);
 
 const getWeekDates = (dateString) => {
@@ -84,20 +90,29 @@ watch(
   },
   { immediate: true }
 );
-
+const dateInputRef = ref(null);
+const openDatePicker = () => {
+  if (dateInputRef.value) {
+    dateInputRef.value.showPicker   // 최신 브라우저 지원
+      ? dateInputRef.value.showPicker()
+      : dateInputRef.value.click()  // fallback
+  }
+}
 
 </script>
 
 <template>
   <div>
-    <v-text-field
-      v-model="selectedDate"
-      label="날짜 선택"
-      type="date"
-      class="mb-4 text-black"
-      variant="underlined"
-    ></v-text-field>
-   
+    <!-- 아래는 날짜 선택용 vuetify 입력 필드 -->
+    <v-text-field v-if="!mdAndDown" v-model="selectedDate" label="날짜 선택" type="date" variant="underlined" />
+    <!-- 작은 화면일 때: 아이콘 -->
+    <div v-else>
+      <v-btn icon="mdi-calendar" variant="text" @click="openDatePicker" />
+
+      <!-- 숨겨진 date input (완전 hidden 금지, 투명 처리만) -->
+      <input ref="dateInputRef" type="date" v-model="selectedDate"
+        style="opacity: 0; position:absolute; left:-70px;" />
+    </div>
   </div>
 </template>
 
