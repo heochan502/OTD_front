@@ -30,6 +30,8 @@ import Profile from '@/views/member/Profile.vue';
 import ProfileDetail from '@/views/member/ProfileDetail.vue';
 import ProfilePassword from '@/views/member/Password.vue';
 
+import NaverMaps from "@/views/maps/Map.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -168,6 +170,12 @@ const router = createRouter({
       path: '/memoAndDiary/diary/list',
       name: 'DiaryList',
       component: DiaryList,
+      props: true,
+    },
+    {
+      path: '/navermaps',
+      name: 'NaverMaps',
+      component: NaverMaps,
       props: true,
     },
   ],
