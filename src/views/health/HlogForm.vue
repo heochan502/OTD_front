@@ -110,6 +110,7 @@ const cancel = () => {
                 variant="solo"
                 class="value-field"
                 clearable
+                density="compact"
               ></v-select>
               <v-select
                 v-model="state.form.sleepQuality"
@@ -125,6 +126,7 @@ const cancel = () => {
                 variant="solo"
                 class="value-field"
                 clearable
+                density="compact"
               ></v-select>
             </v-col>
 
