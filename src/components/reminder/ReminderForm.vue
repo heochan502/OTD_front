@@ -1,14 +1,12 @@
 <script setup>
-import { ref, computed, reactive, onMounted, nextTick } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, computed, reactive, onMounted } from 'vue';
 import MiniCalendar from '@/components/reminder/MiniCalendar.vue';
 import { save } from '@/services/reminder/reminderService';
 import { modify } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 
-const router = useRouter();
-const route = useRoute();
 const reminderStore = useReminderStore();
+const emit = defineEmits(['form-close']);
 
 const state = reactive({
   reminder: {
@@ -16,19 +14,26 @@ const state = reactive({
     title: '',
     content: '',
     startDate: '',
+    endDate: '',
     alarm: false,
     repeat: false,
     repeatDow: [],
   },
 });
 
-const showCalendar = ref(false);
-const selectedDate = ref(new Date());
+const props = defineProps({
+  startDate: { type: String },
+  id: { type: Number },
+});
+
+const showDateCalendar = ref(false);
+const showRepeatCalendar = ref(false);
+// const selectedStartDate = ref(new Date());
 
 // 캘린더에서 날짜 선택했을때 실행할 로직
-const selectedDone = (day) => {
-  selectedDate.value = day; // 화면에 나타날 날짜 데이터값 변경
-  showCalendar.value = false; // 달력 닫기
+const selectedDate = (day) => {
+  //selectedStartDate.value = day;  화면에 나타날 날짜 데이터값 변경
+  showDateCalendar.value = false; // 달력 닫기
 
   const y = day.getFullYear();
   const m = String(day.getMonth() + 1).padStart(2, '0');
@@ -38,27 +43,44 @@ const selectedDone = (day) => {
   if (state.reminder.repeat) {
     state.reminder.repeat = false; // 요일 반복 비활성화
     state.reminder.repeatDow = [];
+    state.reminder.endDate = '';
     dowImage.value.forEach((item) => (item.isOn = false));
   }
 };
 
-const openCalendar = () => {
-  if (state.reminder.repeat) {
-    state.reminder.repeat = false;
-    state.reminder.repeatDow = [];
-    dowImage.value.forEach((item) => (item.isOn = false));
+const selectedRepeat = (day) => {
+  showRepeatCalendar.value = false;
+  const y = day.getFullYear();
+  const m = String(day.getMonth() + 1).padStart(2, '0');
+  const d = String(day.getDate()).padStart(2, '0');
+  state.reminder.endDate = `${y}-${m}-${d}`;
+};
+
+const openCalendar = (use) => {
+  if (use === 'date') {
+    if (state.reminder.repeat) {
+      showRepeatCalendar.value = false;
+      state.reminder.repeat = false;
+      state.reminder.repeatDow = [];
+      state.reminder.endDate = '';
+      dowImage.value.forEach((item) => (item.isOn = false));
+    }
+    showDateCalendar.value = !showDateCalendar.value;
+  } else if (use === 'repeat') {
+    state.reminder.repeat = true;
+    showDateCalendar.value = false;
+    showRepeatCalendar.value = !showRepeatCalendar.value;
   }
-  showCalendar.value = !showCalendar.value;
 };
 
 // 화면에 나타낼 날짜 포맷 변경
-const formattedDate = computed(() => {
-  const selected = new Date(selectedDate.value);
-  const y = selected.getFullYear();
-  const m = String(selected.getMonth() + 1).padStart(2, '0');
-  const d = String(selected.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-});
+// const formattedDate = computed(() => {
+//   const selected = new Date(selectedStartDate.value);
+//   const y = selected.getFullYear();
+//   const m = String(selected.getMonth() + 1).padStart(2, '0');
+//   const d = String(selected.getDate()).padStart(2, '0');
+//   return `${y}-${m}-${d}`;
+// });
 
 // 이미지 토글, 요일 선택시 배열 추가/변경 로직
 const dowImage = ref([
@@ -71,6 +93,7 @@ const dowImage = ref([
   { name: '토', key: 'sat', isOn: false },
 ]);
 const imageToggle = (index) => {
+  showDateCalendar.value = false;
   dowImage.value[index].isOn = !dowImage.value[index].isOn;
 
   const activeIndex = dowImage.value
@@ -80,45 +103,45 @@ const imageToggle = (index) => {
   state.reminder.repeatDow = activeIndex;
   state.reminder.repeat = activeIndex.length > 0;
 
-  if (state.reminder.repeat) {
-    state.reminder.startDate = '';
+  // 추가 폼일때만 작동하게
+  if (state.reminder.repeat && state.reminder.id === 0) {
+    state.reminder.startDate = reminderStore.state.selectedDate;
   }
 };
 
 // 날짜-요일 활성화 비활성화 처리
-const isDateMode = computed(() => state.reminder.startDate !== '');
+const isDateMode = computed(() => !state.reminder.repeat);
 const isRepeatMode = computed(() => state.reminder.repeat);
 
-// 쿼리스트링으로 id가 있으면 해당 리마인더 내용 띄우기
-const reminderId = Number(route.query.id);
-// 쿼리스트링은 문자열 즉, id랑 타입 안맞음
 onMounted(() => {
-  if (reminderId) {
+  console.log(reminderStore.state.selectedDate);
+  state.reminder.startDate = reminderStore.state.selectedDate;
+  if (props.id) {
     const modifyReminder = reminderStore.state.fullReminder.find(
-      (item) => item.id === reminderId
+      (item) => item.id === props.id
     );
 
+    console.log('mod', modifyReminder);
     if (modifyReminder) {
       Object.assign(state.reminder, {
         id: modifyReminder.id,
         title: modifyReminder.title,
         content: modifyReminder.content,
         startDate: modifyReminder.startDate,
+        endDate: modifyReminder.endDate,
         alarm: modifyReminder.alarm,
         repeat: modifyReminder.repeat,
         repeatDow: [...(modifyReminder.repeatDow || [])],
       });
     }
 
-    if (state.reminder.startDate) {
-      const [y, m, d] = state.reminder.startDate.split('-');
-      selectedDate.value = new Date(`${y}-${m}-${d}`);
-    } else if (state.reminder.repeat) {
+    if (state.reminder.repeat) {
       dowImage.value.forEach((item, index) => {
         item.isOn = state.reminder.repeatDow.includes(index);
       });
     }
   }
+  console.log('reminder', state.reminder);
 });
 
 // 서버 통신 로직
@@ -143,48 +166,57 @@ const submit = async () => {
     title: state.reminder.title,
     content: state.reminder.content,
     startDate: state.reminder.startDate,
+    endDate: state.reminder.endDate,
     repeat: state.reminder.repeat,
     repeatDow: state.reminder.repeatDow,
     alarm: state.reminder.alarm,
   };
-  let res = null;
   if (state.reminder.id > 0) {
     jsonBody.id = state.reminder.id;
-    res = await modify(jsonBody);
+    const res = await modify(jsonBody);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;
     }
     alert('일정을 수정했어요!');
-    router.push('/reminder');
+    emit('form-close', 'modify');
   } else {
-    res = await save(jsonBody);
+    const res = await save(jsonBody);
     if (res === undefined || res.status !== 200) {
       alert('오류발생');
       return;
     }
     alert('일정을 추가했어요!');
     reminderStore.setReload(true);
-    router.push('/reminder');
+    emit('form-close');
   }
+};
+
+const close = () => {
+  emit('form-close', 'form');
 };
 </script>
 
 <template>
   <div class="form">
-    <h2 class="form-title">
-      {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
-    </h2>
     <div class="form-card">
-      <span>
-        <router-link to="/reminder">
-          <img src="/image/cancel.png" alt="취소" class="cancel" />
-        </router-link>
-      </span>
+      <h2 class="form-title">
+        {{ state.reminder.id ? '리마인더 수정하기' : '리마인더 추가하기' }}
+      </h2>
+      <div class="cancel">
+        <span class="cancel-button" @click="close">
+          <img src="/image/cancel.png" alt="취소" class="cancel-img" />
+        </span>
+      </div>
       <div :class="{ disabled: isRepeatMode }" class="calendar-popup">
-        <span :class="{ on: isDateMode }" class="off date-box">날짜 지정</span>
-        <span @click="openCalendar">
-          <span class="date">{{ formattedDate }}</span>
+        <span
+          :class="{ on: isDateMode }"
+          class="off date-box"
+          @click="openCalendar('date')"
+          >날짜</span
+        >
+        <span @click="openCalendar('date')">
+          <span class="date">{{ state.reminder.startDate }}</span>
           <img
             src="/image/button.png"
             alt="날짜 선택하기"
@@ -192,8 +224,8 @@ const submit = async () => {
         /></span>
         <div class="calendar">
           <mini-calendar
-            v-if="showCalendar"
-            @selected-date="selectedDone"
+            v-if="showDateCalendar"
+            @selected-fix-date="selectedDate"
             use-page="form"
             class="mini-calendar"
           ></mini-calendar>
@@ -215,9 +247,26 @@ const submit = async () => {
         />알람 설정</span
       >
       <span :class="{ disabled: isDateMode }">
-        <span :class="{ on: isRepeatMode }" class="off toggle-box"
-          >요일 반복</span
+        <span
+          :class="{ on: isRepeatMode }"
+          class="off toggle-box"
+          @click="openCalendar('repeat')"
+          >요일 반복 |
+          {{
+            state.reminder.endDate
+              ? `종료일 : ${state.reminder.endDate}`
+              : '종료일 없음'
+          }}</span
         >
+        <div class="calendar-popup">
+          <mini-calendar
+            v-if="showRepeatCalendar"
+            @selected-repeat-date="selectedRepeat"
+            use-page="form"
+            class="calendar mini-calendar"
+          >
+          </mini-calendar>
+        </div>
         <div class="img">
           <img
             v-for="(dow, index) in dowImage"
@@ -258,13 +307,13 @@ const submit = async () => {
 .form {
   width: 400px;
   margin: 80px auto;
-  background-color: #fff;
+  background-color: transparent;
 
   .form-title {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
-    color: #5d5d5d;
+    color: #000;
     margin-bottom: 25px;
   }
 
@@ -272,26 +321,32 @@ const submit = async () => {
     cursor: pointer;
     position: relative;
     border-radius: 10px;
+    background-color: #fff;
     padding: 20px 30px 30px 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     height: 500px;
 
-    a {
-      &:hover {
-        background-color: #fff;
+    .cancel {
+      display: flex;
+
+      .cancel-button {
+        display: inline-flex;
+        margin-left: auto;
+
+        .cancel-img {
+          display: block;
+          width: 24px;
+          height: 24px;
+          top: 10px;
+          right: 10px;
+          cursor: pointer;
+        }
       }
     }
-    .cancel {
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
-    }
+
     .date-box {
-      margin-right: 173px;
+      margin-right: 197px;
     }
     .calendar-popup {
       position: relative;
@@ -325,9 +380,13 @@ const submit = async () => {
           margin-top: -5px;
         }
       }
+
+      .mini-calendar {
+        margin-top: -5px;
+      }
     }
     .alarm-box {
-      margin-right: 166px;
+      margin-right: 87px;
       cursor: pointer;
     }
 

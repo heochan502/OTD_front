@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
-import ReminderForm from '@/views/reminder/ReminderForm.vue';
-import ReminderList from '@/views/reminder/ReminderList.vue';
+// import ReminderForm from '@/views/reminder/ReminderForm.vue';
+// import ReminderList from '@/views/reminder/ReminderList.vue';
+// import ReminderDetail from '@/components/reminder/ReminderDetail.vue';
 
 import MemoList from '@/components/memo/MemoList.vue';
 import DiaryList from '@/components/memo/DiaryList.vue';
@@ -49,16 +50,21 @@ const router = createRouter({
       component: ReminderHome,
       meta: { requiresAuth: true },
     },
-    {
-      path: '/reminder/form',
-      name: 'reminderform',
-      component: ReminderForm,
-    },
-    {
-      path: '/reminder/list',
-      name: 'reminderlist',
-      component: ReminderList,
-    },
+    // {
+    //   path: '/reminder/form',
+    //   name: 'reminderform',
+    //   component: ReminderForm,
+    // },
+    // {
+    //   path: '/reminder/list',
+    //   name: 'reminderlist',
+    //   component: ReminderList,
+    // },
+    // {
+    //   path: '/reminder/detail',
+    //   name: 'reminderdetail',
+    //   component: ReminderDetail,
+    // },
     {
       path: '/meal',
       name: 'MealForm',
@@ -163,11 +169,11 @@ const router = createRouter({
       name: 'DiaryList',
       component: DiaryList,
       props: true,
-    },    
+    },
   ],
 });
 router.beforeEach((to) => {
-  const accountStore = useAccountStore();  
+  const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
     return '/login';
   }
