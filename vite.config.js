@@ -13,6 +13,11 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      //커뮤니티에서 정적 파일도 백엔드로 프록시 하기위한 코드
+      '/files':{
+        target:'http://localhost:8080',
+        changeOrigin:true,
+      }
     },
   },
   build: {

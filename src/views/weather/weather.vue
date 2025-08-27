@@ -1,34 +1,51 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { getWeather, getNickName } from '@/services/weather/weatherHomeService';
+import DailyWeather from '@/components/weather/DailyWeather.vue';
+import Location from '@/components/weather/Location.vue';
+import { useWeatherStore } from '@/stores/weatherStore';
 
+const weatherStore = useWeatherStore();
 const weather = ref(null);
 const open = ref(false);
 const nickName = ref('');
+const dialog = ref({
+  daily: false,
+  location: false,
+});
+
+const openDialog = (type) => {
+  dialog.value[type] = true;
+};
 
 const LocalWeather = async () => {
   const res = await getWeather();
+  console.log('Weather res.data', res.data);
   weather.value = res.data;
+  if (weather.value.ncstPty !== '없음') {
+    weather.value.villageSky = weather.value.ncstPty;
+  }
 };
+
 // 한줄 알림
 const memberNickName = async () => {
   const res = await getNickName();
   nickName.value = res.data.memberNick;
 };
 const popMessage = computed(() => {
-  const pop = weather.value.pop;
-  const per = '오늘은 비올 확률이' + weather.value.pop + ' % !!';
-  const sky = weather.value.sky;
+  const pop = weather.value.villagePop;
+  const per = '오늘은 비올 확률이 ' + weather.value.villagePop + '% !!';
+  const sky = weather.value.villageSky;
   if ((pop < 10 && sky === '맑음') || (pop < 10 && sky === '구름 많음')) {
     return '오늘의 날씨는 ' + sky + '이네요! 즐거운 하루 보내세요.';
   } else if (
-    (pop < 30 && sky === '맑음') ||
-    (pop < 30 && sky === '구름 많음')
+    pop < 30 &&
+    (sky === '맑음' || sky === '구름 많음' || sky === '흐림')
   ) {
     return per + '걱정 되신다면 우산을 챙기길 추천해요!';
-  } else if (pop < 50 || sky === '흐림') {
+  } else if (pop < 50 && (sky === '흐림' || sky === '비')) {
     return per + '비가 올 수도 있으니 휴대하기 편한 우산 챙기길 추천해요!';
-  } else if (pop < 90) {
+  } else if (pop < 90 && (sky === '흐림' || sky === '비')) {
     return per + '우산 챙기셨나요? 우산 챙겨가세요!';
   } else if (pop > 90 || sky === '비') {
     return per + '우산을 꼭 챙기고 빗길 조심하세요!';
@@ -46,11 +63,14 @@ const skyEmojiList = {
   '구름 많음': '🌤️',
   비: '🌧️',
   눈: '❄️',
-  비눈: '🌨️',
+  '비/눈': '🌨️',
 };
 
 const skyEmoji = computed(() => {
-  return skyEmojiList[weather.value?.sky] || skyEmojiList.default;
+  return (
+    skyEmojiList[weather.value?.ncstPty] ||
+    skyEmojiList[weather.value?.villageSky]
+  );
 });
 
 const dayTimes = computed(() => {
@@ -74,28 +94,37 @@ const backgroundImg = {
   '비-morning': 'url(/image/weather/rain.jpg)',
   '비-evening': 'url(/image/weather/rain.jpg)',
   '비-night': 'url(/image/weather/rain.jpg)',
-  default: 'url(/image/weather/default.png)',
+  default: 'url(/image/loading.gif)',
 };
 
 const weatherBackground = computed(() => {
-  const sky = weather.value?.sky || '';
+  const sky = weather.value?.villageSky || '';
   const time = dayTimes.value;
-  console.log('time', time);
   return backgroundImg[`${sky}-${time}`] || backgroundImg.default;
 });
 
 onMounted(async () => {
   memberNickName();
-  LocalWeather();
+  await LocalWeather();
 });
+
+watch(
+  () => weatherStore.refresh,
+  async () => {
+    await LocalWeather();
+  }
+);
 </script>
 
 <template>
-  <div class="weather-alert" v-if="weather">
-    <strong>{{
-      nickName === '' || nickName === undefined ? '' : nickName + '님~'
-    }}</strong
-    >{{ popMessage }}
+  <div class="weather-alert">
+    <div v-if="weather">
+      <strong>{{
+        nickName === '' || nickName === undefined ? '' : nickName + '님~'
+      }}</strong
+      >{{ popMessage }}
+    </div>
+    <div v-else>로딩중. . .</div>
   </div>
   <div class="header flex justify-between items-center w-full px-4 pt-2">
     <span class="live px-4 py-1 text-white font-semibold text-sm">
@@ -104,9 +133,28 @@ onMounted(async () => {
     <button @click="toggleMenu" class="menu px-2 py-1 text-sm font-bold">
       ☰ 날씨 메뉴
     </button>
-    <router-link v-if="open" to="/location" class="menu-list">
+    <button v-if="open" class="menu-list" @click="openDialog('daily')">
+      시간별 날씨
+      <v-dialog v-model="dialog.daily" max-width="1000" min-height="100">
+        <v-card>
+          <v-card-title class="text-h8">오늘 날씨</v-card-title>
+          <v-card-text>
+            <DailyWeather />
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </button>
+    <button v-if="open" class="menu-list" @click="openDialog('location')">
       지역 변경
-    </router-link>
+      <v-dialog v-model="dialog.location" max-width="1000" min-height="200">
+        <v-card>
+          <v-card-title class="text-h8">지역 저장</v-card-title>
+          <v-card-text>
+            <Location @close="dialog.location = false" />
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </button>
   </div>
   <div>
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">
@@ -115,29 +163,36 @@ onMounted(async () => {
           <div class="weather-location">
             {{ weather.localName }}
           </div>
-          <div class="condition">{{ weather.sky }}</div>
+          <div class="condition">
+            {{ weather.villageSky }}
+            {{ weather.villageSky === '비' ? weather.ncstRh1 + '(mm)' : '' }}
+          </div>
         </div>
 
         <div class="weather-right">
           <div class="warp">
             <div class="weather-icon">{{ skyEmoji }}</div>
             <div class="temperature">
-              {{
-                weather.tem === undefined
-                  ? '날씨를 불러오지 못하였습니다....'
-                  : weather.tem + '℃'
-              }}
+              {{ weather.ncstTem === undefined ? '' : weather.ncstTem + '℃' }}
             </div>
           </div>
           <div class="max_min_temperature">
             {{
-              weather.tmn === undefined
+              weather.villageTmn === undefined
                 ? ''
-                : '최저 ' + weather.tmn + '° / 최고 ' + weather.tmx + '°'
+                : '최저 ' +
+                  weather.villageTmn +
+                  '° / 최고 ' +
+                  weather.villageTmx +
+                  '°'
             }}
           </div>
           <div class="humidity">
-            {{ weather.reh === undefined ? '' : '습도' + weather.reh + '%' }}
+            {{
+              weather.ncstReh === undefined
+                ? ''
+                : '습도' + weather.ncstReh + '%'
+            }}
           </div>
         </div>
       </div>
@@ -151,8 +206,8 @@ onMounted(async () => {
   justify-content: center;
   align-items: center;
   padding: 0.6rem 1rem;
-  margin: 1rem auto;
-  max-width: 97%;
+  margin: 1rem;
+  max-width: 100%;
   font-size: 1.2rem;
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -201,7 +256,6 @@ onMounted(async () => {
   margin: 0px 1rem;
   color: white;
   max-width: 100%;
-  height: 11rem;
   box-shadow: 1px 1px 4px #838383;
   box-sizing: border-box;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
@@ -255,6 +309,85 @@ onMounted(async () => {
     .humidity {
       font-size: 1rem;
     }
+  }
+}
+
+@media (max-width: 790px) {
+  .weather-location {
+    font-size: 2rem !important;
+  }
+  .condition {
+    font-size: 1.2rem !important;
+  }
+  .weather-icon {
+    font-size: 2.8rem !important;
+  }
+
+  .temperature {
+    font-size: 1.8rem !important;
+  }
+  .weather-alert {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 686px) {
+  .weather-location {
+    font-size: 1.6rem !important;
+  }
+  .condition {
+    font-size: 1rem !important;
+  }
+}
+@media (max-width: 679px) {
+  //   .weather-alert {
+  //     font-size: 0.8rem;
+  //   }
+  // }
+  // @media (max-width: 612px) {
+  .weather-location {
+    font-size: 1.4rem !important;
+  }
+  .condition {
+    font-size: 1rem !important;
+  }
+  .weather-icon {
+    font-size: 2.6rem !important;
+  }
+
+  .temperature {
+    font-size: 1.6rem !important;
+  }
+  .weather-alert {
+    font-size: 0.7rem;
+  }
+}
+@media (max-width: 573px) {
+  .weather-location {
+    font-size: 1rem !important;
+  }
+  .weather-right {
+    .weather-icon {
+      font-size: 1.8rem !important;
+    }
+    .temperature {
+      font-size: 1.2rem !important;
+    }
+    .weather-alert {
+      font-size: 0.6rem;
+    }
+  }
+}
+@media (max-width: 522px) {
+  .header {
+    font-size: 10px;
+  }
+  .weather-alert {
+    font-size: 10px;
+  }
+}
+@media (max-width: 498px) {
+  .weather-content {
+    gap: 0 !important;
   }
 }
 </style>

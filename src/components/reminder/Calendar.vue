@@ -2,7 +2,6 @@
 import { ref, onMounted, watch } from 'vue';
 import { useReminderStore } from '@/stores/reminderStore';
 
-
 const reminderStore = useReminderStore();
 
 const props = defineProps({
@@ -12,23 +11,16 @@ const props = defineProps({
   },
   usePage: { type: String, default: 'home' },
 });
-const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
+const emit = defineEmits(['click-date', 'reminder-date']);
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 
-// 캘린더 날짜 선택시의 홈, 폼 emit 분기문
+// 캘린더 날짜 선택시의 emit
 const pickDate = (day) => {
   if (!day) return;
-  const selectedDate = new Date(
-    `${currentYear.value}-${formatNumber(currentMonth.value)}-${formatNumber(
-      day
-    )}`
+  const selectedDate = new Date(currentYear.value, currentMonth.value -1, day
   );
-  if (props.usePage === 'form') {
-    emit('selected-date', selectedDate);
-  } else if (props.usePage === 'home') {
-    emit('click-date', selectedDate);
-  }
+  emit('click-date', selectedDate);
 };
 
 const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -40,37 +32,9 @@ const today = new Date();
 const currentYear = ref(today.getFullYear());
 
 const currentMonth = ref(today.getMonth() + 1);
-// getMonth는 0부터 시작함
 
-// const startYear = 2003;
-// const startDowIdx = new Date(startYear, 0, 1).getDay();
-
-// 원하는 년, 월의 마지막 날짜 구하기(윤년처리까지)
-// const lastDayOfMonth = (year, month) => {
-//   if (month === 2) {
-//     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
-//   } else {
-//     const month30 = [1, 3, 5, 7, 8, 10, 12];
-//     return month30.includes(month) ? 31 : 30;
-//   }
-// };
 const lastDayOfMonth = (year, month) => new Date(year, month, 0).getDate();
-// console.log('last', lastDayOfMonth(2025, 7));
-
-// 원하는 년,월의 시작 요일 구하기
-// const startIdxOfMonth = (thisYear, thisMonth) => {
-//   let totalDay = startDowIdx;
-//   for (let year = startYear; year < thisYear; year++) {
-//     totalDay +=
-//       (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
-//   }
-//   for (let month = 1; month < thisMonth; month++) {
-//     totalDay += lastDayOfMonth(thisYear, month);
-//   }
-//   return totalDay % 7;
-// };
 const startIdxOfMonth = (year, month) => new Date(year, month - 1, 1).getDay();
-// console.log('idx', startIdxOfMonth(2025, 7));
 
 // 캘린더 그리기 로직
 const makeCalendar = () => {
@@ -78,7 +42,6 @@ const makeCalendar = () => {
   const endDay = lastDayOfMonth(currentYear.value, currentMonth.value);
   // console.log('startIdx', startIdx);
   // console.log('endDay', endDay);
-
   const matrix = [];
   let day = 1;
 
@@ -171,14 +134,16 @@ const todayColor = (day) => {
   <div class="calendar">
     <h3 class="calendar_title">
       <a href="#" @click.prevent="prevMonth"
-        ><img
-          src="/image/button.png"
-          alt="이전 달 보기"
-          class="rotate"
+        ><img src="/image/button.png" alt="이전 달 보기" class="rotate"
       /></a>
-      <b>{{ currentYear }}</b
-      >년 <b>{{ currentMonth }}</b
-      >월
+      <span
+        ><b>{{ currentYear }}</b
+        >년</span
+      >
+      <span>
+        <b>{{ currentMonth }}</b
+        >월</span
+      >
       <a href="#" @click.prevent="nextMonth"
         ><img src="/image/button.png" alt="다음 달 보기"
       /></a>
@@ -225,13 +190,13 @@ const todayColor = (day) => {
   background-color: #fff;
   padding: 35px 45px 25px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
   .calendar_title {
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
-    gap: 5px;
+    gap: 10px;
+    cursor: pointer;
     a {
       display: flex;
       align-items: center;
@@ -268,11 +233,11 @@ const todayColor = (day) => {
         background-color: #bfeaff;
       }
     }
-    .today_color {
-      color: steelblue;
-    }
     .sunday_color {
       color: tomato;
+    }
+    .today_color {
+      color: steelblue;
     }
     td {
       height: 70px;

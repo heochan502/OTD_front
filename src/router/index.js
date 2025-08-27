@@ -1,13 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import ReminderHome from '@/views/reminder/ReminderHome.vue';
-import ReminderForm from '@/views/reminder/ReminderForm.vue';
-import ReminderList from '@/views/reminder/ReminderList.vue';
+// import ReminderForm from '@/views/reminder/ReminderForm.vue';
+// import ReminderList from '@/views/reminder/ReminderList.vue';
+// import ReminderDetail from '@/components/reminder/ReminderDetail.vue';
 
 import MemoList from '@/components/memo/MemoList.vue';
 import DiaryList from '@/components/memo/DiaryList.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 import CommunityView from '@/views/community/CommunityView.vue';
+// 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
+import { usecommunityStore } from '@/stores/community/communityStore';
 
 import MealForm from '@/views/meal/MealForm.vue';
 import MealAdd from '@/views/meal/MealAdd.vue';
@@ -23,9 +26,10 @@ import Join from '@/views/member/Join.vue';
 import Login from '@/views/member/Login.vue';
 import Profile from '@/views/member/Profile.vue';
 import ProfileDetail from '@/views/member/ProfileDetail.vue';
-import ProfilePassword from '@/views/member/Password.vue'
+import ProfilePassword from '@/views/member/Password.vue';
 
-import Location from '@/components/location/Location.vue';
+import NaverMaps from "@/views/maps/Map.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -46,16 +50,21 @@ const router = createRouter({
       component: ReminderHome,
       meta: { requiresAuth: true },
     },
-    {
-      path: '/reminder/form',
-      name: 'reminderform',
-      component: ReminderForm,
-    },
-    {
-      path: '/reminder/list',
-      name: 'reminderlist',
-      component: ReminderList,
-    },
+    // {
+    //   path: '/reminder/form',
+    //   name: 'reminderform',
+    //   component: ReminderForm,
+    // },
+    // {
+    //   path: '/reminder/list',
+    //   name: 'reminderlist',
+    //   component: ReminderList,
+    // },
+    // {
+    //   path: '/reminder/detail',
+    //   name: 'reminderdetail',
+    //   component: ReminderDetail,
+    // },
     {
       path: '/meal',
       name: 'MealForm',
@@ -66,11 +75,13 @@ const router = createRouter({
       path: '/meal/add',
       name: 'MealAdd',
       component: MealAdd,
+      meta: { requiresAuth: true },
     },
     {
       path: '/meal/MealStatistic',
       name: 'MealStatistic',
       component: MealStatistic,
+      meta: { requiresAuth: true },
     },
     {
       path: '/health',
@@ -114,7 +125,7 @@ const router = createRouter({
       component: Profile,
       meta: { requiresAuth: true },
     },
-     {
+    {
       path: '/profile/detail',
       name: 'profile_detail',
       component: ProfileDetail,
@@ -124,12 +135,6 @@ const router = createRouter({
       path: '/profile/password',
       name: 'profile_password',
       component: ProfilePassword,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/location',
-      name: 'location',
-      component: Location,
       meta: { requiresAuth: true },
     },
     {
@@ -146,9 +151,15 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/memoAndDiary/diarylist',
+      path: '/memoAndDiary/diary/list',
       name: 'DiaryList',
       component: DiaryList,
+      props: true,
+    },
+    {
+      path: '/navermaps',
+      name: 'NaverMaps',
+      component: NaverMaps,
       props: true,
     },
   ],
@@ -157,6 +168,12 @@ router.beforeEach((to) => {
   const accountStore = useAccountStore();
   if (to.meta.requiresAuth && !accountStore.state.loggedIn) {
     return '/login';
+  }
+  // 커뮤니티 진입 시 항상 리스트 모드로 강제
+  if (to.path === '/community') {
+    const cstore = usecommunityStore();
+    cstore.clearSelectedPost?.(); // 선택 글 초기화
+    cstore.goList?.(); // viewMode = 'list'
   }
 });
 export default router;

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { usecommunityStore } from '@/stores/communityStore';
+import { usecommunityStore } from '@/stores/community/communityStore';
 
 const store = usecommunityStore();
 
@@ -8,16 +8,13 @@ const itemsPerPage = 10;
 const currentPage = ref(1);
 
 onMounted(() => {
-
   store.loadPosts();
   console.log('store.posts:', store.posts);
-
 });
 
 const filteredPosts = computed(() => {
   const query = store.search.trim().toLowerCase();
   if (!query) return store.sortedPosts;
-
   return store.sortedPosts.filter(
     (post) =>
       post.title.toLowerCase().includes(query) ||
@@ -25,17 +22,16 @@ const filteredPosts = computed(() => {
   );
 });
 
-
-// 페이징 계산
 const pageCount = computed(() =>
   Math.ceil(filteredPosts.value.length / itemsPerPage)
 );
 
-const currentPagePosts = computed(() => store.sortedPosts); // 이미 현재 페이지 10개
+// 이미 현재 페이지 10개를 store에서 제공한다고 가정
+const currentPagePosts = computed(() => store.sortedPosts);
 
 const onPageChange = (page) => {
   currentPage.value = page;
-  store.loadPosts(page); //페이지 바뀔 때마다 새 게시글 요청
+  store.loadPosts(page);
 };
 
 function formatDate(dateStr) {
@@ -51,14 +47,9 @@ function formatDate(dateStr) {
 }
 
 const handlePostClick = (post) => {
-  console.log('클릭된 post:', post);
-  if (!post?.postId || post.postId <= 0) {
-    console.warn('유효하지 않은 postId:', post.postId);
-    return;
-  }
+  if (!post?.postId || post.postId <= 0) return;
   store.goDetail(post);
 };
-
 </script>
 
 <template>
@@ -108,28 +99,51 @@ const handlePostClick = (post) => {
         style="border: 1px solid #e0e0e0"
         @click="handlePostClick(post)"
       >
-        <v-row justify="space-between" no-gutters>
-          <v-row align="start" no-gutters class="flex-grow-1">
-            <v-avatar size="40" class="me-3" color="grey-lighten-2">
-              <v-icon icon="mdi-account" />
-            </v-avatar>
-            <div>
-              <div class="text-caption text-grey-darken-1">
-                {{ post.memberNick }} ·
-                {{ formatDate(post.createdAt) }}
-              </div>
-              <div class="text-body-1 font-weight-medium">
-                {{ post?.title }}
-              </div>
-              <div class="text-caption text-grey mt-1">
-                ❤️ {{ post.like }} · 💬 {{ post.commentCount }}· 👁️
-                {{ post.viewCount }}
+        <!-- [CHANGED] 카드 행 자체에 고정 높이 부여해서 균일화 -->
+        <v-row no-gutters align="center" class="card-row">
+          <!-- 텍스트 영역(왼쪽) -->
+          <v-col :cols="post.filePath ? 8 : 12">
+            <!-- [CHANGED] 높이 안에서 세로 가운데 정렬 -->
+            <div class="content-box">
+              <div class="d-flex align-start">
+                <v-avatar size="40" class="me-3" color="grey-lighten-2">
+                  <v-icon icon="mdi-account" />
+                </v-avatar>
+                <div class="w-100">
+                  <div class="text-caption text-grey-darken-1">
+                    {{ post.memberNick }} · {{ formatDate(post.createdAt) }}
+                  </div>
+                  <!-- [CHANGED] 두 줄까지만 보이고 넘치면 말줄임 -->
+                  <div class="text-body-1 font-weight-medium line-2">
+                    {{ post?.title }}
+                  </div>
+                  <div class="text-caption text-grey mt-1">
+                    ❤️ {{ post.like }} · 💬 {{ post.commentCount }} · 👁️
+                    {{ post.viewCount }}
+                  </div>
+                </div>
               </div>
             </div>
-          </v-row>
+          </v-col>
+
+          <!-- 썸네일(오른쪽) -->
+          <v-col v-if="post.filePath" cols="4" sm="3" md="3" class="pl-3">
+            <v-img :src="post.filePath" class="thumb rounded-lg" cover>
+              <template #placeholder>
+                <v-skeleton-loader type="image"></v-skeleton-loader>
+              </template>
+              <template #error>
+                <div
+                  class="thumb-fallback d-flex align-center justify-center rounded-lg"
+                >
+                  <v-icon size="28" icon="mdi-image-off-outline" />
+                </div>
+              </template>
+            </v-img>
+          </v-col>
         </v-row>
       </v-card>
-      <!-- 페이지네이션 -->
+
       <v-row justify="center" class="mt-6">
         <v-pagination
           v-model="currentPage"
@@ -155,5 +169,40 @@ const handlePostClick = (post) => {
 }
 .hover-effect:hover {
   background-color: rgba(100, 100, 100, 0.06);
+}
+
+/* [CHANGED] 카드 행 공통 높이(이미지 유무와 무관하게 동일) */
+.card-row {
+  --thumb-h: 104px; /* 필요 시 96~120px로 조절 */
+  min-height: var(--thumb-h);
+}
+
+/* [CHANGED] 텍스트 영역을 행 높이에 맞춰 가운데 정렬 */
+.content-box {
+  min-height: var(--thumb-h);
+  display: flex;
+  align-items: center; /* 수직 가운데 */
+}
+
+/* 썸네일은 행 높이에 딱 맞춤 */
+.thumb {
+  width: 100%;
+  height: var(--thumb-h);
+  overflow: hidden;
+}
+
+/* 에러시 대체 박스 */
+.thumb-fallback {
+  width: 100%;
+  height: var(--thumb-h);
+  background: rgba(160, 160, 160, 0.15);
+}
+
+/* 두 줄 말줄임 처리 */
+.line-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 최대 2줄 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

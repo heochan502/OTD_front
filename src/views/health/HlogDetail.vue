@@ -1,40 +1,32 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import moodLevels from "@/assets/health/moodLevels.json";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
-import HealthCart from "@/components/health/HealthChart.vue";
+import HealthChart from "@/components/health/HealthChart.vue";
 import { useHealthStore } from "@/stores/healthStore";
 import { useRoute } from "vue-router";
 import { getHlog, deleteHlog } from "@/services/health/hlogService";
 import router from "@/router";
+import { formatDate } from "@/utils/reportUtils";
 
 const healthStore = useHealthStore();
 const route = useRoute();
 
 const state = reactive({
-  hlog: {
-    healthlogId: null,
-    weight: null,
-    height: null,
-    systolicBp: null,
-    diastolicBp: null,
-    sugarLevel: null,
-    moodLevel: null,
-    sleepQuality: null,
-    healthlogDatetime: "",
-  },
+  hlog: [],
 });
 
 const healthlogId = route.params.healthlogId;
-
 onMounted(async () => {
-  await healthStore.fetchHealthlogs();
+  if (!healthlogId) {return;}
+  
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
   state.hlog = res.data;
+  console.log("정보 : ", route);
 });
 
 const fields = [
@@ -46,10 +38,7 @@ const fields = [
   { key: "diastolicBp", label: "이완기 혈압", unit: "mmHg" },
   { key: "sugarLevel", label: "혈당", unit: "mg/dL" },
 ];
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
+const selectedField = ref(fields[0].key);
 
 // @click
 const deleteLog = async () => {
@@ -76,10 +65,10 @@ const deleteLog = async () => {
       </div>
     </v-row>
 
-    <v-item-group selected-class="bg-blue">
+    <v-item-group v-model="selectedField" selected-class="bg-blue">
       <div class="item_group">
         <div v-for="(field, idx) in fields" :key="idx" class="card-wrapper">
-          <v-item v-slot="{ selectedClass, toggle }">
+          <v-item v-slot="{ selectedClass, toggle }" :value="field.key">
             <v-card
               :class="[
                 'd-flex flex-column justify-center align-center text-center',
@@ -90,28 +79,37 @@ const deleteLog = async () => {
               dark
               @click="toggle"
             >
-              <div class="text-h6 subtitle">
-                {{ field.label }}
-              </div>
-              <div class="text-center content">
-                {{
-                  field.key === "moodLevel"
-                    ? moodLevels.find((e) => e.level === state.hlog[field.key])
-                        ?.label
-                    : field.key === "sleepQuality"
-                    ? sleepQualitys.find(
-                        (e) => e.level === state.hlog[field.key]
-                      )?.label
-                    : state.hlog[field.key] +
-                      (field.unit ? ` ${field.unit}` : "")
-                }}
+              <div>
+                <div class="text-h6 subtitle">
+                  {{ field.label }}
+                </div>
+                <div class="text-center content">
+                  {{
+                    field.key === "moodLevel"
+                      ? moodLevels.find(
+                          (e) => e.level === state.hlog[field.key]
+                        )?.label
+                      : field.key === "sleepQuality"
+                      ? sleepQualitys.find(
+                          (e) => e.level === state.hlog[field.key]
+                        )?.label
+                      : state.hlog[field.key] +
+                        (field.unit ? ` ${field.unit}` : "")
+                  }}
+                </div>
               </div>
             </v-card>
           </v-item>
         </div>
       </div>
     </v-item-group>
-    <HealthCart />
+    <!-- 통계 그래프 -->
+    <HealthChart
+      :selected-date="state.hlog.healthlogDatetime"
+      :selectedField="selectedField"
+      :fields="fields"
+      :logs="healthStore.logs"
+    />
   </v-container>
 </template>
 

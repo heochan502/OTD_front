@@ -1,16 +1,29 @@
 <script setup>
-import { onMounted, ref, reactive } from "vue";
-import { useHealthStore } from "@/stores/healthStore";
+import { onMounted, ref, computed, reactive, onUnmounted } from "vue";
+import { getEexerciselogCalendar } from "@/services/health/elogService";
+import { getHealthlogCalendar } from "@/services/health/hlogService";
+import { end } from "@popperjs/core";
 import { useExerciseStore } from "@/stores/exerciseStore";
+import { useHealthStore } from "@/stores/healthStore";
 
-const healthStore = useHealthStore();
 const exerciseStore = useExerciseStore();
+const healthStore = useHealthStore();
 
 const healthLogDate = ref([]);
 const exerciseLogDate = ref([]);
-
 const calendarAttributes = ref([]);
 
+// 오늘날짜
+const selectedDate = ref(new Date());
+
+// 달력 title 날짜
+function formatYearMonth(date) {
+  // if (!date) return "";
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  return `${year}년 ${month}월`;
+}
+// 날짜 형변환
 function formatDate(date) {
   if (!date) return "";
   const d = new Date(date);
@@ -20,26 +33,67 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-const selectedDate = ref(new Date());
+const params = reactive({
+  start: null,
+  end: null,
+});
 
-function formatYearMonth(date) {
-  // if (!date) return "";
+const getData = async (params) => {
+  const res = await getEexerciselogCalendar(params);
+  const res2 = await getHealthlogCalendar(params);
+
+  if (res.status === 200 && res2.status === 200) {
+    const result = res.data;
+    const result2 = res2.data;
+    exerciseStore.addCalendarDate(
+      result.map((item) => formatDate(item.exerciseDatetime))
+    );
+    healthStore.addCalendarDate(
+      result2.map((item) => formatDate(item.healthlogDatetime))
+    );
+  }
+};
+
+// 달력 이동 시 실행되는 함수
+const onDidMove = async (pages) => {
+  exerciseStore.clearCalendarDate();
+  // 현재 보여지는 달력의 첫 페이지 정보
+  const page = pages[0];
+  const year = page.year;
+  const month = page.month;
+  const start = `${year}-${month}-01`; // 월 시작일
+  const end = `${year}-${month}-31`; // 월 마지막일
+
+  params.start = start;
+  params.end = end;
+
+  getData(params);
+};
+
+const getParamsFromDate = (date) => {
   const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  return `${year}년 ${month}월`;
-}
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const start = `${year}-${month}-01`;
+  const end = `${year}-${month}-${new Date(
+    year,
+    date.getMonth() + 1,
+    0
+  ).getDate()}`;
+  return { start, end };
+};
+
+// 점 찍을 때 해당 일자에 데이터 있는지 확인하기 위함
+const healthLogSet = computed(() => new Set(healthStore.calendarDate));
+const exerciseLogSet = computed(() => new Set(exerciseStore.calendarDate));
 
 onMounted(async () => {
-  await healthStore.fetchHealthlogs();
-  await exerciseStore.fetchExerciselogs();
+  const params = getParamsFromDate(selectedDate.value);
+  getData(params);
+});
 
-  healthLogDate.value = healthStore.logs.map((item) =>
-    formatDate(item.healthlogDatetime)
-  );
-
-  exerciseLogDate.value = exerciseStore.logs.map((item) =>
-    formatDate(item.exerciseDatetime)
-  );
+onUnmounted(() => {
+  exerciseStore.clearCalendarDate();
+  healthStore.clearCalendarDate();
 });
 </script>
 
@@ -51,7 +105,7 @@ onMounted(async () => {
       <span class="dot dot-exercise"> </span>
       <span>운동</span>
     </div>
-    <v-calendar
+    <vc-calendar
       is-expanded
       v-model="selectedDate"
       :attributes="calendarAttributes"
@@ -59,6 +113,7 @@ onMounted(async () => {
       :show-adjacent-months="false"
       style="width: 100%; height: 100%; border: none"
       class="calendar"
+      @did-move="onDidMove"
     >
       <!-- 타이틀 디자인 수정 -->
       <template #title="{ start, prev, next }">
@@ -84,17 +139,17 @@ onMounted(async () => {
           </div>
           <div class="dot-wrapper">
             <span
-              v-if="healthLogDate.includes(formatDate(day.date))"
+              v-if="healthLogSet.has(formatDate(day.date))"
               class="dot dot-health"
             ></span>
             <span
-              v-if="exerciseLogDate.includes(formatDate(day.date))"
+              v-if="exerciseLogSet.has(formatDate(day.date))"
               class="dot dot-exercise"
             ></span>
           </div>
         </div>
       </template>
-    </v-calendar>
+    </vc-calendar>
   </v-card>
 </template>
 

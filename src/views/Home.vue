@@ -1,11 +1,11 @@
 <script setup>
 import Weather from '@/views/weather/weather.vue';
 import ReportCard from '@/components/health/ReportCard.vue';
-import ReminderHome from '@/components/reminder/ReminderHome.vue';
+import ReminderHome from '@/components/reminder/HomeReminder.vue';
 </script>
 
 <template>
-  <Weather />
+  <Weather class="weather-layout" />
   <div class="home-layout">
     <div class="reminder-wrapper mt-6">
       <ReminderHome />
@@ -18,9 +18,15 @@ import ReminderHome from '@/components/reminder/ReminderHome.vue';
 
 <style lang="scss" scoped>
 .home-layout {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+}
+.weather-layout {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .reminder-wrapper,
 .report-wrapper {

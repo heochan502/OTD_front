@@ -3,12 +3,16 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useBaseDate, useDayDefine, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
 
 import { getWeekTotal } from '@/services/meal/mealService'
+
+import { useDisplay } from 'vuetify'
+
 import dayjs from "dayjs";
 
 import "dayjs/locale/ko";
 
 dayjs.locale("ko");
 
+const { mdAndDown } = useDisplay() 
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
@@ -16,18 +20,21 @@ const weeklyStore = useWeeklyStore();
 const ondayMealData = useCalorieCalcul();
 
 const selectedDate = ref(ondayMealData.itemInfo.mealDay); // 초기화 및 선택하는 날짜 들어감
+
+
 const weekDates = ref([]);
 
 const getWeekDates = (dateString) => {
   // 오늘 날짜 까져옴
   const date = new Date(dateString);
+
   //0 일요일 ~
   const dayOfWeek = date.getDay();
 
-  console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
-
-
+  // console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
+  
   // 현재 나 선택한 날짜 
+
   const startDate = new Date(date);
 
   // console.log(dayOfWeek + 1, typeof dateString);
@@ -38,10 +45,9 @@ const getWeekDates = (dateString) => {
   else {
     startDate.setDate(date.getDate() - dayOfWeek + 1);
   }
-  console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
+  // console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
   const result = [];
   for (let i = 0; i < 7; i++) {
-   
     // console.log(startDate, typeof startDate);
     const weekDate =  new Date(startDate.toISOString().slice(0,10));
     weekDate.setDate(weekDate.getDate() + i);
@@ -64,7 +70,7 @@ watch(
     newDate = new dayjs().format('YYYY-MM-DD'); // 선택된 날짜가 없으면 현재 날짜로 설정
     
   } 
-   console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
+  //  console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
     ondayMealData.mealFormData(newDate);
     weekDates.value = getWeekDates(newDate);
 
@@ -84,25 +90,29 @@ watch(
   },
   { immediate: true }
 );
-
+const dateInputRef = ref(null);
+const openDatePicker = () => {
+  if (dateInputRef.value) {
+    dateInputRef.value.showPicker   // 최신 브라우저 지원
+      ? dateInputRef.value.showPicker()
+      : dateInputRef.value.click()  // fallback
+  }
+}
 
 </script>
 
 <template>
   <div>
-    <v-text-field
-      v-model="selectedDate"
-      label="날짜 선택"
-      type="date"
-      class="mb-4 text-black"
-      variant="underlined"
-    ></v-text-field>
+    <!-- 아래는 날짜 선택용 vuetify 입력 필드 -->
+    <v-text-field v-if="!mdAndDown" v-model="selectedDate" label="날짜 선택" type="date" variant="underlined" />
+    <!-- 작은 화면일 때: 아이콘 -->
+    <div v-else>
+      <v-btn icon="mdi-calendar" variant="text" @click="openDatePicker" />
 
-    <!-- <v-list>
-        <v-list-item v-for="date in getYData.value " :key="date.day">
-    <v-list-item-title> 출력 부부 ㄴ: {{ date.day }} {{ date.calo }}</v-list-item-title>
-    </v-list-item>
-    </v-list> -->
+      <!-- 숨겨진 date input (완전 hidden 금지, 투명 처리만) -->
+      <input ref="dateInputRef" type="date" v-model="selectedDate"
+        style="opacity: 0; position:absolute; left:-70px;" />
+    </div>
   </div>
 </template>
 

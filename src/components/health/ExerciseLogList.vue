@@ -1,36 +1,64 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useExerciseStore } from "@/stores/exerciseStore";
+import { formatDate } from "@/utils/reportUtils";
+import { getElogList } from "@/services/health/elogService";
 
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
-// 응답받은 기록들
+const data = {
+  page: 1,
+  rowPerPage: 4,
+};
 const state = reactive({
-  logs: [],
+  isLoading: false,
+  isFinish: false,
 });
 
-// 운동기록불러오기
-// const load = async () => {
-//   const res = await getElogs();
-//   if (res === undefined || res.status !== 200) {
-//     alert(res.status + "오류발생!");
-//     return;
-//   }
-//   state.logs = res.data;
-// };
+const handleScroll = (e) => {
+  const target = e.target; // list-wrap
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
 
-onMounted(async () => {
-  await exerciseStore.fetchExercises();
-  await exerciseStore.fetchExerciselogs();
-  state.logs = exerciseStore.logs;
+  const nearBottom = scrollTop + clientHeight >= scrollHeight - 100; // 바닥 근처
+  if (nearBottom) {
+    getData();
+  }
+};
+
+
+onMounted(() => {
+  exerciseStore.fetchExercises();
+  getData();
+
 });
 
-// 날짜 형식 변경
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+onUnmounted(() => {
+  exerciseStore.clearLogList();
+});
+
+const getData = async () => {
+  if (state.isLoading || state.isFinish) return;
+  state.isLoading = true;
+  const params = {
+    page: data.page++,
+    row_per_page: data.rowPerPage,
+  };
+  const res = await getElogList(params);
+
+  if (res.status === 200) {
+    const result = res.data;
+    if (result && result.length > 0) {
+      exerciseStore.addLogList(result);
+    }
+    if (result.length < data.rowPerPage) {
+      state.isFinish = true;
+    }
+  }
+  state.isLoading = false;
 };
 
 // click event
@@ -49,16 +77,18 @@ const add = () => {
       <i class="bi bi-plus-circle btn-plus" @click="add"></i>
     </div>
   </div>
-  <div class="list-wrap">
+  <div class="list-wrap" @scroll="handleScroll">
     <ul>
-      <li v-if="state.logs.length < 1" class="title">운동 기록을 추가하세요</li>
+      <li v-if="exerciseStore.logList.length < 1" class="title">
+        운동 기록을 추가하세요
+      </li>
       <li
-        v-for="item in state.logs"
+        v-for="item in exerciseStore.logList"
         :key="item.exerciselogId"
         @click="detail(item.exerciselogId)"
       >
         <div class="title">
-          {{ exerciseStore.list[item.exerciseId - 1]?.exerciseName }}
+          {{ exerciseStore.exerciseList[item.exerciseId - 1]?.exerciseName }}
         </div>
         <div class="content">
           <div>{{ item.exerciseDuration }}분</div>
@@ -99,7 +129,6 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow: auto;
 
   li {
     display: flex;

@@ -20,7 +20,7 @@ const fetchMemoList = async () => {
     const result = await MemoHttpService.findAll(params);
     memoList.value = result.memoList || result.memolist || [];
   } catch (e) {
-    console.error('❌ 메모 목록 조회 중 오류:', e);
+    console.error("❌ 메모 목록 조회 중 오류:", e);
     memoList.value = [];
   } finally {
     memoListLoading.value = false;
