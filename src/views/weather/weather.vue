@@ -254,6 +254,7 @@ watch(
   border-radius: 0 16px 16px 16px;
   padding: 1rem;
   margin: 0px 1rem;
+  height: 11rem;
   color: white;
   max-width: 100%;
   box-shadow: 1px 1px 4px #838383;
@@ -311,7 +312,16 @@ watch(
     }
   }
 }
-
+@media (max-width: 935px) {
+  .weather-alert {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 802px) {
+  .weather-alert {
+    font-size: 0.8rem;
+  }
+}
 @media (max-width: 790px) {
   .weather-location {
     font-size: 2rem !important;
@@ -325,9 +335,6 @@ watch(
 
   .temperature {
     font-size: 1.8rem !important;
-  }
-  .weather-alert {
-    font-size: 1rem;
   }
 }
 @media (max-width: 686px) {
@@ -358,10 +365,13 @@ watch(
     font-size: 1.6rem !important;
   }
   .weather-alert {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 }
 @media (max-width: 573px) {
+  .weather-card {
+    height: 10rem;
+  }
   .weather-location {
     font-size: 1rem !important;
   }
@@ -372,16 +382,15 @@ watch(
     .temperature {
       font-size: 1.2rem !important;
     }
-    .weather-alert {
-      font-size: 0.6rem;
-    }
+  }
+}
+@media (max-width: 534px) {
+  .weather-alert {
+    font-size: 0.5rem;
   }
 }
 @media (max-width: 522px) {
   .header {
-    font-size: 10px;
-  }
-  .weather-alert {
     font-size: 10px;
   }
 }

@@ -136,7 +136,7 @@ const logoutAccount = async () => {
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 16px 32px 0px;
+  padding: 16px 22px 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -171,7 +171,7 @@ const logoutAccount = async () => {
 .nav {
   padding: 0 40px;
   display: flex;
-  gap: 24px;
+  gap: 18px;
   font-size: 16px;
   color: #222;
   .nav-menu {
@@ -234,10 +234,25 @@ const logoutAccount = async () => {
   height: 40px;
   overflow: hidden;
 }
+@media (max-width: 1080px) {
+  .inner {
+    padding: 16px 32px 0px;
+    .nav {
+      gap: 12px;
+      padding: 0 20px;
+    }
+    .member {
+      padding: 0 0 0 20px;
+    }
+    .logo {
+      padding: 0 20px 0 20px;
+    }
+  }
+}
 @media (max-width: 976px) {
   .inner {
     .logo {
-      padding: 0 10px 0 0;
+      padding: 0 10px 0 18px;
     }
     .nav {
       padding: 0 10px;
@@ -249,7 +264,7 @@ const logoutAccount = async () => {
 }
 @media (max-width: 959px) {
   .photo-wrapper {
-    right: 32px;
+    right: 40px;
     transform: translateY(-50%);
   }
   .profile {
