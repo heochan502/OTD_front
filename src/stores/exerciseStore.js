@@ -10,6 +10,7 @@ export const useExerciseStore = defineStore("exercise", {
       todayLog: [],
       calendarDate: [],
       logList: [],
+      logs: [],
     }),
 
   actions: {
@@ -40,7 +41,5 @@ export const useExerciseStore = defineStore("exercise", {
     },
   },
 
-
   persist: true,
-
 });
