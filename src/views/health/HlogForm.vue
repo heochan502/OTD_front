@@ -62,29 +62,28 @@ const cancel = () => {
 </script>
 
 <template>
-  <v-container class="container" fluid>
-    <v-sheet class="mx-auto" width="1000">
+  <v-container class="container pb-16" fluid>
+    <v-sheet class="mx-auto w-100">
       <v-form>
         <v-row class="title">
           <h4>건강 기록하기</h4>
         </v-row>
-        <v-row class="hlogForm">
-          <v-col class="left">
+        <v-row>
+          <v-col class="left d-flex justify-center">
             <v-date-picker
               v-model="state.form.healthlogDatetime"
-              width="300px"
+              min-width="310px"
               divided
-              landscape
             ></v-date-picker>
           </v-col>
-          <v-col class="right" cols="8">
-            <v-row>
+          <v-row class="d-flex justify-center">
+            <v-col class="d-flex flex-column justify-center" cols="auto">
               <v-text-field
                 v-model="state.form.weight"
                 :rules="rules"
                 label="체중(kg)"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 density="compact"
                 clearable
               ></v-text-field>
@@ -93,38 +92,10 @@ const cancel = () => {
                 :rules="rules"
                 label="신장"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 density="compact"
                 clearable
               ></v-text-field>
-            </v-row>
-            <v-row>
-              <v-text-field
-                v-model="state.form.systolicBp"
-                label="수축기 혈압"
-                variant="solo"
-                class="pa-2"
-                density="compact"
-                clearable
-              ></v-text-field>
-              <v-text-field
-                v-model="state.form.diastolicBp"
-                label="이완기 혈압"
-                variant="solo"
-                class="pa-2"
-                density="compact"
-                clearable
-              ></v-text-field>
-              <v-text-field
-                v-model="state.form.sugarLevel"
-                label="혈당"
-                variant="solo"
-                class="pa-2"
-                density="compact"
-                clearable
-              ></v-text-field>
-            </v-row>
-            <v-row>
               <v-select
                 v-model="state.form.moodLevel"
                 label="감정상태"
@@ -137,7 +108,7 @@ const cancel = () => {
                 item-title="title"
                 item-value="value"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 clearable
               ></v-select>
               <v-select
@@ -152,11 +123,38 @@ const cancel = () => {
                 item-title="title"
                 item-value="value"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 clearable
               ></v-select>
-            </v-row>
-          </v-col>
+            </v-col>
+
+            <v-col class="d-flex flex-column justify-center" cols="auto">
+              <v-text-field
+                v-model="state.form.systolicBp"
+                label="수축기 혈압"
+                variant="solo"
+                class="value-field"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.diastolicBp"
+                label="이완기 혈압"
+                variant="solo"
+                class="value-field"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.sugarLevel"
+                label="혈당"
+                variant="solo"
+                class="value-field"
+                density="compact"
+                clearable
+              ></v-text-field>
+            </v-col>
+          </v-row>
         </v-row>
         <v-row class="btns">
           <v-btn class="save" @click="submit">저장</v-btn>
@@ -175,8 +173,6 @@ const cancel = () => {
 
   flex-direction: column;
 
-  padding-top: 100px;
-
   .title {
     display: flex;
     justify-content: center;
@@ -187,19 +183,8 @@ const cancel = () => {
     }
   }
 
-  .hlogForm {
-    display: flex;
-    flex-direction: row;
-  }
-
   .v-date-picker {
     $date-picker-header-height: 30px;
-  }
-
-  .right {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
   }
 
   .btns {
@@ -215,6 +200,11 @@ const cancel = () => {
     .save {
       background-color: #3bbeff;
     }
+  }
+
+  .value-field {
+    width: 50%;
+    min-width: 310px;
   }
 }
 </style>
