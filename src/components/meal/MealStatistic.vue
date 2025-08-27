@@ -104,16 +104,35 @@ const openDatePicker = () => {
 <template>
   <div>
     <!-- 아래는 날짜 선택용 vuetify 입력 필드 -->
-    <v-text-field v-if="!mdAndDown" v-model="selectedDate" label="날짜 선택" type="date" variant="underlined" />
+    <v-text-field class="dataInBig" v-if="!mdAndDown" v-model="selectedDate" label="날짜 선택" type="date" variant="underlined" />
     <!-- 작은 화면일 때: 아이콘 -->
     <div v-else>
       <v-btn icon="mdi-calendar" variant="text" @click="openDatePicker" />
 
       <!-- 숨겨진 date input (완전 hidden 금지, 투명 처리만) -->
-      <input ref="dateInputRef" type="date" v-model="selectedDate"
-        style="opacity: 0; position:absolute; left:-70px;" />
+      <input class="dateIn" ref="dateInputRef" type="date" v-model="selectedDate"
+        style="opacity: 0; position:absolute; " />
     </div>
   </div>
 </template>
 
-<style></style>
+<style>
+
+.dataInBig{
+  left: -10px;
+}
+
+.dataIn {
+  left:-70px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .dateIn {
+    position: absolute;
+    left: -0px;
+  }
+}
+
+
+</style>
