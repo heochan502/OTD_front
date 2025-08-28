@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import effortLevels from "@/assets/health/effortLevels.json";
 import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
@@ -10,6 +10,7 @@ import { formatDate } from "@/utils/reportUtils";
 const exerciseStore = useExerciseStore();
 const route = useRoute();
 const router = useRouter();
+const confirmDialog = ref(false);
 
 const state = reactive({
   elog: {
@@ -53,15 +54,13 @@ const moveToMain = () => {
   });
 };
 
-const deleteLog = async () => {
-  if (!confirm("삭제하시겠습니까?")) return;
+const confirmYes = async () => {
   const exerciselogId = state.elog.exerciselogId;
   const res = await deleteElog(exerciselogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("삭제되었습니다.");
   router.push("/health");
 };
 </script>
@@ -73,10 +72,8 @@ const deleteLog = async () => {
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
       <div class="btns d-none d-md-flex">
-        <router-link to="/health">
-          <v-btn class="btn_home">홈</v-btn>
-        </router-link>
-        <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
+        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+        <v-btn class="btn_delete" @click="confirmDialog = true">삭제</v-btn>
       </div>
     </v-row>
 
@@ -149,10 +146,22 @@ const deleteLog = async () => {
       <div class="btns">
         <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
 
-        <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
+        <v-btn class="btn_delete" @click="confirmDialog = true">삭제</v-btn>
       </div>
     </v-row>
   </v-container>
+  <!-- 모달창 -->
+  <v-dialog v-model="confirmDialog" max-width="400">
+    <v-card>
+      <v-card-title> 삭제 </v-card-title>
+      <v-card-text>운동 기록을 삭제하시겠습니까?</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="confirmDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="confirmYes">삭제</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>

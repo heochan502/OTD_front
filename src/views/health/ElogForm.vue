@@ -8,7 +8,8 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
-const confirmDialog = ref(false);
+const saveDialog = ref(false);
+const cancelDialog = ref(false);
 
 const state = reactive({
   form: {
@@ -49,12 +50,10 @@ const confirmYes = async () => {
     alert("에러발생");
     return;
   }
-  alert("운동기록 저장 완료!");
   router.push("/health");
 };
 
-const cancel = () => {
-  if (!confirm("취소하고 돌아가시겠습니까?")) return;
+const cancelYes = () => {
   router.push("/health");
 };
 </script>
@@ -149,18 +148,32 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn class="save" @click="confirmDialog = true">저장</v-btn>
-      <v-btn @click.prevent="cancel">취소</v-btn>
+      <v-btn class="save" @click="saveDialog = true">저장</v-btn>
+      <v-btn @click="cancelDialog = true">취소</v-btn>
     </v-row>
   </v-container>
-
-  <v-dialog v-model="confirmDialog" max-width="400">
+  <!-- 모달창 -->
+  <v-dialog v-model="saveDialog" max-width="400">
     <v-card>
-      <v-card-title> 저장하시겠습니까? </v-card-title>
+      <v-card-title> 저장 </v-card-title>
+      <v-card-text>운동 기록을 저장하시겠습니까?</v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="dark" text @click="confirmDialog = false">취소</v-btn>
+        <v-btn color="dark" text @click="saveDialog = false">취소</v-btn>
         <v-btn color="primary" text @click="confirmYes">저장</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="cancelDialog" max-width="400">
+    <v-card>
+      <v-card-title> 취소 </v-card-title>
+      <v-card-text
+        >기록을 저장하지 않고 건강 메인화면으로 돌아가시겠습니까?</v-card-text
+      >
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="cancelDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="cancelYes">이동</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
