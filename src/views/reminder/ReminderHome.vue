@@ -22,34 +22,37 @@ const selectedDate = () => {
   const d = new Date(reminderStore.state.selectedDate).getDate();
   return `${y}년 ${m}월 ${d}일`;
 };
-const today = new Date();
-
-const todayYear = today.getFullYear();
-const todayMonth = today.getMonth() + 1;
 
 const state = reactive({
   reminderDate: [], // 한달치 리마인더 날짜
   todayReminder: [], // 오늘 리마인더 미리보기 내용
 });
 
-onMounted(async () => {
-  getReminderList({ year: todayYear, month: todayMonth });
-  reminderStore.setSelectedDate(formatDate(today));
-  // mounted될 때 마다 리셋될 초기 리마인더(오늘 날짜) 정보 업데이트
-  const todayReminder = filterReminder(today);
-  console.log('dhsmf', todayReminder);
+// reload될 때의 작업 로직
+const reLoad = async() => {
+  await getReminderList({
+    year: reminderStore.state.currentYear,
+    month: reminderStore.state.currentMonth,
+  });
+  const todayReminder = filterReminder(
+    new Date(reminderStore.state.selectedDate)
+  );
   state.todayReminder = todayReminder;
+};
+
+onMounted(async () => {
+  reLoad();
 });
 
-// watch(
-//   () => reminderStore.reload,
-//   (data) => {
-//     if (data) {
-//       getReminderList({ year: todayYear, month: todayMonth });
-//       reminderStore.setReload(false);
-//     }
-//   }
-// );
+watch(
+  () => reminderStore.reload,
+  (data) => {
+    if (data) {
+      reLoad();
+      reminderStore.setReload(false);
+    }
+  }
+);
 
 // 한달치 리마인더 목록(요일반복 포함) 조회
 const getReminderList = async (date) => {
@@ -59,7 +62,6 @@ const getReminderList = async (date) => {
     return;
   }
   reminderStore.setFullReminder(res.data);
-  console.log('d', res.data);
   const fixedDateList = res.data
     .filter((item) => {
       if (!item.repeat) {
@@ -72,12 +74,10 @@ const getReminderList = async (date) => {
 
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
-  console.log('테', state.reminderDate);
 };
 
 // 요일 반복 리마인더 해당 요일 날짜로 변환 로직
 const getRepeatDate = (fullReminder, year, month) => {
-  console.log('full', fullReminder);
   const result = [];
   const end = new Date(year, month, 0).getDate();
 
@@ -97,7 +97,6 @@ const getRepeatDate = (fullReminder, year, month) => {
       }
     }
   }
-  console.log('result', result);
   return result;
 };
 
@@ -107,14 +106,12 @@ const filterReminder = (date) => {
   const formattedDate = formatDate(date);
   const reminderList = reminderStore.state.fullReminder.filter((item) => {
     const isFixed = item.repeat === false && item.startDate === formattedDate;
-
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
       item.startDate <= formattedDate &&
       (!item.endDate || item.endDate >= formattedDate) &&
       !item.exceptionDate?.includes(formattedDate);
-
     return isFixed || isRepeat;
   });
   return reminderList;
@@ -123,15 +120,22 @@ const filterReminder = (date) => {
 // 캘린더 날짜 선택시의 표출할 리마인더 날짜 정보 피니아 업데이트, 리마인더 내용 업데이트
 const routerDate = (date) => {
   const dayReminder = filterReminder(date);
-  console.log('day', dayReminder);
   state.todayReminder = dayReminder;
   reminderStore.setSelectedDate(formatDate(date));
 };
 
 const modal = ref({ form: false, detail: false });
 const openModal = (type) => {
-  console.log('type', type);
   modal.value[type] = true;
+};
+
+// 피니아에 저장된 날짜 현재로 초기화
+const resetDate = () => {
+  const today = new Date();
+  reminderStore.setCurrentYear(today.getFullYear());
+  reminderStore.setCurrentMonth(today.getMonth() + 1);
+  reminderStore.setSelectedDate(formatDate(today));
+  reLoad();
 };
 </script>
 
@@ -146,13 +150,20 @@ const openModal = (type) => {
       ></Calendar>
     </div>
     <div class="right">
-      <div class="add">
-        <button @click="openModal('form')" class="add-button">
-          일정 추가하기
-          <v-dialog v-model="modal.form" max-width="300px">
-            <Form @form-close="modal.form = false"></Form>
-          </v-dialog>
-        </button>
+      <div class="button">
+        <div class="add reset">
+          <button class="reset-button" @click="resetDate">
+            현재 달로 돌아가기
+          </button>
+        </div>
+        <div class="add">
+          <button @click="openModal('form')" class="add-button">
+            일정 추가하기
+            <v-dialog v-model="modal.form" max-width="300px">
+              <Form @form-close="modal.form = false"></Form>
+            </v-dialog>
+          </button>
+        </div>
       </div>
 
       <div class="preview">
@@ -202,25 +213,32 @@ const openModal = (type) => {
     margin-top: 69px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     gap: 10px;
-    .add {
-      width: 135px;
-      height: 43px;
-      background-color: #3bbeff;
+    .button {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 25px;
-      margin-right: 13px;
-      .add-button {
-        color: #fff;
-        outline: none;
-        font-weight: bold;
-        font-size: 17px;
-      }
-      .add-button:hover {
+      justify-content: space-between;
+      .add {
+        width: 135px;
+        height: 43px;
         background-color: #3bbeff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 25px;
+        .add-button,
+        .reset-button {
+          color: #fff;
+          outline: none;
+          font-weight: bold;
+          font-size: 17px;
+        }
+        .add-button:hover,
+        .reset-button {
+          background-color: #3bbeff;
+        }
+      }
+      .reset {
+        width: 160px;
       }
     }
     .modal-wrap {

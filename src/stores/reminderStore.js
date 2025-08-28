@@ -5,7 +5,6 @@ export const useReminderStore = defineStore(
   'reminder',
   () => {
     const state = reactive({
-      // dayReminder: [], // 선택된 날짜의 리마인더
       fullReminder: [], // 한 달 전체 리마인더
       currentYear: new Date().getFullYear(),
       currentMonth: new Date().getMonth() + 1,
@@ -13,10 +12,6 @@ export const useReminderStore = defineStore(
     });
 
     const reload = ref(false);
-
-    // const setDayReminder = (data) => {
-    //   state.dayReminder = data;
-    // };
 
     const setFullReminder = (data) => {
       state.fullReminder = data;
@@ -40,7 +35,6 @@ export const useReminderStore = defineStore(
 
     return {
       state,
-      // setDayReminder,
       setFullReminder,
       setCurrentYear,
       setCurrentMonth,
@@ -57,7 +51,7 @@ export const useReminderStore = defineStore(
         {
           key: 'reminder', // localStorage에 저장될 이름
           storage: localStorage, // 기본값이 이거임 (생략 가능)
-          paths: ['state.dayReminder', 'state.fullReminder'], // 저장할 속성
+          paths: ['state.fullReminder', 'state.currentYear', 'state.currentMonth', 'state.selectedDate'], // 저장할 속성
         },
       ],
     },

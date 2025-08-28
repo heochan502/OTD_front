@@ -4,12 +4,14 @@ import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
 import { onMounted, ref } from 'vue';
 import MobileFooter from '@/components/MobileFooter.vue';
+import { useReminderStore } from '@/stores/reminderStore';
 import { getNickName } from '@/services/weather/weatherHomeService';
 
 const router = useRouter();
 const route = useRoute();
 const counter = useAccountStore();
 const toggle = ref(false);
+const reminderStore = useReminderStore();
 const birthDate = ref('');
 
 function goHome() {
@@ -37,6 +39,22 @@ const logoutAccount = async () => {
   counter.setLoggedIn(false);
   router.push('/login');
 };
+
+const formatNumber = (n) => String(n).padStart(2, '0');
+const formatDate = (date) => {
+  const y = date.getFullYear();
+  const m = formatNumber(date.getMonth() + 1);
+  const d = formatNumber(date.getDate());
+  return `${y}-${m}-${d}`;
+};
+
+const resetDate = () => {
+  const today = new Date();
+  reminderStore.setCurrentYear(today.getFullYear());
+  reminderStore.setCurrentMonth(today.getMonth() + 1);
+  reminderStore.setSelectedDate(formatDate(today));
+};
+
 onMounted(async () => {
   await userCreatedAt();
 });
@@ -89,6 +107,7 @@ onMounted(async () => {
           to="/reminder"
           class="nav-menu"
           :class="{ active: route.path.startsWith('/reminder') }"
+          @click="resetDate"
           >리마인더</router-link
         >
         <router-link
