@@ -305,19 +305,17 @@ onMounted(() => {
 <template>
   <div class="d-flex flex-column mb-6">
     <div>
-      <div class="text-grey-darken-1 mb-1 font-weight-bold flex-row">
-        <span class="text-h3 font-weight-bold">
-          {{ dayStore.dayDefine }} 메뉴
-        </span>
+      <div class="addText text-grey-darken-1 mb-1 font-weight-bold ">
+        <span class="menu text-h4 font-weight-bold text-md-h3">
+          {{ dayStore.dayDefine }} 메뉴   </span>
         <!-- 아래는 배열객체의 값의 총합 -->
-        <span class="text-body-1 font-weight-bold">
-          오늘 먹은 칼로리
+        <span class=" eat_calorie text-body-1 font-weight-bold ml-10">
+          <br class="d-sm-none pl-20 "/>오늘 먹은 칼로리
           {{
             itemList.reduce((sum, item) => sum + item.totalCalorie, 0)
-          }}
-          kcal</span
-        >
-        <span class="ml-10"> 현재 시간 : {{ dayStore.currentTime }} </span>
+          }}kcal</span>
+        <br class="d-sm-none"/>
+        <span class="nowtime ml-sm-10 "> 현재 시간 : {{ dayStore.currentTime }} </span>
       </div>
       <v-row dense class="justify-center">
         <v-col cols="12" md="5">
@@ -479,6 +477,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.addText{
+  flex-direction: row ;
+}
 .scroll-container {
   height: 600px;
   /* 원하는 높이 */
@@ -500,4 +501,32 @@ onMounted(() => {
   padding-right: 20px;
   border-radius: 50px;
 }
+
+
+
+/* 작은 화면: 글자 옆으로 */
+@media (max-width: 768px) {
+ 
+}
+@media (max-width:425) {
+  .addText{
+  flex-direction: column ;
+}
+ .eat_calorie{
+  text-align: right;
+ }
+  
+}
+
+@media (max-width: 375px) {
+  
+  
+}
+@media (max-width: 325px) {
+  
+
+}
+
+
+
 </style>

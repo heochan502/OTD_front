@@ -197,4 +197,13 @@ defineProps({
   }
   
 }
+
+@media (max-width  : 325px)
+{
+  
+  .totalcal,
+  .moreeat{
+    font-size: 14px !important;
+  }
+}
 </style>

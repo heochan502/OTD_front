@@ -139,7 +139,6 @@ const option = {
       lineStyle: {
         color: '#cccccc', // 눈금선 색상
         type: 'dashed', // 점선으로 표시
-        
       },
     },
     triggerEvent: true,
@@ -175,7 +174,6 @@ const option = {
       text: 'Kcal',
       fontSize: '25px Noto Sans KR sans-serif',
       fill: '#ffffff',
-   
     },
     
   },
@@ -188,7 +186,6 @@ const resetWeeklyData = ()=>{
   xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
   xData.totalProtein = Array(xData.dayName.length).fill(0);
 }
-
 
 const getStatistic = async (weeky) => {
   const res = await getWeekTotal(weeky);
@@ -233,7 +230,7 @@ const getStatistic = async (weeky) => {
   // 아래가 y축 데이터 바꾼는거
   // xData.totalCalorie = yData.totalCalorie;
   option.series.data = xData.totalCalorie;
-  option.yAxis.axisLabel.show = window.innerWidth <768 ? false : true;
+  option.yAxis.axisLabel.show = window.innerWidth < 768 ? false : true;
   myChart.setOption(option, true);
   // console.log("xData.dates:", xData.totalCalorie);
   
@@ -245,7 +242,6 @@ const getStatistic = async (weeky) => {
 }
 
 onMounted(async () => {
-
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화    
@@ -304,7 +300,7 @@ watch(weekDay.getWeekDate, (newVal) => {
 });
 
 const newWeekFunc = async (param) => {
-  // console.log("파람::" , param);
+  console.log("파람::" , param);
   resetWeeklyData();
   await nextTick();
   await getStatistic(weekDay.getWeekDate);
@@ -348,7 +344,7 @@ watch (
 </script>
 
 <template>
-  <div  ref="chartRef" class="weekly-calorie  h-100 w-100  ">
+  <div  ref="chartRef" class="weekly-calorie h-100 w-100  ">
     <div class="main-container  border   ">
       
     </div>

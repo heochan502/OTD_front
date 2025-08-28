@@ -51,22 +51,7 @@ const router = createRouter({
       name: 'reminder',
       component: ReminderHome,
       meta: { requiresAuth: true },
-    },
-    // {
-    //   path: '/reminder/form',
-    //   name: 'reminderform',
-    //   component: ReminderForm,
-    // },
-    // {
-    //   path: '/reminder/list',
-    //   name: 'reminderlist',
-    //   component: ReminderList,
-    // },
-    // {
-    //   path: '/reminder/detail',
-    //   name: 'reminderdetail',
-    //   component: ReminderDetail,
-    // },
+    }, 
     {
       path: '/meal',
       name: 'MealForm',

@@ -33,6 +33,9 @@ const ondayMealData = useCalorieCalcul();
 const weeklyData = useWeeklyStore();
 const baseDate = useBaseDate();
 const clickProgress = useClickProgressBar();
+const maxKcal = ref(null);
+
+const router = useRouter();
 
 // 권장 칼로리 일주일치 가져와서 평균치 냄
 const makeTotalCalorie = async () => {
@@ -103,9 +106,7 @@ const makeTotalCalorie = async () => {
   return Math.trunc(result);
 };
 
-const maxKcal = ref(null);
 
-const router = useRouter();
 
 const mealadd = (day) => {
   dayStore.dayDefine = day;
@@ -114,13 +115,12 @@ const mealadd = (day) => {
 };
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
-// 여기서 과거 데이터 보여주는거 고쳐야함
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
-
+  // console.log("칼로리 데이터:", info);
   // null, undefined, 배열 길이 체크
-  if (info.length) {
-    console.log("칼로리 데이터:", info);
+  if (info) {
+    
     return info;
   }
   return {
@@ -150,7 +150,7 @@ onMounted(async () => {
   }
   await healthData.fetchHealthlogs();
   maxKcal.value = await makeTotalCalorie();
-   console.log('맥스 칼로리', maxKcal);
+  //  console.log('맥스 칼로리', maxKcal);
 });
 
 watch(
@@ -181,7 +181,7 @@ const clickProgressBar = (category) => {
     <div class="meal-layout mt-0 pt-0 gt-0">
       <div class="left_progress">
         <div class="progress-container w-full">
-          <span class="totalkcal text-h6 font-weight-bold text-md-h5"
+          <span class="totalkcal  font-weight-bold text-sm-h5 text-h6"
             >{{ calorieData.mealDay }} 칼로리</span
           >
           <ProgressBar
@@ -295,11 +295,11 @@ const clickProgressBar = (category) => {
             {{ Math.round(avg).toLocaleString() }}kcal 먹었어요
           </span>
           <span
-            class="sub-title text-sm-h6 text-subtitle-1 font-md-weight-light text-right  d-md-none "
+            class="sub-title text-subtitle-1 font-md-weight-light text-right  d-md-none "
           >
-            {{ baseDate.getWeekDate.startDate }} 부터
-            {{ baseDate.getWeekDate.endDate }} 평균
-            {{ Math.round(avg).toLocaleString() }}kcal 
+            {{ baseDate.getWeekDate.startDate }} ~ 
+            {{ baseDate.getWeekDate.endDate }} <br />
+           <span class="d-md-none" >섭취 평균</span> {{ Math.round(avg).toLocaleString() }} kcal 
           </span>
         </div>
 
@@ -444,7 +444,8 @@ const clickProgressBar = (category) => {
 .meal-stat {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 5%;
+ 
   padding: 0.75rem;
 }
 
@@ -501,6 +502,28 @@ const clickProgressBar = (category) => {
     /* font-size: 20px;   */
     /* font-weight: 700; */
   }
+  .totalkcal,
+  .main-title{
+    font-size: 18px !important;
+  }
+  
+}
+@media (max-width: 325px) {
+  .mealsaday {
+    flex-direction: column;
+    /* font-size: 20px;   */
+    /* font-weight: 700; */
+  }
+  .totalkcal,
+  .main-title 
+  {
+    font-size: 15px !important;
+  }
+  .sub-title 
+  {
+    font-size: 14px !important;
+  }
+  
 }
 
 @media (max-width:425) {
