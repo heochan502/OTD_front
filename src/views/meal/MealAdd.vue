@@ -384,7 +384,7 @@ onMounted(() => {
       </v-row>
     </div>
 
-    <v-virtual-scroll :items="itemList" class="mt-1 pa-3 mb-2" :height="400">
+    <v-virtual-scroll :items="itemList" class="mt-1 pa-3 mb-2 h-100" >
       <template v-slot:default="{ item }">
         <div class="d-flex flex-column align-center">
           <v-card
