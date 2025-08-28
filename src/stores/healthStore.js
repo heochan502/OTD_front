@@ -3,7 +3,6 @@ import { reactive, ref } from "vue";
 import { getHlogs } from "@/services/health/hlogService";
 import dayjs from "dayjs"; // dayjs 사용
 import "dayjs/locale/ko";
-import { add } from "lodash";
 
 dayjs.locale("ko"); // 한글로 월화수 이렇게 나오게 하는거
 
