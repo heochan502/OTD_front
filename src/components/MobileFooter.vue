@@ -54,7 +54,7 @@ const BASE_URL = '/image/mobile';
   </footer>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .mobile-footer {
   position: fixed;
   bottom: 0;
@@ -100,5 +100,15 @@ const BASE_URL = '/image/mobile';
 .nav-item.router-link-active span {
   color: #4fc3f7;
   font-weight: bold;
+}
+
+// vuetify 설정이 안되어 임의로 설정
+@media (min-width: 769px) {
+  .d-md-flex {
+    display: flex !important;
+  }
+  .d-md-none {
+    display: none !important;
+  }
 }
 </style>

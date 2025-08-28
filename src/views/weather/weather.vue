@@ -4,7 +4,6 @@ import { getWeather, getNickName } from '@/services/weather/weatherHomeService';
 import DailyWeather from '@/components/weather/DailyWeather.vue';
 import Location from '@/components/weather/Location.vue';
 import { useWeatherStore } from '@/stores/weatherStore';
-import { now } from 'lodash';
 
 const weatherStore = useWeatherStore();
 const weather = ref(null);
@@ -163,6 +162,12 @@ watch(
       </v-dialog>
     </button>
   </div>
+  <!-- 폰화면 정보 박스 -->
+  <div
+    class="weather-card d-flex d-sm-none"
+    :style="{ backgroundImage: weatherBackground }"
+  ></div>
+
   <!-- PC날씨 정보 박스 -->
   <div class="d-none d-sm-flex">
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">

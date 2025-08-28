@@ -2,17 +2,33 @@
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import MobileFooter from '@/components/MobileFooter.vue';
+import { getNickName } from '@/services/weather/weatherHomeService';
 
 const router = useRouter();
 const route = useRoute();
 const counter = useAccountStore();
 const toggle = ref(false);
+const birthDate = ref('');
 
 function goHome() {
   router.push({ name: 'home' });
 }
+
+const today = new Date();
+const todayDate = new Date(today.toDateString());
+
+const userCreatedAt = async () => {
+  const res = await getNickName();
+
+  const createdAt = new Date(res.data.birthDate);
+  const joinDate = new Date(createdAt.toDateString());
+
+  const millisecond = todayDate - joinDate;
+  const date = millisecond / (1000 * 60 * 60 * 24);
+  birthDate.value = date;
+};
 
 const logoutAccount = async () => {
   if (!confirm('로그아웃 하시겠습니까?')) return;
@@ -21,6 +37,9 @@ const logoutAccount = async () => {
   counter.setLoggedIn(false);
   router.push('/login');
 };
+onMounted(async () => {
+  await userCreatedAt();
+});
 </script>
 
 <template>
@@ -107,6 +126,10 @@ const logoutAccount = async () => {
           >지도</router-link
         >
       </nav>
+      <!-- 모바일 헤더 중앙 -->
+      <div class="birth-date d-flex d-md-none">
+        원투데이와 {{ birthDate }}일째 친구에요!
+      </div>
       <!-- 오른쪽 로그인 (PC 전용) -->
       <div class="member d-none d-md-flex">
         <div class="auth">
@@ -123,7 +146,7 @@ const logoutAccount = async () => {
     </div>
   </header>
   <div class="d-md-none">
-    <MobileFooter />
+    <MobileFooter class="d-md-none" />
   </div>
 </template>
 
@@ -234,6 +257,13 @@ const logoutAccount = async () => {
   height: 40px;
   overflow: hidden;
 }
+.birth-date {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: #838383;
+}
 @media (max-width: 1080px) {
   .inner {
     padding: 16px 32px 0px;
@@ -258,14 +288,17 @@ const logoutAccount = async () => {
       padding: 0 10px;
     }
     .member {
-      padding: 0 0 0 10px;
+      padding: 0 20px 0 10px;
     }
   }
 }
 @media (max-width: 959px) {
   .photo-wrapper {
-    right: 40px;
+    right: 45px;
     transform: translateY(-50%);
+  }
+  .nav-menu {
+    padding: 8px !important;
   }
   .profile {
     display: inline-block;
@@ -275,6 +308,29 @@ const logoutAccount = async () => {
     border-radius: 50%;
     border: 1px solid #ecf0f1;
     vertical-align: top;
+  }
+}
+@media (max-width: 874px) {
+  .nav {
+    font-size: 16px;
+    gap: 0 !important;
+  }
+  .nav-menu {
+    padding: 8px !important;
+  }
+}
+@media (max-width: 794px) {
+}
+@media (max-width: 794px) {
+  .inner {
+    padding: 16px 34px;
+    .member {
+      padding: 0 14px 0 10px;
+    }
+  }
+  .auth {
+    font-size: 12px;
+    gap: 0 !important;
   }
 }
 @media (max-width: 768px) {
@@ -299,7 +355,7 @@ const logoutAccount = async () => {
     display: none !important;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 769px) {
   .d-md-flex {
     display: flex !important;
   }
