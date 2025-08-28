@@ -90,7 +90,7 @@ const add = () => {
           <div class="title text-subtitle-1 w-50">
             {{ exerciseStore.exerciseList[item.exerciseId - 1]?.exerciseName }}
           </div>
-          <div class="content text-caption">
+          <div class="content text-caption text-sm-body-2">
             <div>{{ item.exerciseDuration }}분</div>
             <div>
               {{ formatDate(item.exerciseDatetime) }}

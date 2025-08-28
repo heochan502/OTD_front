@@ -94,9 +94,9 @@ const detail = (healthlogId) => {
           <div class="title text-subtitle-1 w-50">
             {{ formatDate(item.healthlogDatetime) }}
           </div>
-          <div class="content text-caption">
+          <!-- <div class="content text-caption">
             <div>건강보기</div>
-          </div>
+          </div> -->
         </li>
         <li v-if="state.isLoading" class="title">로딩중...</li>
         <li v-else-if="state.isFinish" class="title">마지막 기록입니다</li>
