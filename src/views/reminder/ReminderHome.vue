@@ -5,6 +5,7 @@ import { useReminderStore } from '@/stores/reminderStore';
 import Calendar from '@/components/reminder/Calendar.vue';
 import Form from '@/components/reminder/ReminderForm.vue';
 import Detail from '@/components/reminder/ReminderDetail.vue';
+import Test from '@/components/reminder/test.vue'
 
 const reminderStore = useReminderStore();
 
@@ -198,6 +199,7 @@ const resetDate = () => {
         </div>
       </div>
     </div>
+    <Test></Test>
   </div>
 </template>
 
@@ -335,5 +337,20 @@ const resetDate = () => {
       }
     }
   }
+}
+@media (max-width: 767px){
+	//모바일
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    // 테블릿 세로
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    // 테블릿 가로
+}
+
+@media (min-width: 1200px) {
+    // 데스크탑 일반
 }
 </style>

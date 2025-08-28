@@ -2,7 +2,7 @@
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
-import { ref } from 'vue';
+import { ref, onMounted} from 'vue';
 import MobileFooter from '@/components/MobileFooter.vue';
 import { useReminderStore } from '@/stores/reminderStore';
 
@@ -38,7 +38,6 @@ const resetDate = () => {
   reminderStore.setCurrentMonth(today.getMonth() + 1);
   reminderStore.setSelectedDate(formatDate(today));
 };
-
 </script>
 
 <template>
