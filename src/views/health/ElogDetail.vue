@@ -124,20 +124,20 @@ const deleteLog = async () => {
     </v-row>
   </v-container>
   <v-container class="container mt-8" fluid>
-    <v-row class="d-flex">
-      <v-col class="w-100">
+    <v-row class="d-flex justify-center">
+      <v-col cols="auto" class="d-flex justify-center flex-column">
         <span class="text-subtitle-2">주간 활동 에너지</span>
         <HealthChart
-          class="mt-3"
+          class="mt-3 chart"
           :selectedDate="state.elog.exerciseDatetime"
           :logs="exerciseStore.logList"
           label="exerciseKcal"
         />
       </v-col>
-      <v-col class="w-100">
+      <v-col cols="auto" class="d-flex justify-center flex-column">
         <span class="text-subtitle-2">주간 운동 시간</span>
         <HealthChart
-          class="mt-3"
+          class="mt-3 chart"
           :selectedDate="state.elog.exerciseDatetime"
           :logs="exerciseStore.logList"
           label="exerciseDuration"
@@ -215,8 +215,8 @@ const deleteLog = async () => {
 }
 
 .chart {
-  display: flex;
-  gap: 10px;
+  width: 400px;
+  min-width: 300px;
 }
 
 :hover {

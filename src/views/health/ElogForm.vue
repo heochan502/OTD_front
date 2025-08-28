@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
-const dialog = ref(false);
+const confirmDialog = ref(false);
 
 const state = reactive({
   form: {
@@ -31,7 +31,7 @@ onMounted(() => {
 
 // click event
 // 기록 저장
-const submit = async () => {
+const confirmYes = async () => {
   const convertDatetimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
   };
@@ -149,17 +149,19 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn class="save" @click="dialog = true">저장</v-btn>
+      <v-btn class="save" @click="confirmDialog = true">저장</v-btn>
       <v-btn @click.prevent="cancel">취소</v-btn>
     </v-row>
   </v-container>
 
-  <v-dialog v-model="dialog" width="500px">
-    <v-card max-width="400px">
+  <v-dialog v-model="confirmDialog" max-width="400">
+    <v-card>
       <v-card-title> 저장하시겠습니까? </v-card-title>
-
-      <v-btn @click.prevent="submit">저장</v-btn>
-      <v-btn @click.prevent="dialog = false">닫기</v-btn>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="confirmDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="confirmYes">저장</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

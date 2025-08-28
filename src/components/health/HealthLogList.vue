@@ -82,7 +82,7 @@ const detail = (healthlogId) => {
     </div>
     <div class="list-wrap" @scroll="handleScroll">
       <ul>
-        <li v-if="healthStore.logList.length < 1" class="title w-0 sm:w-100">
+        <li v-if="healthStore.logList.length < 1" class="title w-100">
           건강 기록을 추가하세요
         </li>
         <li

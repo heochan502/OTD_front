@@ -78,7 +78,7 @@ const add = () => {
     </div>
     <div class="list-wrap" @scroll="handleScroll">
       <ul>
-        <li v-if="exerciseStore.logList.length < 1" class="title w-0 sm:w-100">
+        <li v-if="exerciseStore.logList.length < 1" class="title w-100">
           운동 기록을 추가하세요
         </li>
         <li
