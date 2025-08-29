@@ -9,6 +9,7 @@ import {
 } from '@/services/weather/locationService';
 import { useRouter } from 'vue-router';
 import { useWeatherStore } from '@/stores/weatherStore';
+import SearchAPI from './SearchAPI.vue';
 
 const emit = defineEmits(['close']);
 const weatherStore = useWeatherStore();
@@ -105,7 +106,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="search-box card shadow-sm p-4 mb-4">
+  <!-- <div class="search-box card shadow-sm p-4 mb-4">
     <v-combobox
       v-model="keyword"
       :items="state.autocomplete"
@@ -120,7 +121,7 @@ onMounted(() => {
       <button class="btn btn-primary" @click="saveSearchedLocation">
         + 검색한 지역 저장 +
       </button>
-      <!-- alert -->
+
       <v-dialog v-model="alertDialog.visible" max-width="300" max-height="150">
         <v-card>
           <v-card-text>{{ alertDialog.message }}</v-card-text>
@@ -133,7 +134,8 @@ onMounted(() => {
         </v-card>
       </v-dialog>
     </div>
-  </div>
+  </div> -->
+  <SearchAPI class="mb-0" />
   <div class="list card p-4 shadow-sm">
     <h3>저장한 지역 목록</h3>
     <ul class="list-group list-group-flush">
@@ -198,6 +200,9 @@ onMounted(() => {
   overflow-y: scroll;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
   &::-webkit-scrollbar {
     display: none;
   }
