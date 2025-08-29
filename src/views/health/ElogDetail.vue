@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import effortLevels from "@/assets/health/effortLevels.json";
 import { deleteElog, getElog } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
@@ -10,6 +10,7 @@ import { formatDate } from "@/utils/reportUtils";
 const exerciseStore = useExerciseStore();
 const route = useRoute();
 const router = useRouter();
+const confirmDialog = ref(false);
 
 const state = reactive({
   elog: {
@@ -47,40 +48,36 @@ onMounted(async () => {
 });
 
 // @click
-// const moveToMain = () => {
-//   router.push({
-//     path: "/health",
-//   });
-// };
+const moveToMain = () => {
+  router.push({
+    path: "/health",
+  });
+};
 
-const deleteLog = async () => {
-  if (!confirm("삭제하시겠습니까?")) return;
+const confirmYes = async () => {
   const exerciselogId = state.elog.exerciselogId;
   const res = await deleteElog(exerciselogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("삭제되었습니다.");
   router.push("/health");
 };
 </script>
 
 <template>
-  <v-container class="container" fluid>
+  <v-container fluid>
     <v-row class="top">
-      <div class="exercise_datetime">
+      <div class="exercise_datetime text-h6 text-sm-h5">
         {{ formatDate(state.elog.exerciseDatetime) }}
       </div>
-      <div class="btns">
-        <router-link to="/health">
-          <v-btn class="btn_home">홈</v-btn>
-        </router-link>
-        <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
+      <div class="btns d-none d-md-flex">
+        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+        <v-btn class="btn_delete" @click="confirmDialog = true">삭제</v-btn>
       </div>
     </v-row>
 
-    <v-row class="contents align-center">
+    <v-row class="flex-sm-row flex-column">
       <v-col class="col_left">
         <div class="exercise">
           <span>
@@ -94,24 +91,28 @@ const deleteLog = async () => {
       <v-col class="col_right">
         <v-row>
           <v-col>
-            <div class="subtitle">운동시작</div>
-            <div class="content">
+            <div class="text-subtitle-1">운동시작</div>
+            <div class="content text-subtitle-1 text-sm-h6">
               {{ formatTime(state.elog.exerciseDatetime) }}
             </div>
           </v-col>
           <v-col>
-            <div class="subtitle">운동시간</div>
-            <div class="content">{{ state.elog.exerciseDuration }} 분</div>
+            <div class="text-subtitle-1">운동시간</div>
+            <div class="content text-subtitle-1 text-sm-h6">
+              {{ state.elog.exerciseDuration }} 분
+            </div>
           </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <div class="subtitle">활동에너지</div>
-            <div class="content">{{ state.elog.exerciseKcal }} kcal</div>
+            <div class="text-subtitle-1">활동에너지</div>
+            <div class="content text-subtitle-1 text-sm-h6">
+              {{ state.elog.exerciseKcal }} kcal
+            </div>
           </v-col>
           <v-col>
-            <div class="subtitle">운동강도</div>
-            <div class="content">
+            <div class="text-subtitle-1">운동강도</div>
+            <div class="content text-subtitle-1 text-sm-h6">
               {{ effortLevels[state.elog.effortLevel - 1].label }}
             </div>
           </v-col>
@@ -119,42 +120,58 @@ const deleteLog = async () => {
       </v-col>
     </v-row>
   </v-container>
-  <v-container class="container mt-8">
-    <v-row>
-      <v-col cols="12" md="6">
+  <v-container class="container mt-8" fluid>
+    <v-row class="d-flex justify-center">
+      <v-col cols="auto" class="d-flex justify-center flex-column">
         <span class="text-subtitle-2">주간 활동 에너지</span>
         <HealthChart
-          class="mt-3"
+          class="mt-3 chart"
           :selectedDate="state.elog.exerciseDatetime"
           :logs="exerciseStore.logList"
           label="exerciseKcal"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col cols="auto" class="d-flex justify-center flex-column">
         <span class="text-subtitle-2">주간 운동 시간</span>
         <HealthChart
-          class="mt-3"
+          class="mt-3 chart"
           :selectedDate="state.elog.exerciseDatetime"
           :logs="exerciseStore.logList"
           label="exerciseDuration"
         />
       </v-col>
     </v-row>
+    <!-- md 이하일 때 화면에 보일 버튼 -->
+    <v-row class="d-flex d-md-none justify-center mt-5">
+      <div class="btns">
+        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+
+        <v-btn class="btn_delete" @click="confirmDialog = true">삭제</v-btn>
+      </div>
+    </v-row>
   </v-container>
+  <!-- 모달창 -->
+  <v-dialog v-model="confirmDialog" max-width="400">
+    <v-card>
+      <v-card-title> 삭제 </v-card-title>
+      <v-card-text>운동 기록을 삭제하시겠습니까?</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="confirmDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="confirmYes">삭제</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>
 .container {
-  padding: 0 50px;
+  padding-bottom: 70px;
 }
 .top {
   display: flex;
   justify-content: space-between;
-  padding: 20px 10px 50px;
-  .exercise_datetime {
-    font-size: 25px;
-    font-weight: 600;
-  }
+  // padding: 20px 10px 50px;
 }
 .col_left {
   display: flex;
@@ -166,8 +183,8 @@ const deleteLog = async () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 180px;
-    width: 180px;
+    height: 130px;
+    width: 130px;
     background-color: #3bbeff;
     border-radius: 50%;
     span {
@@ -182,13 +199,11 @@ const deleteLog = async () => {
 .col_right {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-content: center;
 
-  .subtitle {
-    font-size: 18px;
-  }
   .content {
-    font-size: 24px;
-    font-weight: 500;
+    font-weight: 600;
   }
 }
 .btns {
@@ -209,8 +224,8 @@ const deleteLog = async () => {
 }
 
 .chart {
-  display: flex;
-  gap: 10px;
+  width: 400px;
+  min-width: 300px;
 }
 
 :hover {

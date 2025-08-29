@@ -78,7 +78,7 @@ const add = () => {
     </div>
     <div class="list-wrap" @scroll="handleScroll">
       <ul>
-        <li v-if="exerciseStore.logList.length < 1" class="title w-0 sm:w-100">
+        <li v-if="exerciseStore.logList.length < 1" class="title w-100">
           운동 기록을 추가하세요
         </li>
         <li
@@ -90,7 +90,7 @@ const add = () => {
           <div class="title text-subtitle-1 w-50">
             {{ exerciseStore.exerciseList[item.exerciseId - 1]?.exerciseName }}
           </div>
-          <div class="content text-caption">
+          <div class="content text-caption text-sm-body-2">
             <div>{{ item.exerciseDuration }}분</div>
             <div>
               {{ formatDate(item.exerciseDatetime) }}

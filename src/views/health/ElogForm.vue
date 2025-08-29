@@ -8,7 +8,8 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
-const dialog = ref(false);
+const saveDialog = ref(false);
+const cancelDialog = ref(false);
 
 const state = reactive({
   form: {
@@ -31,7 +32,7 @@ onMounted(() => {
 
 // click event
 // 기록 저장
-const submit = async () => {
+const confirmYes = async () => {
   const convertDatetimeFormat = (datetimeStr) => {
     return datetimeStr.replace("T", " ");
   };
@@ -49,23 +50,21 @@ const submit = async () => {
     alert("에러발생");
     return;
   }
-  alert("운동기록 저장 완료!");
   router.push("/health");
 };
 
-const cancel = () => {
-  if (!confirm("취소하고 돌아가시겠습니까?")) return;
+const cancelYes = () => {
   router.push("/health");
 };
 </script>
 
 <template>
   <v-container class="container" fluid>
-    <v-row class="title">
+    <div class="title">
       <h4>운동 기록하기</h4>
-    </v-row>
-    <v-row class="content">
-      <v-col cols="6">
+    </div>
+    <v-row class="content d-flex justify-center">
+      <v-col cols="12" sm="6" class="d-flex flex-column">
         <div class="subtitle">운동일자</div>
         <input
           type="datetime-local"
@@ -93,7 +92,7 @@ const cancel = () => {
           ></v-number-input>
         </div>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <!-- 운동 종목 데이터 통신 필요 -->
         <v-row>
           <div class="subtitle">운동</div>
@@ -111,7 +110,7 @@ const cancel = () => {
             density="compact"
             placeholder="운동을 선택하세요"
             clearable
-            width="274px"
+            max-width="274px"
           ></v-select>
 
           <!-- <v-icon
@@ -122,7 +121,7 @@ const cancel = () => {
         </v-row>
         <div style="display: flex; justify-content: space-between">
           <div class="subtitle">운동강도</div>
-          <div class="text-h3 font-weight-light">
+          <div class="text-h4 text-md-h3 font-weight-light">
             {{ state.form.effortLevel }}
           </div>
         </div>
@@ -134,6 +133,7 @@ const cancel = () => {
           :step="1"
           min="1"
           max="10"
+          max-width="274px"
         >
           <template v-slot:thumb-label="{ modelValue }">
             {{ effortLevels[modelValue - 1].emoji }}
@@ -148,17 +148,33 @@ const cancel = () => {
       </v-col>
     </v-row>
     <v-row class="btns">
-      <v-btn class="save" @click="dialog = true">저장</v-btn>
-      <v-btn @click.prevent="cancel">취소</v-btn>
+      <v-btn class="save" @click="saveDialog = true">저장</v-btn>
+      <v-btn @click="cancelDialog = true">취소</v-btn>
     </v-row>
   </v-container>
-
-  <v-dialog v-model="dialog" width="500px">
-    <v-card max-width="400px">
-      <v-card-title> 저장하시겠습니까? </v-card-title>
-
-      <v-btn @click.prevent="submit">저장</v-btn>
-      <v-btn @click.prevent="dialog = false">닫기</v-btn>
+  <!-- 모달창 -->
+  <v-dialog v-model="saveDialog" max-width="400">
+    <v-card>
+      <v-card-title> 저장 </v-card-title>
+      <v-card-text>운동 기록을 저장하시겠습니까?</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="saveDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="confirmYes">저장</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="cancelDialog" max-width="400">
+    <v-card>
+      <v-card-title> 취소 </v-card-title>
+      <v-card-text
+        >기록을 저장하지 않고 건강 메인화면으로 돌아가시겠습니까?</v-card-text
+      >
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="cancelDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="cancelYes">이동</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -170,8 +186,6 @@ const cancel = () => {
   align-items: center;
 
   flex-direction: column;
-
-  padding-top: 100px;
 
   .title {
     display: flex;

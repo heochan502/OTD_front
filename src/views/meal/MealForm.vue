@@ -33,6 +33,9 @@ const ondayMealData = useCalorieCalcul();
 const weeklyData = useWeeklyStore();
 const baseDate = useBaseDate();
 const clickProgress = useClickProgressBar();
+const maxKcal = ref(null);
+
+const router = useRouter();
 
 // 권장 칼로리 일주일치 가져와서 평균치 냄
 const makeTotalCalorie = async () => {
@@ -45,16 +48,21 @@ const makeTotalCalorie = async () => {
   //   const totalPrice = items.reduce((sum, item) => {
   //   return sum + item.price; // 각 item의 price 값을 sum에 더함
   // }, 0); // 초기값은 0
+  if (!healthData.logs.length)
+    {
+      
+      
+      return router.push({ name: 'HlogForm' });}
 
-  const weightSum = healthData.logs.reduce(
-    (acc, current) => acc + current.weight,
-    0
-  );
 
-  const heightSum = healthData.logs.reduce(
-    (acc, current) => acc + current.height,
-    0
-  );
+
+  const weightSum = healthData.logs.length>0 ?healthData.logs.reduce(
+    (acc, current) => acc + current.weight, 0 ) : 0;
+
+  const heightSum = healthData.logs.length> 0 ? healthData.logs.reduce(
+    (acc, current) => acc + current.height, 0) : 0;
+
+    console.log('평균 값들 : ',weightSum + heightSum);
 
   const currentDay = new dayjs();
   const birthDate = dayjs(res.data.birthDate, 'YYYYMMDD');
@@ -98,9 +106,7 @@ const makeTotalCalorie = async () => {
   return Math.trunc(result);
 };
 
-const maxKcal = ref(null);
 
-const router = useRouter();
 
 const mealadd = (day) => {
   dayStore.dayDefine = day;
@@ -109,13 +115,12 @@ const mealadd = (day) => {
 };
 
 // 화면 뿌려질떄는 데이터가 없어서 터지는거 방지
-// 여기서 과거 데이터 보여주는거 고쳐야함
 const calorieData = computed(() => {
   const info = ondayMealData.itemInfo;
-
+  // console.log("칼로리 데이터:", info);
   // null, undefined, 배열 길이 체크
   if (info) {
-    // console.log("칼로리 데이터:", info);
+    
     return info;
   }
   return {
@@ -145,7 +150,7 @@ onMounted(async () => {
   }
   await healthData.fetchHealthlogs();
   maxKcal.value = await makeTotalCalorie();
-  console.log('맥스 칼로리', maxKcal);
+  //  console.log('맥스 칼로리', maxKcal);
 });
 
 watch(
@@ -172,42 +177,85 @@ const clickProgressBar = (category) => {
 </script>
 
 <template>
-  <div id="mealForm" class="main-container flex-column">
+  <div class="mealForm main-container flex-column">
     <div class="meal-layout mt-0 pt-0 gt-0">
       <div class="left_progress">
         <div class="progress-container w-full">
-          <span class="totalkcal text-h6 font-weight-black">{{ calorieData.mealDay }} 칼로리</span>
-          <ProgressBar class="totalcal" :value="calorieData.allDayCalorie" :leftString="`${formatNumber(
+          <span class="totalkcal  font-weight-bold text-sm-h5 text-h6"
+            >{{ calorieData.mealDay }} 칼로리</span
+          >
+          <ProgressBar
+            class="totalcal"
+            :value="calorieData.allDayCalorie"
+            :leftString="`${formatNumber(
               calorieData.allDayCalorie
-            )}/${formatNumber(maxKcal)}kcal`" :rightString="`${formatNumber(
+            )}/${formatNumber(maxKcal)}kcal`"
+            :rightString="`${formatNumber(
               maxKcal - calorieData.allDayCalorie
-            )}kcal 더 먹을 수 있어요!`" :max="maxKcal" customsize="totalcal" @click="clickProgressBar(0)" />
-          <div class="inprogressbar d-flex justify-content-between">
-            <ProgressBar class="tansu" :value="calorieData.totalCarbohydrate" :leftString="`탄수화물`" :rightString="`${(
+            )}kcal 더 먹을 수 있어요!`"
+            :max="maxKcal"
+            customsize="totalcal"
+            @click="clickProgressBar(0)"
+          />
+          <div class="inprogressbar">
+            <ProgressBar
+              class="tansu"
+              :value="calorieData.totalCarbohydrate"
+              :leftString="`탄수화물`"
+              :rightString="`${(
                 (calorieData.totalCarbohydrate / ((maxKcal * 0.6) / 4)) *
                 100
-              ).toFixed(1)}%`" :max="(maxKcal * 0.6) / 4" customsize="tansu" @click="clickProgressBar(1)" />
-            <ProgressBar class="protein" :value="calorieData.totalProtein" :leftString="`단백질`" :rightString="`${(
+              ).toFixed(1)}%`"
+              :max="(maxKcal * 0.6) / 4"
+              customsize="tansu"
+              @click="clickProgressBar(1)"
+            />
+            <ProgressBar
+              class="protein"
+              :value="calorieData.totalProtein"
+              :leftString="`단백질`"
+              :rightString="`${(
                 (calorieData.totalProtein / ((maxKcal * 0.15) / 4)) *
                 100
-              ).toFixed(1)}%`" customsize="protein" :max="(maxKcal * 0.15) / 4" @click="clickProgressBar(2)" />
-            <ProgressBar class="jibang" :value="calorieData.totalFat" :leftString="`지방`" :rightString="`${(
+              ).toFixed(1)}%`"
+              customsize="protein"
+              :max="(maxKcal * 0.15) / 4"
+              @click="clickProgressBar(2)"
+            />
+            <ProgressBar
+              class="jibang"
+              :value="calorieData.totalFat"
+              :leftString="`지방`"
+              :rightString="`${(
                 (calorieData.totalFat / ((maxKcal * 0.25) / 9)) *
                 100
-              ).toFixed(1)}%`" customsize="jibang" :max="(maxKcal * 0.25) / 9" @click="clickProgressBar(3)" />
+              ).toFixed(1)}%`"
+              customsize="jibang"
+              :max="(maxKcal * 0.25) / 9"
+              @click="clickProgressBar(3)"
+            />
           </div>
         </div>
       </div>
 
       <div class="right_button">
         <!-- <div class="dailymeal border"> -->
-        <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('아침')">
+        <button
+          class="btn btn-primary mealsaday font-weight-black text-body-3"
+          @click="mealadd('아침')"
+        >
           <span>아침</span> <span>✚</span>
         </button>
-        <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('점심')">
+        <button
+          class="btn btn-primary mealsaday font-weight-black text-body-3"
+          @click="mealadd('점심')"
+        >
           <span>점심</span> <span>✚</span>
         </button>
-        <button class="btn btn-primary mealsaday font-weight-black text-body-3" @click="mealadd('저녁')">
+        <button
+          class="btn btn-primary mealsaday font-weight-black text-body-3"
+          @click="mealadd('저녁')"
+        >
           <span>저녁</span> <span>✚</span>
         </button>
         <!-- </div> -->
@@ -232,13 +280,26 @@ const clickProgressBar = (category) => {
       </div>
     </div> -->
     <div class="weeky-title h-100 ml-0 pl-0">
-      <div class="title d-flex justify-content-between ml-0 pl-0 position-relative">
+      <div
+        class="title d-flex justify-content-between ml-0 pl-0 position-relative"
+      >
         <div class="d-flex flex-column mb-0 pb-0">
-          <span class="main-title text-h6"> 주간 기록 </span>
-          <span class="sub-title text-subtitle-1">
+          <span class="main-title text-h6 font-weight-bold text-md-h5">
+            주간 기록
+          </span>
+          <span
+            class="sub-title text-sm-h6 text-subtitle-1 font-md-weight-light text-right  d-none d-sm-flex "
+          >
             {{ baseDate.getWeekDate.startDate }} 부터
             {{ baseDate.getWeekDate.endDate }} 평균
             {{ Math.round(avg).toLocaleString() }}kcal 먹었어요
+          </span>
+          <span
+            class="sub-title text-subtitle-1 font-md-weight-light text-right  d-md-none "
+          >
+            {{ baseDate.getWeekDate.startDate }} ~ 
+            {{ baseDate.getWeekDate.endDate }} <br />
+           <span class="d-md-none" >섭취 평균</span> {{ Math.round(avg).toLocaleString() }} kcal 
           </span>
         </div>
 
@@ -252,14 +313,13 @@ const clickProgressBar = (category) => {
         <WeeklyCalorie />
       </div>
     </div>
-
   </div>
 
   <!-- </div> -->
 </template>
 
 <style scoped>
-#mealForm {
+.mealForm {
   display: flex;
   height: 100vh;
   padding-left: 10px;
@@ -324,6 +384,8 @@ const clickProgressBar = (category) => {
   justify-content: flex-start;
   margin-left: 10px;
   /* ← 항목 사이 간격 조절 */
+  padding-left: 10px;
+  padding-right: 3px;
   margin-top: 0px;
   margin-left: 0px;
   margin-right: 0px;
@@ -339,29 +401,27 @@ const clickProgressBar = (category) => {
   margin-top: 10px;
 }
 
-.main-title {
-  font-weight: bold;
-  /* font-size: 30px; */
-}
+
 
 .sub-title {
   margin-left: 10px;
   /* font-size: 16px; */
-  font-weight: 500;
+  /* font-weight: 500; */
   color: #333;
 }
-
+/* 날짜 부분 글씨 */
 .totalkcal {
-  font-size: 25px;
+  /* font-size: 23px; */
   color: #000000;
   text-align: left;
   top: 5px;
   display: flex;
   height: 30px;
+  /* font-weight: 700; */
 }
 
 .tansu {
-  margin: 0px 0px 10px 30px;
+  margin: 0px 0px 10px 10px;
   padding: 0px;
 }
 
@@ -384,7 +444,8 @@ const clickProgressBar = (category) => {
 .meal-stat {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 5%;
+ 
   padding: 0.75rem;
 }
 
@@ -406,43 +467,102 @@ const clickProgressBar = (category) => {
   .title .d-flex.flex-column {
     flex: 1;
   }
-.meal-layout{
-  display: flex;
-  flex-direction: column;
-  flex: none;
-  width: 100%;
-  justify-content: space-between;
-}
-.right_button{
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  gap: 25px;
-  align-items: center;
-  margin-top: 40px;
-  margin-left: 0px;
-}
-.left_progress {
-  width: 100%;
-  /* height: 50%; */
-  /* float: left; */
-  margin-top: 5px;
-  padding-right: 20px;
-}
-.inprogressbar {
-  /* display: flex;
+  .meal-layout {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .left_progress {
+    width: 100%;
+    /* height: 50%; */
+    /* float: left; */
+    margin-top: 5px;
+    padding-right: 20px;
+  }
+  .inprogressbar {
+    /* display: flex;
   align-items: center;
   justify-content: flex-start;
   margin-left: 10px; */
-  /* ← 항목 사이 간격 조절 */
-  /* margin-top: 0px;
+    /* ← 항목 사이 간격 조절 */
+    /* margin-top: 0px;
   margin-left: 0px;
   margin-right: 0px; */
+    margin-left: 0px;
+    padding-left: 0px;
+    justify-content: center;
+  }
 }
 
+@media (max-width: 375px) {
+  .mealsaday {
+    flex-direction: column;
+    /* font-size: 20px;   */
+    /* font-weight: 700; */
+  }
+  .totalkcal,
+  .main-title{
+    font-size: 18px !important;
+  }
+  
+}
+@media (max-width: 325px) {
+  .mealsaday {
+    flex-direction: column;
+    /* font-size: 20px;   */
+    /* font-weight: 700; */
+  }
+  .totalkcal,
+  .main-title 
+  {
+    font-size: 15px !important;
+  }
+  .sub-title 
+  {
+    font-size: 14px !important;
+  }
+  
+}
+
+@media (max-width:425) {
+  .sub-title{
+    white-space: pre-line;
+  }
+  
 }
 
 
 
+@media (max-width: 768px) {
+  .right_button {    width: 100%;
+   
+    display: flex;
+    gap:10px;
+    flex-direction: row; 
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 0px;
+  } 
+  .mealsaday {
+  
+  height: 100%;
+  background-color: #3bbeff;
+  color: white;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Noto Sans KR', sans-serif;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 50px;
+}
+.progress-container {
+  gap: 5px
+}
 
+
+}
 </style>
