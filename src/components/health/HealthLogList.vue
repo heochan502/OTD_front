@@ -82,7 +82,7 @@ const detail = (healthlogId) => {
     </div>
     <div class="list-wrap" @scroll="handleScroll">
       <ul>
-        <li v-if="healthStore.logList.length < 1" class="title w-0 sm:w-100">
+        <li v-if="healthStore.logList.length < 1" class="title w-100">
           건강 기록을 추가하세요
         </li>
         <li
@@ -94,9 +94,9 @@ const detail = (healthlogId) => {
           <div class="title text-subtitle-1 w-50">
             {{ formatDate(item.healthlogDatetime) }}
           </div>
-          <div class="content text-caption">
+          <!-- <div class="content text-caption">
             <div>건강보기</div>
-          </div>
+          </div> -->
         </li>
         <li v-if="state.isLoading" class="title">로딩중...</li>
         <li v-else-if="state.isFinish" class="title">마지막 기록입니다</li>

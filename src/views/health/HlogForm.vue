@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import sleepQualitys from "@/assets/health/sleepQualitys.json";
 import moodLevels from "@/assets/health/moodLevels.json";
@@ -7,6 +7,9 @@ import { saveHlog } from "@/services/health/hlogService";
 import dayjs from "dayjs";
 
 const router = useRouter();
+
+const saveDialog = ref(false);
+const cancelDialog = ref(false);
 
 const state = reactive({
   form: {
@@ -33,8 +36,7 @@ const convertDatetimeFormat = (input) => {
 };
 
 // @click
-const submit = async () => {
-  if (!confirm("건강 기록을 저장하시겠습니까?")) return;
+const confirmYes = async () => {
   const jsonBody = {
     weight: state.form.weight,
     height: state.form.height,
@@ -51,40 +53,38 @@ const submit = async () => {
     alert("에러발생");
     return;
   }
-  alert("건강기록 저장 완료!");
   router.push("/health");
 };
 
-const cancel = () => {
+const cancelYes = () => {
   if (!confirm("취소하고 돌아가시겠습니까?")) return;
   router.push("/health");
 };
 </script>
 
 <template>
-  <v-container class="container" fluid>
-    <v-sheet class="mx-auto" width="1000">
+  <v-container class="container pb-16" fluid>
+    <v-sheet class="mx-auto w-100">
       <v-form>
         <v-row class="title">
           <h4>건강 기록하기</h4>
         </v-row>
-        <v-row class="hlogForm">
-          <v-col class="left">
+        <v-row>
+          <v-col class="left d-flex justify-center">
             <v-date-picker
               v-model="state.form.healthlogDatetime"
-              width="300px"
+              min-width="310px"
               divided
-              landscape
             ></v-date-picker>
           </v-col>
-          <v-col class="right" cols="8">
-            <v-row>
+          <v-row class="d-flex justify-center">
+            <v-col class="d-flex flex-column justify-center" cols="auto">
               <v-text-field
                 v-model="state.form.weight"
                 :rules="rules"
                 label="체중(kg)"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 density="compact"
                 clearable
               ></v-text-field>
@@ -93,38 +93,10 @@ const cancel = () => {
                 :rules="rules"
                 label="신장"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 density="compact"
                 clearable
               ></v-text-field>
-            </v-row>
-            <v-row>
-              <v-text-field
-                v-model="state.form.systolicBp"
-                label="수축기 혈압"
-                variant="solo"
-                class="pa-2"
-                density="compact"
-                clearable
-              ></v-text-field>
-              <v-text-field
-                v-model="state.form.diastolicBp"
-                label="이완기 혈압"
-                variant="solo"
-                class="pa-2"
-                density="compact"
-                clearable
-              ></v-text-field>
-              <v-text-field
-                v-model="state.form.sugarLevel"
-                label="혈당"
-                variant="solo"
-                class="pa-2"
-                density="compact"
-                clearable
-              ></v-text-field>
-            </v-row>
-            <v-row>
               <v-select
                 v-model="state.form.moodLevel"
                 label="감정상태"
@@ -137,8 +109,9 @@ const cancel = () => {
                 item-title="title"
                 item-value="value"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 clearable
+                density="compact"
               ></v-select>
               <v-select
                 v-model="state.form.sleepQuality"
@@ -152,19 +125,72 @@ const cancel = () => {
                 item-title="title"
                 item-value="value"
                 variant="solo"
-                class="pa-2"
+                class="value-field"
                 clearable
+                density="compact"
               ></v-select>
-            </v-row>
-          </v-col>
+            </v-col>
+
+            <v-col class="d-flex flex-column justify-center" cols="auto">
+              <v-text-field
+                v-model="state.form.systolicBp"
+                label="수축기 혈압"
+                variant="solo"
+                class="value-field"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.diastolicBp"
+                label="이완기 혈압"
+                variant="solo"
+                class="value-field"
+                density="compact"
+                clearable
+              ></v-text-field>
+              <v-text-field
+                v-model="state.form.sugarLevel"
+                label="혈당"
+                variant="solo"
+                class="value-field"
+                density="compact"
+                clearable
+              ></v-text-field>
+            </v-col>
+          </v-row>
         </v-row>
         <v-row class="btns">
-          <v-btn class="save" @click="submit">저장</v-btn>
-          <v-btn @click="cancel">취소</v-btn>
+          <v-btn class="save" @click="saveDialog = true">저장</v-btn>
+          <v-btn @click="cancelDialog = true">취소</v-btn>
         </v-row>
       </v-form>
     </v-sheet>
   </v-container>
+  <!-- 모달창 -->
+  <v-dialog v-model="saveDialog" max-width="400">
+    <v-card>
+      <v-card-title> 저장 </v-card-title>
+      <v-card-text>건강 기록을 저장하시겠습니까?</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="saveDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="confirmYes">저장</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="cancelDialog" max-width="400">
+    <v-card>
+      <v-card-title> 취소 </v-card-title>
+      <v-card-text
+        >기록을 저장하지 않고 건강 메인화면으로 돌아가시겠습니까?</v-card-text
+      >
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="cancelDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="cancelYes">이동</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>
@@ -174,8 +200,6 @@ const cancel = () => {
   align-items: center;
 
   flex-direction: column;
-
-  padding-top: 100px;
 
   .title {
     display: flex;
@@ -187,19 +211,8 @@ const cancel = () => {
     }
   }
 
-  .hlogForm {
-    display: flex;
-    flex-direction: row;
-  }
-
   .v-date-picker {
     $date-picker-header-height: 30px;
-  }
-
-  .right {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
   }
 
   .btns {
@@ -215,6 +228,11 @@ const cancel = () => {
     .save {
       background-color: #3bbeff;
     }
+  }
+
+  .value-field {
+    width: 50%;
+    min-width: 310px;
   }
 }
 </style>
