@@ -2,19 +2,35 @@
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import MobileFooter from '@/components/MobileFooter.vue';
 import { useReminderStore } from '@/stores/reminderStore';
+import { getNickName } from '@/services/weather/weatherHomeService';
 
 const router = useRouter();
 const route = useRoute();
 const counter = useAccountStore();
 const toggle = ref(false);
 const reminderStore = useReminderStore();
+const birthDate = ref('');
 
 function goHome() {
   router.push({ name: 'home' });
 }
+
+const today = new Date();
+const todayDate = new Date(today.toDateString());
+
+const userCreatedAt = async () => {
+  const res = await getNickName();
+
+  const createdAt = new Date(res.data.birthDate);
+  const joinDate = new Date(createdAt.toDateString());
+
+  const millisecond = todayDate - joinDate;
+  const date = millisecond / (1000 * 60 * 60 * 24);
+  birthDate.value = date;
+};
 
 const logoutAccount = async () => {
   if (!confirm('로그아웃 하시겠습니까?')) return;
@@ -39,6 +55,9 @@ const resetDate = () => {
   reminderStore.setSelectedDate(formatDate(today));
 };
 
+onMounted(async () => {
+  await userCreatedAt();
+});
 </script>
 
 <template>
@@ -126,6 +145,10 @@ const resetDate = () => {
           >지도</router-link
         > -->
       </nav>
+      <!-- 모바일 헤더 중앙 -->
+      <div class="birth-date d-flex d-md-none">
+        원투데이와 {{ birthDate }}일째 친구에요!
+      </div>
       <!-- 오른쪽 로그인 (PC 전용) -->
       <div class="member d-none d-md-flex">
         <div class="auth">
@@ -141,8 +164,8 @@ const resetDate = () => {
       </div>
     </div>
   </header>
-  <div class="d-lg-none">
-    <MobileFooter />
+  <div class="d-md-none">
+    <MobileFooter class="d-md-none" />
   </div>
 </template>
 
@@ -155,7 +178,7 @@ const resetDate = () => {
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 16px 32px 0px;
+  padding: 16px 22px 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -190,7 +213,7 @@ const resetDate = () => {
 .nav {
   padding: 0 40px;
   display: flex;
-  gap: 24px;
+  gap: 18px;
   font-size: 16px;
   color: #222;
   .nav-menu {
@@ -253,23 +276,48 @@ const resetDate = () => {
   height: 40px;
   overflow: hidden;
 }
+.birth-date {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: #838383;
+}
+@media (max-width: 1080px) {
+  .inner {
+    padding: 16px 32px 0px;
+    .nav {
+      gap: 12px;
+      padding: 0 20px;
+    }
+    .member {
+      padding: 0 0 0 20px;
+    }
+    .logo {
+      padding: 0 20px 0 20px;
+    }
+  }
+}
 @media (max-width: 976px) {
   .inner {
     .logo {
-      padding: 0 10px 0 0;
+      padding: 0 10px 0 18px;
     }
     .nav {
       padding: 0 10px;
     }
     .member {
-      padding: 0 0 0 10px;
+      padding: 0 20px 0 10px;
     }
   }
 }
 @media (max-width: 959px) {
   .photo-wrapper {
-    right: 32px;
+    right: 45px;
     transform: translateY(-50%);
+  }
+  .nav-menu {
+    padding: 8px !important;
   }
   .profile {
     display: inline-block;
@@ -279,6 +327,67 @@ const resetDate = () => {
     border-radius: 50%;
     border: 1px solid #ecf0f1;
     vertical-align: top;
+  }
+}
+@media (max-width: 874px) {
+  .nav {
+    font-size: 16px;
+    gap: 0 !important;
+  }
+  .nav-menu {
+    padding: 8px !important;
+  }
+}
+@media (max-width: 794px) {
+}
+@media (max-width: 794px) {
+  .inner {
+    padding: 16px 34px;
+    .member {
+      padding: 0 14px 0 10px;
+    }
+  }
+  .auth {
+    font-size: 12px;
+    gap: 0 !important;
+  }
+}
+@media (max-width: 768px) {
+  .inner {
+    .logo {
+      padding: 0 10px 0 19px;
+    }
+    .nav {
+      padding: 0 4px;
+    }
+    .member {
+      padding: 0 0 0 0.2rem;
+    }
+  }
+}
+// vuetify 설정이 안되어 임의로 설정
+@media (min-width: 480px) {
+  .d-sm-flex {
+    display: flex !important;
+  }
+  .d-sm-none {
+    display: none !important;
+  }
+}
+@media (min-width: 769px) {
+  .d-md-flex {
+    display: flex !important;
+  }
+  .d-md-none {
+    display: none !important;
+  }
+}
+@media (min-width: 1024px) {
+  .d-lg-flex {
+    display: flex !important;
+  }
+  .d-lg-none {
+    display: none !important;
   }
 }
 </style>
