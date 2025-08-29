@@ -2,7 +2,9 @@
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/counter';
 import { logout } from '@/services/member/accountService';
+
 import { onMounted, ref } from 'vue';
+
 import MobileFooter from '@/components/MobileFooter.vue';
 import { useReminderStore } from '@/stores/reminderStore';
 import { getNickName } from '@/services/weather/weatherHomeService';
@@ -55,9 +57,11 @@ const resetDate = () => {
   reminderStore.setSelectedDate(formatDate(today));
 };
 
+
 onMounted(async () => {
   await userCreatedAt();
 });
+
 </script>
 
 <template>
