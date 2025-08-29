@@ -5,7 +5,7 @@ export const useWeatherStore = defineStore('weather', {
     refresh: false,
   }),
   actions: {
-    triggerRefresh() {
+    homeRefresh() {
       this.refresh = !this.refresh;
     },
   },

@@ -1,13 +1,13 @@
 <script setup>
-import { reactive, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { reactive, onMounted, watch, ref } from 'vue';
 import { getByMonth } from '@/services/reminder/reminderService';
 import { useReminderStore } from '@/stores/reminderStore';
 import Calendar from '@/components/reminder/Calendar.vue';
+import Form from '@/components/reminder/ReminderForm.vue';
+import Detail from '@/components/reminder/ReminderDetail.vue';
+import Test from '@/components/reminder/test.vue'
 
 const reminderStore = useReminderStore();
-
-const router = useRouter();
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 const formatDate = (date) => {
@@ -17,27 +17,39 @@ const formatDate = (date) => {
   return `${y}-${m}-${d}`;
 };
 
-const today = new Date();
-
-const todayYear = today.getFullYear();
-const todayMonth = today.getMonth() + 1;
-const todayDate = today.getDate();
+const selectedDate = () => {
+  const y = new Date(reminderStore.state.selectedDate).getFullYear();
+  const m = new Date(reminderStore.state.selectedDate).getMonth() + 1;
+  const d = new Date(reminderStore.state.selectedDate).getDate();
+  return `${y}년 ${m}월 ${d}일`;
+};
 
 const state = reactive({
   reminderDate: [], // 한달치 리마인더 날짜
   todayReminder: [], // 오늘 리마인더 미리보기 내용
 });
 
+// reload될 때의 작업 로직
+const reLoad = async() => {
+  await getReminderList({
+    year: reminderStore.state.currentYear,
+    month: reminderStore.state.currentMonth,
+  });
+  const todayReminder = filterReminder(
+    new Date(reminderStore.state.selectedDate)
+  );
+  state.todayReminder = todayReminder;
+};
+
 onMounted(async () => {
-  getReminderList({ year: todayYear, month: todayMonth });
-  reminderStore.setSelectedDate(formatDate(today));
+  reLoad();
 });
 
 watch(
   () => reminderStore.reload,
   (data) => {
     if (data) {
-      getReminderList({ year: todayYear, month: todayMonth });
+      reLoad();
       reminderStore.setReload(false);
     }
   }
@@ -51,16 +63,18 @@ const getReminderList = async (date) => {
     return;
   }
   reminderStore.setFullReminder(res.data);
-
   const fixedDateList = res.data
-    .filter((item) => item.date)
-    .map((item) => item.date);
+    .filter((item) => {
+      if (!item.repeat) {
+        return item.startDate;
+      }
+    })
+    .map((item) => item.startDate);
 
   const repeatDateList = getRepeatDate(res.data, date.year, date.month);
 
   const merge = Array.from(new Set([...fixedDateList, ...repeatDateList]));
   state.reminderDate = merge;
-  setTodayReminder(date);
 };
 
 // 요일 반복 리마인더 해당 요일 날짜로 변환 로직
@@ -70,62 +84,59 @@ const getRepeatDate = (fullReminder, year, month) => {
 
   for (let day = 1; day <= end; day++) {
     const date = new Date(year, month - 1, day);
+    const formattedDate = formatDate(date);
     const dow = date.getDay();
     for (const item of fullReminder) {
-      if (item.repeat && item.repeatDow?.includes(dow)) {
-        const created = new Date(item.created);
-        if (date >= created) {
-          result.push(formatDate(date));
-          break;
-        }
+      if (
+        item.repeat &&
+        item.repeatDow?.includes(dow) &&
+        item.startDate <= formattedDate &&
+        (!item.endDate || item.endDate >= formattedDate) &&
+        !item.exceptionDate?.includes(formattedDate)
+      ) {
+        result.push(formattedDate);
       }
     }
   }
-  // console.log('result', result);
   return result;
 };
 
-// 캘린더 날짜 클릭시 해당 날짜의 리마인더 정보 업데이트
-const setTodayReminder = (date) => {
-  const todayDow = today.getDay();
-  const todayReminder = reminderStore.state.fullReminder.filter((item) => {
-    return (
-      item.date === formatDate(new Date()) ||
-      (item.repeat && item.repeatDow?.includes(todayDow))
-    );
-  });
-  if (date.month === todayMonth && date.year === todayYear)
-    state.todayReminder = todayReminder;
-  // reminderStore.setDayReminder(todayReminder);
-};
-
-// 캘린더 날짜 선택시의 홈, 폼 router 분기문
-const routerDate = (date) => {
-  const formattedDate = formatDate(date);
+// 하루치 리마인더 정보 필터링 로직
+const filterReminder = (date) => {
   const dow = date.getDay();
-  const dayReminder = reminderStore.state.fullReminder.filter((item) => {
-    const isFixed = item.date === formattedDate;
-
+  const formattedDate = formatDate(date);
+  const reminderList = reminderStore.state.fullReminder.filter((item) => {
+    const isFixed = item.repeat === false && item.startDate === formattedDate;
     const isRepeat =
       item.repeat &&
       item.repeatDow?.includes(dow) &&
-      new Date(formattedDate) >= new Date(item.created);
-
+      item.startDate <= formattedDate &&
+      (!item.endDate || item.endDate >= formattedDate) &&
+      !item.exceptionDate?.includes(formattedDate);
     return isFixed || isRepeat;
   });
-
-  state.todayReminder = dayReminder;
-
-  // if (dayReminder.length > 0) {
-  reminderStore.setSelectedDate(date);
-  //   router.push('/reminder/list');
-  // } else {
-  //   router.push('/reminder/form');
-  // }
+  return reminderList;
 };
 
-const toForm = (id) => {
-  router.push({ path: '/reminder/form', query: { id } });
+// 캘린더 날짜 선택시의 표출할 리마인더 날짜 정보 피니아 업데이트, 리마인더 내용 업데이트
+const routerDate = (date) => {
+  const dayReminder = filterReminder(date);
+  state.todayReminder = dayReminder;
+  reminderStore.setSelectedDate(formatDate(date));
+};
+
+const modal = ref({ form: false, detail: false });
+const openModal = (type) => {
+  modal.value[type] = true;
+};
+
+// 피니아에 저장된 날짜 현재로 초기화
+const resetDate = () => {
+  const today = new Date();
+  reminderStore.setCurrentYear(today.getFullYear());
+  reminderStore.setCurrentMonth(today.getMonth() + 1);
+  reminderStore.setSelectedDate(formatDate(today));
+  reLoad();
 };
 </script>
 
@@ -140,45 +151,55 @@ const toForm = (id) => {
       ></Calendar>
     </div>
     <div class="right">
-      <div class="add">
-        <router-link to="/reminder/form">일정 추가하기</router-link>
+      <div class="button">
+        <div class="add reset">
+          <button class="reset-button" @click="resetDate">
+            현재 달로 돌아가기
+          </button>
+        </div>
+        <div class="add">
+          <button @click="openModal('form')" class="add-button">
+            일정 추가하기
+            <v-dialog v-model="modal.form" max-width="300px">
+              <Form @form-close="modal.form = false"></Form>
+            </v-dialog>
+          </button>
+        </div>
       </div>
+
       <div class="preview">
         <div class="block">
-          <div class="link">
-            <!-- <router-link
-            :to="
-              state.todayReminder.length === 0
-                ? '/reminder/form'
-                : '/reminder/list'
-            "
-            @click="setTodayReminder"
-            class="link"
-          > -->
-            <span class="list-title">리마인더</span>
-            <span class="list-date">
-              {{ new Date(reminderStore.state.selectedDate).getFullYear() }}년
-              {{ new Date(reminderStore.state.selectedDate).getMonth() + 1 }}월
-              {{ new Date(reminderStore.state.selectedDate).getDate() }}일</span
+          <span class="list-title">리마인더</span>
+          <span class="list-date"> {{ selectedDate() }}</span>
+          <ul v-if="state.todayReminder.length > 0" class="list">
+            <li
+              v-for="item in state.todayReminder"
+              :key="item.id"
+              class="list-card"
+              @click="openModal('detail')"
+              @detail-close="modal.detail = false"
             >
-            <ul v-if="state.todayReminder.length > 0" class="list">
-              <li
-                v-for="item in state.todayReminder"
-                :key="item.id"
-                class="list-card"
-                @click="toForm(item.id)"
-              >
-                <span class="reminder-title">• {{ item.title }}</span>
-              </li>
-            </ul>
-            <div v-else class="empty-comment" @click="toForm()">
-              "등록된 일정이 없어요!"
-            </div>
+              <span class="reminder-title">• {{ item.title }}</span>
+              <v-dialog v-model="modal.detail" max-width="300px">
+                <Detail
+                  :date="reminderStore.state.selectedDate"
+                  :id="item.id"
+                  @detail-close="modal.detail = false"
+                >
+                </Detail>
+              </v-dialog>
+            </li>
+          </ul>
+          <div v-else class="empty-block" @click="openModal('form')">
+            <span class="empty-comment"> "등록된 일정이 없어요!"</span>
+            <v-dialog v-model="modal.form" max-width="300px">
+              <Form @form-close="modal.form = false"></Form>
+            </v-dialog>
           </div>
-          <!-- </router-link> -->
         </div>
       </div>
     </div>
+    <Test></Test>
   </div>
 </template>
 
@@ -194,25 +215,53 @@ const toForm = (id) => {
     margin-top: 69px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     gap: 10px;
-    .add {
-      width: 135px;
-      height: 43px;
-      background-color: #3bbeff;
+    .button {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 25px;
-      margin-right: 13px;
-      a {
-        color: #fff;
-        outline: none;
-        font-weight: bold;
-        font-size: 17px;
-      }
-      a:hover {
+      justify-content: space-between;
+      .add {
+        width: 135px;
+        height: 43px;
         background-color: #3bbeff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 25px;
+        .add-button,
+        .reset-button {
+          color: #fff;
+          outline: none;
+          font-weight: bold;
+          font-size: 17px;
+        }
+        .add-button:hover,
+        .reset-button {
+          background-color: #3bbeff;
+        }
+      }
+      .reset {
+        width: 160px;
+      }
+    }
+    .modal-wrap {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+
+      .modal-container {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 550px;
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-sizing: border-box;
+        z-index: 99999999;
       }
     }
     .preview {
@@ -268,20 +317,40 @@ const toForm = (id) => {
             }
           }
         }
-      }
+        .empty-block {
+          position: relative;
+          width: 100%;
+          height: 80%;
 
-      .empty-comment {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: inline-block;
-        color: #575757;
-        font-weight: bold;
-        font-size: 20px;
-        white-space: nowrap;
+          .empty-comment {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: inline-block;
+            color: #575757;
+            font-weight: bold;
+            font-size: 20px;
+            white-space: nowrap;
+          }
+        }
       }
     }
   }
+}
+@media (max-width: 767px){
+	//모바일
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    // 테블릿 세로
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    // 테블릿 가로
+}
+
+@media (min-width: 1200px) {
+    // 데스크탑 일반
 }
 </style>

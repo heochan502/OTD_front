@@ -1,14 +1,23 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
-import { useBaseDate, useDayDefine, useWeeklyStore, useCalorieCalcul } from '@/stores/mealStore';
+import {
+  useBaseDate,
+  useDayDefine,
+  useWeeklyStore,
+  useCalorieCalcul,
+} from '@/stores/mealStore';
 
-import { getWeekTotal } from '@/services/meal/mealService'
-import dayjs from "dayjs";
+import { getWeekTotal } from '@/services/meal/mealService';
 
-import "dayjs/locale/ko";
+import { useDisplay } from 'vuetify';
 
-dayjs.locale("ko");
+import dayjs from 'dayjs';
 
+import 'dayjs/locale/ko';
+
+dayjs.locale('ko');
+
+const { mdAndDown } = useDisplay();
 
 const weekDay = useBaseDate();
 const nowDay = useDayDefine();
@@ -16,6 +25,7 @@ const weeklyStore = useWeeklyStore();
 const ondayMealData = useCalorieCalcul();
 
 const selectedDate = ref(ondayMealData.itemInfo.mealDay); // 초기화 및 선택하는 날짜 들어감
+
 const weekDates = ref([]);
 
 const getWeekDates = (dateString) => {
@@ -26,8 +36,8 @@ const getWeekDates = (dateString) => {
   const dayOfWeek = date.getDay();
 
   // console.log("선택된 날짜 : ", date, "요일 : ", dayOfWeek);
-  
-  // 현재 나 선택한 날짜 
+
+  // 현재 나 선택한 날짜
 
   const startDate = new Date(date);
 
@@ -35,70 +45,119 @@ const getWeekDates = (dateString) => {
   // 해당 요일의 번호를 빼서 월요일로 초기화
   if (dayOfWeek === 0) {
     startDate.setDate(startDate.getDate() - 6);
-  } 
-  else {
+  } else {
     startDate.setDate(date.getDate() - dayOfWeek + 1);
   }
   // console.log("startDate 날짜 : ", startDate, "요일 : ", dayOfWeek);
   const result = [];
   for (let i = 0; i < 7; i++) {
     // console.log(startDate, typeof startDate);
-    const weekDate =  new Date(startDate.toISOString().slice(0,10));
+    const weekDate = new Date(startDate.toISOString().slice(0, 10));
     weekDate.setDate(weekDate.getDate() + i);
     // console.log("날짜 겟데이타 : ", startDate.toISOString().slice(0, 10));
     // console.log("날짜 만든거 : ", weekDate);
     result.push(nowDay.updateTime(weekDate).slice(3, 13));
     // console.log("날짜 : ", result[i]);
-    
   }
-  // 여기서 날짜 관련한 데이터 편집 해야함 
-  // 한굴 표기로 
+  // 여기서 날짜 관련한 데이터 편집 해야함
+  // 한굴 표기로
   return result;
-}
+};
 
 watch(
   selectedDate,
- (newDate) => {
-
-  if (!newDate) {
-    newDate = new dayjs().format('YYYY-MM-DD'); // 선택된 날짜가 없으면 현재 날짜로 설정
-    
-  } 
-  //  console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
+  (newDate) => {
+    if (!newDate) {
+      newDate = new dayjs().format('YYYY-MM-DD'); // 선택된 날짜가 없으면 현재 날짜로 설정
+    }
+     console.log("선택된 날짜 : ", ondayMealData.itemInfo.mealDay);
     ondayMealData.mealFormData(newDate);
     weekDates.value = getWeekDates(newDate);
 
-    //여기 데이터 확인 
+    //여기 데이터 확인
     weekDay.getWeekDate.startDate = weekDates.value[0];
     weekDay.getWeekDate.endDate = weekDates.value[6];
- 
 
-    const res =  getWeekTotal(weekDay.getWeekDate);
+    const res = getWeekTotal(weekDay.getWeekDate);
     if (res.status === 200) {
       weeklyStore.weeklyRawData = res.data;
-      
     }
-   weeklyStore.weekyDate = weekDates.value;
-  //  console.log("통신구역 ", weeklyStore.weekyDate);
-
+    weeklyStore.weekyDate = weekDates.value;
+    //  console.log("통신구역 ", weeklyStore.weekyDate);
   },
   { immediate: true }
 );
-
-
+const dateInputRef = ref(null);
+const openDatePicker = () => {
+  if (dateInputRef.value) {
+    dateInputRef.value.showPicker // 최신 브라우저 지원
+      ? dateInputRef.value.showPicker()
+      : dateInputRef.value.click(); // fallback
+  }
+};
 </script>
 
 <template>
   <div>
+    <!-- 아래는 날짜 선택용 vuetify 입력 필드 -->
     <v-text-field
+      class="dataInBig"
+      v-if="!mdAndDown"
       v-model="selectedDate"
       label="날짜 선택"
       type="date"
-      class="mb-4 text-black"
       variant="underlined"
-    ></v-text-field>
-   
+    />
+    <!-- 작은 화면일 때: 아이콘 -->
+    <div v-else>
+      <v-btn icon="mdi-calendar" variant="text" @click="openDatePicker" />
+
+      <!-- 숨겨진 date input (완전 hidden 금지, 투명 처리만) -->
+      <input
+        class="dateIn"
+        ref="dateInputRef"
+        type="date"
+        v-model="selectedDate"
+        style="opacity: 0"
+      />
+    </div>
   </div>
+
+ 
 </template>
 
-<style></style>
+<style>
+/* 반응형 */
+
+
+.dateIn {
+  position: absolute;
+
+  @media (max-width: 425px) {
+    left: 25%;
+    /*/ 모바일 초소형 화면 */
+  }
+
+  @media (min-width: 481px) and (max-width: 768px) {
+    left: 70%;
+    /*  태블릿 작은 화면 */
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+   
+    left: 70% !important;
+    /*  태블릿 큰 화면 */
+  }
+
+
+  @media (min-width: 1240px) and (max-width: 1440px) {
+    left: 65%;
+    /* // 일반 데스크탑 */
+  }
+
+  @media (min-width: 1441px) {
+    left: auto;
+    /* // 큰 화면일 때 기본 위치 (필요 없으면 지워도 됨) */
+  }
+}
+</style>

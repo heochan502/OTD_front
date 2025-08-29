@@ -1,32 +1,60 @@
-<script setup></script>
+<script setup>
+const BASE_URL = '/image/mobile';
+</script>
 
 <template>
   <footer class="mobile-footer">
     <nav class="nav-icon">
-      <router-link to="/reminder" class="nav-item">
-        <img src="/image/mobile/calendar.png" alt="리마인더" />
+      <router-link to="/reminder" class="nav-item" v-slot="{ isActive }">
+        <img
+          :src="
+            isActive
+              ? `${BASE_URL}/select-calendar.png`
+              : `${BASE_URL}/calendar.png`
+          "
+          alt="리마인더"
+        />
         <span>리마인더</span>
       </router-link>
 
-      <router-link to="/meal" class="nav-item">
-        <img src="/image/mobile/food.png" alt="식단" />
+      <router-link to="/meal" class="nav-item" v-slot="{ isActive }">
+        <img
+          :src="
+            isActive ? `${BASE_URL}/select-food.png` : `${BASE_URL}/food.png`
+          "
+          alt="식단"
+        />
         <span>식단</span>
       </router-link>
 
-      <router-link to="/health" class="nav-item">
-        <img src="/image/mobile/health.png" alt="건강" />
+      <router-link to="/health" class="nav-item" v-slot="{ isActive }">
+        <img
+          :src="
+            isActive
+              ? `${BASE_URL}/select-health.png`
+              : `${BASE_URL}/health.png`
+          "
+          alt="건강"
+        />
         <span>건강</span>
       </router-link>
 
-      <router-link to="/community" class="nav-item">
-        <img src="/image/mobile/community.png" alt="커뮤니티" />
+      <router-link to="/community" class="nav-item" v-slot="{ isActive }">
+        <img
+          :src="
+            isActive
+              ? `${BASE_URL}/select-community.png`
+              : `${BASE_URL}/community.png`
+          "
+          alt="커뮤니티"
+        />
         <span>커뮤니티</span>
       </router-link>
     </nav>
   </footer>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .mobile-footer {
   position: fixed;
   bottom: 0;
@@ -39,7 +67,7 @@
     background-color: #fff;
     cursor: pointer;
     :active {
-      background-color: #4fc3f7;
+      background-color: #fff;
     }
   }
 }
@@ -56,7 +84,7 @@
   align-items: center;
   font-size: 12px;
   flex: 1;
-
+  bottom: 0;
   border-right: 1px solid #ddd;
   text-decoration: none;
   color: #333;
@@ -72,5 +100,15 @@
 .nav-item.router-link-active span {
   color: #4fc3f7;
   font-weight: bold;
+}
+
+// vuetify 설정이 안되어 임의로 설정
+@media (min-width: 769px) {
+  .d-md-flex {
+    display: flex !important;
+  }
+  .d-md-none {
+    display: none !important;
+  }
 }
 </style>

@@ -13,6 +13,11 @@ const dialog = ref({
   daily: false,
   location: false,
 });
+const today = new Date();
+const year = today.getFullYear();
+const month = today.getMonth() + 1;
+const day = today.getDay();
+const nowDate = `${year}년 ${month}월 ${day}일`;
 
 const openDialog = (type) => {
   dialog.value[type] = true;
@@ -67,7 +72,10 @@ const skyEmojiList = {
 };
 
 const skyEmoji = computed(() => {
-  return skyEmojiList[weather.value?.villageSky] || skyEmojiList.default;
+  return (
+    skyEmojiList[weather.value?.ncstPty] ||
+    skyEmojiList[weather.value?.villageSky]
+  );
 });
 
 const dayTimes = computed(() => {
@@ -91,7 +99,7 @@ const backgroundImg = {
   '비-morning': 'url(/image/weather/rain.jpg)',
   '비-evening': 'url(/image/weather/rain.jpg)',
   '비-night': 'url(/image/weather/rain.jpg)',
-  default: 'url(/image/weather/default.png)',
+  default: 'url(/image/loading.gif)',
 };
 
 const weatherBackground = computed(() => {
@@ -114,12 +122,16 @@ watch(
 </script>
 
 <template>
-  <div class="weather-alert" v-if="weather">
-    <strong>{{
-      nickName === '' || nickName === undefined ? '' : nickName + '님~'
-    }}</strong
-    >{{ popMessage }}
+  <div class="weather-alert">
+    <div v-if="weather">
+      <strong>{{
+        nickName === '' || nickName === undefined ? '' : nickName + '님~'
+      }}</strong
+      >{{ popMessage }}
+    </div>
+    <div v-else>로딩중. . .</div>
   </div>
+  <!-- PC날씨 정보 헤더 -->
   <div class="header flex justify-between items-center w-full px-4 pt-2">
     <span class="live px-4 py-1 text-white font-semibold text-sm">
       실시간 날씨 정보
@@ -131,7 +143,7 @@ watch(
       시간별 날씨
       <v-dialog v-model="dialog.daily" max-width="1000" min-height="100">
         <v-card>
-          <v-card-title class="text-h8">오늘 날씨</v-card-title>
+          <v-card-title class="text-h8">{{ nowDate }} 날씨</v-card-title>
           <v-card-text>
             <DailyWeather />
           </v-card-text>
@@ -150,7 +162,14 @@ watch(
       </v-dialog>
     </button>
   </div>
-  <div>
+  <!-- 폰화면 정보 박스 -->
+  <div
+    class="weather-card d-flex d-sm-none"
+    :style="{ backgroundImage: weatherBackground }"
+  ></div>
+
+  <!-- PC날씨 정보 박스 -->
+  <div class="d-none d-sm-flex">
     <div class="weather-card" :style="{ backgroundImage: weatherBackground }">
       <div v-if="weather" class="weather-content">
         <div class="weather-left">
@@ -167,11 +186,7 @@ watch(
           <div class="warp">
             <div class="weather-icon">{{ skyEmoji }}</div>
             <div class="temperature">
-              {{
-                weather.ncstTem === undefined
-                  ? '날씨를 불러오지 못하였습니다....'
-                  : weather.ncstTem + '℃'
-              }}
+              {{ weather.ncstTem === undefined ? '' : weather.ncstTem + '℃' }}
             </div>
           </div>
           <div class="max_min_temperature">
@@ -204,8 +219,8 @@ watch(
   justify-content: center;
   align-items: center;
   padding: 0.6rem 1rem;
-  margin: 1rem auto;
-  max-width: 97%;
+  margin: 1rem;
+  max-width: 100%;
   font-size: 1.2rem;
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -242,7 +257,7 @@ watch(
   padding: 0 1rem 0.1rem;
   border-radius: 16px;
   &:hover {
-    background-color: white;
+    background-color: transparent;
   }
 }
 
@@ -252,9 +267,9 @@ watch(
   border-radius: 0 16px 16px 16px;
   padding: 1rem;
   margin: 0px 1rem;
-  color: white;
-  max-width: 100%;
   height: 11rem;
+  color: white;
+  width: 100%;
   box-shadow: 1px 1px 4px #838383;
   box-sizing: border-box;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
@@ -308,6 +323,138 @@ watch(
     .humidity {
       font-size: 1rem;
     }
+  }
+}
+@media (max-width: 935px) {
+  .weather-alert {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 802px) {
+  .weather-alert {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 790px) {
+  .weather-location {
+    font-size: 2rem !important;
+  }
+  .condition {
+    font-size: 1.2rem !important;
+  }
+  .weather-icon {
+    font-size: 2.8rem !important;
+  }
+
+  .temperature {
+    font-size: 1.8rem !important;
+  }
+}
+@media (max-width: 686px) {
+  .weather-location {
+    font-size: 1.6rem !important;
+  }
+  .condition {
+    font-size: 1rem !important;
+  }
+}
+@media (max-width: 679px) {
+  //   .weather-alert {
+  //     font-size: 0.8rem;
+  //   }
+  // }
+  // @media (max-width: 612px) {
+  .weather-location {
+    font-size: 1.4rem !important;
+  }
+  .condition {
+    font-size: 1rem !important;
+  }
+  .weather-icon {
+    font-size: 2.6rem !important;
+  }
+
+  .temperature {
+    font-size: 1.6rem !important;
+  }
+  .weather-alert {
+    font-size: 0.6rem;
+  }
+}
+@media (max-width: 573px) {
+  .weather-card {
+    height: 10rem;
+  }
+  .weather-location {
+    font-size: 1rem !important;
+  }
+  .weather-right {
+    .weather-icon {
+      font-size: 1.8rem !important;
+    }
+    .temperature {
+      font-size: 1.2rem !important;
+    }
+  }
+}
+@media (max-width: 534px) {
+  .weather-alert {
+    font-size: 0.5rem;
+  }
+}
+@media (max-width: 522px) {
+  .header {
+    font-size: 10px;
+  }
+}
+@media (max-width: 498px) {
+  .weather-content {
+    gap: 0 !important;
+  }
+}
+@media (max-width: 446px) {
+  .weather-card {
+    height: 8rem;
+  }
+  .weather-content {
+    flex-wrap: nowrap !important;
+  }
+  .weather-right {
+    .weather-icon {
+      font-size: 1.4rem !important;
+    }
+    .temperature {
+      font-size: 1rem !important;
+    }
+    .max_min_temperature,
+    .humidity {
+      font-size: 0.8rem !important;
+    }
+  }
+}
+// vuetify 설정이 안되어 임의로 설정
+@media (min-width: 480px) {
+  .d-sm-flex {
+    display: flex !important;
+  }
+  .d-sm-none {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .d-md-flex {
+    display: flex !important;
+  }
+  .d-md-none {
+    display: none !important;
+  }
+}
+@media (min-width: 1024px) {
+  .d-lg-flex {
+    display: flex !important;
+  }
+  .d-lg-none {
+    display: none !important;
   }
 }
 </style>

@@ -11,7 +11,7 @@ const props = defineProps({
   },
   usePage: { type: String, default: 'home' },
 });
-const emit = defineEmits(['selected-date', 'reminder-date', 'click-date']);
+const emit = defineEmits(['click-date', 'reminder-date']);
 
 const formatNumber = (n) => String(n).padStart(2, '0');
 
@@ -19,15 +19,11 @@ const formatNumber = (n) => String(n).padStart(2, '0');
 const pickDate = (day) => {
   if (!day) return;
   const selectedDate = new Date(
-    `${currentYear.value}-${formatNumber(currentMonth.value)}-${formatNumber(
-      day
-    )}`
+    reminderStore.state.currentYear,
+    reminderStore.state.currentMonth - 1,
+    day
   );
-  if (props.usePage === 'form') {
-    emit('selected-date', selectedDate);
-  } else if (props.usePage === 'home') {
-    emit('click-date', selectedDate);
-  }
+  emit('click-date', selectedDate);
 };
 
 const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -39,45 +35,22 @@ const today = new Date();
 const currentYear = ref(today.getFullYear());
 
 const currentMonth = ref(today.getMonth() + 1);
-// getMonth는 0부터 시작함
 
-// const startYear = 2003;
-// const startDowIdx = new Date(startYear, 0, 1).getDay();
-
-// 원하는 년, 월의 마지막 날짜 구하기(윤년처리까지)
-// const lastDayOfMonth = (year, month) => {
-//   if (month === 2) {
-//     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
-//   } else {
-//     const month30 = [1, 3, 5, 7, 8, 10, 12];
-//     return month30.includes(month) ? 31 : 30;
-//   }
-// };
 const lastDayOfMonth = (year, month) => new Date(year, month, 0).getDate();
-// console.log('last', lastDayOfMonth(2025, 7));
-
-// 원하는 년,월의 시작 요일 구하기
-// const startIdxOfMonth = (thisYear, thisMonth) => {
-//   let totalDay = startDowIdx;
-//   for (let year = startYear; year < thisYear; year++) {
-//     totalDay +=
-//       (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
-//   }
-//   for (let month = 1; month < thisMonth; month++) {
-//     totalDay += lastDayOfMonth(thisYear, month);
-//   }
-//   return totalDay % 7;
-// };
 const startIdxOfMonth = (year, month) => new Date(year, month - 1, 1).getDay();
-// console.log('idx', startIdxOfMonth(2025, 7));
 
 // 캘린더 그리기 로직
 const makeCalendar = () => {
-  const startIdx = startIdxOfMonth(currentYear.value, currentMonth.value);
-  const endDay = lastDayOfMonth(currentYear.value, currentMonth.value);
+  const startIdx = startIdxOfMonth(
+    reminderStore.state.currentYear,
+    reminderStore.state.currentMonth
+  );
+  const endDay = lastDayOfMonth(
+    reminderStore.state.currentYear,
+    reminderStore.state.currentMonth
+  );
   // console.log('startIdx', startIdx);
   // console.log('endDay', endDay);
-
   const matrix = [];
   let day = 1;
 
@@ -87,8 +60,8 @@ const makeCalendar = () => {
       if (i === 0 && k < startIdx) {
         row.push({ date: '', hasReminder: false });
       } else if (day <= endDay) {
-        const fullDate = `${currentYear.value}-${formatNumber(
-          currentMonth.value
+        const fullDate = `${reminderStore.state.currentYear}-${formatNumber(
+          reminderStore.state.currentMonth
         )}-${formatNumber(day)}`;
 
         const hasReminder = props.reminderDate.includes(fullDate);
@@ -124,21 +97,21 @@ watch(
 // 달 이동 버튼 눌렀을때 홈 화면에 보낼 년, 월 정보 에밋 / 피니아 년 월 정보 업데이트
 const changeMonth = () => {
   emit('reminder-date', {
-    year: currentYear.value,
-    month: currentMonth.value,
+    year: reminderStore.state.currentYear,
+    month: reminderStore.state.currentMonth,
   });
 
-  reminderStore.setCurrentYear(currentYear.value);
-  reminderStore.setCurrentMonth(currentMonth.value);
+  // reminderStore.setCurrentYear(currentYear.value);
+  // reminderStore.setCurrentMonth(currentMonth.value);
 };
 
 // 이전 달 보기
 const prevMonth = () => {
-  if (currentMonth.value === 1) {
-    currentMonth.value = 12;
-    currentYear.value--;
+  if (reminderStore.state.currentMonth === 1) {
+    reminderStore.state.currentMonth = 12;
+    reminderStore.state.currentYear--;
   } else {
-    currentMonth.value--;
+    reminderStore.state.currentMonth--;
   }
   makeCalendar();
   changeMonth();
@@ -146,11 +119,11 @@ const prevMonth = () => {
 
 // 다음 달 보기
 const nextMonth = () => {
-  if (currentMonth.value === 12) {
-    currentMonth.value = 1;
-    currentYear.value++;
+  if (reminderStore.state.currentMonth === 12) {
+    reminderStore.state.currentMonth = 1;
+    reminderStore.state.currentYear++;
   } else {
-    currentMonth.value++;
+    reminderStore.state.currentMonth++;
   }
   makeCalendar();
   changeMonth();
@@ -160,8 +133,8 @@ const nextMonth = () => {
 const todayColor = (day) => {
   const today = new Date();
   return (
-    currentYear.value === today.getFullYear() &&
-    currentMonth.value === today.getMonth() + 1 &&
+    reminderStore.state.currentYear === today.getFullYear() &&
+    reminderStore.state.currentMonth === today.getMonth() + 1 &&
     day === today.getDate()
   );
 };
@@ -173,11 +146,11 @@ const todayColor = (day) => {
         ><img src="/image/button.png" alt="이전 달 보기" class="rotate"
       /></a>
       <span
-        ><b>{{ currentYear }}</b
+        ><b>{{ reminderStore.state.currentYear }}</b
         >년</span
       >
       <span>
-        <b>{{ currentMonth }}</b
+        <b>{{ reminderStore.state.currentMonth }}</b
         >월</span
       >
       <a href="#" @click.prevent="nextMonth"
@@ -269,11 +242,11 @@ const todayColor = (day) => {
         background-color: #bfeaff;
       }
     }
-    .today_color {
-      color: steelblue;
-    }
     .sunday_color {
       color: tomato;
+    }
+    .today_color {
+      color: steelblue;
     }
     td {
       height: 70px;

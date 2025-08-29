@@ -13,6 +13,9 @@ import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 
+
+const showHide = ref(true);
+
 const clickProgress = useClickProgressBar();
 const ondayMealData = useCalorieCalcul();
 const weeklyStore = useWeeklyStore();
@@ -28,6 +31,7 @@ const xData = {
   totalFat : Array(len).fill(0),
   totalCarbohydrate : Array(len).fill(0),
   totalProtein : Array(len).fill(0),
+  
 };
 
 
@@ -65,7 +69,7 @@ const chartRef = ref(null); // 차트 DOM 요소 참조
 let myChart = null; // ECharts 인스턴스
 
 const option = {
- 
+
   title: {
     text: `주간 총 ${clickProgress.nowCategory} 통계`,
   },
@@ -123,13 +127,13 @@ const option = {
     triggerEvent: true,
   },
   yAxis: {
-    type: 'value',
+    type: 'value',             
     axisLabel: {
       color: '#000000',
       fontSize: 12,
       fontWeight: 'bold',
-      formatter: '{value} kcal'
-
+      formatter: '{value} kcal',
+      show: showHide.value, // y축 숨기 표시
     },
     splitLine: {
       lineStyle: {
@@ -148,7 +152,7 @@ const option = {
      // y축 데이터와 x축 날짜를 결합
     // 막대그래프 스타일 설정
     data: xData.totalCalorie,
-    barWidth: '50%',
+    barWidth: '50%',     
     itemStyle: {
       borderRadius: [30, 30, 0, 0],
       color: '#D9D9D9',
@@ -171,8 +175,18 @@ const option = {
       fontSize: '25px Noto Sans KR sans-serif',
       fill: '#ffffff',
     },
+    
   },
 };
+
+//차트 날짜 변화할때 그래프 그리는 데이터 초기화
+const resetWeeklyData = ()=>{
+  xData.totalCalorie = Array(xData.dayName.length).fill(0);
+  xData.totalFat = Array(xData.dayName.length).fill(0);
+  xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
+  xData.totalProtein = Array(xData.dayName.length).fill(0);
+}
+
 const getStatistic = async (weeky) => {
   const res = await getWeekTotal(weeky);
   // console.log("weeky:", weeky);
@@ -187,10 +201,7 @@ const getStatistic = async (weeky) => {
   xData.dates= weeklyStore.weekyDate; // 날짜 추가
   // 주간 데이터 없으면 배열 데이터 초기화
  if (!weeklyStore.weeklyRawData.length){
-  xData.totalCalorie = Array(xData.dayName.length).fill(0);
-  xData.totalFat = Array(xData.dayName.length).fill(0);
-  xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
-  xData.totalProtein = Array(xData.dayName.length).fill(0);
+  resetWeeklyData();
  }
 
   weeklyStore.weeklyRawData.forEach(item => {
@@ -219,6 +230,7 @@ const getStatistic = async (weeky) => {
   // 아래가 y축 데이터 바꾼는거
   // xData.totalCalorie = yData.totalCalorie;
   option.series.data = xData.totalCalorie;
+  option.yAxis.axisLabel.show = window.innerWidth < 768 ? false : true;
   myChart.setOption(option, true);
   // console.log("xData.dates:", xData.totalCalorie);
   
@@ -230,7 +242,6 @@ const getStatistic = async (weeky) => {
 }
 
 onMounted(async () => {
-
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화    
@@ -244,10 +255,10 @@ onMounted(async () => {
   myChart.on("click", (params) => {
     if (params.componentType === "series") {
       const dataIndex = params.dataIndex;
-      const dayName = xData.dates[dataIndex];
-      // console.log("Clicked on:", params);
-      // console.log("Clicked on day:", dayName);
+      const dayName = xData.dates[dataIndex];      
       ondayMealData.mealFormData(dayName);
+      
+      console.log("데이터 값 : ", ondayMealData.itemInfo);
     }
     // 요일을 클릭해도 해당 요일에 대한 값이 나옴 
     else if (params.componentType === 'xAxis') {
@@ -255,23 +266,42 @@ onMounted(async () => {
       const dataIndex = params.dataIndex;
       const dayName = xData.dates[dataIndex];
       ondayMealData.mealFormData(dayName);
-      // alert('xAxis 클릭하였습니다.');
     }
-    // else if (params.componentType === 'yAxis') {
-    //   alert('yAxis 클릭하였습니다.');
-    // }
-    // console.log("Clicked on non-series component:", params);
+
   });
   // console.log("주시작 : ", weekDay.getWeekDate);
-
+   // resize 이벤트 등록
+   window.addEventListener('resize', handleResize)
 });
+
+// onBeforeUnmount(() => {
+//   // 컴포넌트 unmount 시 이벤트 해제
+//   window.removeEventListener('resize', handleResize)
+//   myChart?.dispose()
+// })
+
+function handleResize() {
+
+  if (window.innerWidth <768){  
+    option.yAxis.axisLabel.show = false;
+    myChart.setOption(option, true);
+  } 
+  else{
+    option.yAxis.axisLabel.show = true;
+    myChart.setOption(option, true);
+  }  
+  myChart?.resize()
+
+}
+
 
 watch(weekDay.getWeekDate, (newVal) => {
   newWeekFunc(newVal);
 });
 
 const newWeekFunc = async (param) => {
-  // console.log("파람::" , param);
+  console.log("파람::" , param);
+  resetWeeklyData();
   await nextTick();
   await getStatistic(weekDay.getWeekDate);
   // myChart = echarts.init(chartRef.value);
@@ -314,20 +344,20 @@ watch (
 </script>
 
 <template>
-  <div class="weekly-calorie   ">
-    <div ref="chartRef" class="main-container  " style="height: 500px; width: 100%"></div>
+  <div  ref="chartRef" class="weekly-calorie h-100 w-100  ">
+    <div class="main-container  border   ">
+      
+    </div>
+    
   </div>
+ 
 
-  <MealStatistic />
+
 </template>
 
 <style scoped>
-.weekly-calorie {
-  width: 80%;
-  height: 100%;
-}
 
-.main-container {
-  width: 80%;
-}
+
+
+
 </style>

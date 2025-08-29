@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, effect } from 'vue';
 import { getDailyWeather } from '@/services/weather/weatherHomeService';
 
 const dayWeather = ref([]);
+const scrollRef = ref(null);
 
 const DayWeather = async () => {
   const res = await getDailyWeather();
@@ -18,7 +19,7 @@ const dayWeatherWithTime = computed(() =>
   dayWeather.value.map((item) => ({
     ...item,
     time: convertTime(item.fcstTime),
-    emoji: skyEmojiList[item.sky] || '',
+    emoji: skyEmojiList[item.pty] || skyEmojiList[item.sky] || '',
   }))
 );
 const skyEmojiList = {
@@ -32,11 +33,17 @@ const skyEmojiList = {
 
 onMounted(async () => {
   await DayWeather();
+
+  const xs = scrollRef.value;
+  xs.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    xs.scrollLeft += e.deltaY;
+  });
 });
 </script>
 
 <template>
-  <div class="info">
+  <div class="info" ref="scrollRef">
     <div class="item" v-for="item in dayWeatherWithTime" :key="item.fcstTime">
       {{ item.time }} {{ item.emoji }} {{ item.tmp }}℃
     </div>
@@ -46,11 +53,15 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .info {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  overflow-x: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .item {
-  align-items: center;
-  justify-content: center;
+  margin-right: 1rem;
 }
 </style>

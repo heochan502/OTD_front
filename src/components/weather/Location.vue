@@ -42,7 +42,7 @@ const confirmYes = async () => {
   if (actions.value === 'select') {
     const res = await selectLocation(selectedLocalId.value);
     if (res && res.status === 200) {
-      weatherStore.triggerRefresh();
+      weatherStore.homeRefresh();
       emit('close');
       router.push('/');
     }
@@ -135,7 +135,7 @@ onMounted(() => {
     </div>
   </div>
   <div class="list card p-4 shadow-sm">
-    <h2>저장한 지역 목록</h2>
+    <h3>저장한 지역 목록</h3>
     <ul class="list-group list-group-flush">
       <li
         class="list-group-item d-flex align-items-center justify-content-between"
@@ -145,22 +145,22 @@ onMounted(() => {
         <span class="location-name">
           {{ item.city }} {{ item.county }} {{ item.town }}
         </span>
-        <div class="d-flex gap-2">
+        <div class="list-btn d-flex gap-2">
           <button
-            class="btn btn-outline-primary btn-sm"
+            class="btn list-btn btn-outline-primary btn-sm"
             @click="
               openConfirm(
-                `${item.city} ${item.county} ${item.town}이(가) 선택되었습니다. 홈 화면에 표시하겠습니까?`,
+                `${item.city} ${item.county} ${item.town}이(가) 선택되었습니다. 홈 화면에 등록하시겠습니까?`,
                 'select',
                 item.localId,
                 `${item.city} ${item.county} ${item.town}`
               )
             "
           >
-            홈화면에 표시
+            등록
           </button>
           <button
-            class="btn btn-outline-danger btn-sm"
+            class="btn list-btn btn-outline-danger btn-sm"
             @click="
               openConfirm(
                 '선택한 지역을 삭제하시겠습니까?',
@@ -196,15 +196,22 @@ onMounted(() => {
   color: black;
   height: 40vh;
   overflow-y: scroll;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .location-name {
   font-size: 25px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .location-wrapper {
   max-width: 700px;
   margin: auto;
 }
-
 .search-box {
   background-color: #f8f9fa;
   border-radius: 1rem;
@@ -214,6 +221,27 @@ onMounted(() => {
   transition: background-color 0.2s ease-in-out;
   &:hover {
     background-color: #f1f1f1;
+  }
+}
+@media (max-width: 640px) {
+  .location-name {
+    font-size: 20px;
+  }
+}
+@media (max-width: 560px) {
+  .location-name {
+    font-size: 16px;
+  }
+}
+@media (max-width: 480px) {
+  .location-name {
+    font-size: 20px;
+  }
+  .btn {
+    font-size: 10px;
+  }
+  .list-btn {
+    flex-direction: column;
   }
 }
 </style>
