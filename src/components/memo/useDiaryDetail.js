@@ -51,12 +51,11 @@ export function useDiaryDetail(props, emit) {
     fileInputRef.value && (fileInputRef.value.value = null);
   };
 
-  const buildFormData = (dataKey, obj, fileKey, inputEl) => {
+  const buildFormData = (key, obj, inputEl) => {
     const fd = new FormData();
-    const { diaryImage, createdAt, ...rest } = obj;
-    fd.append(dataKey, new Blob([JSON.stringify(rest)], { type: 'application/json' }));
+    fd.append(key, new Blob([JSON.stringify(obj)], { type: 'application/json' }));
     const file = inputEl?.files?.[0];
-    if (file) fd.append(fileKey, file);
+    if (file) fd.append(`${key === 'diaryData' ? 'memoImage' : 'diaryImage'}`, file);
     return fd;
   };
 
@@ -98,7 +97,7 @@ export function useDiaryDetail(props, emit) {
   };
 
   const IMAGE_BASE = '/api/OTD/memoAndDiary/diary/image/';
-  const imageUrl = IMAGE_BASE + diary.diaryImage;
+  const imageUrl = computed(() => diary.value.diaryImage ? `${IMAGE_BASE}${diary.value.diaryImage}` : '');
 
 
   const setDiaryProp = (incomingDiary) => {

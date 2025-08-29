@@ -21,7 +21,7 @@ export function useMemoDetail(props, emit) {
   const mode = ref('view');
 
   const IMAGE_BASE = '/api/OTD/memoAndDiary/memo/image/';
-  const imageUrl = IMAGE_BASE + diary.diaryImage;
+  const imageUrl = computed(() => memo.value.memoImage ? `${IMAGE_BASE}${memo.value.memoImage}` : '');
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isEditMode   = computed(() => mode.value === 'edit');
@@ -58,12 +58,11 @@ export function useMemoDetail(props, emit) {
     if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
-  const buildFormData = (dataKey, memoObj, fileKey, inputEl) => {
+  const buildFormData = (key, obj, inputEl) => {
     const fd = new FormData();
-    const { memoImage, createdAt, ...rest } = memoObj;
-    fd.append(dataKey, new Blob([JSON.stringify(rest)], { type: 'application/json' }));
+    fd.append(key, new Blob([JSON.stringify(obj)], { type: 'application/json' }));
     const file = inputEl?.files?.[0];
-    if (file) fd.append(fileKey, file);
+    if (file) fd.append(`${key === 'memoData' ? 'memoImage' : 'diaryImage'}`, file);
     return fd;
   };
 

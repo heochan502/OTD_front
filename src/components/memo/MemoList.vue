@@ -107,7 +107,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
       <!-- 기존 저장 이미지 -->
       <div v-if="memo.memoImage && previewImages.length === 0" class="memo-preview-list">
         <div class="memo-preview-item">
-          <img :src="`/pic/${memo.memoImage}`" alt="등록된 이미지" />
+          <img :src="`/api/OTD/memoAndDiary/memo/image/${memo.memoImage}`" alt="등록된 이미지" />
         </div>
       </div>
 
@@ -170,7 +170,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
           </div>
           <img
             v-if="m.memoImage"
-            :src="`/pic/${m.memoImage}`"
+            :src="`/api/OTD/memoAndDiary/memo/image/${m.memoImage}`"
             class="memo-list-image"
             alt="memo"
             @error="e => e.target.style.display = 'none'"
