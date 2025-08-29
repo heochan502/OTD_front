@@ -33,10 +33,12 @@ export default createVuetify({
     mobileBreakpoint: 'sm',
     thresholds: {
       xs: 0, // 초소형폰
+      xm: 425, // 초소형전
       sm: 480, // 일반 스마트폰 (아이폰/갤럭시 360~414px 포함)
       md: 768, // 태블릿 (아이패드 미니 ~ 아이패드 일반)
       lg: 1024, // 작은 노트북/대형 태블릿
       xl: 1440, // 데스크탑
+      // width값 최소 ex) xs: 0 ~ 479 sm : 480 ~ 767
     },
   },
 });

@@ -139,7 +139,6 @@ const option = {
       lineStyle: {
         color: '#cccccc', // 눈금선 색상
         type: 'dashed', // 점선으로 표시
-        
       },
     },
     triggerEvent: true,
@@ -175,12 +174,18 @@ const option = {
       text: 'Kcal',
       fontSize: '25px Noto Sans KR sans-serif',
       fill: '#ffffff',
-   
     },
     
   },
 };
 
+//차트 날짜 변화할때 그래프 그리는 데이터 초기화
+const resetWeeklyData = ()=>{
+  xData.totalCalorie = Array(xData.dayName.length).fill(0);
+  xData.totalFat = Array(xData.dayName.length).fill(0);
+  xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
+  xData.totalProtein = Array(xData.dayName.length).fill(0);
+}
 
 const getStatistic = async (weeky) => {
   const res = await getWeekTotal(weeky);
@@ -196,10 +201,7 @@ const getStatistic = async (weeky) => {
   xData.dates= weeklyStore.weekyDate; // 날짜 추가
   // 주간 데이터 없으면 배열 데이터 초기화
  if (!weeklyStore.weeklyRawData.length){
-  xData.totalCalorie = Array(xData.dayName.length).fill(0);
-  xData.totalFat = Array(xData.dayName.length).fill(0);
-  xData.totalCarbohydrate = Array(xData.dayName.length).fill(0);
-  xData.totalProtein = Array(xData.dayName.length).fill(0);
+  resetWeeklyData();
  }
 
   weeklyStore.weeklyRawData.forEach(item => {
@@ -228,6 +230,7 @@ const getStatistic = async (weeky) => {
   // 아래가 y축 데이터 바꾼는거
   // xData.totalCalorie = yData.totalCalorie;
   option.series.data = xData.totalCalorie;
+  option.yAxis.axisLabel.show = window.innerWidth < 768 ? false : true;
   myChart.setOption(option, true);
   // console.log("xData.dates:", xData.totalCalorie);
   
@@ -239,7 +242,6 @@ const getStatistic = async (weeky) => {
 }
 
 onMounted(async () => {
-
   await nextTick(); // DOM 업데이트가 완료될 때까지 기다림
   if (chartRef.value) {
     myChart = echarts.init(chartRef.value); // ECharts 인스턴스 초기화    
@@ -253,8 +255,10 @@ onMounted(async () => {
   myChart.on("click", (params) => {
     if (params.componentType === "series") {
       const dataIndex = params.dataIndex;
-      const dayName = xData.dates[dataIndex];
+      const dayName = xData.dates[dataIndex];      
       ondayMealData.mealFormData(dayName);
+      
+      console.log("데이터 값 : ", ondayMealData.itemInfo);
     }
     // 요일을 클릭해도 해당 요일에 대한 값이 나옴 
     else if (params.componentType === 'xAxis') {
@@ -296,7 +300,8 @@ watch(weekDay.getWeekDate, (newVal) => {
 });
 
 const newWeekFunc = async (param) => {
-  // console.log("파람::" , param);
+  console.log("파람::" , param);
+  resetWeeklyData();
   await nextTick();
   await getStatistic(weekDay.getWeekDate);
   // myChart = echarts.init(chartRef.value);
@@ -339,7 +344,7 @@ watch (
 </script>
 
 <template>
-  <div  ref="chartRef" class="weekly-calorie  h-100 w-100  ">
+  <div  ref="chartRef" class="weekly-calorie h-100 w-100  ">
     <div class="main-container  border   ">
       
     </div>
@@ -351,10 +356,7 @@ watch (
 </template>
 
 <style scoped>
-.main-container 
-{
-  
-}
+
 
 
 
