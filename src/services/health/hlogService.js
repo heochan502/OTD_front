@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = '/api/OTD';
+axios.defaults.baseURL = "/api/OTD";
 
 const path = "/health/hlog";
 
@@ -8,7 +8,7 @@ export const saveHlog = (args) => {
   return axios.post(path, args).catch((e) => e.response);
 };
 
-// 건강기록 목록 조회
+// 건강기록 조회
 export const getHlogs = (weekly) => {
   return axios.get(path, { params: weekly }).catch((e) => e.response);
 };

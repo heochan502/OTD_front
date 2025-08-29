@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, onUnmounted } from "vue";
+import { onMounted, reactive, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { formatDate } from "@/utils/reportUtils";
@@ -8,15 +8,19 @@ import { getElogList } from "@/services/health/elogService";
 const router = useRouter();
 const exerciseStore = useExerciseStore();
 
+// 페이징 정보
 const data = {
   page: 1,
   rowPerPage: 7,
 };
+
+// 페이징 상태
 const state = reactive({
   isLoading: false,
   isFinish: false,
 });
 
+// scroll 시 호출되는 함수
 const handleScroll = (e) => {
   const target = e.target; // list-wrap
   const scrollTop = target.scrollTop;
@@ -35,7 +39,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  // exerciseStore.clearLogList();
+  exerciseStore.clearLogList();
 });
 
 const getData = async () => {

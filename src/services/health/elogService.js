@@ -2,7 +2,6 @@ import axios from "axios";
 
 axios.defaults.baseURL = "/api/OTD";
 
-
 const path = "/health/elog";
 
 // 운동기록 생성
@@ -11,8 +10,8 @@ export const saveElog = (args) => {
 };
 
 // 운동기록 목록
-export const getElogs = () => {
-  return axios.get(path).catch((e) => e.response);
+export const getElogs = (params) => {
+  return axios.get(path, { params }).catch((e) => e.response);
 };
 
 // 운동기록 리스트 페이징

@@ -21,10 +21,6 @@ const state = reactive({
   },
 });
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 onMounted(() => {
   exerciseStore.fetchExercises();

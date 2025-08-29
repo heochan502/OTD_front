@@ -5,6 +5,7 @@ import ExercuseLogList from "@/components/health/ExerciseLogList.vue";
 import HealthLogList from "@/components/health/HealthLogList.vue";
 
 import { onMounted } from "vue";
+
 </script>
 
 <template>
