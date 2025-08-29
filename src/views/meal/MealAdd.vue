@@ -490,7 +490,7 @@ onMounted(() => {
 
 .mealsaday {
   width: 150px;
-  height: 70px;
+  height: 60px;
   background-color: #3bbeff;
   color: white;
   border: none;
