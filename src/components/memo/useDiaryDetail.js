@@ -97,10 +97,12 @@ export function useDiaryDetail(props, emit) {
     }
   };
 
+  const IMAGE_BASE = '/api/OTD/memoAndDiary/diary/image/';
+
   const setDiaryProp = (incomingDiary) => {
     if (incomingDiary) {
       diary.value = { ...incomingDiary };
-      previewImages.value = incomingDiary.diaryImage ? [`/pic/${incomingDiary.diaryImage}`] : [];
+      previewImages.value = incomingDiary.diaryImage ? [`${IMAGE_BASE}${incomingDiary.diaryImage}`] : [];
     }
   };
   
@@ -117,9 +119,10 @@ export function useDiaryDetail(props, emit) {
           mood: incoming.mood ?? '',
         };
         setMode('view');
-        previewImages.value = diary.value.diaryImage ? [`/pic/${diary.value.diaryImage}`] : [];
+        previewImages.value = diary.value.diaryImage ? [`${IMAGE_BASE}${diary.value.diaryImage}`] : [];
       } else {
-        clearForm();
+        diary.value = { diaryId: null, diaryName: '', diaryContent: '', diaryImage: '', createdAt: null };
+        previewImages.value = [];
         setMode('create');
       }
     },
@@ -130,7 +133,7 @@ export function useDiaryDetail(props, emit) {
     try {
       const data = await DiaryHttpService.findById(id);
       diary.value = data;
-      previewImages.value = data.diaryImage ? [`/pic/${data.diaryImage}`] : [];
+      previewImages.value = diary.value.diaryImage ? [`${IMAGE_BASE}${diary.value.diaryImage}`] : [];
     } catch (error) {
       console.error('📔 다이어리 조회 실패:', error);
     }
@@ -148,7 +151,6 @@ export function useDiaryDetail(props, emit) {
         };
         reader.readAsDataURL(file);
       }
-      // diary.value.diaryImage = files[0].name;
     }
   };
 

@@ -151,7 +151,7 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/memoAndDiary/diary/list',
+      path: '/memoAndDiary/diarylist',
       name: 'DiaryList',
       component: DiaryList,
       props: true,

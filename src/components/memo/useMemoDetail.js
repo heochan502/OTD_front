@@ -20,6 +20,8 @@ export function useMemoDetail(props, emit) {
   const previewImages = ref([]);
   const mode = ref('view');
 
+  const IMAGE_BASE = '/api/OTD/memoAndDiary/memo/image/';
+
   const isCreateMode = computed(() => mode.value === 'create');
   const isEditMode   = computed(() => mode.value === 'edit');
   const isViewMode   = computed(() => mode.value === 'view');
@@ -29,17 +31,25 @@ export function useMemoDetail(props, emit) {
 
   const setMode = (value) => { mode.value = value; };
 
+  const clearPreviewImages = () => {
+    previewImages.value = [];
+    if (fileInputRef.value) fileInputRef.value.value = null;
+  };
+
   const handleImageChange = (e) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
-    const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 업로드 가능합니다.');
-      return;
+    previewImages.value = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImages.value.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
     }
-    const reader = new FileReader();
-    reader.onload = () => { previewImages.value = [reader.result]; };
-    reader.readAsDataURL(file);
   };
 
   const removeImage = (index) => {
@@ -47,16 +57,10 @@ export function useMemoDetail(props, emit) {
     if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
-  const clearPreviewImages = () => {
-    previewImages.value = [];
-    if (fileInputRef.value) fileInputRef.value.value = null;
-  };
-
-  // FormData 통일 헬퍼
-  const buildFormData = (memoDataKey, memoObj, fileKey, inputEl) => {
+  const buildFormData = (dataKey, memoObj, fileKey, inputEl) => {
     const fd = new FormData();
     const { memoImage, createdAt, ...rest } = memoObj;
-    fd.append(memoDataKey, new Blob([JSON.stringify(rest)], { type: 'application/json' }));
+    fd.append(dataKey, new Blob([JSON.stringify(rest)], { type: 'application/json' }));
     const file = inputEl?.files?.[0];
     if (file) fd.append(fileKey, file);
     return fd;
@@ -90,7 +94,7 @@ export function useMemoDetail(props, emit) {
   const deleteMemo = async () => {
     try {
       if (confirm('정말 삭제하시겠습니까?')) {
-        await MemoHttpService.deleteById(memo.value.memoId) ?? MemoHttpService.remove(memo.value.memoId);
+        await MemoHttpService.deleteById(memo.value.memoId);
         emit('deleted');
       }
     } catch (err) {
@@ -110,7 +114,7 @@ export function useMemoDetail(props, emit) {
         memoImage: data.memoImage ?? null,
         createdAt: data.createdAt ?? null,
       };
-      clearPreviewImages();
+      previewImages.value = memo.value.memoImage ? [`${IMAGE_BASE}${memo.value.memoImage}`] : [];
     } catch (err) {
       console.error('메모 조회 실패', err);
     }
@@ -128,8 +132,11 @@ export function useMemoDetail(props, emit) {
           createdAt: newMemo.createdAt ?? null,
         };
         setMode('view');
-        // 기존 이미지 프리뷰
-        previewImages.value = memo.value.memoImage ? [`/pic/${memo.value.memoImage}`] : [];
+        previewImages.value = memo.value.memoImage ? [`${IMAGE_BASE}${memo.value.memoImage}`] : [];
+      } else {
+        memo.value = { memoId: null, memoName: '', memoContent: '', memoImage: '', createdAt: null };
+        clearPreviewImages();
+        setMode('create');
       }
     },
     { immediate: true }
@@ -141,17 +148,13 @@ export function useMemoDetail(props, emit) {
       return router.push('/account/login');
     }
 
-    if (route.path.includes('/add')) {
+    const id = route.params.id;
+    if (route.name === 'MemoAdd') {
       setMode('create');
       return;
-    }
-
-    const id = route.params.id;
-    if (id) {
-      fetchCurrentMemo(id);
-      mode.value = 'view';
-    } else {
-      mode.value = 'create';
+    } else if (id) {
+      await fetchCurrentMemo(id);
+      setMode('view');
     }
   });
 

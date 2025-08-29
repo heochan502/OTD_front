@@ -180,7 +180,7 @@ const formatDate = (dateStr) => {
             </div>
             <div class="diary-image-wrapper" v-if="diary.diaryImage">
               <img
-                :src="`/pic/${diary.diaryImage}`"
+               :src="`/api/OTD/memoAndDiary/diary/image/${diary.diaryImage}`"
                 class="diary-preview-image"
                 alt="다이어리 이미지"
                 @error="e => console.error('❌ 이미지 로딩 실패:', e.target.src)"
