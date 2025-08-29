@@ -98,6 +98,8 @@ export function useDiaryDetail(props, emit) {
   };
 
   const IMAGE_BASE = '/api/OTD/memoAndDiary/diary/image/';
+  const imageUrl = IMAGE_BASE + diary.diaryImage;
+
 
   const setDiaryProp = (incomingDiary) => {
     if (incomingDiary) {

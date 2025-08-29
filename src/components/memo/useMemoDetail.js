@@ -21,6 +21,7 @@ export function useMemoDetail(props, emit) {
   const mode = ref('view');
 
   const IMAGE_BASE = '/api/OTD/memoAndDiary/memo/image/';
+  const imageUrl = IMAGE_BASE + diary.diaryImage;
 
   const isCreateMode = computed(() => mode.value === 'create');
   const isEditMode   = computed(() => mode.value === 'edit');
