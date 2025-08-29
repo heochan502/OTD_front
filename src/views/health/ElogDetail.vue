@@ -1,16 +1,19 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, computed, watch } from "vue";
 import effortLevels from "@/assets/health/effortLevels.json";
-import { deleteElog, getElog } from "@/services/health/elogService";
+import { deleteElog, getElog, getElogs } from "@/services/health/elogService";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import { useRoute, useRouter } from "vue-router";
 import HealthChart from "@/components/health/HealthChart.vue";
-import { formatDate } from "@/utils/reportUtils";
+import { formatDate, formatDate2 } from "@/utils/reportUtils";
+import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
 
 const exerciseStore = useExerciseStore();
 const route = useRoute();
 const router = useRouter();
-const confirmDialog = ref(false);   // 모달에 사용됨
+const confirmDialog = ref(false); // 모달에 사용됨
+dayjs.extend(isoWeek);
 
 const state = reactive({
   elog: {
@@ -21,6 +24,7 @@ const state = reactive({
     exerciseDuration: 0,
     effortLevel: 1,
   },
+  weeklyLogs: [],
 });
 
 const formatTime = (dateStr) => {
@@ -31,19 +35,18 @@ const formatTime = (dateStr) => {
   return `${date.getHours()}시 ${date.getHours()}분`;
 };
 
-const exerciseLogId = route.params.exerciselogId;       // 쿼리스트링으로 id 값 받기
+const exerciseLogId = route.params.exerciselogId; // 쿼리스트링으로 id 값 받기
 
 onMounted(async () => {
   if (!exerciseLogId) return;
-  const res = await getElog(exerciseLogId);             // 운동기록 데이터 받
+  const res = await getElog(exerciseLogId); // 운동기록 데이터 받기
 
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  // console.log("운동기록", res.data);
+
   state.elog = res.data;
-  // console.log("저장", state.elog.effortLevel);
 });
 
 // @click
@@ -62,6 +65,24 @@ const confirmYes = async () => {
   }
   router.push("/health");
 };
+
+watch(state, async () => {
+  // 해당주차범위
+  const params = computed(() => {
+    const base = dayjs(state.elog.exerciseDatetime);
+    const weekRange = {
+      startDate: base.startOf("isoWeek"),
+      endDate: base.endOf("isoWeek"),
+    };
+    return {
+      start_date: formatDate2(weekRange.startDate),
+      end_date: formatDate2(weekRange.endDate),
+    };
+  });
+
+  const res = await getElogs(params.value);
+  state.weeklyLogs = res.data;
+});
 </script>
 
 <template>
@@ -126,7 +147,7 @@ const confirmYes = async () => {
         <HealthChart
           class="mt-3 chart"
           :selectedDate="state.elog.exerciseDatetime"
-          :logs="exerciseStore.logList"
+          :logs="state.weeklyLogs"
           label="exerciseKcal"
         />
       </v-col>
@@ -135,7 +156,7 @@ const confirmYes = async () => {
         <HealthChart
           class="mt-3 chart"
           :selectedDate="state.elog.exerciseDatetime"
-          :logs="exerciseStore.logList"
+          :logs="state.weeklyLogs"
           label="exerciseDuration"
         />
       </v-col>
