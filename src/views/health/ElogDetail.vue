@@ -10,7 +10,7 @@ import { formatDate } from "@/utils/reportUtils";
 const exerciseStore = useExerciseStore();
 const route = useRoute();
 const router = useRouter();
-const confirmDialog = ref(false);
+const confirmDialog = ref(false);   // 모달에 사용됨
 
 const state = reactive({
   elog: {
@@ -31,20 +31,19 @@ const formatTime = (dateStr) => {
   return `${date.getHours()}시 ${date.getHours()}분`;
 };
 
-const exerciseLogId = route.params.exerciselogId;
+const exerciseLogId = route.params.exerciselogId;       // 쿼리스트링으로 id 값 받기
 
 onMounted(async () => {
-  const exerciseLogId = route.params.exerciselogId;
   if (!exerciseLogId) return;
-  const res = await getElog(exerciseLogId);
+  const res = await getElog(exerciseLogId);             // 운동기록 데이터 받
 
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  console.log("운동기록", res.data);
+  // console.log("운동기록", res.data);
   state.elog = res.data;
-  console.log("저장", state.elog.effortLevel);
+  // console.log("저장", state.elog.effortLevel);
 });
 
 // @click
