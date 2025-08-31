@@ -18,3 +18,7 @@ export const getList = () => {
 export const removeListItem = (id) => {
   return axios.delete(`/location/delete/${id}`).catch((e) => e.response);
 };
+
+export const selectLocation = (id) => {
+  return axios.put(`location/select/${id}`).catch((e) => e.response);
+};

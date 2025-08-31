@@ -1,6 +1,10 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import { getList, removeListItem } from "@/services/weather/locationService";
+import {
+  getList,
+  removeListItem,
+  selectLocation,
+} from "@/services/weather/locationService";
 import { useRouter } from "vue-router";
 import { useWeatherStore } from "@/stores/weatherStore";
 import SearchAPI from "./SearchAPI.vue";
