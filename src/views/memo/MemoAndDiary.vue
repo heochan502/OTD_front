@@ -12,7 +12,7 @@ const goToMemo = () => {
 };
 
 const goToDiary = () => {
-  router.push('/memoAndDiary/diary/list');
+  router.push('/memoAndDiary/diarylist');
 };
 </script>
 

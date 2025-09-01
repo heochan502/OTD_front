@@ -1,60 +1,66 @@
-import { defineStore } from "pinia";
-import { getMealTotalOnDay } from "@/services/meal/mealService";
-import { ref } from "vue";
-import dayjs from "dayjs";
+import { defineStore } from 'pinia';
+import { getMealTotalOnDay } from '@/services/meal/mealService';
+import { ref } from 'vue';
+import dayjs from 'dayjs';
 
-import "dayjs/locale/ko";
+import 'dayjs/locale/ko';
 
-dayjs.locale("ko");
+dayjs.locale('ko');
 
-export const useCalorieCalcul = defineStore("mealInfo", () => {
-  // const dayStore = useDayDefine();
-  const itemInfo = ref({
-    mealDay: "", // 최소한 기본 구조를 잡아줌
-    totalCalorie: 0,
-    totalFat: 0,
-    totalCarbohydrate: 0,
-    totalProtein: 0,
-  });
-  const mealFormData = async (dateStr) => {
-    // 처음 화면 상단 그래프 부분 출력용
-    // dayStore.updateTime();
-    // const dataStr = dayStore.currentTime.slice(3, 13);
-    // console.log(":보내는 날짜 :", dateStr);
-    const getData = await getMealTotalOnDay(dateStr);
-    //  console.log("바로 가져온값 : ",getData );
-    if (getData === "" || getData === null) {
-      itemInfo.value = {
-        mealDay: dateStr,
-        allDayCalorie: 0,
-        totalFat: 0,
-        totalCarbohydrate: 0,
-        totalProtein: 0,
-      };
-    }
-    // getData null 일때  다른 값 들어가게 해야함
-    else {
-      itemInfo.value = {
-        mealDay: dateStr,
-        allDayCalorie: getData.totalCalorie,
-        totalFat: getData.totalFat,
-        totalCarbohydrate: getData.totalCarbohydrate,
-        totalProtein: getData.totalProtein,
-      };
-    }
-    // console.log(":가져오는 값 :", itemInfo.value);
-  };
+export const useCalorieCalcul = defineStore(
+  'useCalorieCalcul',
+  () => {
+    // const dayStore = useDayDefine();
+    const itemInfo = ref({
+      mealDay: '', // 최소한 기본 구조를 잡아줌
+      totalCalorie: 0,
+      totalFat: 0,
+      totalCarbohydrate: 0,
+      totalProtein: 0,
+    });
+    const mealFormData = async (dateStr) => {
+      // 처음 화면 상단 그래프 부분 출력용
+      // dayStore.updateTime();
+      // const dataStr = dayStore.currentTime.slice(3, 13);
+      // console.log(":보내는 날짜 :", dateStr);
+      const getData = await getMealTotalOnDay(dateStr);
+      //  console.log("바로 가져온값 : ",getData );
+      if (getData === '' || getData === null) {
+        itemInfo.value = {
+          mealDay: dateStr,
+          allDayCalorie: 0,
+          totalFat: 0,
+          totalCarbohydrate: 0,
+          totalProtein: 0,
+        };
+      }
+      // getData null 일때  다른 값 들어가게 해야함
+      else {
+        itemInfo.value = {
+          mealDay: dateStr,
+          allDayCalorie: getData.totalCalorie,
+          totalFat: getData.totalFat,
+          totalCarbohydrate: getData.totalCarbohydrate,
+          totalProtein: getData.totalProtein,
+        };
+      }
+      // console.log(":가져오는 값 :", itemInfo.value);
+    };
 
-  return { itemInfo, mealFormData };
-});
+    return { itemInfo, mealFormData };
+  },
+  {
+    persist: true, // 🔥 이 한 줄로 localStorage 자동 저장/복원됨
+  }
+);
 
 export const useDayDefine = defineStore(
-  "useDayDefine",
+  'useDayDefine',
   () => {
     // 0 - 아침  1 - 점심 2- 저녁
-    const dayDefine = ref("");
+    const dayDefine = ref('');
 
-    const currentTime = ref("");
+    const currentTime = ref('');
     const nowDay = ref();
     const updateTime = (times) => {
       let now = new Date();
@@ -66,12 +72,12 @@ export const useDayDefine = defineStore(
       }
       // const now = new Date();
       const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const day = String(now.getDate()).padStart(2, "0");
-      const ampm = String(now.getHours() - 12 <= 0 ? "오전" : "오후");
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const ampm = String(now.getHours() - 12 <= 0 ? '오전' : '오후');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
       if (times) {
         return `${ampm} ${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       }
@@ -94,38 +100,50 @@ export const useDayDefine = defineStore(
 );
 
 // 하루의 모든
-export const useAlldayMeal = defineStore("useAllDayDefine", () => {
-  const dayMealCategory = ref({
-    amount: [],
-    foodDbId: [],
-    totalCalorie: "",
-    mealDay: "",
-    mealBrLuDi: "",
-  });
-  return { dayMealCategory };
-});
+export const useAlldayMeal = defineStore(
+  'useAlldayMeal',
+  () => {
+    const dayMealCategory = ref({
+      amount: [],
+      foodDbId: [],
+      totalCalorie: '',
+      mealDay: '',
+      mealBrLuDi: '',
+    });
+    return { dayMealCategory };
+  },
+  {
+    persist: true, // 🔥 이 한 줄로 localStorage 자동 저장/복원됨
+  }
+);
 // 주의 시작과 끝
-export const useBaseDate = defineStore("useBaseDate", () => {
+export const useBaseDate = defineStore('useBaseDate', () => {
   const getWeekDate = ref({
-    startDate: "",
-    endDate: "",
+    startDate: '',
+    endDate: '',
   });
   return { getWeekDate };
 });
 
 // 주간 전체 데이터
-export const useWeeklyStore = defineStore("weekly", () => {
-  const weeklyRawData = ref([]);
-  const weekyDate = ref([]);
-  return {
-    weeklyRawData,
-    weekyDate,
-  };
-});
+export const useWeeklyStore = defineStore(
+  'useWeeklyStore',
+  () => {
+    const weeklyRawData = ref([]);
+    const weekyDate = ref([]);
+    return {
+      weeklyRawData,
+      weekyDate,
+    };
+  },
+  {
+    persist: true, // 🔥 이 한 줄로 localStorage 자동 저장/복원됨
+  }
+);
 
 // 프로그래스 바 눌렀을때 변경되는거
-export const useClickProgressBar = defineStore("useClickProgressBar", () => {
-  const nowCategory = ref("칼로리"); // 현재 선택된 카테고리
+export const useClickProgressBar = defineStore('useClickProgressBar', () => {
+  const nowCategory = ref('칼로리'); // 현재 선택된 카테고리
 
   const nowProgress = (category) => {
     // category : 0 totalCalorie 전체 칼로리
@@ -135,16 +153,16 @@ export const useClickProgressBar = defineStore("useClickProgressBar", () => {
     // console.log(category);
     switch (category) {
       case 1:
-        return (nowCategory.value = "탄수화물");
+        return (nowCategory.value = '탄수화물');
 
       case 2:
-        return (nowCategory.value = "단백질");
+        return (nowCategory.value = '단백질');
 
       case 3:
-        return (nowCategory.value = "지방");
+        return (nowCategory.value = '지방');
       case 0:
       default:
-        return (nowCategory.value = "칼로리");
+        return (nowCategory.value = '칼로리');
     }
   };
   return { nowProgress, nowCategory };

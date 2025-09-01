@@ -64,11 +64,11 @@ const getData = async () => {
 // @click
 // 건강기록 추가
 const add = () => {
-  router.push("/hlog/add");
+  router.push("health/hlog/add");
 };
 // 건강기록 상세페이지로 이동
 const detail = (healthlogId) => {
-  router.push(`/hlog/${healthlogId}`);
+  router.push(`health/hlog/${healthlogId}`);
 };
 </script>
 

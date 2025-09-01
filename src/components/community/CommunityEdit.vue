@@ -25,7 +25,7 @@ const post = computed(() => store.selectedPost || {});
 const editedTitle = ref(post.value.title || '');
 const editedContent = ref(post.value.content || '');
 
-const imageList = ref([]);
+const imageList = ref([]); // [{ fileId, filePath, fileName, deletable }]
 const loadingImages = ref(false);
 const hasImages = computed(() => (imageList.value?.length || 0) > 0);
 
@@ -36,25 +36,56 @@ const openLightboxAt = (i) => {
   lightbox.value = true;
 };
 
+/** 유틸: 응답에서 배열을 "안전하게" 뽑기 */
+function extractArrayLike(payload) {
+  if (Array.isArray(payload)) return payload;
+
+  // 흔한 래핑 키들을 순서대로 검사
+  const candidates = [
+    'data',
+    'list',
+    'images',
+    'result',
+    'rows',
+    'content',
+    'items',
+  ];
+
+  for (const k of candidates) {
+    const v = payload?.[k];
+    if (Array.isArray(v)) return v;
+  }
+
+  // 객체 안에 첫 배열 프로퍼티가 있으면 그것도 허용
+  if (payload && typeof payload === 'object') {
+    for (const [k, v] of Object.entries(payload)) {
+      if (Array.isArray(v)) return v;
+    }
+  }
+
+  return [];
+}
+
 /**
- * 서버 응답을 [{ fileId, filePath, fileName }]로 통일
- * - 후보 키를 넓게(숫자PK/문자PK/중첩키/스네이크) 커버
- * - 문자열 '0' → 0, 'null'/'undefined'/'' → null
+ * 서버 응답을 [{ fileId, filePath, fileName, deletable }]로 통일
+ * - 가능한 많은 id 후보 탐색
+ * - url/path 후보도 넓게 탐색
+ * - fileId 없으면 deletable=false (대표이미지 등)
  */
-function normalizeImages(arr = []) {
-  const deep = (o, ks) =>
-    ks.reduce((a, k) => (a != null ? a[k] : undefined), o);
+function normalizeImages(arr = [], fallbackCover = '') {
+  // 객체 깊은 조회
+  const deepGet = (o, path) =>
+    path.reduce((a, k) => (a != null ? a[k] : undefined), o);
 
   const pickId = (it) => {
-    const candidates = [
-      // 일반/자주쓰는 케이스
+    // 명시적 후보(앞/뒤 단어가 있어도 id/no/uuid/key/seq 패턴이면 허용)
+    const explicit = [
       'fileId',
       'postFileId',
+      'postImageId',
       'communityFileId',
       'fileNo',
       'fileSeq',
-      'postFileNo',
-      'attachmentNo',
       'imageId',
       'attachmentId',
       'attachId',
@@ -63,41 +94,46 @@ function normalizeImages(arr = []) {
       'uid',
       'key',
       'pk',
-      // 스네이크/다른 케이스
       'file_id',
+      'post_file_id',
+      'post_image_id',
+      'community_file_id',
+      'file_no',
+      'file_seq',
       'image_id',
-      'attach_id',
       'attachment_id',
-      'file_uuid',
-      'image_uuid',
-      'attachment_uuid',
-      'file_key',
-      'image_key',
-      'attachment_key',
-      // 중첩 구조 가능성
+      'attach_id',
+      // 중첩
       ['file', 'id'],
       ['image', 'id'],
       ['attachment', 'id'],
-      ['meta', 'fileId'],
       ['meta', 'id'],
       ['file', 'uuid'],
       ['image', 'uuid'],
       ['attachment', 'uuid'],
     ];
-    for (const k of candidates) {
-      const v = Array.isArray(k) ? deep(it, k) : it[k];
-      if (v != null) return v;
+
+    for (const cand of explicit) {
+      const v = Array.isArray(cand) ? deepGet(it, cand) : it[cand];
+      if (v != null && v !== '') return v;
     }
-    // 패턴 스캔 (postId 같은 건 제외)
-    for (const k of Object.keys(it)) {
+
+    // 정규 패턴 스캔: postId/boardId 등 게시글 ID로 보이는 건 제외
+    for (const [k, v] of Object.entries(it)) {
       const lower = k.toLowerCase();
-      if (lower === 'postid') continue;
+      // 게시글 id/번호는 제외
+      if (/(^|_)(post|board|article)(id|no|seq)(_|$)/.test(lower)) continue;
+      // 파일/이미지/첨부 + id/no/seq/uuid/key/pk 패턴
       if (
-        /(^|_)(file|image|attach|attachment)?(id|no|seq|uuid|key|pk)(_|$)/.test(
+        /(^|_)(file|image|img|attach|attachment)?(.*?)(id|no|seq|uuid|key|pk)(_|$)/.test(
           lower
         )
       ) {
-        if (it[k] != null) return it[k];
+        if (v != null && v !== '') return v;
+      }
+      // 뒤에 file 붙거나 image 붙은 key도 허용
+      if (/(^|_)(id|no|seq|uuid|key|pk)(.*?)(file|image)(_|$)/.test(lower)) {
+        if (v != null && v !== '') return v;
       }
     }
     return null;
@@ -109,6 +145,7 @@ function normalizeImages(arr = []) {
     it.path ??
     it.imageUrl ??
     it.image_url ??
+    it.file_url ??
     it.file_path ??
     '';
 
@@ -120,64 +157,84 @@ function normalizeImages(arr = []) {
     it.filename ??
     '';
 
-  return arr.map((it) => {
-    let fileId = pickId(it);
-    if (typeof fileId === 'string') {
-      const t = fileId.trim().toLowerCase();
-      if (t === '' || t === 'null' || t === 'undefined') fileId = null;
-      else if (!Number.isNaN(Number(t))) fileId = Number(t);
-      // 숫자가 아니면 그대로 문자열 ID 유지(예: UUID)
-    }
-    return {
-      fileId,
-      filePath: pickPath(it),
-      fileName: pickName(it),
-      _raw: it, // 디버그용(확인 후 제거 가능)
-    };
-  });
+  // 문자열만 오는 케이스도 허용 (그 자체가 url)
+  return (
+    arr
+      .map((raw) => {
+        if (raw == null) {
+          return {
+            fileId: null,
+            filePath: '',
+            fileName: '',
+            deletable: false,
+            _raw: raw,
+          };
+        }
+        if (typeof raw === 'string') {
+          const url = raw.trim();
+          return {
+            fileId: null,
+            filePath: url,
+            fileName: '',
+            deletable: false,
+            _raw: raw,
+          };
+        }
+
+        let fileId = pickId(raw);
+        if (typeof fileId === 'string') {
+          const t = fileId.trim().toLowerCase();
+          if (t === '' || t === 'null' || t === 'undefined') fileId = null;
+          else if (!Number.isNaN(Number(t))) fileId = Number(t); // 숫자 문자열이면 숫자로
+          // uuid 등 문자열 id는 그대로 둠
+        }
+
+        const filePath = pickPath(raw) || '';
+        const fileName = pickName(raw) || '';
+
+        // 서버 id가 있어야 개별 삭제 가능
+        const deletable =
+          fileId !== null && fileId !== undefined && fileId !== '';
+
+        return { fileId, filePath, fileName, deletable, _raw: raw };
+      })
+      // 표시 가능한 항목만 유지 (url/path가 아예 없으면 제외)
+      .filter((x) => !!x.filePath || x.deletable)
+      // 아무것도 없는데 대표 이미지(fallbackCover)가 있으면 한 장만 표시(삭제불가)
+      .concat(
+        arr.length === 0 && fallbackCover
+          ? [
+              {
+                fileId: null,
+                filePath: fallbackCover,
+                fileName: '',
+                deletable: false,
+              },
+            ]
+          : []
+      )
+  );
 }
 
+/** 이미지 로드 */
 async function loadImages() {
   if (!post.value?.postId) return;
   loadingImages.value = true;
   try {
-    const { data } = await fetchPostImages(post.value.postId);
-    // 디버그: 응답 구조 확인
-    console.log('[fetchPostImages] postId =', post.value.postId, 'raw =', data);
-    if (Array.isArray(data) && data.length) {
-      console.log(
-        '[fetchPostImages] keys(first) =',
-        Object.keys(data[0]).join(', ')
-      );
-      console.table(data);
-    }
+    const resp = await fetchPostImages(post.value.postId);
+    // fetchPostImages가 { data } 또는 바로 배열일 수 있음
+    const payload = resp?.data ?? resp;
+    const list = extractArrayLike(payload);
+    const normalized = normalizeImages(list, post.value.filePath);
 
-    const list = Array.isArray(data) ? data : [];
-    const normalized = normalizeImages(list);
+    // 디버그 로그 (필요 없으면 삭제 가능)
+    // console.table(normalized.map((x,i)=>({i, id:x.fileId, del:x.deletable, path:x.filePath})));
 
-    // 디버그: 정규화 결과 확인
-    console.table(
-      normalized.map((x, idx) => ({
-        idx,
-        fileId: x.fileId,
-        filePath: x.filePath,
-        fileName: x.fileName,
-      }))
-    );
-
-    if (normalized.length === 0 && post.value.filePath) {
-      imageList.value = [
-        { fileId: null, filePath: post.value.filePath, fileName: '' },
-      ];
-    } else {
-      imageList.value = normalized;
-    }
+    imageList.value = normalized;
     current.value = 0;
   } catch (e) {
     console.error('이미지 목록 조회 실패', e);
-    imageList.value = post.value?.filePath
-      ? [{ fileId: null, filePath: post.value.filePath, fileName: '' }]
-      : [];
+    imageList.value = normalizeImages([], post.value.filePath);
   } finally {
     loadingImages.value = false;
   }
@@ -186,11 +243,11 @@ async function loadImages() {
 const deleting = ref(false);
 async function onDeleteExisting(img) {
   if (!img) return;
-  console.log('[delete click] img =', img);
-  if (img.fileId === null || img.fileId === undefined) {
+  if (!img.deletable) {
     await dialog.alert({
       title: '안내',
-      message: '대표 이미지는 여기서 삭제할 수 없습니다.',
+      message:
+        '대표 이미지 또는 서버 ID가 없는 이미지는 여기서 삭제할 수 없습니다.',
     });
     return;
   }
@@ -201,9 +258,10 @@ async function onDeleteExisting(img) {
     cancelText: '취소',
   });
   if (!ok) return;
+
   try {
     deleting.value = true;
-    await deletePostImage(img.fileId);
+    await deletePostImage(img.fileId); // 서버가 요구하는 정확한 식별자
     await loadImages();
   } catch (e) {
     console.error('이미지 삭제 실패', e);
@@ -216,6 +274,7 @@ async function onDeleteExisting(img) {
   }
 }
 
+/* 새 이미지 추가 */
 const newFiles = ref([]);
 const newPreviews = ref([]);
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -369,6 +428,7 @@ watch(post, async (p) => {
             clearable
           />
 
+          <!-- 등록된 이미지 -->
           <div class="mt-6">
             <div class="d-flex align-center mb-2">
               <span class="text-subtitle-2 font-weight-medium"
@@ -397,14 +457,13 @@ watch(post, async (p) => {
                     elevation="1"
                   >
                     <v-img
-                      :src="img.filePath || img.url"
+                      :src="img.filePath"
                       :alt="img.fileName || ''"
                       cover
                       aspect-ratio="1"
                       @click="openLightboxAt(i)"
                       style="cursor: pointer"
                     >
-                      <!-- 로딩/에러 시에도 박스가 보이도록 -->
                       <template #placeholder>
                         <div
                           class="d-flex align-center justify-center"
@@ -427,7 +486,6 @@ watch(post, async (p) => {
                       </template>
                     </v-img>
 
-                    <!-- 디버그 표시: 실제로 몇 장이 들어왔는지, fileId가 있는지 즉시 확인 -->
                     <div class="px-2 py-1 text-caption text-medium-emphasis">
                       <div>id: {{ img.fileId ?? 'null' }}</div>
                       <div class="text-truncate" :title="img.filePath">
@@ -445,13 +503,11 @@ watch(post, async (p) => {
                         icon="mdi-delete"
                         size="small"
                         variant="text"
-                        :color="(img.fileId ?? null) === null ? 'grey' : 'red'"
-                        :disabled="(img.fileId ?? null) === null || deleting"
+                        :color="img.deletable ? 'red' : 'grey'"
+                        :disabled="!img.deletable || deleting"
                         @click.stop="onDeleteExisting(img)"
                         :title="
-                          (img.fileId ?? null) === null
-                            ? '대표 이미지(삭제 불가)'
-                            : '삭제'
+                          img.deletable ? '삭제' : '대표/식별자 없음(삭제 불가)'
                         "
                       />
                     </div>
@@ -471,6 +527,7 @@ watch(post, async (p) => {
             </v-alert>
           </div>
 
+          <!-- 이미지 추가 -->
           <div class="mt-8">
             <div class="text-subtitle-2 font-weight-medium mb-2">
               이미지 추가
@@ -512,9 +569,9 @@ watch(post, async (p) => {
                   <div
                     class="d-flex justify-space-between align-center px-2 py-1"
                   >
-                    <span class="text-truncate" style="max-width: 160px">
-                      {{ p.name }}
-                    </span>
+                    <span class="text-truncate" style="max-width: 160px">{{
+                      p.name
+                    }}</span>
                     <v-btn
                       icon="mdi-close"
                       size="small"
@@ -555,12 +612,11 @@ watch(post, async (p) => {
               variant="flat"
               class="mr-2"
               @click="saveChanges"
+              >저장</v-btn
             >
-              저장
-            </v-btn>
-            <v-btn color="grey" variant="outlined" @click="cancelEdit">
-              취소
-            </v-btn>
+            <v-btn color="grey" variant="outlined" @click="cancelEdit"
+              >취소</v-btn
+            >
           </div>
         </v-card-text>
       </v-card>

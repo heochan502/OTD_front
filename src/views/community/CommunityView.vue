@@ -40,4 +40,23 @@ watch(
   flex-direction: column;
   min-height: 100vh;
 }
+
+/* 350px 이하에서는 더 줄어들지 않도록 고정 폭으로 두고 넘치는 부분은 가려짐 처리 */
+@media (max-width: 380px) {
+  .community-container {
+    min-width: 400px;
+    width: 400px;
+    margin: 0 auto;
+    overflow-x: hidden;
+  }
+}
+</style>
+
+<style>
+@media (max-width: 400px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
 </style>
