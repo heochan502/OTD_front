@@ -65,3 +65,10 @@ export const deletePostImage = (fileId) => {
   // DELETE /api/OTD/community/file/{fileId}
   return axios.delete(`community/file/${fileId}`);
 };
+
+export const deletePostImageByPath = (postId, filePath) => {
+  // DELETE /api/OTD/community/file?postId=xx&filePath=xx
+  return axios.delete(`${COMMUNITY_BASE}file`, {
+    params: { postId, filePath },
+  });
+};
