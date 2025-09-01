@@ -40,7 +40,7 @@ export function useMemoDetail(props, emit) {
   const handleImageChange = (e) => {
     const files = e.target.files;
     previewImages.value = [];
-
+  
     if (files && files.length > 0) {
       for (const file of files) {
         if (!file.type.startsWith('image/')) continue;
@@ -58,11 +58,11 @@ export function useMemoDetail(props, emit) {
     if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
-  const buildFormData = (key, obj, inputEl) => {
+  const buildFormData = (jsonKey, jsonObj, fileKey, inputEl) => {
     const fd = new FormData();
-    fd.append(key, new Blob([JSON.stringify(obj)], { type: 'application/json' }));
+    fd.append(jsonKey, new Blob([JSON.stringify(jsonObj)], { type: 'application/json' }));
     const file = inputEl?.files?.[0];
-    if (file) fd.append(`${key === 'memoData' ? 'memoImage' : 'diaryImage'}`, file);
+    if (file) fd.append(fileKey, file);
     return fd;
   };
 
