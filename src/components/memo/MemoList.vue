@@ -187,7 +187,7 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 <style scoped>
 .memo-list-page { max-width: 900px; margin: 20px auto; }
 
-/* 상단 폼 스타일 */
+/* ===== 상단 폼 ===== */
 .memo-detail {
   max-width: 800px;
   margin: 20px auto;
@@ -200,39 +200,139 @@ const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 .memo-title { font-size: 2rem; font-weight: bold; text-align: center; margin-bottom: 24px; }
 .memo-label { display: block; margin-top: 20px; margin-bottom: 5px; font-weight: bold; font-size: 1.2rem; }
 .memo-input, .memo-textarea, .memo-file-input {
-  width: 100%; font-size: 1.1rem; padding: 5px 24px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 24px; box-sizing: border-box;
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 5px 24px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-sizing: border-box;
 }
 .memo-textarea { height: 350px; resize: vertical; }
-.memo-preview-list { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px; }
-.memo-preview-item { width: 120px; height: 120px; position: relative; background-color: #eee; border-radius: 8px; overflow: hidden; }
-.memo-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.memo-preview-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+.memo-preview-item { position: relative; width: 120px; height: 120px; }
+.memo-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
 .memo-remove-btn {
-  position: absolute; top: 5px; right: 5px; width: 24px; height: 24px;
-  background-color: #dc3545; color: white; border: none; border-radius: 50%; font-weight: bold; cursor: pointer;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-weight: bold;
+  cursor: pointer;
 }
 .memo-error { color: #dc3545; font-size: 0.9rem; margin-top: -16px; margin-bottom: 12px; }
+.memo-button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  justify-content: center;
+}
+.memo-button-group button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #50C3F7;
+  color: white;
+  transition: background-color 0.2s;
+}
+.memo-button-group button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.memo-button-group .memo-delete-btn {
+  background-color: #dc3545;
+}
 
-/* 하단 목록 스타일 */
+/* ===== 하단 목록 ===== */
 .memo-list-wrapper {
-  margin-top: 24px; padding: 20px; background-color: #f9f9f9;
-  border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); color: #000;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  color: #000;
 }
-.memo-list-heading { margin: 0 0 16px; font-size: 1.25rem; font-weight: 700; }
+.memo-list-heading {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
 .memo-list-item {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  background: #f5f5f5; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin-bottom: 16px; cursor: pointer; transition: background-color 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f5f5f5;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
 }
-.memo-list-item:hover { background-color: #f0f0f0; }
-.memo-list-text { flex: 1; }
-.memo-list-title { font-size: 1.1rem; margin: 0 0 8px; font-weight: 700; }
-.memo-list-content { font-size: 1rem; margin: 0 0 10px; color: #333; }
-.memo-list-date { font-size: 0.9rem; color: #888; }
-.memo-list-image { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; margin-left: 24px; }
-.memo-list-empty { text-align: center; color: #999; margin-top: 12px; font-style: italic; }
+.memo-item-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+.memo-list-text {
+  flex: 1;
+  padding-right: 16px;
+}
+.memo-list-title {
+  font-size: 1.1rem;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+.memo-list-content {
+  font-size: 1rem;
+  margin: 0 0 10px;
+  color: #333;
+}
+.memo-list-date {
+  font-size: 0.9rem;
+  color: #888;
+}
+.memo-image-wrapper {
+  flex-shrink: 0;
+}
+.memo-list-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-left: 24px;
+}
+.memo-list-empty {
+  text-align: center;
+  color: #999;
+  margin-top: 12px;
+  font-style: italic;
+}
 
 @media (max-width: 768px) {
+  .memo-list-wrapper { padding: 16px; }
   .memo-list-item { flex-direction: column; align-items: flex-start; }
-  .memo-list-image { width: 100%; height: auto; margin-left: 0; margin-top: 12px; }
+  .memo-item-content { flex-direction: column; align-items: flex-start; }
+  .memo-list-image {
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-left: 0;
+    margin-top: 12px;
+  }
 }
 </style>
