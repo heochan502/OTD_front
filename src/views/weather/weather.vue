@@ -16,8 +16,10 @@ const dialog = ref({
 const today = new Date();
 const year = today.getFullYear();
 const month = today.getMonth() + 1;
-const day = today.getDay();
-const nowDate = `${year}년 ${month}월 ${day}일`;
+const day = today.getDate();
+const days = ['일', '월', '화', '수', '목', '금', '토'];
+const weekday = days[today.getDay()];
+const nowDate = `${year}년 ${month}월 ${day}일(${weekday})`;
 
 const openDialog = (type) => {
   dialog.value[type] = true;
@@ -154,7 +156,7 @@ watch(
       지역 변경
       <v-dialog v-model="dialog.location" max-width="1000" min-height="200">
         <v-card>
-          <v-card-title class="text-h8">지역 저장</v-card-title>
+          <v-card-title class="text-h8">지역 검색 및 목록</v-card-title>
           <v-card-text>
             <Location @close="dialog.location = false" />
           </v-card-text>
