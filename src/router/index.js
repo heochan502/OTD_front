@@ -77,22 +77,22 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/elog/:exerciselogId',
+      path: '/health/elog/:exerciselogId',
       name: 'ElogDetail',
       component: ElogDetail,
     },
     {
-      path: '/elog/form',
+      path: '/health/elog/form',
       name: 'ElogForm',
       component: ElogForm,
     },
     {
-      path: '/hlog/:healthlogId',
+      path: '/health/hlog/:healthlogId',
       name: 'HlogDetail',
       component: HlogDetail,
     },
     {
-      path: '/hlog/add',
+      path: '/health/hlog/add',
       name: 'HlogForm',
       component: HlogForm,
     },
