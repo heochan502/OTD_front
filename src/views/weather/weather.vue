@@ -138,37 +138,50 @@ watch(
     <span class="live px-4 py-1 text-white font-semibold text-sm">
       실시간 날씨 정보
     </span>
-    <button @click="toggleMenu" class="menu px-2 py-1 text-sm font-bold">
-      ☰ 날씨 메뉴
-    </button>
-    <button v-if="open" class="menu-list" @click="openDialog('daily')">
-      시간별 날씨
-      <v-dialog v-model="dialog.daily" max-width="1000" min-height="100">
-        <v-card>
-          <v-card-title class="text-h8">{{ nowDate }} 날씨</v-card-title>
-          <v-card-text>
-            <DailyWeather />
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </button>
-    <button v-if="open" class="menu-list" @click="openDialog('location')">
-      지역 변경
-      <v-dialog v-model="dialog.location" max-width="1000" min-height="200">
-        <v-card>
-          <v-card-title class="text-h8">지역 검색 및 목록</v-card-title>
-          <v-card-text>
-            <Location @close="dialog.location = false" />
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </button>
+    <v-menu v-model="open" offset-y location="bottom end">
+      <template v-slot:activator="{ props }">
+        <button v-bind="props" class="menu px-2 py-1 text-sm font-bold">
+          ☰ 날씨 메뉴
+        </button>
+      </template>
+      <v-list class="menu-list">
+        <v-list-item @click="openDialog('daily')">시간별 날씨</v-list-item>
+        <v-list-item @click="openDialog('location')">지역 변경</v-list-item>
+      </v-list>
+    </v-menu>
+
+    <v-dialog v-model="dialog.daily" max-width="1000" min-height="100">
+      <v-card>
+        <v-card-title class="text-h8">{{ nowDate }} 날씨</v-card-title>
+        <v-card-text>
+          <DailyWeather />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialog.location" max-width="1000" min-height="200">
+      <v-card>
+        <v-card-title class="text-h8">지역 검색 및 목록</v-card-title>
+        <v-card-text>
+          <Location @close="dialog.location = false" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
   <!-- 폰화면 정보 박스 -->
   <div
+    v-if="weather"
     class="weather-card d-flex d-sm-none"
     :style="{ backgroundImage: weatherBackground }"
-  ></div>
+  >
+    <div class="weather-location">{{ weather.localName }}</div>
+    <div class="warp">
+      <div class="weather-icon">{{ skyEmoji }}</div>
+      <div class="temperature">
+        {{ weather.ncstTem === undefined ? '' : weather.ncstTem + '℃' }}
+      </div>
+    </div>
+  </div>
 
   <!-- PC날씨 정보 박스 -->
   <div class="d-none d-sm-flex">
@@ -239,6 +252,8 @@ watch(
 }
 .header {
   display: flex;
+  align-items: center;
+  position: relative;
 
   .live {
     background-color: #3bbeff;
@@ -252,6 +267,7 @@ watch(
   color: #3bbeff;
   background-color: transparent;
   border: none;
+  margin-left: auto;
 }
 .menu-list {
   margin-top: 4px;
@@ -262,7 +278,6 @@ watch(
     background-color: transparent;
   }
 }
-
 .weather-card {
   background-size: cover;
   background-position: center;
@@ -276,6 +291,8 @@ watch(
   box-sizing: border-box;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
   user-select: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   .weather-content {
     display: flex;
@@ -293,6 +310,9 @@ watch(
     .weather-location {
       font-size: 2.4rem;
       font-weight: bold;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .condition {
@@ -327,9 +347,19 @@ watch(
     }
   }
 }
+@media (max-width: 981px) {
+  .weather-location {
+    font-size: 2rem !important;
+  }
+}
 @media (max-width: 935px) {
   .weather-alert {
     font-size: 1rem;
+  }
+}
+@media (max-width: 873px) {
+  .weather-location {
+    font-size: 1.8rem !important;
   }
 }
 @media (max-width: 802px) {
@@ -338,9 +368,6 @@ watch(
   }
 }
 @media (max-width: 790px) {
-  .weather-location {
-    font-size: 2rem !important;
-  }
   .condition {
     font-size: 1.2rem !important;
   }
@@ -383,9 +410,17 @@ watch(
     font-size: 0.6rem;
   }
 }
+@media (max-width: 601px) {
+  .weather-location {
+    font-size: 1.2rem !important;
+  }
+}
 @media (max-width: 573px) {
+  .weather-content {
+    gap: 0 !important;
+  }
   .weather-card {
-    height: 10rem;
+    height: 9rem;
   }
   .weather-location {
     font-size: 1rem !important;
@@ -401,7 +436,7 @@ watch(
 }
 @media (max-width: 534px) {
   .weather-alert {
-    font-size: 0.5rem;
+    font-size: 0.6rem;
   }
 }
 @media (max-width: 522px) {
@@ -410,8 +445,23 @@ watch(
   }
 }
 @media (max-width: 498px) {
+  .weather-card {
+    width: 93% !important;
+  }
   .weather-content {
     gap: 0 !important;
+    flex-flow: nowrap !important;
+  }
+  .weather-right {
+    .max_min_temperature,
+    .humidity {
+      font-size: 0.8rem !important;
+    }
+  }
+}
+@media (max-width: 479px) {
+  .weather-card {
+    flex-direction: column;
   }
 }
 @media (max-width: 446px) {
@@ -427,10 +477,6 @@ watch(
     }
     .temperature {
       font-size: 1rem !important;
-    }
-    .max_min_temperature,
-    .humidity {
-      font-size: 0.8rem !important;
     }
   }
 }

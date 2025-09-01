@@ -36,7 +36,6 @@ import ReminderHome from '@/components/reminder/HomeReminder.vue';
 
 .report-wrapper {
   width: 50%;
-
   :deep(.v-card) {
     background-color: transparent !important;
     width: 97%;
@@ -71,17 +70,13 @@ import ReminderHome from '@/components/reminder/HomeReminder.vue';
 }
 @media (max-width: 945px) {
   .report-wrapper {
-    :deep(.health_report) {
-    }
-    :deep(.exercise_report) {
-    }
     :deep(.v-card-text) {
       // width: 50%;
       padding: 10 0 !important;
     }
   }
 }
-@media (max-width: 522px) {
+@media (max-width: 701px) {
   .home-layout {
     flex-direction: column;
   }
@@ -100,12 +95,31 @@ import ReminderHome from '@/components/reminder/HomeReminder.vue';
   }
   .report-wrapper {
     width: 100%;
+    padding: 0 1rem;
     :deep(.v-card) {
-      // margin: 0 1rem 0 1rem;
-      width: 93%;
-      margin-left: 1rem;
-      margin-bottom: 5rem;
-      border-radius: 25px;
+      width: 100% !important;
+      margin: 0 !important;
+      box-sizing: border-box;
+    }
+    :deep(.health_report) {
+      margin: 0 !important;
+      gap: 0 !important;
+    }
+  }
+}
+@media (max-width: 400px) {
+  .report-wrapper {
+    padding: 0 !important;
+
+    :deep(.v-card) {
+      width: calc(100% - 2rem) !important;
+      margin: 0 auto !important;
+      box-sizing: border-box;
+      min-width: 90% !important;
+    }
+
+    :deep(.v-card-text) {
+      padding: 0.6rem !important; // ✅ 내부 패딩도 축소
     }
   }
 }

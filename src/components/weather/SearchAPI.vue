@@ -1,15 +1,15 @@
 <script setup>
-import { ref } from "vue";
-import { searchApi, postAddress } from "@/services/weather/locationService";
+import { ref } from 'vue';
+import { searchApi, postAddress } from '@/services/weather/locationService';
 
-const emit = defineEmits(["saved"]);
-const keyword = ref("");
+const emit = defineEmits(['saved']);
+const keyword = ref('');
 const results = ref([]);
 const dialog = ref(false);
 const confirmDialog = ref(false); // 주소 추가 확인 모달
 const selectedItem = ref(null); // 선택된 주소 임시 저장
 const alertDialog = ref(false);
-const alertMessage = ref("");
+const alertMessage = ref('');
 
 const searchLocation = async () => {
   if (!keyword.value || !keyword.value.toString().trim()) return;
@@ -18,29 +18,52 @@ const searchLocation = async () => {
     results.value = res.data;
     dialog.value = true; // 검색하면 모달 열기
   } catch (e) {
-    console.error("검색 실패:", e);
+    console.error('검색 실패:', e);
   }
 };
 
 const selectItem = (item) => {
   selectedItem.value = item;
   confirmDialog.value = true;
+  console.log('select', selectedItem.value);
 };
 
 const confirmYes = async () => {
   if (!selectedItem.value) return;
   try {
-    const res = await postAddress({
-      title: selectedItem.value.title,
-      roadAddress: selectedItem.value.road,
-      parcelAddress: selectedItem.value.parcel,
-      lat: selectedItem.value.lat,
-      lon: selectedItem.value.lon,
-    });
-    alertMessage.value = res.data;
-    emit("saved");
+    if (selectedItem.value.title != null) {
+      const res = await postAddress({
+        title: selectedItem.value.title,
+        roadAddress: selectedItem.value.road,
+        parcelAddress: selectedItem.value.parcel,
+        lat: selectedItem.value.lat,
+        lon: selectedItem.value.lon,
+      });
+      alertMessage.value = res.data;
+      emit('saved');
+    } else if (selectedItem.value.bldnm == null) {
+      const res = await postAddress({
+        title: selectedItem.value.title,
+        roadAddress: '',
+        parcelAddress: selectedItem.value.parcel,
+        lat: selectedItem.value.lat,
+        lon: selectedItem.value.lon,
+      });
+      alertMessage.value = res.data;
+      emit('saved');
+    } else {
+      const res = await postAddress({
+        title: selectedItem.value.bldnm,
+        roadAddress: selectedItem.value.road,
+        parcelAddress: selectedItem.value.parcel,
+        lat: selectedItem.value.lat,
+        lon: selectedItem.value.lon,
+      });
+      alertMessage.value = res.data;
+      emit('saved');
+    }
   } catch (e) {
-    alertMessage.value = e.response?.data || "주소 저장 실패";
+    alertMessage.value = e.response?.data || '주소 저장 실패';
   }
   alertDialog.value = true;
   confirmDialog.value = false;

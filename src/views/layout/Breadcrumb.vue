@@ -57,19 +57,20 @@ const resetDate = () => {
   reminderStore.setSelectedDate(formatDate(today));
 };
 
-
 onMounted(async () => {
   await userCreatedAt();
 });
-
 </script>
 
 <template>
   <!-- 상단바 컴포넌트 -->
   <header class="breadcrumb">
     <div class="inner">
-      <!-- 왼쪽 로고 (모바일 화면용) -->
-      <div class="logo" @click="goHome" style="cursor: pointer">
+      <div
+        class="logo d-none d-md-flex"
+        @click="goHome"
+        style="cursor: pointer"
+      >
         <div>
           <span class="logo-one">One</span>
           <span class="logo-today">ToDay</span>
@@ -77,7 +78,15 @@ onMounted(async () => {
         <div class="logo-sub">하루이틀</div>
       </div>
 
-      <!-- 오른쪽 사용자 메뉴(모바일 화면용) -->
+      <!-- 모바일 헤더 중앙 -->
+      <div class="birth-date d-flex d-md-none">
+        원투데이와 {{ birthDate }}일째 친구예요!
+      </div>
+      <!-- 사용자 메뉴(모바일 화면용) -->
+      <div class="logo-img d-flex d-none d-md-none">
+        <img src="/public/image/ontoday_logo.png" alt="logo" @click="goHome" />
+      </div>
+
       <div class="d-flex flex-row d-md-none">
         <button class="photo-wrapper" @click="toggle = !toggle">
           <img
@@ -149,10 +158,6 @@ onMounted(async () => {
           >지도</router-link
         > -->
       </nav>
-      <!-- 모바일 헤더 중앙 -->
-      <div class="birth-date d-flex d-md-none">
-        원투데이와 {{ birthDate }}일째 친구에요!
-      </div>
       <!-- 오른쪽 로그인 (PC 전용) -->
       <div class="member d-none d-md-flex">
         <div class="auth">
@@ -284,8 +289,12 @@ onMounted(async () => {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 20px;
+  font-size: 23px;
   color: #838383;
+}
+.logo-img img {
+  width: 15%;
+  height: 15%;
 }
 @media (max-width: 1080px) {
   .inner {
@@ -317,7 +326,7 @@ onMounted(async () => {
 }
 @media (max-width: 959px) {
   .photo-wrapper {
-    right: 45px;
+    right: 50px;
     transform: translateY(-50%);
   }
   .nav-menu {
@@ -367,6 +376,21 @@ onMounted(async () => {
     .member {
       padding: 0 0 0 0.2rem;
     }
+  }
+}
+@media (max-width: 601px) {
+  .birth-date {
+    font-size: 14px;
+  }
+}
+@media (max-width: 479px) {
+  .birth-date {
+    left: 50%;
+  }
+}
+@media (max-width: 375px) {
+  .birth-date {
+    font-size: 12px;
   }
 }
 // vuetify 설정이 안되어 임의로 설정
