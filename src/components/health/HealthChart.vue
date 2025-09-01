@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useHealthStore } from "@/stores/healthStore";
 import { useExerciseStore } from "@/stores/exerciseStore";
 import dayjs from "dayjs";
@@ -41,14 +41,6 @@ const props = defineProps({
   fields: Array,
   label: String,
   logs: { type: Array, default: () => [] },
-});
-
-const healthStore = useHealthStore();
-const exerciseStore = useExerciseStore();
-
-onMounted(async () => {
-  // await healthStore.fetchHealthlogs();
-  // await exerciseStore.fetchExerciselogs();
 });
 
 // 해당 주차 범위
@@ -114,10 +106,23 @@ const chartData = computed(() => ({
     {
       data: weeklyData.value,
       borderColor: "#3BBEFF",
-      backgroundColor: "rgba(59, 190, 255, 0.2)",
+      backgroundColor: (context) => {
+        const ctx = context.chart.ctx;
+        const gradient = ctx.createLinearGradient(
+          0,
+          0,
+          0,
+          context.chart.height
+        );
+        gradient.addColorStop(0, "rgba(59,190,255,1)"); // 위쪽 조금 더 진하게
+        gradient.addColorStop(0.5, "rgba(59, 190, 255, 0.5)"); // 중간
+        gradient.addColorStop(1, "rgba(59, 190, 255, 0)"); // 아래쪽 투명
+        return gradient;
+      },
       fill: true,
-      pointRadius: 3,
+      pointRadius: 0,
       pointBackgroundColor: "#3BBEFF",
+      tension: 0.4,
     },
   ],
 }));
@@ -176,7 +181,7 @@ const chartOptions = {
 <style lang="scss" scoped>
 .chart {
   display: flex;
-  width: 100%;
+  // min-width: 310px;
   height: 350px;
   padding: 12px;
 }

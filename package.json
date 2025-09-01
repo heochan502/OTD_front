@@ -11,7 +11,8 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@popperjs/core": "^2.11.8",
-    "axios": "^1.11.0",
+    "@vueuse/core": "^13.8.0",
+    "axios": "^1.10.0",
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.0",
     "dayjs": "^1.11.13",
@@ -29,7 +30,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.0",
-    "sass": "^1.90.0",
+    "sass": "^1.91.0",
     "vite": "^7.0.0",
     "vite-plugin-vue-devtools": "^7.7.7",
     "vite-plugin-vuetify": "^2.1.1",

@@ -11,15 +11,19 @@ import { formatDate } from "@/utils/reportUtils";
 
 const healthStore = useHealthStore();
 const route = useRoute();
+const confirmDialog = ref(false);
 
 const state = reactive({
   hlog: [],
 });
 
 const healthlogId = route.params.healthlogId;
+
 onMounted(async () => {
-  if (!healthlogId) {return;}
-  
+  if (!healthlogId) {
+    return;
+  }
+
   const res = await getHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
@@ -41,27 +45,30 @@ const fields = [
 const selectedField = ref(fields[0].key);
 
 // @click
-const deleteLog = async () => {
-  if (!confirm("삭제하시겠습니까?")) return;
+const moveToMain = () => {
+  router.push({
+    path: "/health",
+  });
+};
+const confirmYes = async () => {
   const res = await deleteHlog(healthlogId);
   if (res === undefined || res.status !== 200) {
     alert("에러발생");
     return;
   }
-  alert("삭제되었습니다");
   router.push("/health");
 };
 </script>
 
 <template>
-  <v-container>
+  <v-container class="pb-16">
     <v-row class="top">
-      <div class="datetime">{{ formatDate(state.hlog.healthlogDatetime) }}</div>
-      <div class="btns">
-        <router-link to="/health">
-          <v-btn class="btn_home">홈</v-btn>
-        </router-link>
-        <v-btn class="btn_delete" @click.prevent="deleteLog">삭제</v-btn>
+      <div class="text-h6 text-md-h5">
+        {{ formatDate(state.hlog.healthlogDatetime) }}
+      </div>
+      <div class="btns d-none d-md-flex">
+        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+        <v-btn class="btn_delete" @click="confirmDialog = true">삭제</v-btn>
       </div>
     </v-row>
 
@@ -73,17 +80,18 @@ const deleteLog = async () => {
               :class="[
                 'd-flex flex-column justify-center align-center text-center',
                 selectedClass,
+                ,
               ]"
-              height="150"
-              width="200"
+              min-height="100"
+              min-width="150"
               dark
               @click="toggle"
             >
               <div>
-                <div class="text-h6 subtitle">
+                <div class="text-subtitle-2 subtitle">
                   {{ field.label }}
                 </div>
-                <div class="text-center content">
+                <div class="text-subtitle-1 text-center content">
                   {{
                     field.key === "moodLevel"
                       ? moodLevels.find(
@@ -104,13 +112,36 @@ const deleteLog = async () => {
       </div>
     </v-item-group>
     <!-- 통계 그래프 -->
-    <HealthChart
-      :selected-date="state.hlog.healthlogDatetime"
-      :selectedField="selectedField"
-      :fields="fields"
-      :logs="healthStore.logs"
-    />
+    <div class="pt-10">
+      <HealthChart
+        :selected-date="state.hlog.healthlogDatetime"
+        :selectedField="selectedField"
+        :fields="fields"
+        :logs="healthStore.logList"
+      />
+    </div>
+    <!-- md 이하일 때 화면에 보일 버튼 -->
+    <v-row class="d-flex d-md-none justify-center mt-5">
+      <div class="btns">
+        <v-btn class="btn_home" @click.prevent="moveToMain">홈</v-btn>
+        <v-btn class="btn_delete" @click.prevent="confirmDialog = true"
+          >삭제</v-btn
+        >
+      </div>
+    </v-row>
   </v-container>
+  <!-- 모달창 -->
+  <v-dialog v-model="confirmDialog" max-width="400">
+    <v-card>
+      <v-card-title> 삭제 </v-card-title>
+      <v-card-text>건강 기록을 삭제하시겠습니까?</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="dark" text @click="confirmDialog = false">취소</v-btn>
+        <v-btn color="primary" text @click="confirmYes">삭제</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>
@@ -119,11 +150,6 @@ const deleteLog = async () => {
   justify-content: space-between;
   align-items: center;
   padding: 20px 10px 50px;
-
-  .datetime {
-    font-size: 25px;
-    font-weight: 600;
-  }
 }
 .item_group {
   display: flex;

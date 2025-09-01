@@ -39,3 +39,9 @@ export const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
+
+// 날짜 포맷 함수 'YYYY-MM-DD'
+export const formatDate2 = (dateStr) => {
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+};

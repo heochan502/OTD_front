@@ -22,7 +22,7 @@ export const useCalorieCalcul = defineStore("mealInfo", () => {
     // const dataStr = dayStore.currentTime.slice(3, 13);
     // console.log(":보내는 날짜 :", dateStr);
     const getData = await getMealTotalOnDay(dateStr);
-    // console.log("바로 가져온값 : ",getData );
+    //  console.log("바로 가져온값 : ",getData );
     if (getData === "" || getData === null) {
       itemInfo.value = {
         mealDay: dateStr,

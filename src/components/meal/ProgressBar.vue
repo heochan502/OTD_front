@@ -18,12 +18,12 @@ defineProps({
 <template>
   <div>
     <div class="progress-wrapper">
-      <div class="bar-header d-flex justify-content-between">
-        <span :class="customsize"> {{ leftString }}</span>
-        <span class="moreeat">{{ rightString }}</span>
+      <div :class="`bar-header ${customsize !== 'totalcal' ? 'optional-progressText' : 'totalcal_text'} text-sm-h6 text-subtitle-1 font-md-weight-medium` ">
+        <span :class="`${customsize} text-sm-h6 text-subtitle-1 font-md-weight-medium`"> {{ leftString }}</span>
+        <span class="moreeat text-sm-h6 text-subtitle-1 font-md-weight-medium">{{ rightString }}</span>
       </div>
       <div>
-        <progress :class="`progress ${customsize} ${customsize !== 'totalcal' ? 'optional-progress' : ''}`"
+        <progress :class="`progress ${customsize} ${customsize !== 'totalcal' ? 'optional-progress' : 'totalcal'}`"
           :value="value" min="0" :max="max"></progress>
       </div>
     </div>
@@ -34,7 +34,7 @@ defineProps({
 
 
 .tansu {    
-    font-size: 16px;
+    
     margin-top: 5px;
     color: #ff6b6b ;
     width:  100%;
@@ -58,11 +58,11 @@ defineProps({
   }
 
 .protein {    
-    font-size: 16px;
+   
     margin-top: 5px;
     color: #4dabf7;
     width:  100%;
-    margin-left: 15px;
+    margin-left: 8px;
 
     .progress {
     appearance: none;
@@ -86,11 +86,11 @@ defineProps({
     }
 }
 .jibang {    
-    font-size: 16px;
+   
     color: #ffd43b;
     margin-top: 5px;
     width:  100%;
-    margin-left: 40px;
+    margin-left: 15px;
 
     .progress {
     appearance: none;
@@ -113,34 +113,36 @@ defineProps({
 }
 .totalcal {    
     margin-left: 10px;
-    inline-size: 100%;
-    font-size: 20px;  
+    inline-size: 100%; 
     top: 0px;
-    font-weight: 500;
 }
 .bar-header {
   padding: 0px 0px 0px 10px;
-
   font-family: 'Noto Sans KR', sans-serif;
+  display: flex;
   justify-content: space-between; /* 양쪽 정렬 유지 */
   align-items: center;
 }
 .moreeat {
-  font-size: 18px;
   margin-bottom: -5px;
   color: #000000; /* 텍스트 색상 변경 */
-  font-weight: 400;
+  
   size: 100%;
   white-space: nowrap; /* 줄바꿈 방지 */
 }
 .progress-wrapper {
-  padding: 10px 0px 0px 10px;
+  padding: 10px 0px 0px 0px;
+ 
 }
+
+
+
 
 .progress {
   appearance: none;
   border-radius: 15px;
-  height: 30px;
+  height: 30px;  
+  margin-top: 5px;
 }
 .progress::-webkit-progress-bar {
   background: #ffffff;
@@ -156,8 +158,52 @@ defineProps({
 }
 /* 반응형 */
 @media (max-width: 768px) {
-  .optional-progress {
+  .optional-progress {    
     display: none;
+  }
+ 
+}
+@media (max-width:530px) {
+
+  .optional-progressText ,
+  .totalcal_text {      
+    display: grid;
+    justify-content: center ;
+    margin-top: 0px;
+    padding-top: 0px;
+    /* 자식 요소들을 수직 중앙에 정렬 */ 
+    /* align-items: center;  */
+    /* 자식 요소들을 수직 중앙에 정렬 */
+    .moreeat{
+      margin-left: 10px;      
+    }
+  }
+  .totalcal_text{
+    /* float: right; */
+    margin-bottom: 5px;    
+    .totalcal{
+     text-align: right;
+     padding-right: 14px;
+     margin-bottom: -6px;
+    }
+  }
+  .totalcal
+  {
+    margin: 5px;
+  }
+  .progress-wrapper{
+    margin: 0px;
+    padding-top: 0px;
+  }
+  
+}
+
+@media (max-width  : 325px)
+{
+  
+  .totalcal,
+  .moreeat{
+    font-size: 14px !important;
   }
 }
 </style>

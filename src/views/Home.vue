@@ -1,7 +1,7 @@
 <script setup>
-import Weather from '@/views/weather/weather.vue';
-import ReportCard from '@/components/health/ReportCard.vue';
-import ReminderHome from '@/components/reminder/HomeReminder.vue';
+import Weather from "@/views/weather/weather.vue";
+import ReportCard from "@/components/health/ReportCard.vue";
+import ReminderHome from "@/components/reminder/HomeReminder.vue";
 </script>
 
 <template>
@@ -22,30 +22,31 @@ import ReminderHome from '@/components/reminder/HomeReminder.vue';
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
 }
 .weather-layout {
   max-width: 1200px;
   margin: 0 auto;
 }
-.reminder-wrapper,
-.report-wrapper {
+.reminder-wrapper {
   width: 50%;
+  :deep(.empty-wrapper) {
+    min-height: 250px;
+  }
 }
 
 .report-wrapper {
+  width: 50%;
+
   :deep(.v-card) {
     background-color: transparent !important;
-    border-radius: 25px 25px 0 0 !important;
-    width: 96%;
+    width: 97%;
     min-height: 448px;
+    margin: 0 1rem 1rem 0;
   }
 
   :deep(.v-card-text) {
     background-color: #fff;
     padding: 1rem !important;
-    max-height: 400px !important;
-    min-height: 400px !important;
   }
   :deep(.v-tab) {
     font-size: 1rem !important;
@@ -61,12 +62,51 @@ import ReminderHome from '@/components/reminder/HomeReminder.vue';
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 1.2rem;
     min-height: 350px;
     margin: 0 auto !important;
+    gap: 1rem;
     padding-top: 1rem;
     user-select: none;
+  }
+}
+@media (max-width: 945px) {
+  .report-wrapper {
+    :deep(.health_report) {
+    }
+    :deep(.exercise_report) {
+    }
+    :deep(.v-card-text) {
+      // width: 50%;
+      padding: 10 0 !important;
+    }
+  }
+}
+@media (max-width: 522px) {
+  .home-layout {
+    flex-direction: column;
+  }
+  .reminder-wrapper {
+    width: 100%;
+    :deep(.reminder) {
+      // border-radius: 0 25px 25px;
+      border-radius: 0 0 25px 25px;
+    }
+    :deep(.list-title) {
+      width: 100%;
+    }
+    :deep(.empty-wrapper) {
+      min-height: 200px;
+    }
+  }
+  .report-wrapper {
+    width: 100%;
+    :deep(.v-card) {
+      // margin: 0 1rem 0 1rem;
+      width: 93%;
+      margin-left: 1rem;
+      margin-bottom: 5rem;
+      border-radius: 25px;
+    }
   }
 }
 </style>
