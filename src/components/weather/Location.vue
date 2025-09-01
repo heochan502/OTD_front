@@ -1,15 +1,15 @@
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted } from 'vue';
 import {
   getList,
   removeListItem,
   selectLocation,
-} from "@/services/weather/locationService";
-import { useRouter } from "vue-router";
-import { useWeatherStore } from "@/stores/weatherStore";
-import SearchAPI from "./SearchAPI.vue";
+} from '@/services/weather/locationService';
+import { useRouter } from 'vue-router';
+import { useWeatherStore } from '@/stores/weatherStore';
+import SearchAPI from './SearchAPI.vue';
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(['close']);
 const weatherStore = useWeatherStore();
 const router = useRouter();
 const state = reactive({
@@ -20,15 +20,16 @@ const state = reactive({
 
 // 모달 통일
 const confirmDialog = ref(false);
-const alertDialog = ref({ visible: false, message: "" });
-const confirmMessage = ref("");
+const edit = ref(false);
+const alertDialog = ref({ visible: false, message: '' });
+const confirmMessage = ref('');
 const actions = ref(null);
 const selectedLocalId = ref(null);
-const selectedLocationName = ref("");
+const selectedLocationName = ref('');
 
-const openConfirm = (message, action, id = null, title = "") => {
-  console.log("삭제 버튼 눌림 → localId:", id); // ✅ 확인용 로그
-  console.log("item 전체 확인:", title); // 혹시 주소 데이터도 확인
+const openConfirm = (message, action, id = null, title = '') => {
+  console.log('삭제 버튼 눌림 → localId:', id); // ✅ 확인용 로그
+  console.log('item 전체 확인:', title); // 혹시 주소 데이터도 확인
   confirmDialog.value = true;
   confirmMessage.value = message;
   actions.value = action;
@@ -38,17 +39,17 @@ const openConfirm = (message, action, id = null, title = "") => {
 const confirmYes = async () => {
   confirmDialog.value = false;
 
-  if (actions.value === "select") {
+  if (actions.value === 'select') {
     const res = await selectLocation(selectedLocalId.value);
     if (res && res.status === 200) {
       weatherStore.homeRefresh();
-      emit("close");
-      router.push("/");
+      emit('close');
+      router.push('/');
     }
-  } else if (actions.value === "remove") {
+  } else if (actions.value === 'remove') {
     const res = await removeListItem(selectedLocalId.value);
     if (res.status === 200) {
-      openAlert("삭제되었습니다.");
+      openAlert('삭제되었습니다.');
       await LocalList();
     }
   }
@@ -80,17 +81,24 @@ onMounted(() => {
         v-for="(item, index) in state.list"
         :key="index"
       >
-        <span class="location-name">
-          <strong>{{ item.title }}</strong> <br />{{ item.roadAddress }} ({{
-            item.parcelAddress
-          }})
-        </span>
+        <v-tooltip location="bottom">
+          <template v-slot:activator="{ props }">
+            <span v-bind="props" class="location-name">
+              <strong>{{ item.title }}</strong> <br />{{ item.roadAddress }} ({{
+                item.parcelAddress
+              }})
+            </span>
+          </template>
+          <span>{{ item.roadAddress }}({{ item.parcelAddress }})</span>
+        </v-tooltip>
         <div class="list-btn d-flex gap-2">
           <button
             class="btn list-btn btn-outline-primary btn-sm"
             @click="
               openConfirm(
-                `${item.title} (${item.roadAddress})을(를) 등록하시겠습니까?`,
+                item.roadAddress == null
+                  ? `${item.title}을(를) 등록하시겠습니까?`
+                  : `${item.title} (${item.roadAddress})을(를) 등록하시겠습니까?`,
                 'select',
                 item.id,
                 `${item.title} ${item.roadAddress} ${item.parcelAddress}`
@@ -101,12 +109,18 @@ onMounted(() => {
           </button>
           <button
             class="btn list-btn btn-outline-danger btn-sm"
+            @click="edit = true"
+          >
+            편집
+          </button>
+          <!-- <button
+            class="btn list-btn btn-outline-danger btn-sm"
             @click="
               openConfirm('선택한 지역을 삭제하시겠습니까?', 'remove', item.id)
             "
           >
             삭제
-          </button>
+          </button> -->
           <!-- confirm -->
           <v-dialog v-model="confirmDialog" max-width="400">
             <v-card>
@@ -118,6 +132,31 @@ onMounted(() => {
                   >취소</v-btn
                 >
                 <v-btn color="primary" text @click="confirmYes">확인</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog v-model="edit" max-width="500">
+            <v-card>
+              <v-card-title>편집</v-card-title>
+              <v-card-text><input v-model="item.title" type="text"></input></v-card-text>
+              <v-card-actions>
+                <v-spacer />
+                <v-btn color="dark" text @click="edit = false"
+                  >취소</v-btn
+                >
+                <v-btn color="primary" text @click="confirmYes">수정</v-btn>
+                <v-btn
+                  color="danger"
+                  @click="
+                    openConfirm(
+                      '선택한 지역을 삭제하시겠습니까?',
+                      'remove',
+                      item.id
+                    )
+                  "
+                  >삭제</v-btn
+                >
               </v-card-actions>
             </v-card>
           </v-dialog>

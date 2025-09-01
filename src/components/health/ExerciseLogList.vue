@@ -65,10 +65,10 @@ const getData = async () => {
 
 // click event
 const detail = (exerciselogId) => {
-  router.push(`/elog/${exerciselogId}`);
+  router.push(`health/elog/${exerciselogId}`);
 };
 const add = () => {
-  router.push("/elog/form");
+  router.push("health/elog/form");
 };
 </script>
 

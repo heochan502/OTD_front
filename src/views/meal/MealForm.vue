@@ -42,8 +42,8 @@ const makeTotalCalorie = async () => {
   // 회원의 몸무게 키 나이를 가져와서 칼로리 계산을 하는 거
   const res = await getProfile();
   // 피니아에 health 관련 정보 가져옴
-  console.log('헬스데이타 로그 : ', healthData.logs);
-  console.log('회워정보 로그 : ', res.data);
+  console.log('헬스데이터 로그 : ', healthData.logs);
+  console.log('회원정보 로그 : ', res.data);
 
   //   const totalPrice = items.reduce((sum, item) => {
   //   return sum + item.price; // 각 item의 price 값을 sum에 더함
@@ -182,7 +182,7 @@ const clickProgressBar = (category) => {
       <div class="left_progress">
         <div class="progress-container w-full">
           <span class="totalkcal  font-weight-bold text-sm-h5 text-h6"
-            >{{ calorieData.mealDay }} 칼로리</span
+            >{{  dayjs(calorieData.mealDay).format('YYYY년 MM월 DD일 dddd')  }} </span
           >
           <ProgressBar
             class="totalcal"
@@ -295,7 +295,7 @@ const clickProgressBar = (category) => {
             {{ Math.round(avg).toLocaleString() }}kcal 먹었어요
           </span>
           <span
-            class="sub-title text-subtitle-1 font-md-weight-light text-right  d-md-none "
+            class="sub-title text-subtitle-1 font-md-weight-light text-right  d-sm-none "
           >
             {{ baseDate.getWeekDate.startDate }} ~ 
             {{ baseDate.getWeekDate.endDate }} <br />
@@ -407,7 +407,7 @@ const clickProgressBar = (category) => {
   margin-left: 10px;
   /* font-size: 16px; */
   /* font-weight: 500; */
-  color: #333;
+  color: #000000;
 }
 /* 날짜 부분 글씨 */
 .totalkcal {
