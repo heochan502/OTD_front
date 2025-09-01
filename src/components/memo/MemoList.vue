@@ -35,7 +35,6 @@ const afterMutate = async () => {
   clearPreviewImages();
 };
 
-// useMemoDetail 훅 사용 (이 부분은 거의 그대로!)
 const emit = (event) => {
   if (event === 'created' || event === 'updated' || event === 'deleted') {
     afterMutate();

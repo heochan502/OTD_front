@@ -131,15 +131,17 @@ const router = createRouter({
     },
     {
       path: '/memoAndDiary/memolist',
-      name: 'MemoList',
+      name: 'memo',
       component: MemoList,
       props: true,
+      meta: { requiresAuth: true },
     },
     {
       path: '/memoAndDiary/diarylist',
-      name: 'DiaryList',
+      name: 'diary',
       component: DiaryList,
       props: true,
+      meta: { requiresAuth: true },
     },
     {
       path: '/navermaps',
