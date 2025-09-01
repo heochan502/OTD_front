@@ -395,12 +395,12 @@ onMounted(async () => {
       </v-row>
     </div>
 
-    <v-virtual-scroll :items="itemList" v-if="itemList.length >0" class="mt-1 pa-3 mb-2 scroll_heigth" >
+    <v-virtual-scroll :items="itemList" v-if="itemList.length >0" class="mt-1 pt-2 mb-2 scroll_heigth" >
       <template v-slot:default="{ item }">
         <div class=" d-flex flex-column align-center">
           <v-card
-            class="mb-2 rounded-lx rounded-pill"
-            style="width:70%"
+            class="mb-2 rounded-lx rounded-pill card_detail"
+            
             variant="tonal"
 
           >
@@ -519,6 +519,11 @@ onMounted(async () => {
   border: 1px solid #ddd;
   padding: 8px;
 }
+/* 선택한 음식 안에 표기할때 스타일 */
+.card_detail{
+ width: 70%;
+}
+
 
 .mealsaday {
   width: 120px;
@@ -554,7 +559,7 @@ onMounted(async () => {
 }
 .insert-icon
 {
-  width: 70%;
+  width: 65%;
   filter: invert(1); 
 
    /* 색상을 반전시켜 흰색으로 만듭니다. */
@@ -603,7 +608,11 @@ onMounted(async () => {
   /* display: none; */
   width: 75px;
   height: 40px;
+  
   }
+  .card_detail{
+ width: 90%;
+}
 }
 
 @media (max-width: 375px) {
