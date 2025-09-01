@@ -1,6 +1,8 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import { debounce, toNumber } from 'lodash';
+import { useDisplay } from 'vuetify';
+
 import {
   getFoodNames,
   getFoodCalorie,
@@ -23,6 +25,11 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
+
+const BASE_URL = '/image';
+
+//크기 판별 변수
+const { smAndUp } = useDisplay();
 
 const dayStore = useDayDefine();
 const weeklyData = useWeeklyStore();
@@ -388,7 +395,7 @@ onMounted(async () => {
       </v-row>
     </div>
 
-    <v-virtual-scroll :items="itemList" class="mt-1 pa-3 mb-2 scroll_heigth" >
+    <v-virtual-scroll :items="itemList" v-if="itemList.length >0" class="mt-1 pa-3 mb-2 scroll_heigth" >
       <template v-slot:default="{ item }">
         <div class=" d-flex flex-column align-center">
           <v-card
@@ -463,21 +470,24 @@ onMounted(async () => {
       </template>
     </v-virtual-scroll>
     <div v-if="itemList.length === 0">
-      <v-alert variant="tonal" type="info">추가된 음식이 없습니다.</v-alert>
+      <v-alert class="mb-2" variant="tonal" type="info">추가된 음식이 없습니다.</v-alert>
     </div>
   </div>
 
   <div class="d-flex flex-row align-end justify-end">
-    <v-btn class="mealsaday text-center text-body-3" @click="meal"
-      >식단 홈으로
-      <i class="fi fi-sr-angle-left"></i></v-btn
-    >
+    <v-btn class=" mealsaday text-center text-body-2 " @click="meal"
+      >
+      <span v-if=smAndUp > 식단 홈 </span>    
+      <img v-else :src="`${BASE_URL}/back-page.png` " class="meal-icon" alt="식단홈으로"  /> 
+      </v-btn>   
 
     <v-btn
-      class="mealsaday text-center ml-5 text-body-3"
+      class="mealsaday text-center ml-5 text-body-2"
       @click="openDialog(saveText === '저장하기' ? 'save' : 'update')"
-      >{{ saveText }}</v-btn
-    >
+      >
+      <span v-if=smAndUp >{{ saveText }}</span>    
+      <img v-else :src="`${BASE_URL}/insert.png` " class="insert-icon" alt="식단홈으로"  /> 
+    </v-btn >
   </div>
 
   <v-dialog v-model="dialog.visible" max-width="500px">
@@ -511,14 +521,15 @@ onMounted(async () => {
 }
 
 .mealsaday {
-  width: 150px;
-  height: 60px;
+  width: 120px;
+  height: 50px;
   background-color: #3bbeff;
   color: white;
   border: none;
   font-weight: 1000;
   font-size: 15px;
   font-family: 'Noto Sans KR', sans-serif;
+  
   padding-left: 20px;
   padding-right: 20px;
   border-radius: 50px;
@@ -533,6 +544,22 @@ onMounted(async () => {
 .sm_text_foodname{
   display: none;
 }
+.meal-icon
+{
+  width: 80%;
+  height: 50%; 
+  filter: invert(1); 
+
+   /* 색상을 반전시켜 흰색으로 만듭니다. */
+}
+.insert-icon
+{
+  width: 70%;
+  filter: invert(1); 
+
+   /* 색상을 반전시켜 흰색으로 만듭니다. */
+}
+
 @media (max-width: 1024px)
 {
   .scroll_heigth{
@@ -571,7 +598,12 @@ onMounted(async () => {
 }
 
 
-@media (max-width: 425) {
+@media (max-width: 425px) {
+  .mealsaday{
+  /* display: none; */
+  width: 75px;
+  height: 40px;
+  }
 }
 
 @media (max-width: 375px) {
