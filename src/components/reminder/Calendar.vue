@@ -78,6 +78,7 @@ const makeCalendar = () => {
     }
   }
   calendarMatrix.value = matrix;
+  console.log('111', calendarMatrix.value);
 };
 
 onMounted(() => {
@@ -142,9 +143,9 @@ const todayColor = (day) => {
 <template>
   <div class="calendar">
     <h3 class="calendar_title">
-      <a href="#" @click.prevent="prevMonth"
-        ><img src="/image/button.png" alt="이전 달 보기" class="rotate"
-      /></a>
+      <div href="#" @click.prevent="prevMonth">
+        <img src="/image/button.png" alt="이전 달 보기" class="rotate" />
+      </div>
       <span
         ><b>{{ reminderStore.state.currentYear }}</b
         >년</span
@@ -153,40 +154,31 @@ const todayColor = (day) => {
         <b>{{ reminderStore.state.currentMonth }}</b
         >월</span
       >
-      <a href="#" @click.prevent="nextMonth"
-        ><img src="/image/button.png" alt="다음 달 보기"
-      /></a>
+      <div href="#" @click.prevent="nextMonth">
+        <img src="/image/button.png" alt="다음 달 보기" />
+      </div>
     </h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <td v-for="dayOfWeek in dayOfWeek" :key="dayOfWeek">
-            <b>{{ dayOfWeek }}</b>
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(rowOfMonth, index) in calendarMatrix" :key="index">
-          <td
-            v-for="(dayOfMonth, index) in rowOfMonth"
-            :key="index"
-            :class="{
-              today_color: todayColor(dayOfMonth.date),
-              sunday_color: index === 0,
-            }"
-            class="day"
-            @click="pickDate(dayOfMonth.date)"
-          >
-            <span
-              class="date"
-              :class="{ reminder_color: dayOfMonth.hasReminder }"
-            >
-              {{ dayOfMonth.date }}</span
-            >
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="header calendar-grid">
+      <div v-for="day in dayOfWeek" :key="day" class="day-header">
+        {{ day }}
+      </div>
+    </div>
+    <div class="body calendar-grid">
+      <div
+        v-for="(dayOfMonth, index) in calendarMatrix.flat()"
+        :key="index"
+        class="day-cell"
+        :class="{
+          today_color: todayColor(dayOfMonth.date),
+          reminder_color: dayOfMonth.hasReminder,
+          empty: !dayOfMonth.date,
+          sunday_color: index % 7 === 0,
+        }"
+        @click="pickDate(dayOfMonth.date)"
+      >
+        {{ dayOfMonth.date }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -195,7 +187,7 @@ const todayColor = (day) => {
   border-radius: 20px;
   border: #dedede solid 1px;
   margin-top: 70px;
-  width: 630px;
+  width: clamp(300px, 40vw, 630px);
   background-color: #fff;
   padding: 35px 45px 25px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -206,7 +198,7 @@ const todayColor = (day) => {
     color: #000;
     gap: 10px;
     cursor: pointer;
-    a {
+    div {
       display: flex;
       align-items: center;
       img {
@@ -220,37 +212,92 @@ const todayColor = (day) => {
       background-color: #fff;
     }
   }
-  .table {
-    font-size: 25px;
-    td {
-      border-bottom: none;
-      cursor: pointer;
-      text-align: center;
-      vertical-align: middle;
-      height: 70px;
-      .date {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
-        font-weight: bold;
-        border-radius: 100%;
-        margin: auto;
-      }
-      .reminder_color {
-        background-color: #bfeaff;
-      }
+  .calendar-grid {
+    color: #000;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    // width: clamp(300px, 40vw, 630px);
+  }
+  .day-header {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: clamp(12px, 3vw, 25px);
+  }
+
+  .day-cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: clamp(12px, 3vw, 25px);
+    border-radius: 50%;
+    cursor: pointer;
+    margin: 1vw;
+
+    &.reminder_color {
+      background-color: #bfeaff;
     }
-    .sunday_color {
-      color: tomato;
-    }
-    .today_color {
+    &.today_color {
       color: steelblue;
     }
-    td {
-      height: 70px;
+    &.sunday_color {
+      color: tomato;
+    }
+    &.empty {
+      background: none;
+      cursor: default;
     }
   }
 }
+// @media (max-width: 768px) {
+//   .calendar {
+//     padding: 25px 30px 15px;
+//     .calendar_title {
+//       font-size: 20px;
+//       gap: 5px;
+//     }
+//     .table {
+//       font-size: 20px;
+//       td {
+//         height: 50px;
+//         .date {
+//           width: 35px;
+//           height: 35px;
+//         }
+//       }
+//     }
+//   }
+// }
+
+// @media (max-width: 425px) {
+//   .calendar {
+//     padding: 15px 20px 5px;
+//     .calendar_title {
+//       font-size: 14px;
+//       gap: 5px;
+//       div {
+//         img {
+//           width: 15px;
+//         }
+//       }
+//     }
+//     .table {
+//       font-size: 12px;
+//       td {
+//         height: 34px;
+
+//         padding: 3px;
+//         .date {
+//           width: 28px;
+//           height: 28px;
+//         }
+//       }
+//     }
+//   }
+// }
 </style>
