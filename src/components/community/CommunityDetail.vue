@@ -25,7 +25,21 @@ const likeCount = ref(0);
 
 const images = ref([]);
 const carouselIndex = ref(0);
-const hasImages = computed(() => (images.value?.length || 0) > 0);
+
+/** 유효한 이미지(주소가 있는 것만)로 정규화 */
+const normalizedImages = computed(() => {
+  const arr = Array.isArray(images.value) ? images.value : [];
+  return arr
+    .filter(Boolean)
+    .map((it) => ({
+      url: it?.url ?? it?.filePath ?? '',
+      name: it?.name ?? it?.fileName ?? '',
+    }))
+    .filter((it) => !!it.url);
+});
+
+/** 이미지가 하나 이상일 때만 미디어/라이트박스 렌더 */
+const hasImages = computed(() => normalizedImages.value.length > 0);
 
 const loadImages = async () => {
   if (!post.value?.postId) {
@@ -34,10 +48,14 @@ const loadImages = async () => {
   }
   try {
     const { data } = await fetchPostImages(post.value.postId);
-    images.value = Array.isArray(data) ? data : [];
-    if (!images.value.length && post.value.filePath) {
-      images.value = [{ filePath: post.value.filePath }];
-    }
+    const fetched = Array.isArray(data) ? data : [];
+    // 서버가 비어있고 대표 이미지(filePath)가 있으면 보조로 추가
+    images.value =
+      fetched.length > 0
+        ? fetched
+        : post.value.filePath
+        ? [{ filePath: post.value.filePath }]
+        : [];
     carouselIndex.value = 0;
   } catch {
     images.value = post.value?.filePath
@@ -143,71 +161,62 @@ const pick = (i) => {
       elevation="2"
       rounded="lg"
     >
-      <div class="px-4 pt-4 media-wrap">
+      <!-- 이미지가 있을 때만 미디어/캐러셀 영역 렌더 -->
+      <div v-if="hasImages" class="px-4 pt-4 media-wrap">
         <v-card variant="tonal" rounded="lg" class="overflow-hidden">
-          <!-- 캐러셀 -->
-          <template v-if="hasImages">
-            <v-carousel
-              v-model="carouselIndex"
-              class="detail-carousel"
-              :height="carouselHeight"
-              :hide-delimiters="images.length <= 1 ? true : false"
-              hide-delimiter-background
-              show-arrows="always"
-              cycle
-              continuous
-              touch
+          <v-carousel
+            v-model="carouselIndex"
+            class="detail-carousel"
+            :height="carouselHeight"
+            :hide-delimiters="normalizedImages.length <= 1"
+            hide-delimiter-background
+            show-arrows="always"
+            cycle
+            continuous
+            touch
+          >
+            <v-carousel-item
+              v-for="(img, i) in normalizedImages"
+              :key="`img-${i}`"
             >
-              <v-carousel-item v-for="(img, i) in images" :key="`img-${i}`">
-                <div class="slide-frame">
-                  <v-img
-                    :src="img.filePath || img.url"
-                    cover
-                    height="100%"
-                    width="100%"
-                  />
-                </div>
-              </v-carousel-item>
-            </v-carousel>
+              <div class="slide-frame">
+                <v-img
+                  :src="img.url"
+                  :alt="img.name"
+                  cover
+                  height="100%"
+                  width="100%"
+                />
+              </div>
+            </v-carousel-item>
+          </v-carousel>
 
-            <!-- 썸네일 바 (탭 전환) -->
-            <v-slide-group
-              v-if="images.length > 1"
-              class="thumb-strip"
-              show-arrows
+          <v-slide-group
+            v-if="normalizedImages.length > 1"
+            class="thumb-strip"
+            show-arrows
+          >
+            <v-slide-group-item
+              v-for="(img, i) in normalizedImages"
+              :key="`thumb-${i}`"
+              v-slot="{ isSelected, toggle }"
             >
-              <v-slide-group-item
-                v-for="(img, i) in images"
-                :key="`thumb-${i}`"
-                v-slot="{ isSelected, toggle }"
+              <v-sheet
+                class="thumb-item"
+                :elevation="isSelected ? 4 : 1"
+                rounded="md"
+                @click="
+                  toggle();
+                  pick(i);
+                "
               >
-                <v-sheet
-                  class="thumb-item"
-                  :elevation="isSelected ? 4 : 1"
-                  rounded="md"
-                  @click="
-                    toggle();
-                    pick(i);
-                  "
-                >
-                  <v-img
-                    :src="img.filePath || img.url"
-                    width="64"
-                    height="48"
-                    cover
-                  />
-                </v-sheet>
-              </v-slide-group-item>
-            </v-slide-group>
-          </template>
-
-          <template v-else>
-            <div class="slide-frame" :style="{ height: carouselHeight + 'px' }">
-              <v-img :src="post.filePath" cover height="100%" width="100%" />
-            </div>
-          </template>
+                <v-img :src="img.url" width="64" height="48" cover />
+              </v-sheet>
+            </v-slide-group-item>
+          </v-slide-group>
         </v-card>
       </div>
+      <!-- hasImages=false면 media-wrap 자체가 렌더되지 않음 (라이트박스/캐러셀 완전 미노출) -->
 
       <v-card-text class="detail-body">
         <h2 class="mt-4 mb-4 font-weight-bold detail-title text-h5">
@@ -355,7 +364,5 @@ const pick = (i) => {
     width: 38px;
     height: 38px;
   }
-
-  /* 모바일에서도 도트/화살표를 숨기지 않음 → 여러 장 여부를 시각적으로 확인 & 터치가 불안정해도 조작 가능 */
 }
 </style>
