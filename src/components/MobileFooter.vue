@@ -20,23 +20,23 @@ const BASE_URL = '/image/mobile';
       <router-link to="/meal" class="nav-item" v-slot="{ isActive }">
         <img
           :src="
-            isActive ? `${BASE_URL}/select-food.png` : `${BASE_URL}/food.png`
+            $route.path.startsWith(`/meal`)  ? `${BASE_URL}/select-food.png` : `${BASE_URL}/food.png`
           "
           alt="식단"
         />
-        <span>식단</span>
+        <span :class="{ 'active-text': $route.path.startsWith(`/meal`) }"   >식단 </span>
       </router-link>
 
       <router-link to="/health" class="nav-item" v-slot="{ isActive }">
         <img
           :src="
-            isActive
+             $route.path.startsWith(`/health`) 
               ? `${BASE_URL}/select-health.png`
               : `${BASE_URL}/health.png`
           "
           alt="건강"
         />
-        <span>건강</span>
+        <span :class="{ 'active-text': $route.path.startsWith(`/health`) }">건강</span>
       </router-link>
 
       <router-link to="/community" class="nav-item" v-slot="{ isActive }">
@@ -97,7 +97,8 @@ const BASE_URL = '/image/mobile';
 }
 
 /* 현재 선택된 메뉴 강조 */
-.nav-item.router-link-active span {
+.nav-item.router-link-active span,
+.active-text {
   color: #4fc3f7;
   font-weight: bold;
 }

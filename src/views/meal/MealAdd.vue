@@ -299,7 +299,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="d-flex flex-column mb-6">
+  <div class="d-flex flex-column "  >
     <div>
       <div class="addText text-grey-darken-1 mb-1 font-weight-bold">
         <span class="menu text-h4 font-weight-bold text-md-h3">
@@ -388,11 +388,11 @@ onMounted(async () => {
       </v-row>
     </div>
 
-    <v-virtual-scroll :items="itemList" class="mt-1 pa-3 mb-2 h-100">
+    <v-virtual-scroll :items="itemList" class="mt-1 pa-3 mb-2 scroll_heigth" >
       <template v-slot:default="{ item }">
         <div class=" d-flex flex-column align-center">
           <v-card
-            class="mb-4 rounded-lx rounded-pill"
+            class="mb-2 rounded-lx rounded-pill"
             style="width:70%"
             variant="tonal"
 
@@ -469,7 +469,8 @@ onMounted(async () => {
 
   <div class="d-flex flex-row align-end justify-end">
     <v-btn class="mealsaday text-center text-body-3" @click="meal"
-      >식단 홈으로</v-btn
+      >식단 홈으로
+      <i class="fi fi-sr-angle-left"></i></v-btn
     >
 
     <v-btn
@@ -532,7 +533,12 @@ onMounted(async () => {
 .sm_text_foodname{
   display: none;
 }
-
+@media (max-width: 1024px)
+{
+  .scroll_heigth{
+  height: 400px;
+}
+}
 
 /* 작은 화면: 글자 옆으로 */
 @media (max-width: 760px) {
@@ -557,8 +563,14 @@ onMounted(async () => {
   display: flex;
   
   flex-direction: row;
+
+}
+.scroll_heigth{
+  height: 300px;
 }
 }
+
+
 @media (max-width: 425) {
 }
 
