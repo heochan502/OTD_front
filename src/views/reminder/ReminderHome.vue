@@ -273,9 +273,9 @@ const resetDate = () => {
 
       .block {
         margin: 35px;
-        height: 418px;
         position: relative;
         max-height: 418px;
+        min-height: 418px;
         overflow-y: auto;
 
         &::-webkit-scrollbar {
@@ -339,14 +339,17 @@ const resetDate = () => {
   }
 }
 // 테블릿 세로
-@media (max-width: 768px) {
+@media (max-width: 1240px) {
   .reminder {
     flex-direction: column;
+    .left {
+      margin: 0 auto;
+    }
   }
 }
-@media (max-width: 425px) {
-  .reminder {
-    flex-direction: column;
-  }
-}
+// @media (max-width: 425px) {
+//   .reminder {
+//     flex-direction: column;
+//   }
+// }
 </style>

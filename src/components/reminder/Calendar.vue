@@ -187,9 +187,9 @@ const todayColor = (day) => {
   border-radius: 20px;
   border: #dedede solid 1px;
   margin-top: 70px;
-  width: clamp(300px, 40vw, 630px);
+  width: 630px;
   background-color: #fff;
-  padding: 35px 45px 25px;
+  padding: 40px 50px 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   .calendar_title {
     display: flex;
@@ -216,8 +216,6 @@ const todayColor = (day) => {
     color: #000;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    // width: clamp(300px, 40vw, 630px);
   }
   .day-header {
     aspect-ratio: 1 / 1;
@@ -225,7 +223,7 @@ const todayColor = (day) => {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: clamp(12px, 3vw, 25px);
+    font-size: clamp(12px, 6cqi, 25px);
   }
 
   .day-cell {
@@ -234,10 +232,10 @@ const todayColor = (day) => {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: clamp(12px, 3vw, 25px);
+    font-size: clamp(12px, 6cqi, 25px);
     border-radius: 50%;
     cursor: pointer;
-    margin: 1vw;
+    margin: 10px;
 
     &.reminder_color {
       background-color: #bfeaff;
@@ -251,6 +249,27 @@ const todayColor = (day) => {
     &.empty {
       background: none;
       cursor: default;
+    }
+  }
+}
+@media (max-width: 1239px) {
+  .calendar {
+    width: clamp(300px, calc(37.5vw + 165px), 630px);
+    container-type: inline-size;
+    padding: 3vw 4vw 3vw;
+
+    .calendar_title {
+      font-size: clamp(14px, 7cqi, 28px);
+      img {
+        width: 6cqi;
+      }
+    }
+    .day-header {
+      font-size: clamp(12px, 6cqi, 25px);
+    }
+    .day-cell {
+      font-size: clamp(12px, 6cqi, 25px);
+      margin: 1.5cqi;
     }
   }
 }
