@@ -9,10 +9,10 @@ export function useMemoDetail(props, emit) {
   const route = useRoute();
 
   const memo = ref({
-    id: null,
+    memoId: null,
     memoName: '',
     memoContent: '',
-    imageFileName: null,
+    memoImage: '',
     createdAt: null,
   });
 
@@ -20,61 +20,56 @@ export function useMemoDetail(props, emit) {
   const previewImages = ref([]);
   const mode = ref('view');
 
+  const IMAGE_BASE = '/api/OTD/memoAndDiary/memo/image/';
+  const imageUrl = computed(() => memo.value.memoImage ? `${IMAGE_BASE}${memo.value.memoImage}` : '');
+
   const isCreateMode = computed(() => mode.value === 'create');
-  const isEditMode = computed(() => mode.value === 'edit');
-  const isViewMode = computed(() => mode.value === 'view');
+  const isEditMode   = computed(() => mode.value === 'edit');
+  const isViewMode   = computed(() => mode.value === 'view');
 
-  const isTitleValid = computed(() => memo.value.memoName.trim().length >= 10);
-  const isContentValid = computed(() => memo.value.memoContent.length >= 10);
+  const isTitleValid   = computed(() => memo.value.memoName.trim().length >= 5);
+  const isContentValid = computed(() => memo.value.memoContent.trim().length >= 10);
 
-  const setMode = (value) => {
-    mode.value = value;
+  const setMode = (value) => { mode.value = value; };
+
+  const clearPreviewImages = () => {
+    previewImages.value = [];
+    if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
   const handleImageChange = (e) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 업로드 가능합니다.');
-      return;
+    previewImages.value = [];
+  
+    if (files && files.length > 0) {
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImages.value.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
     }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      previewImages.value = [reader.result];
-    };
-    reader.readAsDataURL(file);
   };
 
   const removeImage = (index) => {
     previewImages.value.splice(index, 1);
-    if (fileInputRef.value) {
-      fileInputRef.value.value = null;
-    }
+    if (fileInputRef.value) fileInputRef.value.value = null;
   };
 
-  const clearPreviewImages = () => {
-    previewImages.value = [];
-    if (fileInputRef.value) {
-      fileInputRef.value.value = null;
-    }
+  const buildFormData = (jsonKey, jsonObj, fileKey, inputEl) => {
+    const fd = new FormData();
+    fd.append(jsonKey, new Blob([JSON.stringify(jsonObj)], { type: 'application/json' }));
+    const file = inputEl?.files?.[0];
+    if (file) fd.append(fileKey, file);
+    return fd;
   };
 
   const createMemo = async () => {
     try {
-      const formData = new FormData();
-      const memoData = new Blob(
-        [JSON.stringify(memo.value)],
-        { type: 'application/json' }
-      );
-
-      formData.append('memoData', memoData);
-      if (fileInputRef.value?.files[0]) {
-        formData.append('memoImageFiles', fileInputRef.value.files[0]);
-      }
-
+      const payload = { ...memo.value, memberNoLogin: accountStore.state.memberNoLogin };
+      const formData = buildFormData('memoData', payload, 'memoImage', fileInputRef.value);
       await MemoHttpService.create(formData);
       emit('created');
       clearPreviewImages();
@@ -85,17 +80,8 @@ export function useMemoDetail(props, emit) {
 
   const updateMemo = async () => {
     try {
-      const formData = new FormData();
-      const memoData = new Blob(
-        [JSON.stringify(memo.value)],
-        { type: 'application/json' }
-      );
-
-      formData.append('memoData', memoData);
-      if (fileInputRef.value?.files[0]) {
-        formData.append('memoImageFiles', fileInputRef.value.files[0]);
-      }
-
+      const payload = { ...memo.value, memberNoLogin: accountStore.state.memberNoLogin };
+      const formData = buildFormData('memoData', payload, 'memoImage', fileInputRef.value);
       await MemoHttpService.modify(formData);
       emit('updated');
       setMode('view');
@@ -108,7 +94,7 @@ export function useMemoDetail(props, emit) {
   const deleteMemo = async () => {
     try {
       if (confirm('정말 삭제하시겠습니까?')) {
-        await MemoHttpService.deleteById(memo.value.id);
+        await MemoHttpService.deleteById(memo.value.memoId);
         emit('deleted');
       }
     } catch (err) {
@@ -116,54 +102,63 @@ export function useMemoDetail(props, emit) {
     }
   };
 
-  const cancelEdit = () => {
-    emit('cancel');
-  };
+  const cancelEdit = () => { emit('cancel'); };
 
   const fetchCurrentMemo = async (id) => {
     try {
       const data = await MemoHttpService.findById(id);
-      memo.value = data;
-      clearPreviewImages();
+      memo.value = {
+        memoId: data.memoId ?? null,
+        memoName: data.memoName ?? '',
+        memoContent: data.memoContent ?? '',
+        memoImage: data.memoImage ?? null,
+        createdAt: data.createdAt ?? null,
+      };
+      previewImages.value = memo.value.memoImage ? [`${IMAGE_BASE}${memo.value.memoImage}`] : [];
     } catch (err) {
       console.error('메모 조회 실패', err);
     }
   };
-watch(
-  () => props.memoProp,
-  (newMemo) => {
-    if (newMemo) {
-      memo.value = { ...newMemo };
-      setMode('view'); // 선택 시 항상 view 모드로 진입
-      clearPreviewImages();
+
+  watch(
+    () => props.memoProp,
+    (newMemo) => {
+      if (newMemo) {
+        memo.value = {
+          memoId: newMemo.memoId ?? null,
+          memoName: newMemo.memoName ?? '',
+          memoContent: newMemo.memoContent ?? '',
+          memoImage: newMemo.memoImage ?? null,
+          createdAt: newMemo.createdAt ?? null,
+        };
+        setMode('view');
+        previewImages.value = memo.value.memoImage ? [`${IMAGE_BASE}${memo.value.memoImage}`] : [];
+      } else {
+        memo.value = { memoId: null, memoName: '', memoContent: '', memoImage: '', createdAt: null };
+        clearPreviewImages();
+        setMode('create');
+      }
+    },
+    { immediate: true }
+  );
+
+  onMounted(async () => {
+    if (!accountStore.state.loggedIn) {
+      alert('로그인 후 이용해주세요.');
+      return router.push('/account/login');
     }
-  },
-  { immediate: true }
-);
 
-onMounted(async () => {
-  if (!accountStore.state.loggedIn) {
-    alert('로그인 후 이용해주세요.');
-    return router.push('/account/login');
-  }
-
-  if (route.path.includes('/add')) {
-    setMode('create');
-    return;
-  }
-
-  const id = route.params.id;
-  if (id) {
-    fetchCurrentMemo(id);   
-    mode.value = 'view';
-  } else {
-    mode.value = 'create';
-  }
-});
-
-  onBeforeUnmount(() => {
-    clearPreviewImages();
+    const id = route.params.id;
+    if (route.name === 'MemoAdd') {
+      setMode('create');
+      return;
+    } else if (id) {
+      await fetchCurrentMemo(id);
+      setMode('view');
+    }
   });
+
+  onBeforeUnmount(() => { clearPreviewImages(); });
 
   return {
     memo,

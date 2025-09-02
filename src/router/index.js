@@ -7,8 +7,6 @@ import ReminderHome from '@/views/reminder/ReminderHome.vue';
 
 import MemoList from '@/components/memo/MemoList.vue';
 import DiaryList from '@/components/memo/DiaryList.vue';
-import MemoDetail from '@/components/memo/MemoDetail.vue';
-import DiaryDetail from '@/components/memo/DiaryDetail.vue';
 import MemoAndDiary from '@/views/memo/MemoAndDiary.vue';
 import CommunityView from '@/views/community/CommunityView.vue';
 // 커뮤니티 클릭했을때 리스트만 보이게 하기 위해 추가한 코드
@@ -132,30 +130,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/memoAndDiary/memo',
+      path: '/memoAndDiary/memolist',
       name: 'memo',
-      component: MemoDetail,
-      props: true,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/memoAndDiary/diary',
-      name: 'diary',
-      component: DiaryDetail,
-      props: true,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/memoAndDiary/memo/list',
-      name: 'MemoList',
       component: MemoList,
       props: true,
+      meta: { requiresAuth: true },
     },
     {
-      path: '/memoAndDiary/diary/list',
-      name: 'DiaryList',
+      path: '/memoAndDiary/diarylist',
+      name: 'diary',
       component: DiaryList,
       props: true,
+      meta: { requiresAuth: true },
     },
     {
       path: '/navermaps',

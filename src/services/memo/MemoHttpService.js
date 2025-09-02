@@ -43,9 +43,9 @@ class MemoHttpService {
     }
   }
 
-  _handleError(err, context) {
+  _handleError(err, contextMessage) {
     const status = err.response?.status;
-    let message = `❌ ${context} 중 오류가 발생했습니다.`;
+    let message = `❌ ${contextMessage} 중 오류가 발생했습니다.`;
 
     if (status === 401) {
       message = '🔒 로그인 후 이용해주세요.';
@@ -56,7 +56,7 @@ class MemoHttpService {
     }
 
     alert(message);
-    console.error(`❌ ${context} 실패:`, err);
+    console.error(`❌ ${contextMessage} 실패:`, err);
   }
 }
 
