@@ -319,8 +319,9 @@ const resetDate = () => {
         }
         .empty-block {
           position: relative;
+          height: 334px;
           width: 100%;
-          height: 80%;
+          // height: 80%;
 
           .empty-comment {
             position: absolute;
@@ -339,14 +340,14 @@ const resetDate = () => {
   }
 }
 // 테블릿 세로
-@media (max-width: 1240px) {
-  .reminder {
-    flex-direction: column;
-    .left {
-      margin: 0 auto;
-    }
-  }
-}
+// @media (max-width: 1240px) {
+//   .reminder {
+//     flex-direction: column;
+//     .left {
+//       margin: 0 auto;
+//     }
+//   }
+// }
 // @media (max-width: 425px) {
 //   .reminder {
 //     flex-direction: column;

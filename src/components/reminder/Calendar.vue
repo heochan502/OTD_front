@@ -269,7 +269,7 @@ const todayColor = (day) => {
     }
     .day-cell {
       font-size: clamp(12px, 6cqi, 25px);
-      margin: 1.5cqi;
+      margin: 1.7cqi;
     }
   }
 }
