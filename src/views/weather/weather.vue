@@ -273,9 +273,9 @@ watch(
   margin-top: 4px;
   color: #ccc;
   padding: 0 1rem 0.1rem;
-  border-radius: 16px;
+  border-radius: 25px;
   &:hover {
-    background-color: transparent;
+    font-weight: bold;
   }
 }
 .weather-card {

@@ -4,6 +4,7 @@ import {
   getList,
   removeListItem,
   selectLocation,
+  modifyTitle
 } from '@/services/weather/locationService';
 import { useRouter } from 'vue-router';
 import { useWeatherStore } from '@/stores/weatherStore';
@@ -13,8 +14,6 @@ const emit = defineEmits(['close']);
 const weatherStore = useWeatherStore();
 const router = useRouter();
 const state = reactive({
-  items: [], // 지역 검색 결과 리스트
-  autocomplete: [], // 자동완성용 리스트
   list: [],
 });
 
@@ -27,15 +26,24 @@ const actions = ref(null);
 const selectedLocalId = ref(null);
 const selectedLocationName = ref('');
 
+const editing = ref(null);
+
+const openEdit = (item) => {
+  editing.value = {...item};
+  edit.value = true;
+}
 const openConfirm = (message, action, id = null, title = '') => {
-  console.log('삭제 버튼 눌림 → localId:', id); // ✅ 확인용 로그
-  console.log('item 전체 확인:', title); // 혹시 주소 데이터도 확인
   confirmDialog.value = true;
   confirmMessage.value = message;
   actions.value = action;
   selectedLocalId.value = id;
   selectedLocationName.value = title;
 };
+const openAlert = (message) => {
+  alertDialog.value.message = message;
+  alertDialog.value.visible = true;
+};
+
 const confirmYes = async () => {
   confirmDialog.value = false;
 
@@ -54,15 +62,21 @@ const confirmYes = async () => {
     }
   }
 };
-
-const openAlert = (message) => {
-  alertDialog.value.message = message;
-  alertDialog.value.visible = true;
-};
+const confirmEdit = async () => {
+  const json = {
+    id: editing.value.id,
+    keyword:editing.value.title
+  }
+  const res = await modifyTitle(json)
+  if (res.status === 200) {
+    openAlert('수정되었습니다.');
+    await LocalList();
+    edit.value = false;
+  }
+}
 
 const LocalList = async () => {
   const res = await getList();
-  console.log(res.data);
   state.list = res.data;
 };
 
@@ -109,57 +123,61 @@ onMounted(() => {
           </button>
           <button
             class="btn list-btn btn-outline-danger btn-sm"
-            @click="edit = true"
+            @click="openEdit(item)"
           >
             편집
           </button>
-          <!-- <button
-            class="btn list-btn btn-outline-danger btn-sm"
-            @click="
-              openConfirm('선택한 지역을 삭제하시겠습니까?', 'remove', item.id)
-            "
-          >
-            삭제
-          </button> -->
-          <!-- confirm -->
-          <v-dialog v-model="confirmDialog" max-width="400">
-            <v-card>
-              <v-card-title>확인</v-card-title>
-              <v-card-text>{{ confirmMessage }}</v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn color="dark" text @click="confirmDialog = false"
-                  >취소</v-btn
-                >
-                <v-btn color="primary" text @click="confirmYes">확인</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <v-dialog v-model="edit" max-width="500">
+        <!-- confirm -->
+        <v-dialog v-model="confirmDialog" max-width="400">
+          <v-card>
+            <v-card-title>확인</v-card-title>
+            <v-card-text>{{ confirmMessage }}</v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn color="dark" text @click="confirmDialog = false"
+              >취소</v-btn
+              >
+              <v-btn color="primary" text @click="confirmYes">확인</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <!-- 삭제 confirm -->
+        <v-dialog v-model="edit" max-width="500">
             <v-card>
               <v-card-title>편집</v-card-title>
-              <v-card-text><input v-model="item.title" type="text"></input></v-card-text>
+              <v-card-text><input v-model="editing.title" type="text"></input></v-card-text>
               <v-card-actions>
-                <v-spacer />
-                <v-btn color="dark" text @click="edit = false"
-                  >취소</v-btn
-                >
-                <v-btn color="primary" text @click="confirmYes">수정</v-btn>
                 <v-btn
                   color="danger"
                   @click="
                     openConfirm(
                       '선택한 지역을 삭제하시겠습니까?',
                       'remove',
-                      item.id
+                      editing.id
                     )
                   "
                   >삭제</v-btn
                 >
+                <v-spacer />
+                <v-btn color="dark" text @click="edit = false"
+                  >취소</v-btn
+                >
+                <v-btn color="primary" text @click="confirmEdit">수정</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
+
+          <!-- alert -->
+          <v-dialog v-model="alertDialog.visible" max-width="400">
+            <v-card>
+              <v-card-title>알림</v-card-title>
+                <v-card-text>{{ alertDialog.message }}</v-card-text>
+                <v-card-actions>
+                <v-spacer />
+                <v-btn color="primary" text @click="alertDialog.visible = false">확인</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>          
         </div>
       </li>
     </ul>
