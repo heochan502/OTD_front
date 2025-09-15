@@ -158,4 +158,10 @@ const submit = async () => {
   text-decoration: none;
   font-weight: 500;
 }
+.kakao {
+  
+  background-size: cover;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 </style>

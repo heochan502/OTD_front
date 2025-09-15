@@ -1574,18 +1574,17 @@ const submit = async () => {
   color: #2a9df4;
   font-weight: 600;
 }
-
 .form-row {
   display: flex;
-  gap: 30px;
+  gap: 30px; 
   align-items: center;
 }
 
 .form-row .form-group {
-  flex: 1;
+  flex: 1; 
 }
 
-.gender-checkbox-container {
+.gender-checkbox-container{
   padding-left: 30px;
 }
 </style>
