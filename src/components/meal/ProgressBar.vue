@@ -54,6 +54,7 @@ defineProps({
         background: #ff6b6b ; 
         background: -webkit-linear-gradient(to right, #ff6b6b, #ff6b6b );
         background: linear-gradient(to right, #ff8787, #ff6b6b);
+        transition: width 2s ease;  /* 값이 바뀔 때 부드럽게 */
     }
   }
 
@@ -76,13 +77,16 @@ defineProps({
     .progress::-webkit-progress-bar {
         background: #fafafa;
         border-radius: 15px;
+       
         box-shadow: inset 3px 3px 10px #ffffff;
     }
     .progress::-webkit-progress-value {
         border-radius: 15px;
         background: #ffffff;
+        animation: -webkit-progress-bar 3s infinite;
         background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
         background: linear-gradient(to right, #74c0fc, #4dabf7);
+        transition: width 2s ease;  /* 값이 바뀔 때 부드럽게 */
     }
 }
 .jibang {    
@@ -109,6 +113,7 @@ defineProps({
         background: #ffffff;
         background: -webkit-linear-gradient(to right, #ffffff, #ffffff);
         background: linear-gradient(to right, #ffe066, #ffd43b);
+        transition: width 2s ease;  /* 값이 바뀔 때 부드럽게 */
     }
 }
 .totalcal {    
@@ -136,8 +141,6 @@ defineProps({
 }
 
 
-
-
 .progress {
   appearance: none;
   border-radius: 15px;
@@ -155,7 +158,9 @@ defineProps({
   background: #ffffff;
   background: -webkit-linear-gradient(to right, #88a0ec, #305ff8);
   background: linear-gradient(to right, #88a0ec, #305ff8);
+  transition: width 0.5s ease;  /* 값이 바뀔 때 부드럽게 */
 }
+
 /* 반응형 */
 @media (max-width: 768px) {
   .optional-progress {    
