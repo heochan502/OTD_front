@@ -14,11 +14,6 @@ const data = {
   rowPerPage: 7,
 };
 
-// 페이징 상태
-const state = reactive({
-  isLoading: false,
-  isFinish: false,
-});
 
 // scroll 시 호출되는 함수
 const handleScroll = (e) => {
